@@ -17,17 +17,17 @@ upgrade without starting over).
 
 The quickest way to get the latest opam up and working is to run:
 ```
-wget https://raw.github.com/ocaml/opam/master/shell/opam_installer.sh -O - | sh -s /usr/local/bin
+wget https://raw.github.com/ocaml/opam/master/shell/install.sh -O - | sh -s /usr/local/bin
 ```
 
 This will simply check your architecture, download and install the proper
 pre-compiled binary and run `opam init`.
 
 (If you don't have `wget`, or have trouble installing it, another
-option is to simply copy the contents of `opam_installer.sh` to your
+option is to simply copy the contents of `install.sh` to your
 system and run it.  Use your browser to go to the URL listed above after
 `wget`, copy the text in the page that opens, and save that text into a file
-named "opam_installer.sh".  Make this file executable and run it.)
+named "install.sh".  Make this file executable and run it.)
 
 We provide pre-compiled binaries for:
 - Linux i686, amd64 and arm7
