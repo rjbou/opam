@@ -174,16 +174,15 @@ let report_fetch_failure pkg = function
     Not_available (s, l)
   | res -> res
 
-let fetch_dev_package url srcdir ?(working_dir=false) nv =
+let fetch_dev_package url srcdir ?(working_dir=false) ?subpath nv =
   let remote_url = OpamFile.URL.url url in
   let mirrors = remote_url :: OpamFile.URL.mirrors url in
   let checksum = OpamFile.URL.checksum url in
   log "updating %a" (slog OpamUrl.to_string) remote_url;
   OpamRepository.pull_tree
     ~cache_dir:(OpamRepositoryPath.download_cache OpamStateConfig.(!r.root_dir))
-    (OpamPackage.to_string nv) srcdir checksum ~working_dir mirrors
+    (OpamPackage.to_string nv) srcdir checksum ~working_dir ?subpath mirrors
   @@| report_fetch_failure nv
-
 
 let pinned_package st ?version ?(working_dir=false) name =
   log "update-pinned-package %s%a" (OpamPackage.Name.to_string name)
