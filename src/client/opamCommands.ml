@@ -2427,7 +2427,7 @@ let pin ?(unpin_only=false) () =
     mk_flag ["dev-repo"] "Pin to the upstream package source for the latest \
                           development version"
   in
-  let guess_names ~recurse url k =
+  let guess_names ~recurse ?subpath url k =
     let from_opam_files dir =
       OpamStd.List.filter_map
         (fun (nameopt, f, subpath) ->
@@ -2438,7 +2438,7 @@ let pin ?(unpin_only=false) () =
              | some -> some
            in
            OpamStd.Option.map (fun n -> n, opam_opt, subpath) name)
-        (OpamPinned.files_in_source ~recurse dir)
+        (OpamPinned.files_in_source ~recurse ?subpath dir)
     in
     let basename =
       match OpamStd.String.split (OpamUrl.basename url) '.' with
@@ -2586,7 +2586,7 @@ let pin ?(unpin_only=false) () =
          in
          `Error (true, msg)
        | `Source url ->
-         guess_names ~recurse url @@ fun names ->
+         guess_names ~recurse ?subpath url @@ fun names ->
          let names = match names with
            | _::_::_ ->
              if OpamConsole.confirm
