@@ -27,8 +27,7 @@ let adds_esc b s =
       match String.get s i with
       | '"' -> flush b start i; adds b "\\\""; loop next next
       | '\\' -> flush b start i; adds b "\\\\"; loop next next
-      | '\x00' .. '\x1F' | '\x7F' (* US-ASCII control chars *)
-      | '\x80' .. '\xFF' (* Extended ASCII chars *) as c ->
+      | '\x00' .. '\x1F' | '\x7F' (* US-ASCII control chars *) as c ->
           flush b start i;
           adds b (Printf.sprintf "\\u%04X" (Char.code c));
           loop next next

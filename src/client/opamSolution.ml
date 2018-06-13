@@ -192,6 +192,95 @@ let display_error (n, error) =
   | `Build nv          -> f "compiling" nv
 
 module Json = struct
+
+  open OpamStd.Op
+  let clean chaine =
+    let char = Char.chr @> Re.char in
+    let primo = [0xC0; 0xC1] @ List.init 11 ((+) 245) in
+    let primo = List.map char primo in
+    let invalid_single =
+      primo
+      |> Re.alt
+    in
+    let init beg len = List.init len ((+) beg @> char) in
+    let secondary = init 0 0x80 @ init 0xC0 64  in
+    let constr_regexp bytes beg len =
+      let fst = init beg len in
+      Re.(List.init bytes (fun i -> alt (if i = 0 then fst else secondary))
+          |> seq)
+    in
+    let inv2 = constr_regexp 2 0xC2 30 in
+    let inv3 = constr_regexp 3 0xE0 16 in
+    let inv4 = constr_regexp 4 0xF0 5 in
+    let inv_one =
+      let fst = init 0x00 127 in
+      let snd = init 0x80 64 in
+      Re.(seq (List.map alt [fst; snd]))
+    in
+    (* 11110000   10000100  10000000  10000000
+       11110111   10111111  10111111  10111111
+       let extraF4 =
+       let fst = char 244 in
+       let snd = init 144 48 in
+       let thd = init 0x80 64 in
+       Re.(seq (fst::List.map alt [snd; thd]))
+       in
+    *)
+    let extraF4 =
+      let fst = char 0xF4 in
+      let snd = init 0x84 60 in
+      let thd = init 0x80 64 in
+      Re.(seq (fst::List.map alt [snd; thd; thd]))
+    in
+    (* 11101101  10100000  10000000
+        11101101  10111111  10111111
+    *)
+    let extraED =
+      let fst = char 0xED in
+      let snd = init 0xA0 32 in
+      let thd = init 0x80 64 in
+      Re.(seq (fst::List.map alt [snd; thd]))
+    in
+    (* 1110xxxx   10xxxxxx  10xxxxxx
+       1110xxxx   10xxxxxx  10xxxxxx
+    *)
+    let extraE0 =
+      let fst = char 0xED in
+      let snd = init 0x80 64 in
+      let thd = init 0xAF 17 in
+      Re.(seq (fst::List.map alt [snd; thd]))
+    in
+    (* 1110xxxx   10xxxxxx  10xxxxxx
+       1110xxxx   10xxxxxx  10xxxxxx
+    *)
+    let _extraF0 =
+      let fst = char 0xED in
+      let snd = init 0x90 48 in
+      let thd = init 0x80 64 in
+      Re.(seq (fst::List.map alt [snd; thd]))
+    in
+    let repl regexp x =
+      Re.(replace_string ~all:true (compile regexp) ~by:"XXXX" x)
+    in
+    let snd chaine =
+      chaine
+      |> repl inv4
+      |> repl inv3
+      |> repl inv2
+      |> repl inv_one
+      |> repl invalid_single
+      |> repl (Re.alt [extraE0; extraED; extraF4])
+    in
+    let rec aux pre ch = if pre = ch then ch else aux ch (snd ch) in
+    let snd = aux chaine (snd chaine) in
+    let cleaned = chaine = snd in
+    let _ =
+      if not cleaned then
+        OpamConsole.error "%s\n%s" chaine snd
+      else OpamConsole.note "%s" snd
+    in
+    snd
+
   let output_request request user_action =
     if OpamClientConfig.(!r.json_out = None) then () else
     let atoms =
@@ -247,10 +336,10 @@ module Json = struct
                   ("duration", `Float r_duration);
                   ("info", `O (lmap (fun (k,v) -> (k, `String v)) r_info)); ]
                 @ if OpamCoreConfig.(!r.merged_output) then
-                  [("output", `A (lmap (fun s -> `String s) r_stdout))]
+                  [("output", `A (lmap (fun s -> `String (clean s)) r_stdout))]
                 else
-                  [("output", `A (lmap (fun s -> `String s) r_stdout));
-                   ("stderr", `A (lmap (fun s -> `String s) r_stderr));
+                  [("output", `A (lmap (fun s -> `String (clean s)) r_stdout));
+                   ("stderr", `A (lmap (fun s -> `String (clean s)) r_stderr));
                   ]))]
     | OpamSystem.Internal_error s ->
       `O [ ("internal-error", `String s) ]
