@@ -2752,6 +2752,10 @@ let source =
          (see option `--dir')"
         (Dir.to_string dir);
     let opam = OpamSwitchState.opam t nv in
+    let subpath =
+      OpamStd.Option.map_default OpamFile.URL.subpath
+        None (OpamFile.OPAM.url opam)
+    in
     if dev_repo then (
       match OpamFile.OPAM.dev_repo opam with
       | None ->
@@ -2766,6 +2770,7 @@ let source =
             (OpamRepository.pull_tree
                ~cache_dir:(OpamRepositoryPath.download_cache
                              OpamStateConfig.(!r.root_dir))
+               ?subpath
                (OpamPackage.to_string nv) dir []
                [url])
         with
@@ -2791,7 +2796,9 @@ let source =
               (Dir.to_string dir) (Printexc.to_string e)
       in
       OpamProcess.Job.run job;
-      if OpamPinned.find_opam_file_in_source nv.name dir = None
+      if OpamPinned.find_opam_file_in_source nv.name
+          (OpamStd.Option.map_default (fun sp -> Op.(dir / sp)) dir subpath)
+         = None
       then
         let f =
           if OpamFilename.exists_dir Op.(dir / "opam")
