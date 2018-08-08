@@ -1232,7 +1232,7 @@ let install =
   in
   let install
       global_options build_options add_to_roots deps_only restore destdir
-      assume_built recurse atoms_or_locals =
+      assume_built recurse subpath atoms_or_locals =
     apply_global_options global_options;
     apply_build_options build_options;
     if atoms_or_locals = [] && not restore then
@@ -1261,7 +1261,7 @@ let install =
     if atoms_or_locals = [] then `Ok () else
     let st, atoms =
       OpamAuxCommands.autopin
-        st ~recurse ~simulate:deps_only atoms_or_locals
+        st ~recurse ?subpath ~simulate:deps_only atoms_or_locals
     in
     if atoms = [] then
       (OpamConsole.msg "Nothing to do\n";
@@ -1280,7 +1280,7 @@ let install =
   Term.ret
     Term.(const install $global_options $build_options
           $add_to_roots $deps_only $restore $destdir $assume_built
-          $recurse $atom_or_local_list),
+          $recurse $subpath $atom_or_local_list),
   term_info "install" ~doc ~man
 
 (* REMOVE *)
@@ -1394,7 +1394,8 @@ let reinstall =
                 overriding."
       ])
   in
-  let reinstall global_options build_options assume_built atoms_locs cmd =
+  let reinstall global_options build_options assume_built recurse subpath
+      atoms_locs cmd =
     apply_global_options global_options;
     apply_build_options build_options;
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
@@ -1402,7 +1403,7 @@ let reinstall =
     | `Default, (_::_ as atom_locs) ->
       OpamSwitchState.with_ `Lock_write gt @@ fun st ->
       OpamSwitchState.drop @@ OpamClient.reinstall st ~assume_built
-        (OpamAuxCommands.resolve_locals_pinned st atom_locs);
+        (OpamAuxCommands.resolve_locals_pinned st ~recurse ?subpath atom_locs);
       `Ok ()
     | `Pending, [] | `Default, [] ->
       OpamSwitchState.with_ `Lock_write gt @@ fun st ->
@@ -1423,7 +1424,7 @@ let reinstall =
       `Ok ()
     | `Forget_pending, atom_locs ->
       OpamSwitchState.with_ `Lock_write gt @@ fun st ->
-      let atoms = OpamAuxCommands.resolve_locals_pinned st atom_locs in
+      let atoms = OpamAuxCommands.resolve_locals_pinned ~recurse ?subpath st atom_locs in
       let to_forget = match atoms with
         | [] -> st.reinstall
         | atoms -> OpamFormula.packages_of_atoms st.reinstall atoms
@@ -1446,7 +1447,7 @@ let reinstall =
       `Error (true, "Package arguments not allowed with this option")
   in
   Term.(ret (const reinstall $global_options $build_options $assume_built
-             $atom_or_dir_list $cmd)),
+             $recurse $subpath $atom_or_dir_list $cmd)),
   term_info "reinstall" ~doc ~man
 
 (* UPDATE *)
