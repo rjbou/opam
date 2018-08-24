@@ -168,7 +168,9 @@ let download_package st nv =
          in
          Done (Some na))
      @@ fun () ->
-     OpamUpdate.download_package_source st nv dir @@| function
+     OpamUpdate.download_package_source st
+       ~working_dir:OpamClientConfig.(!r.working_dir)
+       nv dir @@| function
      | Some (Not_available (s,l)) -> Some (s,l)
      | None | Some (Up_to_date () | Result ()) -> None)
 

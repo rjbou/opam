@@ -74,7 +74,7 @@ val pinned_package:
     known hash) into the cache. For non-VC remotes, verifies the checksum if
     any *)
 val download_package_source:
-  'a switch_state -> package -> dirname ->
+  'a switch_state -> ?working_dir:bool -> package -> dirname ->
   unit download option OpamProcess.job
 
 (** [cleanup_source old_opam_option new_opam] checks if the remote URL has
