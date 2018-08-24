@@ -2018,7 +2018,7 @@ module OPAMSyntax = struct
   }
 
   let empty = {
-    opam_version = OpamVersion.current_nopatch;
+    opam_version = OpamVersion.of_string "2.0.1";
 
     name       = None;
     version    = None;
