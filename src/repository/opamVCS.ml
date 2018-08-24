@@ -99,13 +99,26 @@ module Make (VCS: VCS) = struct
     VCS.revision repo_root @@+ fun r ->
     Done (OpamStd.Option.map OpamPackage.Version.of_string r)
 
-  let sync_dirty repo_root repo_url =
+  let sync_dirty ?subpath repo_root repo_url =
     match OpamUrl.local_dir repo_url with
-    | None -> pull_url repo_root None repo_url
+    | None -> pull_url ?subpath repo_root None repo_url
     | Some dir ->
+      let files =
       let files =
         List.map OpamFilename.(remove_prefix dir)
           (OpamFilename.rec_files dir)
+        in
+        match subpath with
+        | None -> files
+        | Some sp ->
+          (OpamStd.List.filter_map
+             (fun f ->
+                if OpamStd.String.remove_prefix ~prefix:(sp ^ Filename.dir_sep) f
+                   <> f then Some f else None)
+             files)
+          @
+          (List.map OpamFilename.(remove_prefix dir)
+             (OpamFilename.rec_files (VCS.vc_dir dir)))
       in
       (* Remove non-listed files from destination *)
       (* fixme: doesn't clean directories *)

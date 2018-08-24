@@ -71,7 +71,7 @@ module type S = sig
   (** Like [pull_url], except for locally-bound version control backends, where
       it should get the latest, uncommitted source. *)
   val sync_dirty:
-    dirname -> url -> filename option download OpamProcess.job
+    ?subpath:string -> dirname -> url -> filename option download OpamProcess.job
 
   (** [get_remote_url ?hash dirname] return the distant url of repo [dirname], \
       if found. When [hash] is specified, it checks that this hash (branch or \
