@@ -688,7 +688,7 @@ let display st format packages =
     (if format.header then
        OpamConsole.errmsg "%s\n"
          (OpamConsole.colorise `red "# No matches found");
-     OpamStd.Sys.exit_because `False)
+     OpamStd.Sys.exit_because `Not_found)
   else
     List.rev_map (fun nv ->
         List.map (detail_printer ~prettify ~normalise st nv) format.columns)
