@@ -234,10 +234,14 @@ let autopin_aux st ?quiet atom_or_local_list =
       st.pinned
   in
   let already_pinned, to_pin =
-    List.partition (fun (name, target, _) ->
+    List.partition (fun (name, target, opam) ->
         try
-          OpamSwitchState.primary_url st (OpamPinned.package st name)
-          = Some target
+          let pinned_pkg = OpamPinned.package st name in
+          OpamSwitchState.primary_url st pinned_pkg = Some target
+          &&
+          Some (OpamPackage.version pinned_pkg) =
+          OpamStd.Option.Op.(
+            OpamFile.OPAM.read_opt opam >>= OpamFile.OPAM.version_opt)
         with Not_found -> false)
       to_pin
   in
@@ -282,9 +286,9 @@ let simulate_local_pinnings ?quiet ?(for_view=false) st to_pin =
     if for_view then
       let open OpamPackage.Set.Op in
       st.pinned ++
-      (local_packages --
-       OpamPackage.packages_of_names st.pinned
-         (OpamPackage.names_of_packages local_packages))
+      local_packages --
+      OpamPackage.packages_of_names st.pinned
+        (OpamPackage.names_of_packages local_packages)
     else st.pinned
   in
   let st = {
