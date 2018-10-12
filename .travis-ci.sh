@@ -166,9 +166,10 @@ export OCAMLRUNPARAM=b
     done
     # Compile and run opam-rt
     cd ~/build
-    wget https://github.com/ocaml/opam-rt/archive/$TRAVIS_PULL_REQUEST_BRANCH.tar.gz -O opam-rt.tar.gz || \
-    wget https://github.com/ocaml/opam-rt/archive/master.tar.gz -O opam-rt.tar.gz
-    tar -xzf opam-rt.tar.gz
+    #wget https://github.com/ocaml/opam-rt/archive/$TRAVIS_PULL_REQUEST_BRANCH.tar.gz -O opam-rt.tar.gz || \
+    #wget https://github.com/ocaml/opam-rt/archive/master.tar.gz -O opam-rt.tar.gz
+    #tar -xzf opam-rt.tar.gz
+    git clone -b 2.0.1 https://github.com/rjbou/opam-rt
     cd opam-rt-*
     make
 
@@ -183,6 +184,8 @@ export OCAMLRUNPARAM=b
 
 ( # Finally run the tests, in a clean environment
   export OPAMKEEPLOGS=1
+  export OPAMDEBUG=1
+  export OPAMVERBOSE=1
 
   if [[ $OPAM_TEST -eq 1 ]] ; then
     cd ~/build/opam-rt-*
