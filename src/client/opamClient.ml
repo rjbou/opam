@@ -168,6 +168,7 @@ let update_dev_packages_t atoms t =
 
 let compute_upgrade_t
     ?(strict_upgrade=true) ?(auto_install=false) ~all atoms t =
+    let _ = OpamConsole.error "compute upgrade!!!" in
   let names = OpamPackage.Name.Set.of_list (List.rev_map fst atoms) in
   let atoms =
     List.map (function
@@ -214,6 +215,18 @@ let compute_upgrade_t
   if all then
     let t, full_orphans, orphan_versions = orphans ~transitive:true t in
     let to_upgrade = t.installed -- full_orphans in
+let _=
+full_orphans ++ orphan_versions
+|> OpamPackage.Set.to_string 
+|> OpamConsole.error "ORPHANS! %s";
+names
+|> OpamPackage.Name.Set.to_string 
+|> OpamConsole.error "NAMES! %s";
+to_upgrade
+|> OpamPackage.Set.to_string 
+|> OpamConsole.error "MR! %s";
+in
+
     names,
     OpamSolution.resolve t Upgrade
       ~orphans:(full_orphans ++ orphan_versions)
@@ -238,6 +251,17 @@ let compute_upgrade_t
         try name, List.assoc name atoms
         with Not_found -> name, None)
       (OpamPackage.Set.elements to_upgrade) in
+let _=
+full_orphans ++ orphan_versions
+|> OpamPackage.Set.to_string 
+|> OpamConsole.error "ORPHANS! %s";
+names
+|> OpamPackage.Name.Set.to_string 
+|> OpamConsole.error "NAMES! %s";
+to_remove
+|> OpamPackage.Set.to_string 
+|> OpamConsole.error "MR! %s";
+in
   names,
   OpamSolution.resolve t Upgrade
     ~orphans:(full_orphans ++ orphan_versions)

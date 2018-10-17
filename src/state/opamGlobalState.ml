@@ -101,6 +101,11 @@ let load lock_kind =
           acc)
       global_variables eval_variables
   in
+  let _ =
+  global_variables
+  |> OpamVariable.Map.to_string (fun (vc, s) -> s ^ " - " ^ (OpamStd.Option.to_string ~none:"XXX" OpamVariable.string_of_variable_contents (Lazy.force vc)) ^ "\n")
+  |> OpamConsole.error "Variables %s"
+in
   { global_lock = config_lock;
     root;
     config;

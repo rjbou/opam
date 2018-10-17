@@ -107,8 +107,17 @@ let resolve_switch_raw ?package gt switch switch_config full_var =
         | _ -> None
 
 let resolve_switch ?package st full_var =
+  if  (OpamVariable.Full.to_string full_var) = "sys-ocaml-version" then assert false;
+  let t =
   resolve_switch_raw ?package
     st.switch_global st.switch st.switch_config full_var
+    in
+    let _ = 
+    t
+    |> OpamStd.Option.to_string ~none:"YYY" OpamVariable.string_of_variable_contents 
+    |> OpamConsole.error "Resolve switch %s %s" (OpamVariable.Full.to_string full_var)
+    in
+    t
 
 open OpamVariable
 
