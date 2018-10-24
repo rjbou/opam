@@ -127,6 +127,12 @@ let string_of_info ?(color=`yellow) info =
         (OpamConsole.colorise color k) v) info;
   Buffer.contents b
 
+(* Print only if called with command "/usr/bin/ocamlc" *)
+let toc cmd =
+  if cmd = "/usr/bin/ocamlc" then
+    fun f -> f ()
+  else fun _ -> ()
+
 (** [create cmd args] create a new process to execute the command
     [cmd] with arguments [args]. If [stdout_file] or [stderr_file] are
     set, the channels are redirected to the corresponding files.  The
@@ -192,6 +198,16 @@ let create ?info_file ?env_file ?(allow_stdin=true) ?stdout_file ?stderr_file ?e
 
   let pid =
     try
+      (* Printing full argument of precess creation *)
+      let _ =
+        toc cmd @@ fun () ->
+        OpamConsole.note "Command\ncmd: %s\nfull: %s\nenv: %s\nout: %s\nerr: %s"
+          cmd
+          (OpamStd.List.to_string (fun x -> x) (cmd::args))
+          (OpamStd.List.to_string (fun x -> x) @@ Array.to_list env)
+          (OpamStd.Option.default "stdout" stdout_file)
+          (OpamStd.Option.default "stderr" stderr_file)
+      in
       Unix.create_process_env
         cmd
         (Array.of_list (cmd :: args))
@@ -431,6 +447,43 @@ let safe_wait fallback_pid f x =
 let wait p =
   set_verbose_process p;
   let _, return = safe_wait p.p_pid (Unix.waitpid []) p.p_pid in
+  let _ =
+    let stdout_file = p.p_stdout in
+    let stderr_file = p.p_stderr in
+    toc p.p_name @@ fun () ->
+    let copy src dst =
+      OpamConsole.error "cp %s %s" src dst;
+      try
+        let _ =
+          Unix.create_process "/bin/cp" [|"/bin/cp";src;dst|] Unix.stdin Unix.stdout Unix.stderr
+        in ()
+      with _e -> OpamConsole.error "Error on cp %s %s" src dst
+    in
+    let read f =
+      let fd = open_in f in
+      let rec aux acc =
+        try
+          let l = (input_line fd) in
+          OpamConsole.error "read %s" l ;
+          aux (l::acc )
+        with End_of_file | Sys_error _ -> acc
+      in
+      close_in fd;
+      OpamStd.List.to_string (fun x -> x ^ " ~~~ ") (List.rev (aux []))
+    in
+    let copy typ  =
+      OpamStd.Option.iter
+        (fun f ->
+           copy f (Printf.sprintf "/tmp/%s-%f" typ (Sys.time ()));
+(*
+        let out = (read f) in
+    OpamConsole.error "Stdout %s:\n%s" f out;
+*)
+        )
+    in
+    copy "out"  stdout_file;
+    copy "err"  stderr_file;
+  in
   exit_status p return
 
 let dontwait p =
