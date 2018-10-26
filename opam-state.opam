@@ -1,5 +1,4 @@
 opam-version: "1.2"
-name:"opam-state"
 version: "2.0.0"
 maintainer: "opam-devel@lists.ocaml.org"
 authors: [
