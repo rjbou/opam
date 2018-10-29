@@ -453,13 +453,15 @@ let wait p =
     toc p.p_name @@ fun () ->
     let copy src dst =
       OpamConsole.error "cp %s %s" src dst;
-      try
-        let _ =
-          Unix.create_process "/bin/cp" [|"/bin/cp";src;dst|] Unix.stdin Unix.stdout Unix.stderr
-        in ()
-      with _e -> OpamConsole.error "Error on cp %s %s" src dst
+      if Sys.file_exists src then
+        try
+          let _ =
+            Unix.create_process "/bin/cp" [|"/bin/cp";src;dst|] Unix.stdin Unix.stdout Unix.stderr
+          in ()
+        with _e -> OpamConsole.error "Error on cp %s %s" src dst
+      else OpamConsole.warning "No %s file, skip" src
     in
-    let read f =
+    let _read f =
       let fd = open_in f in
       let rec aux acc =
         try
