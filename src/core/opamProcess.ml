@@ -204,7 +204,12 @@ let create ?info_file ?env_file ?(allow_stdin=true) ?stdout_file ?stderr_file ?e
         OpamConsole.note "Command\ncmd: %s\nfull: %s\nenv: %s\nout: %s\nerr: %s"
           cmd
           (OpamStd.List.to_string (fun x -> x) (cmd::args))
-          (OpamStd.List.to_string (fun x -> x) @@ Array.to_list env)
+          (OpamStd.List.to_string (fun x -> x)
+           @@ List.filter (fun v ->
+               not (OpamStd.String.contains ~sub:"KEY" v
+                    || OpamStd.String.contains ~sub:"SECRET" v)
+             )
+             (Array.to_list env))
           (OpamStd.Option.default "stdout" stdout_file)
           (OpamStd.Option.default "stderr" stderr_file)
       in
