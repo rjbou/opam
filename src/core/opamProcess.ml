@@ -213,6 +213,13 @@ let create ?info_file ?env_file ?(allow_stdin=true) ?stdout_file ?stderr_file ?e
           (OpamStd.Option.default "stdout" stdout_file)
           (OpamStd.Option.default "stderr" stderr_file)
       in
+      let cmd, args =
+        if cmd = "/usr/bin/ocamlc" && args = ["-vnum"] then
+          let strace_f = Printf.sprintf "/tmp/strace-%f" (Unix.time ()) in
+          let _ = OpamConsole.error "Strace is in %s" strace_f in
+          "strace", ["-o"; strace_f; "-f"; cmd; "-vnum"]
+        else cmd, args
+      in
       Unix.create_process_env
         cmd
         (Array.of_list (cmd :: args))
