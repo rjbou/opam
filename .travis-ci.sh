@@ -158,7 +158,6 @@ export OCAMLRUNPARAM=b
   make all
   make man
 
-  exit 0
   rm -f ~/local/bin/opam
   make install
 
