@@ -1127,7 +1127,9 @@ let build_options =
        lock) plugin can be used to generate such files, based on the versions \
        of the dependencies currently installed on the host. This is equivalent \
        to setting the $(b,\\$OPAMLOCKED) environment variable. Note that this \
-       option doesn't generally affect already pinned packages."
+       option doesn't generally affect already pinned packages and that in the \
+       case where using default value; make sure to $(b,not) follow it by a \
+       simple string (end of command or followed by another option)."
   in
   Term.(const create_build_options
     $keep_build_dir $reuse_build_dir $inplace_build $make
