@@ -1233,7 +1233,7 @@ let install =
   let save =
     mk_opt ["save"] "FILE"
     "Save installed package in the `depends:` field of the given opam file"
-    Arg.(some filename) None
+    existing_filename_dirname_or_dash None
   in
   let install
       global_options build_options add_to_roots deps_only restore destdir
@@ -1243,6 +1243,36 @@ let install =
     if atoms_or_locals = [] && not restore then
       `Error (true, "required argument PACKAGES is missing")
     else
+    let save =
+      let opam_files_in_dir d =
+        match OpamPinned.files_in_source d with
+        | [] ->
+          OpamConsole.warning "No opam files found in %s"
+            (OpamFilename.Dir.to_string d);
+          []
+        | l ->
+          List.map (fun (_,f) -> OpamFile.filename f) l
+      in
+      let file =
+        match save with
+        | Some (OpamFilename.D d) ->
+          (match opam_files_in_dir d with
+           | [file] -> Some file
+           | [] ->
+             OpamConsole.error_and_exit `Not_found
+               "No opam file in %s" (OpamFilename.Dir.to_string d)
+           | _ ->
+             OpamConsole.error_and_exit `Not_found
+               "Multiple opam files in %s" (OpamFilename.Dir.to_string d))
+        | Some (OpamFilename.F f) -> Some f
+        | _ -> None
+      in
+      let _opam =
+        OpamStd.Option.map
+          (fun file -> OpamFile.make file |> OpamFile.OPAM.read) file
+      in
+      file
+    in
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
     OpamSwitchState.with_ `Lock_write gt @@ fun st ->
     let pure_atoms =
