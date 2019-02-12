@@ -92,3 +92,9 @@ val simulate_autopin:
 val get_compatible_compiler:
   ?repos:repository_name list ->
   'a repos_state -> dirname -> atom list * bool
+
+
+(** [save_to_opam_file atoms file] save [atoms] into opam [file] without any check. *)
+val save_to_opam_file:
+  [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
+  filename -> unit

@@ -560,3 +560,69 @@ let get_compatible_compiler ?repos rt dir =
            Do you want to?"
       then [], false
       else OpamStd.Sys.exit_because `Aborted
+
+let save_to_opam_file atoms_or_locals file =
+  let opam0 = OpamFile.make file in
+  let opam = OpamFile.OPAM.read opam0 in
+  let new_depends, updated, added =
+    let map_atoms =
+      OpamStd.List.filter_map (function
+          | `Atom (n,vc) ->
+            let vformula =
+              match vc with
+              | None -> OpamFormula.Empty
+              | Some (op,v) ->
+                OpamFormula.Atom
+                  (Constraint
+                     (op, FString (OpamPackage.Version.to_string v)))
+            in
+            Some (n, OpamFormula.Atom (n, vformula))
+          | _ -> None) atoms_or_locals
+      |> OpamPackage.Name.Map.of_list
+    in
+    let ands_dep = OpamFormula.ands_to_list (OpamFile.OPAM.depends opam) in
+    let new_depends, map_atoms, updated =
+      List.fold_left (fun (deps, map_atoms, upd) form ->
+          match form with
+          | (Atom (n, _) as old_atom) ->
+            (match OpamPackage.Name.Map.find_opt n map_atoms with
+             | Some new_atom when new_atom <> old_atom ->
+               (new_atom :: deps),
+               (OpamPackage.Name.Map.remove n map_atoms),
+               (old_atom, new_atom)::upd
+             | Some _ ->
+               (old_atom::deps),
+               (OpamPackage.Name.Map.remove n map_atoms),
+               upd
+             | None -> (old_atom::deps), map_atoms, upd)
+          | r -> ((r::deps), map_atoms, upd))
+        ([], map_atoms, []) ands_dep
+    in
+    if OpamPackage.Name.Map.is_empty map_atoms then
+      new_depends, updated, []
+    else
+    let _, new_atoms =
+      List.split (OpamPackage.Name.Map.bindings map_atoms)
+    in
+    new_atoms @ new_depends, updated, new_atoms
+  in
+  if updated <> [] || added <> [] then
+    let ltostr f l = OpamStd.List.concat_map ~left:"" ~right:"" ~nil:"{}" ", " f l in
+    OpamConsole.msg "Update dependencies in %s:\n%s%s"
+      (OpamFilename.to_string file)
+      (if updated = [] then "" else
+         OpamStd.Format.itemize (fun updated ->
+             Printf.sprintf "update: %s"
+               (ltostr (fun (old_atom, new_atom) ->
+                    Printf.sprintf "{%s} -> {%s}"
+                      (OpamFilter.string_of_filtered_formula old_atom)
+                      (OpamFilter.string_of_filtered_formula new_atom))
+                   updated)) [updated])
+      (if added = [] then "" else
+         OpamStd.Format.itemize (fun added ->
+             Printf.sprintf "add: %s"
+               (ltostr OpamFilter.string_of_filtered_formula added))
+           [added]);
+    let new_depends = OpamFormula.ands (List.rev new_depends)  in
+    OpamFile.OPAM.with_depends new_depends opam
+    |> OpamFile.OPAM.write_with_preserved_format ~format_from:opam0 opam0

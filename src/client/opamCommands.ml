@@ -1230,9 +1230,14 @@ let install =
        --destdir) to revert."
       Arg.(some dirname) None
   in
+  let save =
+    mk_opt ["save"] "FILE"
+    "Save installed package in the `depends:` field of the given opam file"
+    Arg.(some filename) None
+  in
   let install
       global_options build_options add_to_roots deps_only restore destdir
-      assume_built atoms_or_locals =
+      assume_built save atoms_or_locals =
     apply_global_options global_options;
     apply_build_options build_options;
     if atoms_or_locals = [] && not restore then
@@ -1269,6 +1274,8 @@ let install =
       OpamClient.install st atoms
         ~autoupdate:pure_atoms ?add_to_roots ~deps_only ~assume_built
     in
+    (* Save the new installed package in the given opam file *)
+    OpamStd.Option.iter (OpamAuxCommands.save_to_opam_file atoms_or_locals) save;
     match destdir with
     | None -> `Ok ()
     | Some dest ->
@@ -1278,7 +1285,7 @@ let install =
   in
   Term.ret
     Term.(const install $global_options $build_options
-          $add_to_roots $deps_only $restore $destdir $assume_built
+          $add_to_roots $deps_only $restore $destdir $assume_built $save
           $atom_or_local_list),
   term_info "install" ~doc ~man
 
