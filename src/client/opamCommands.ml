@@ -1249,6 +1249,7 @@ let install =
       OpamStd.List.filter_map (function `Atom a -> Some a | _ -> None)
         atoms_or_locals
     in
+    let atloc_to_save = atoms_or_locals in
     let atoms_or_locals =
       if restore then
         let to_restore = OpamPackage.Set.diff st.installed_roots st.installed in
@@ -1274,14 +1275,14 @@ let install =
       OpamClient.install st atoms
         ~autoupdate:pure_atoms ?add_to_roots ~deps_only ~assume_built
     in
+    (match destdir with
+     | None -> ()
+     | Some dest ->
+       let packages = OpamFormula.packages_of_atoms st.installed atoms in
+       OpamAuxCommands.copy_files_to_destdir st dest packages);
     (* Save the new installed package in the given opam file *)
-    OpamStd.Option.iter (OpamAuxCommands.save_to_opam_file atoms_or_locals) save;
-    match destdir with
-    | None -> `Ok ()
-    | Some dest ->
-      let packages = OpamFormula.packages_of_atoms st.installed atoms in
-      OpamAuxCommands.copy_files_to_destdir st dest packages;
-      `Ok ()
+    OpamStd.Option.iter (OpamAuxCommands.save_to_opam_file atloc_to_save) save;
+    `Ok ()
   in
   Term.ret
     Term.(const install $global_options $build_options
