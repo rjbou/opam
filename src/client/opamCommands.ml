@@ -1311,7 +1311,7 @@ let install =
        let packages = OpamFormula.packages_of_atoms st.installed atoms in
        OpamAuxCommands.copy_files_to_destdir st dest packages);
     (* Save the new installed package in the given opam file *)
-    OpamStd.Option.iter (OpamAuxCommands.save_to_opam_file atloc_to_save) save;
+    OpamStd.Option.iter (OpamAuxCommands.save_to_opam_file st atloc_to_save) save;
     `Ok ()
   in
   Term.ret

@@ -561,7 +561,7 @@ let get_compatible_compiler ?repos rt dir =
       then [], false
       else OpamStd.Sys.exit_because `Aborted
 
-let save_to_opam_file atoms_or_locals file =
+let save_to_opam_file st atoms_or_locals file =
   let opam0 = OpamFile.make file in
   let map_atoms =
     OpamStd.List.filter_map (function
@@ -584,6 +584,7 @@ let save_to_opam_file atoms_or_locals file =
     |> snd
   in
   let opam = OpamFile.OPAM.read opam0 in
+  (* Add atom sin depdencies *)
   let new_depends, updated, added =
     let ands_dep = OpamFormula.ands_to_list (OpamFile.OPAM.depends opam) in
     let new_depends, map_atoms, updated =
@@ -613,21 +614,59 @@ let save_to_opam_file atoms_or_locals file =
     let str f l =
       OpamStd.List.concat_map ~nil:"{}" ", " f l
     in
-    OpamConsole.msg "Update dependencies in %s:\n%s%s"
-      (OpamFilename.to_string file)
-      (if updated = [] then "" else
-         OpamStd.Format.itemize (fun updated ->
-             Printf.sprintf "update: %s"
-               (str (fun (old_atom, new_atom) ->
-                    Printf.sprintf "{%s} -> {%s}"
-                      (OpamFilter.string_of_filtered_formula old_atom)
-                      (OpamFilter.string_of_filtered_formula new_atom))
-                   updated)) [updated])
-      (if added = [] then "" else
-         OpamStd.Format.itemize (fun added ->
-             Printf.sprintf "add: %s"
-               (str OpamFilter.string_of_filtered_formula added))
-           [added]);
     let new_depends = OpamFormula.ands (List.rev new_depends)  in
+    (* Add pinned packages *)
+    let new_pin_depends =
+      let open OpamStd.Option.Op in
+      OpamStd.List.filter_map (fun n ->
+          let nv =
+            (if OpamSwitchState.is_pinned st n then
+               Some n else None)
+            >>= (fun n ->
+                try Some (OpamPackage.package_of_name st.installed n)
+                with Not_found -> None)
+          in
+          let u =
+            nv
+            >>= OpamSwitchState.opam_opt st
+            >>= OpamFile.OPAM.get_url
+          in
+          match nv, u with
+          | Some nv, Some u ->
+            (match  List.find_opt (fun (nv',_) -> nv.name = nv'.name)
+                      (OpamFile.OPAM.pin_depends opam) with
+            | Some (nv', u') ->
+              if OpamConsole.confirm ~default:false
+                  "Replace pin_depends [%s %s] by [%s %s]?"
+                  (OpamPackage.to_string nv')
+                  (OpamUrl.to_string u')
+                  (OpamPackage.to_string nv)
+                  (OpamUrl.to_string u) then
+                Some (nv,u)
+              else None
+            | None -> Some (nv,u))
+          | _, _ -> None)
+        (OpamPackage.Name.Map.keys map_atoms)
+    in
+    OpamConsole.msg "Update dependencies in %s:\n%s%s%s"
+      (OpamFilename.to_string file)
+      (OpamStd.Format.itemize (fun _ ->
+           Printf.sprintf "update: %s"
+             (str (fun (old_atom, new_atom) ->
+                  Printf.sprintf "{%s} -> {%s}"
+                    (OpamFilter.string_of_filtered_formula old_atom)
+                    (OpamFilter.string_of_filtered_formula new_atom))
+                 updated)) updated)
+      (OpamStd.Format.itemize (fun _ ->
+           Printf.sprintf "add: %s"
+             (str OpamFilter.string_of_filtered_formula added))
+          added)
+      (OpamStd.Format.itemize (fun _ ->
+           Printf.sprintf "pin_depends: %s"
+             (str (fun (nv,u) ->
+                  Printf.sprintf "[%s %s]" (OpamPackage.to_string nv)
+                    (OpamUrl.to_string u))
+                 new_pin_depends)) new_pin_depends);
     OpamFile.OPAM.with_depends new_depends opam
+    |> OpamFile.OPAM.with_pin_depends new_pin_depends
     |> OpamFile.OPAM.write_with_preserved_format ~format_from:opam0 opam0

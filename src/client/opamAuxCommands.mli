@@ -96,5 +96,6 @@ val get_compatible_compiler:
 
 (** [save_to_opam_file atoms file] save [atoms] into opam [file] without any check. *)
 val save_to_opam_file:
+  'a switch_state ->
   [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
   filename -> unit
