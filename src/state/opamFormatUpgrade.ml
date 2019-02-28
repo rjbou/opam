@@ -345,7 +345,49 @@ let opam_file_from_1_2_to_2_0 ?filename opam =
   auto_add_flags |>
   filter_out_flagtags
 
-
+let opam_file_from_2_1_to_2_0 ?filename opam =
+  let opam =
+    opam |>
+    OpamFile.OPAM.with_opam_version (OpamVersion.of_string "2.0")
+  in
+  match OpamFile.OPAM.url opam with
+  | None -> opam
+  | Some url ->
+    (match OpamFile.URL.subpath url with
+     | None -> opam
+     | Some sp ->
+       (let filename =
+          match filename with
+          | Some f -> OpamFile.to_string f
+          | None -> match OpamFile.OPAM.metadata_dir opam with
+            | Some (Some r, rel_d) ->
+              Printf.sprintf "<%s>/%s/opam" (OpamRepositoryName.to_string r) rel_d
+            | Some (None, abs_d) ->
+              let d = OpamFilename.Dir.of_string abs_d in
+              OpamFilename.to_string (d // "opam")
+            | None -> "opam file"
+        in
+        OpamConsole.warning
+          "In %s, %s field (%s) is not supported in opam < 2.1, adding \
+          %s constraint."
+          filename  (OpamConsole.colorise `underline "subpath") sp
+          (OpamConsole.colorise `underline "\"opam-version\"");
+        let available =
+          let opam_restriction =
+            FOp
+              (FIdent ([], OpamVariable.of_string "opam-version", None),
+               `Leq, FString "2.1")
+          in
+          match  OpamFile.OPAM.available opam with
+          | FBool true -> opam_restriction
+          | available ->
+            FAnd (available, opam_restriction)
+        in
+        opam |>
+        OpamFile.OPAM.with_url (OpamFile.URL.with_subpath_opt None url) |>
+        OpamFile.OPAM.with_available available
+       )
+    )
 
 (* - Progressive version update functions - *)
 
@@ -1113,16 +1155,21 @@ let as_necessary global_lock root config =
 
 let opam_file ?(quiet=false) ?filename opam =
   let v = OpamFile.OPAM.opam_version opam in
-  if OpamVersion.compare v v2_0_alpha3 < 0
-  then
-    ((match filename with
-        | Some f when not quiet ->
-          log "Internally converting format of %a from %a to %a"
-            (slog OpamFile.to_string) f
-            (slog OpamVersion.to_string) v
-            (slog OpamVersion.to_string) latest_version
-        | _ -> ());
+  let msg version =
+    match filename with
+    | Some f when not quiet ->
+      log "Internally converting format of %a from %a to %a"
+        (slog OpamFile.to_string) f
+        (slog OpamVersion.to_string) v
+        (slog OpamVersion.to_string) version
+    | _ -> ()
+  in
+  if OpamVersion.compare v v2_0_alpha3 < 0 then
+    (msg latest_version;
      opam_file_from_1_2_to_2_0 ?filename opam)
+  else if OpamVersion.compare v v2_1 < 0 then
+    (msg latest_version;
+     opam_file_from_2_1_to_2_0 ?filename opam)
   else opam
 
 let opam_file_with_aux ?(quiet=false) ?dir ~files ?filename opam =
