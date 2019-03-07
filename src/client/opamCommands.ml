@@ -3067,6 +3067,151 @@ let clean =
         $logs $switch $all_switches),
   term_info "clean" ~doc ~man
 
+let depext =
+  let doc = "Query and install external dependencies of OPAM packages" in
+  let man = [
+    `S "DESCRIPTION";
+    `P "$(b,opam-depext) is a simple program intended to facilitate the \
+        interaction between OPAM packages and the host package management \
+        system. It can perform OS and distribution detection, query OPAM for \
+        the right external dependencies on a set of packages, and call the OS \
+        package manager in the appropriate way to install then.";
+    `S "OPAM OPTIONS";
+    `P "These options are passed through to the child opam process when used \
+        in conjunction with the $(i,-i) flag. Additionally, $(i,--yes) implies \
+        $(i,--noninteractive) unless $(i,--interactive) was made explicit.";
+    `S "COPYRIGHT";
+    `P "$(b,opam-depext) is written by Louis Gesbert \
+        <louis.gesbert@ocamlpro.com>, copyright OCamlPro 2014-2015 with \
+        contributions from Anil Madhavapeddy, distributed under the terms of \
+        the LGPL v3 with linking exception. Full source available at \
+        $(i,https://github.com/ocaml/opam-depext)";
+    `S "BUGS";
+    `P "Bugs are tracked at $(i,https://github.com/ocaml/opam-depext/issues) \
+        or can be reported to $(i,<opam-devel@lists.ocaml.org>).";
+    `S "ARGUMENTS";
+    `S "OPTIONS";
+    `S OpamArg.build_option_section;
+  ] in
+  let print_flags =
+    mk_flag  ["flags"]
+      "Only display the inferred \"depexts\" variables"
+  in
+  let list =
+    mk_flag ["l";"list"] "Only list the system packages needed"
+  in
+  let update =
+    mk_flag ["u";"update"] "Update the OS package sets before installation"
+  in
+  let install =
+    mk_flag ["i";"install"]
+      "Install the packages after installing external dependencies"
+  in
+  let su =
+    mk_flag ["su"] "Attempt 'su' rather than 'sudo' when requiring root rights"
+  in
+  let interactive =
+    Arg.(value & vflag None [
+        Some true, info
+          ~doc:"Run the system package manager interactively (default if run \
+                from a tty and $(i,--yes) was not also specified)"
+          ["interactive";"I"];
+        Some false, info
+          ~doc:"Run the system package manager non-interactively \
+                (default when not running from a tty)"
+          ["noninteractive"];
+      ])
+  in
+  let depext global_options build_options print_flags list install update su interactive short
+      atoms_or_locals =
+    apply_global_options global_options;
+    apply_build_options build_options;
+    let dryrun = OpamStateConfig.(!r.dryrun) in
+    let opam_vars =
+      OpamStd.List.filter_map (fun (v,c) ->
+          OpamStd.Option.map (fun c ->
+              OpamVariable.to_string v,
+              OpamVariable.string_of_variable_contents c) (Lazy.force c))
+        OpamSysPoll.variables
+    in
+    if print_flags then
+      (if short then
+         List.iter (fun (v,x) -> OpamConsole.errmsg "%s=%s\n" v x) opam_vars
+       else
+         OpamConsole.errmsg "# Depexts vars detected on this system: %s\n%!"
+           (String.concat ", " (List.map (fun (v,x) -> v^"="^x) opam_vars));
+       OpamStd.Sys.exit_because `Success);
+    if not short then
+      OpamConsole.errmsg "# Detecting depexts using vars: %s\n%!"
+        (String.concat ", " (List.map (fun (v,x) -> v^"="^x) opam_vars));
+    OpamGlobalState.with_ `Lock_none @@ fun gt ->
+    OpamSwitchState.with_ `Lock_write gt @@ fun st ->
+    let st, atoms = OpamAuxCommands.simulate_autopin st atoms_or_locals in
+    let univ =
+      OpamSwitchState.universe st
+        ~requested:(OpamPackage.names_of_packages st.packages) Query
+    in
+    (* XXX lookup is done according current switch. Add a --no-switch option *)
+    let os_packages =
+      (match OpamSolver.resolve univ ~orphans:OpamPackage.Set.empty
+               (OpamSolver.request ~install:atoms ()) with
+      | Success s ->
+        let pkgs = OpamSolver.new_packages s in
+        OpamListCommand.get_depexts st pkgs
+      | Conflicts cs ->
+        (* XXX update *)
+        OpamConsole.error_and_exit `No_solution
+          "No solution%s for %s: %s"
+          "" (*if tog.depopts then " including optional dependencies" else "")*)
+          (OpamFormula.string_of_atoms atoms)
+          (OpamCudf.string_of_conflict st.packages
+             (OpamSwitchState.unavailable_reason st) cs))
+    in
+    if OpamStd.String.Set.is_empty os_packages && not short then
+      (OpamConsole.errmsg "# The following system packages are needed:";
+       OpamConsole.msg "%s\n%!" (String.concat "\n" (OpamStd.String.Set.elements os_packages)))
+    else if list && not short then
+      OpamConsole.errmsg "# No required system packages found\n";
+    if list then OpamStd.Sys.exit_because `Success;
+    if OpamStd.String.Set.is_empty os_packages && not short then
+      OpamConsole.errmsg "# No extra OS packages requirements found.\n%!";
+    let installed = OpamDepextCommand.get_installed_packages os_packages in
+    let os_packages =
+    (* XXX *)
+      OpamStd.String.Set.filter (fun p -> not (OpamStd.String.Set.mem p installed)) os_packages
+    in
+    if short then (* XXX *) OpamStd.String.Set.iter (fun x -> OpamConsole.msg "%s\n" x) os_packages
+    else if not (OpamStd.String.Set.is_empty installed) then
+      if not (OpamStd.String.Set.is_empty os_packages) then
+        OpamConsole.errmsg
+          "# The following new OS packages need to be installed: %s\n%!"
+          (OpamStd.String.Set.to_string os_packages)
+      else
+        OpamConsole.errmsg
+          "# All required OS packages found.\n%!";
+    if dryrun then
+      OpamStd.Sys.exit_because (if OpamStd.String.Set.is_empty os_packages then `Success else `False);
+    let su = su || OpamSystem.resolve_command "sudo" = None in
+    let interactive =
+      match interactive with
+      | Some i -> i
+      | None -> (OpamCoreConfig.(!r.answer) <> Some true) && OpamStd.Sys.tty_in
+    in
+    if (not (OpamStd.String.Set.is_empty os_packages) || atoms = []) && update then
+      OpamDepextCommand.update ~su ~interactive;
+    OpamDepextCommand.install ~su ~interactive os_packages;
+    if install && atoms <> [] then
+      ((if not short then
+      OpamConsole.errmsg "# Now letting OPAM install the packages\n%!");
+       (if OpamConsole.debug () then
+       OpamConsole.errmsg "+ %s\n%!" (OpamFormula.string_of_atoms atoms));
+       (* XXX execute opam install opam_cmdline *)
+       ignore @@ OpamClient.install st atoms)
+  in
+  Term.(const depext $global_options $build_options $print_flags $list
+        $install $update $su $interactive $print_short_flag $atom_or_local_list),
+  term_info "depext" ~doc ~man
+
 (* HELP *)
 let help =
   let doc = "Display help about opam and opam commands." in
@@ -3167,6 +3312,7 @@ let commands = [
   source;
   lint;
   clean;
+  depext;
   admin;
   help;
 ]
