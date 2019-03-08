@@ -339,13 +339,33 @@ let parallel_apply t _action ~requested ?add_roots ~assume_built action_graph =
              OpamFilename.exists_dir (OpamSwitchState.source_dir t nv)))
         sources_needed
     then OpamConsole.header_msg "Gathering sources";
-    let results =
+    (* separate package according url redundancy, to not download twice an
+       archive *)
+    let to_dl, from_cache =
+      let url_map, no_url =
+        List.fold_left (fun (map, no_url) nv  ->
+            match OpamFile.OPAM.url (OpamSwitchState.opam t nv) with
+            | Some url ->
+              let url = OpamFile.URL.url url in
+              (match OpamUrl.Map.find_opt url map with
+               | Some pkgs ->OpamUrl.Map.add url (nv::pkgs) map, no_url
+               | None -> OpamUrl.Map.add url [nv] map, no_url)
+            | None -> (map, nv::no_url)) (OpamUrl.Map.empty,[]) sources_list
+      in
+      OpamUrl.Map.fold (fun _url pkgl (to_dl, from_cache) ->
+          match pkgl with
+          | [] -> assert false
+          | [nv] -> nv::to_dl, from_cache
+          | nv::pkgs->  nv::to_dl, pkgs@from_cache) url_map (no_url,[])
+    in
+    let dl sources_list =
       OpamParallel.map
         ~jobs:OpamStateConfig.(!r.dl_jobs)
         ~command:(OpamAction.download_package t)
         ~dry_run:OpamStateConfig.(!r.dryrun)
         sources_list
     in
+    let results = List.flatten (List.map dl [to_dl; from_cache]) in
     List.fold_left2 (fun failed nv -> function
         | None -> failed
         | Some (s,l) -> OpamPackage.Map.add nv (s,l) failed)
