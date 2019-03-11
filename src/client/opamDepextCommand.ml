@@ -62,7 +62,7 @@ let update_command = match family with
   | "archlinux" | "arch" ->
     ["pacman"; "-S"]
   | "gentoo" ->
-    ["emerge"; "-u"]
+    ["emerge"; "--sync"]
   | "alpine" ->
     ["apk"; "update"]
   | "suse" | "opensuse" ->
