@@ -60,7 +60,7 @@ let update_command = match family with
   | "rhel" | "centos" | "fedora" | "mageia" | "oraclelinux" ->
     ["yum"; "-y"; "update"]
   | "archlinux" | "arch" ->
-    ["pacman"; "-S"]
+    ["pacman"; "-Sy"]
   | "gentoo" ->
     ["emerge"; "-u"]
   | "alpine" ->
