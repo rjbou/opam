@@ -163,18 +163,18 @@ let get_installed_packages packages =
       installed lines
   | "amzn" | "centos" | "fedora" | "mageia" | "archlinux" | "arch" | "gentoo"
   | "alpine" | "rhel" | "oraclelinux" ->
-    let cmd, args =
+    let cmd, get_args =
       match distribution with
       | "amzn" | "centos" | "fedora" | "mageia" | "rhel" | "oraclelinux" ->
-        "rpm", ["-qi"]
-      | "archlinux" | "arch" -> "pacman", ["-Q"]
-      | "gentoo" -> "equery", ["list"]
-      | "alpine" -> "apk", ["info"; "-e"]
+        "rpm", fun pkg_name -> ["-qi"; pkg_name]
+      | "archlinux" | "arch" -> "pacman", fun pkg_name -> ["-Q"; pkg_name]
+      | "gentoo" -> "sh", fun pkg_name -> ["-c"; "ls -d /var/db/pkg/*/* | cut -f5- -d/ | grep -q '^"^pkg_name^"-[0-9].*$'"]
+      | "alpine" -> "apk", fun pkg_name -> ["info"; "-e"; pkg_name]
       | _ -> fatal_error "Distribution %s is not supported" distribution
     in
     OpamStd.String.Set.filter
       (fun pkg_name ->
-         let args = args @ [pkg_name] in
+         let args = get_args pkg_name in
          run_command cmd args @@ fun r ->
          match r.r_code with
          | 0 -> true (* installed *)
