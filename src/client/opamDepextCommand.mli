@@ -1,4 +1,3 @@
-open OpamTypes
 
 val get_installed_packages: OpamStd.String.Set.t -> OpamStd.String.Set.t
 val update : su:bool -> interactive:bool -> unit
