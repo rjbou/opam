@@ -40,10 +40,9 @@ let upgrade_depexts_to_2_0_beta5 filename depexts =
       | "dragonfly" | "win32" | "cygwin" as o -> eq os o
 
       | "nixpkgs"     -> eq distro "nixos"
-      | "arch"        -> eq distro "archlinux"
       | "homebrew" | "macports" | "debian" | "ubuntu" | "centos" | "fedora"
       | "rhel" | "opensuse" | "oraclelinux" | "mageia" | "alpine"
-      | "archlinux" | "gentoo" | "nixos" as d -> eq distro d
+      | "arch" | "gentoo" | "nixos" as d -> eq distro d
 
       | "bsd"         -> eq os_family "bsd"
       | "mswindows"   -> eq os_family "windows"

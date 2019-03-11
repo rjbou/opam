@@ -41,7 +41,7 @@ let install_packages_commands ~interactive packages =
   | "bsd" ->
     if distribution = "freebsd" then ["pkg"::"install"::packages]
     else ["pkg_add"::packages]
-  | "archlinux" ->
+  | "arch" ->
     ["pacman"::"-S"::packages]
   | "gentoo" ->
     ["emerge"::packages]
@@ -59,7 +59,7 @@ let update_command = match family with
     ["brew"; "update"]
   | "rhel" | "centos" | "fedora" | "mageia" | "oraclelinux" ->
     ["yum"; "-y"; "update"]
-  | "archlinux" ->
+  | "arch" ->
     ["pacman"; "-S"]
   | "gentoo" ->
     ["emerge"; "-u"]
@@ -161,13 +161,13 @@ let get_installed_packages packages =
             | None -> acc)
          | _ -> acc)
       installed lines
-  | "amzn" | "centos" | "fedora" | "mageia" | "archlinux" | "gentoo" | "alpine"
+  | "amzn" | "centos" | "fedora" | "mageia" | "arch" | "gentoo" | "alpine"
   | "rhel" | "oraclelinux" ->
     let cmd, args =
       match distribution with
       | "amzn" | "centos" | "fedora" | "mageia" | "rhel" | "oraclelinux" ->
         "rpm", ["-qi"]
-      | "archlinux" | "arch" -> "pacman", ["-Q"]
+      | "arch" -> "pacman", ["-Q"]
       | "gentoo" -> "equery", ["list"]
       | "alpine" -> "apk", ["info"; "-e"]
       | _ -> fatal_error "Distribution %s is not supported" distribution
