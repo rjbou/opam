@@ -58,7 +58,7 @@ let update_command = match family with
   | "homebrew" ->
     ["brew"; "update"]
   | "rhel" | "centos" | "fedora" | "mageia" | "oraclelinux" ->
-    ["yum"; "-y"; "update"]
+    ["yum"; "makecache"]
   | "archlinux" | "arch" ->
     ["pacman"; "-S"]
   | "gentoo" ->
