@@ -705,6 +705,31 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
        "License doesn't adhere to the SPDX standard, see https://spdx.org/licenses/"
        ~detail:bad_licenses
        (bad_licenses <> []));
+    (let subpath =
+       match  OpamStd.String.Map.find_opt "x-subpath" (extensions t) with
+       | Some (String (_,_)) -> true
+       | _ -> false
+     in
+     let opam_restriction =
+       OpamFilter.fold_down_left (fun acc filter ->
+           if acc then acc
+           else
+           match filter with
+           | FOp (FIdent (_, var, _), `Eq, FString version) ->
+             OpamVariable.to_string var = "opam-version" && version = "2.1"
+           | _ -> false) false t.available
+     in
+     cond 63 `Error
+       "`subpath` field need `opam-version = 2.1` restriction"
+       (subpath && not opam_restriction));
+    (let subpath_string =
+       match OpamStd.String.Map.find_opt "x-subpath" (extensions t) with
+       | Some (String (_,_)) | None -> false
+       | _ -> true
+     in
+     cond 64 `Warning
+       "`x-subpath` must be a simple string to be considered as a subpath`"
+       subpath_string);
   ]
   in
   format_errors @
