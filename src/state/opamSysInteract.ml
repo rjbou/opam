@@ -131,7 +131,10 @@ let packages_status packages =
           (fun inst l ->
              match OpamStd.String.split l ' ' with
              | "ii"::pkg::_ ->
-               OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) inst
+               (match OpamStd.String.cut_at pkg ':' with
+                | Some (pkg,_) ->
+                  OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) inst
+                | None -> inst)
              | _ -> inst)
           OpamSysPkg.Set.empty lines
       in
