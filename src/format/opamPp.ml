@@ -248,7 +248,7 @@ type ('a, 'value) field_parser = ('a * 'value option, 'a) t
 (** add setter/getter and an accumulator to a pp; useful to use
     to get/set field records *)
 let ppacc_opt
-(* : ('a -> 'b -> 'a) -> ('a -> 'b option) -> ('value, 'b) t -> 'a field_parser *)
+(* : ('b -> 'a -> 'a) -> ('a -> 'b option) -> ('value, 'b) t -> 'a field_parser *)
   = fun ?(cleanup = fun ~pos:_ _acc x -> x) set get pp1 ->
     let parse ~pos = function
       | acc, Some s ->
