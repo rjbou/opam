@@ -50,3 +50,5 @@ val name_of_opam_filename: dirname -> filename -> name option
 val orig_opam_file:
   'a switch_state -> OpamPackage.Name.t -> OpamFile.OPAM.t ->
   OpamFile.OPAM.t OpamFile.t option
+
+val possible_definition_filenames: ?gen:bool -> OpamFilename.Dir.t -> name -> OpamFilename.t list
