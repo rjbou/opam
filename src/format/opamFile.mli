@@ -658,6 +658,13 @@ module OPAM: sig
 
 end
 
+module Opam_gen: sig
+  include IO_FILE
+  val dir: t -> string option
+  val generate: t -> command list
+  val depends: t -> filtered_formula
+end
+
 (** Compiler aliases: [$opam/aliases]. Deprecated, used only for migration *)
 module Aliases: IO_FILE with type t = string switch_map
 

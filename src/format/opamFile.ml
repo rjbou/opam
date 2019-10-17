@@ -2885,6 +2885,62 @@ module OPAM = struct
         (OpamConsole.colorise `bold "ignored")
 end
 
+(** opam generator format *)
+module Opam_genSyntax = struct
+
+  let internal = ".opamgen"
+  let format_version = OpamVersion.of_string "1.0"
+
+  type t = {
+    opam_version : OpamVersion.t;
+    depends    : filtered_formula;
+    generate   : command list;
+    dir        : string option;
+  }
+
+  let empty = {
+    opam_version = format_version;
+    depends = OpamFormula.Empty;
+    generate = []; (* XXX replace with dune default *)
+    dir = None;
+  }
+
+  let opam_version t = t.opam_version
+  let depends t = t.depends
+  let generate t = t.generate
+  let dir t = t.dir
+
+  let with_opam_version opam_version t = { t with opam_version }
+  let with_depends depends t = { t with depends }
+  let with_generate generate t = { t with generate }
+  let with_dir dir t = { t with dir = Some dir }
+  let with_dir_opt dir t = { t with dir }
+
+  let fields =
+    [
+      "opam-version", Pp.ppacc with_opam_version opam_version
+        (Pp.V.string -| Pp.of_module "opam-version" (module OpamVersion));
+      "depends", Pp.ppacc with_depends depends
+        (Pp.V.package_formula `Conj Pp.V.(filtered_constraints ext_version));
+      "generate", Pp.ppacc with_generate generate
+        (Pp.V.map_list ~depth:2 Pp.V.command);
+      "dir", Pp.ppacc_opt with_dir dir
+        Pp.V.string;
+    ]
+
+  let pp =
+    let name = internal in
+    Pp.I.map_file
+    @@ Pp.I.check_opam_version ~format_version ()
+       -| Pp.I.fields ~name ~empty fields
+       -| Pp.I.show_errors ~name ~strict:OpamCoreConfig.(not !r.safe_mode) ()
+
+end
+
+module Opam_gen = struct
+  include Opam_genSyntax
+  include SyntaxFile (Opam_genSyntax)
+end
 
 (** Optional package.install files (<source>/<pkgname>.install,
     <repo>/packages/.../files/<pkgname>.install) *)
