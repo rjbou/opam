@@ -21,14 +21,16 @@ let version st name = (package st name).version
 
 let packages st = st.pinned
 
-let possible_definition_filenames dir name = [
-  dir / (OpamPackage.Name.to_string name ^ ".opam") // "opam";
-  dir // (OpamPackage.Name.to_string name ^ ".opam");
-  dir / "opam" / (OpamPackage.Name.to_string name ^ ".opam") // "opam";
-  dir / "opam" // (OpamPackage.Name.to_string name ^ ".opam");
-  dir / "opam" // "opam";
-  dir // "opam"
-]
+let possible_definition_filenames ?(gen=false) dir name =
+  let opam = if gen then "opam_gen" else "opam" in
+  [
+    dir / (OpamPackage.Name.to_string name ^ "." ^ opam) // opam;
+    dir // (OpamPackage.Name.to_string name ^ "." ^ opam);
+    dir / opam / (OpamPackage.Name.to_string name ^ "." ^ opam) // "opam";
+    dir / opam // (OpamPackage.Name.to_string name ^ "." ^ opam);
+    dir / opam // "opam";
+    dir // opam
+  ]
 
 let check_locked default =
   match OpamStateConfig.(!r.locked) with
