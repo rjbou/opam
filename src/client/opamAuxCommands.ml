@@ -88,26 +88,115 @@ let url_with_local_branch = function
      | None -> url)
   | url -> url
 
-let opams_of_dir d =
+let generate_opam_file st dir =
+let _ = OpamConsole.error "generating!!" in
+  let skip ?r () =
+    OpamConsole.warning "Skipping opam file generation%s"
+      (OpamStd.Option.to_string ~none:"" (fun r -> ": "^r) r)
+  in
+  let gens =
+    List.filter OpamFilename.exists
+      OpamFilename.Op.([
+          dir / "opam" // "opam_gen";
+          dir // "opam_gen"
+        ])
+  in
+  match gens with
+  | [] -> st
+  | _::_::_ -> skip ~r:"Uniq gen file required" (); st
+  | [gen] ->
+    let gen = OpamFile.Opam_gen.read (OpamFile.make gen) in
+    let env = OpamPackageVar.resolve st in
+    let depends = OpamFile.Opam_gen.depends gen in
+    let formula = OpamPackageVar.filter_depends_formula ~env depends in
+    let installed =
+      OpamPackage.names_of_packages (OpamFormula.packages st.installed formula)
+    in
+    let all =
+      OpamPackage.names_of_packages (OpamFormula.packages st.packages formula)
+    in
+    let missing = OpamPackage.Name.Set.Op.(all -- installed) in
+    let need_install = not (OpamPackage.Name.Set.is_empty missing) in
+    if need_install &&
+       not (OpamConsole.confirm
+              "Missing packages form opam file generation: %s. Install %s?"
+              (OpamPackage.Name.Set.to_string missing)
+              (if OpamPackage.Name.Set.is_singleton missing then "it" else "them"))
+    then (skip ~r:"Aborted" (); st) else
+    let _, st =
+      (* XXX install without propagating st ? *)
+      if not need_install then (), st else
+        OpamSwitchState.with_write_lock st @@ fun st ->
+        let atoms = (OpamFormula.atoms formula) in
+        let request = OpamSolver.request  ~install:atoms () in
+        let solution =
+          OpamSolution.resolve st Install ~orphans:OpamPackage.Set.empty
+            ~requested:missing request
+        in
+        match solution with
+        | Conflicts cs ->
+          log "conflict!";
+          OpamConsole.msg "%s"
+            (OpamCudf.string_of_conflict st.packages
+               (OpamSwitchState.unavailable_reason st) cs);
+          skip ~r:"Install failed" ();
+          (), st
+        | Success sol ->
+          (* add to roots ??? XXX *)
+          let st, res = OpamSolution.apply st ~requested:missing sol in
+          OpamSolution.check_solution st (Success res);
+          (), st
+    in
+    let dir =
+      match OpamFile.Opam_gen.dir gen with
+      | Some sub -> OpamFilename.Op.(dir / sub)
+      | None -> dir
+    in
+    let commands =
+      OpamStd.List.filter_map (function
+          | cmd::args ->
+            Some (OpamSystem.make_command
+                    ~text:"generating opam file"
+                    ~verbose:(OpamConsole.verbose ())
+                    ~name:"opamgen"
+                    ~dir:(OpamFilename.Dir.to_string dir)
+                    cmd args)
+          |  [] -> None)
+        (OpamFilter.commands env (OpamFile.Opam_gen.generate gen))
+    in
+    let results = OpamProcess.Job.run (OpamProcess.Job.of_list commands) in
+    (match results with
+     | None ->
+       OpamConsole.note "opam file generated";
+     | Some (_cmd, err) ->
+       skip ~r:(Printf.sprintf "Generation error %s"
+                  (OpamProcess.result_summary err)) ());
+    st
+
+let opams_of_dir st d =
+  let st_opt = generate_opam_file st d in
   let files = OpamPinned.files_in_source d in
-  List.fold_left (fun acc (n, f) ->
-      let name =
-        let open OpamStd.Option.Op in
-        n >>+ fun () ->
-        OpamFile.OPAM.(name_opt (safe_read f))
-        >>+ fun () ->
-        match files with
-        | [] | _::_::_ -> None
-        | [_] -> name_from_project_dirname d
-      in
-      match name with
-      | Some n -> (n, f) :: acc
-      | None ->
-        OpamConsole.warning
-          "Ignoring file at %s: could not infer package name"
-          (OpamFile.to_string f);
-        acc)
-    [] files
+  let opams =
+    List.fold_left (fun acc (n, f) ->
+        let name =
+          let open OpamStd.Option.Op in
+          n >>+ fun () ->
+          OpamFile.OPAM.(name_opt (safe_read f))
+          >>+ fun () ->
+          match files with
+          | [] | _::_::_ -> None
+          | [_] -> name_from_project_dirname d
+        in
+        match name with
+        | Some n -> (n, f) :: acc
+        | None ->
+          OpamConsole.warning
+            "Ignoring file at %s: could not infer package name"
+            (OpamFile.to_string f);
+          acc)
+      [] files
+  in
+  st_opt, opams
 
 let name_and_dir_of_opam_file f =
   let srcdir = OpamFilename.dirname f in
@@ -152,18 +241,18 @@ let resolve_locals_pinned st atom_or_local_list =
   in
   List.rev atoms
 
-let resolve_locals ?(quiet=false) atom_or_local_list =
+let resolve_locals ?(quiet=false) st atom_or_local_list =
   let target_dir dir =
     let d = OpamFilename.Dir.to_string dir in
     let backend = OpamUrl.guess_version_control d in
     OpamUrl.parse ?backend d |>
     url_with_local_branch
   in
-  let to_pin, atoms =
-    List.fold_left (fun (to_pin, atoms) -> function
-        | `Atom a -> to_pin, a :: atoms
+  let st, to_pin, atoms =
+    List.fold_left (fun (st,to_pin, atoms) -> function
+        | `Atom a -> st, to_pin, a :: atoms
         | `Dirname d ->
-          let names_files = opams_of_dir d in
+          let st, names_files = opams_of_dir st d in
           if names_files = [] && not quiet then
             OpamConsole.warning "No package definitions found at %s"
               (OpamFilename.Dir.to_string d);
@@ -174,17 +263,18 @@ let resolve_locals ?(quiet=false) atom_or_local_list =
           let atoms =
             List.map (fun (n,_) -> n, None) names_files @ atoms
           in
-          to_pin, atoms
+          st, to_pin, atoms
         | `Filename f ->
           match name_and_dir_of_opam_file f with
           | Some n, srcdir ->
+            st,
             (n, target_dir srcdir, OpamFile.make f) :: to_pin,
             (n, None) :: atoms
           | None, _ ->
             OpamConsole.error_and_exit `Not_found
               "Could not infer package name from package definition file %s"
               (OpamFilename.to_string f))
-      ([], [])
+      (st, [], [])
       atom_or_local_list
   in
   let duplicates =
@@ -193,20 +283,20 @@ let resolve_locals ?(quiet=false) atom_or_local_list =
       to_pin
   in
   match duplicates with
-  | [] -> List.rev to_pin, List.rev atoms
+  | [] -> st, List.rev to_pin, List.rev atoms
   | _ ->
     OpamConsole.error_and_exit `Bad_arguments
       "Multiple files for the same package name were specified:\n%s"
       (OpamStd.Format.itemize (fun (n, t, f) ->
-         Printf.sprintf "Package %s with definition %s %s %s"
-           (OpamConsole.colorise `bold @@ OpamPackage.Name.to_string n)
-           (OpamFile.to_string f)
-           (OpamConsole.colorise `blue "=>")
-           (OpamUrl.to_string t))
+           Printf.sprintf "Package %s with definition %s %s %s"
+             (OpamConsole.colorise `bold @@ OpamPackage.Name.to_string n)
+             (OpamFile.to_string f)
+             (OpamConsole.colorise `blue "=>")
+             (OpamUrl.to_string t))
           duplicates)
 
 let autopin_aux st ?quiet ?(for_view=false) atom_or_local_list =
-  let to_pin, atoms = resolve_locals ?quiet atom_or_local_list in
+  let st, to_pin, atoms = resolve_locals ?quiet st atom_or_local_list in
   if to_pin = [] then
     atoms, to_pin, OpamPackage.Set.empty, OpamPackage.Set.empty
   else
@@ -412,7 +502,7 @@ let get_compatible_compiler ?repos rt dir =
   let virt_st =
     OpamSwitchState.load_virtual ?repos_list:repos gt rt
   in
-  let local_files = opams_of_dir dir in
+  let _st, local_files = opams_of_dir virt_st dir in
   let local_opams =
     List.fold_left (fun acc (name, f) ->
         let opam = OpamFile.OPAM.safe_read f in

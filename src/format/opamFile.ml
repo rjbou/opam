@@ -2888,7 +2888,7 @@ end
 (** opam generator format *)
 module Opam_genSyntax = struct
 
-  let internal = ".opamgen"
+  let internal = "opam_gen"
   let format_version = OpamVersion.of_string "1.0"
 
   type t = {

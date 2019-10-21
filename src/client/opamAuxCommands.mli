@@ -40,7 +40,9 @@ val name_and_dir_of_opam_file: filename -> name option * dirname
 *)
 val resolve_locals:
   ?quiet:bool ->
+  rw switch_state ->
   [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
+  rw switch_state *
   (name * OpamUrl.t * OpamFile.OPAM.t OpamFile.t) list * atom list
 
 (** Resolves the opam files and directories in the list to package name and
