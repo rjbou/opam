@@ -33,6 +33,7 @@ module type S = sig
   val get_remote_url:
     ?hash:string -> dirname ->
     url option OpamProcess.job
+  val clean_generated_opam_file: dirname -> unit OpamProcess.job
 end
 
 let compare r1 r2 = compare r1.repo_name r2.repo_name

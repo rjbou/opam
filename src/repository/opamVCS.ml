@@ -29,6 +29,7 @@ module type VCS = sig
   val is_dirty: dirname -> bool OpamProcess.job
   val modified_files: dirname -> string list OpamProcess.job
   val get_remote_url: ?hash:string -> dirname -> url option OpamProcess.job
+  val clean_source_tree: (filename -> bool) -> dirname -> unit OpamProcess.job
 end
 
 let convert_path =
@@ -161,5 +162,10 @@ module Make (VCS: VCS) = struct
           | Not_available _ as na -> na)
 
   let get_remote_url = VCS.get_remote_url
+
+  let clean_generated_opam_file dir =
+    VCS.clean_source_tree (fun f ->
+        OpamFilename.check_suffix f "opam" || f = OpamFilename.of_string "opam")
+      dir @@+ fun r -> Done ()
 
 end

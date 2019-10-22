@@ -28,7 +28,9 @@ let find_vcs_backend = function
   | `hg -> (module OpamHg.VCS: OpamVCS.VCS)
   | `darcs -> (module OpamDarcs.VCS: OpamVCS.VCS)
 
-let url_backend url = find_backend_by_kind url.OpamUrl.backend
+let url_backend url = 
+OpamConsole.error "backend %s" (OpamUrl.string_of_backend  url.OpamUrl.backend);
+find_backend_by_kind url.OpamUrl.backend
 
 let find_backend r = url_backend r.repo_url
 
@@ -485,3 +487,7 @@ let report_fetch_result pkg = function
     OpamConsole.msg "[%s] fetching sources failed: %s\n"
       (OpamConsole.colorise `red (OpamPackage.to_string pkg)) msg;
     Not_available (s, l)
+
+let clean_generated_opam_file dir url =
+  let module B = (val url_backend url: OpamRepositoryBackend.S) in
+  B.clean_generated_opam_file dir

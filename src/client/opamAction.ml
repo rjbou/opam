@@ -184,12 +184,12 @@ let download_package st nv =
   else
   let dir = OpamSwitchState.source_dir st nv in
   if OpamPackage.Set.mem nv st.pinned &&
-     OpamFilename.exists_dir dir &&
+     OpamFilename.exists_dir dir (*&&
      OpamStd.Option.Op.(
        OpamPinned.find_opam_file_in_source nv.name dir >>=
        OpamFile.OPAM.read_opt >>=
        OpamFile.OPAM.version_opt)
-     = Some nv.version
+     = Some nv.version*)
   then Done None
   else
   let print_action msg =
@@ -212,6 +212,7 @@ let download_package st nv =
       in
       Done (Some na))
   @@ fun () ->
+  let _ = OpamConsole.error "downloading!!" in
   OpamUpdate.download_package_source st nv dir @@| function
   | Some (Not_available (s, l)), _ ->
     let msg = match s with None -> l | Some s -> s in

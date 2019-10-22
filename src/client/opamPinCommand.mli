@@ -67,3 +67,5 @@ val read_opam_file_for_pinning:
 (** The default version for pinning a package: depends on the state, what is
     installed and available, and defaults to [~dev]. *)
 val default_version: 'a switch_state -> name -> version
+
+val generate_opam_file: 'a switch_state -> dirname -> 'a switch_state * (url -> unit)

@@ -72,6 +72,9 @@ module type VCS = sig
   val modified_files: dirname -> string list OpamProcess.job
 
   val get_remote_url: ?hash:string -> dirname -> url option OpamProcess.job
+
+  val clean_source_tree: (filename -> bool) -> dirname -> unit OpamProcess.job
+
 end
 
 (** Create a backend from a [VCS] implementation. *)

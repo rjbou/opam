@@ -199,6 +199,8 @@ module VCS = struct
     | { OpamProcess.r_code = 1; _ } -> Done None
     | r -> OpamSystem.process_error r
 
+ let clean_source_tree check dir = Done ()
+
 end
 
 module B = OpamVCS.Make(VCS)

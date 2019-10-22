@@ -188,6 +188,7 @@ let pinned_package st ?version ?(working_dir=false) name =
   match overlay_opam >>| fun opam -> opam, OpamFile.OPAM.url opam with
   | None | Some (_, None) -> Done ((fun st -> st), false)
   | Some (opam, Some urlf) ->
+  
     let url = OpamFile.URL.url urlf in
     let version =
       OpamFile.OPAM.version_opt opam ++
@@ -496,6 +497,8 @@ let cleanup_source st old_opam_opt new_opam =
 
 let download_package_source st nv dirname =
   let opam = OpamSwitchState.opam st nv in
+    let _ = OpamConsole.note "version\n%s" (OpamVersion.to_string opam.opam_version)
+    in
   let cache_dir = OpamRepositoryPath.download_cache st.switch_global.root in
   let cache_urls = active_caches st nv in
 

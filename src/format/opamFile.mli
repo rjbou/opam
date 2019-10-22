@@ -660,7 +660,7 @@ end
 
 module Opam_gen: sig
   include IO_FILE
-  val dir: t -> string option
+(*   val dir: t -> string option *)
   val generate: t -> command list
   val depends: t -> filtered_formula
 end

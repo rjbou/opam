@@ -79,6 +79,7 @@ module type S = sig
       this hash. If the hash is absent it returns the remote url with no hash. *)
   val get_remote_url:
     ?hash:string -> dirname -> url option OpamProcess.job
+  val clean_generated_opam_file: dirname -> unit OpamProcess.job
 end
 
 (** Pretty-print *)

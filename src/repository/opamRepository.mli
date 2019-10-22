@@ -69,3 +69,5 @@ val find_backend_by_kind: OpamUrl.backend -> (module OpamRepositoryBackend.S)
 
 (** Prints user messages upon the result of a download *)
 val report_fetch_result: package -> string download -> unit download
+
+val clean_generated_opam_file: dirname -> url -> unit OpamProcess.job

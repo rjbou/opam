@@ -54,85 +54,92 @@ let read_opam_file_for_pinning ?(quiet=false) name f url =
 
 exception Fetch_Fail of string
 
-let generate_opam_file st dir name =
-  let open OpamStd.Option.Op in
-  OpamStd.List.find_opt OpamFilename.exists
-    (OpamPinned.possible_definition_filenames ~gen:true dir name)
-  >>= fun gen ->
-  let nstr = OpamPackage.Name.to_string name in
-  OpamConsole.error "Generating %s opam file from %s"
-    nstr
-    (OpamFilename.to_string gen);
-  let gen = OpamFile.Opam_gen.read (OpamFile.make gen) in
-  let env = OpamPackageVar.resolve st in
-  let depends = OpamFile.Opam_gen.depends gen in
-  let formula = OpamPackageVar.filter_depends_formula ~env depends in
-  let installed = OpamPackage.names_of_packages (OpamFormula.packages st.installed formula) in
-  let all = OpamPackage.names_of_packages (OpamFormula.packages st.packages formula) in
-  let missing = OpamPackage.Name.Set.Op.(all -- installed) in
-  let _ = OpamConsole.error " installed %s all %s missing %s"
-      (OpamPackage.Name.Set.to_string installed)
-      (OpamPackage.Name.Set.to_string all)
-      (OpamPackage.Name.Set.to_string missing)
-  in
+let generate_opam_file st dir =
   let skip ?r () =
-    OpamConsole.warning "Skipping %s opam file generation%s"
-      nstr (OpamStd.Option.to_string ~none:"" (fun r -> ": "^r) r)
+    OpamConsole.warning "Skipping opam file generation%s"
+      (OpamStd.Option.to_string ~none:"" (fun r -> ": "^r) r)
   in
-  let need_install = not (OpamPackage.Name.Set.is_empty missing) in
-  if need_install &&
-     not (OpamConsole.confirm
-            "Missing packages form opam file generation: %s. Install %s?"
-            (OpamPackage.Name.Set.to_string missing)
-            (if OpamPackage.Name.Set.is_singleton missing then "it" else "them"))
-  then (skip ~r:"Aborted" (); None) else
-  let st =
-    (* XXX install without propagating st ? *)
-    if not need_install then None else
-    let atoms = (OpamFormula.atoms formula) in
-    let request = OpamSolver.request  ~install:atoms () in
-    let solution =
-      OpamSolution.resolve st Install ~orphans:OpamPackage.Set.empty
-        ~requested:missing request
+  let gens =
+    List.filter (fun f ->
+        OpamFilename.check_suffix f ".opam_gen"
+        || "opam_gen" = OpamFilename.Base.to_string (OpamFilename.basename f))
+      (OpamFilename.files dir)
+  in
+  let clean url =
+    OpamProcess.Job.run @@ OpamRepository.clean_generated_opam_file dir url
+  in
+  let noclean _ = () in
+  match gens with
+  | [] ->  st, noclean
+  | _::_::_ -> skip ~r:"Uniq gen file required" (); st, noclean
+  | [gen] ->
+    let gen = OpamFile.Opam_gen.read (OpamFile.make gen) in
+    let env = OpamPackageVar.resolve st in
+    let depends = OpamFile.Opam_gen.depends gen in
+    let formula = OpamPackageVar.filter_depends_formula ~env depends in
+    let installed =
+      OpamPackage.names_of_packages (OpamFormula.packages st.installed formula)
     in
-    match solution with
-    | Conflicts cs ->
-      log "conflict!";
-      OpamConsole.msg "%s"
-        (OpamCudf.string_of_conflict st.packages
-           (OpamSwitchState.unavailable_reason st) cs);
-      skip ~r:"Install failed" ();
-      None
-    | Success sol ->
-      (* add to roots ??? XXX *)
-      let st, res = OpamSolution.apply st ~requested:missing sol in
-      OpamSolution.check_solution st (Success res);
-      Some st
-  in
-  let dir =
-    match OpamFile.Opam_gen.dir gen with
-    | Some sub -> OpamFilename.Op.(dir / sub)
-    | None -> dir
-  in
-  let commands =
-    OpamStd.List.filter_map (function
-        | cmd::args ->
-          Some (OpamSystem.make_command
-                  ~text:(Printf.sprintf "generating %s opam file" nstr)
-                  ~verbose:(OpamConsole.verbose ())
-                  ~name:(Printf.sprintf "%s_gen" nstr)
-                  ~dir:(OpamFilename.Dir.to_string dir)
-                  cmd args)
-        |  [] -> None)
-      (OpamFilter.commands env (OpamFile.Opam_gen.generate gen))
-  in
-  let results = OpamProcess.Job.run (OpamProcess.Job.of_list commands) in
-  (match results with
-   | None ->
-     OpamConsole.note "opam file generated for %s" nstr;
-   | Some (_cmd, err) ->
-     skip ~r:("Generation error %s" ^ (OpamProcess.result_summary err)) ());
-  st
+    let all =
+      OpamPackage.names_of_packages (OpamFormula.packages st.packages formula)
+    in
+    let missing = OpamPackage.Name.Set.Op.(all -- installed) in
+    let need_install = not (OpamPackage.Name.Set.is_empty missing) in
+    if need_install &&
+       not (OpamConsole.confirm
+              "Missing packages form opam file generation: %s. Install %s?"
+              (OpamPackage.Name.Set.to_string missing)
+              (if OpamPackage.Name.Set.is_singleton missing then "it" else "them"))
+    then (skip ~r:"Aborted" (); st, noclean) else
+    let _, st =
+      (* XXX install without propagating st ? *)
+      if not need_install then (), st else
+        OpamSwitchState.with_write_lock st @@ fun st ->
+        let atoms = (OpamFormula.atoms formula) in
+        let request = OpamSolver.request  ~install:atoms () in
+        let solution =
+          OpamSolution.resolve st Install ~orphans:OpamPackage.Set.empty
+            ~requested:missing request
+        in
+        match solution with
+        | Conflicts cs ->
+          log "conflict!";
+          OpamConsole.msg "%s"
+            (OpamCudf.string_of_conflict st.packages
+               (OpamSwitchState.unavailable_reason st) cs);
+          skip ~r:"Install failed" ();
+          (), st
+        | Success sol ->
+          (* add to roots ??? XXX *)
+          let st, res = OpamSolution.apply st ~requested:missing sol in
+          OpamSolution.check_solution st (Success res);
+          (), st
+    in
+    let dir =
+      match OpamFile.Opam_gen.dir gen with
+      | Some sub -> OpamFilename.Op.(dir / sub)
+      | None -> dir
+    in
+    let commands =
+      OpamStd.List.filter_map (function
+          | cmd::args ->
+            Some (OpamSystem.make_command
+                    ~text:"generating opam file"
+                    ~verbose:(OpamConsole.verbose ())
+                    ~name:"opamgen"
+                    ~dir:(OpamFilename.Dir.to_string dir)
+                    cmd args)
+          |  [] -> None)
+        (OpamFilter.commands env (OpamFile.Opam_gen.generate gen))
+    in
+    let results = OpamProcess.Job.run (OpamProcess.Job.of_list commands) in
+    (match results with
+     | None ->
+       OpamConsole.note "opam file generated";
+     | Some (_cmd, err) ->
+       skip ~r:(Printf.sprintf "Generation error %s"
+                  (OpamProcess.result_summary err)) ());
+    st, clean
 
 let get_source_definition ?version st nv url =
   let root = st.switch_global.root in
@@ -149,7 +156,7 @@ let get_source_definition ?version st nv url =
   OpamUpdate.fetch_dev_package url srcdir nv @@| function
   | Not_available (_,s) -> raise (Fetch_Fail s)
   | Up_to_date _ | Result _ ->
-    let st_opt = generate_opam_file st srcdir (OpamPackage.name nv) in
+    let st, cleanup = generate_opam_file st srcdir in
     let opam_opt =
       match OpamPinned.find_opam_file_in_source nv.name srcdir with
       | None -> None
@@ -164,7 +171,11 @@ let get_source_definition ?version st nv url =
           None
         | Some opam -> Some (fix opam)
     in
-    st_opt, opam_opt
+    let _ = OpamConsole.note "source_def\n%s"
+    (OpamStd.Option.to_string ~none:"--" (OpamFile.OPAM.write_to_string) opam_opt)
+    in
+    cleanup (OpamFile.URL.url url);
+    st, opam_opt
 
 let copy_files st opam =
   let name = OpamFile.OPAM.name opam in
@@ -541,23 +552,21 @@ and source_pin
   in
   OpamFilename.remove (OpamFile.filename temp_file);
 
-  let st_opt, opam_opt =
+  let st, opam_opt =
     try
       match opam_opt with
-      | Some _ -> None, opam_opt
+      | Some _ -> st, opam_opt
       | None ->
         (urlf >>| fun url ->
          OpamProcess.Job.run @@ get_source_definition ?version st nv url)
-        +! (None, None)
+        +! (st, None)
     with Fetch_Fail err ->
-      if force then None, None else
+      if force then st, None else
         (OpamConsole.error_and_exit `Sync_error
            "Error getting source from %s:\n%s"
            (OpamStd.Option.to_string OpamUrl.to_string target_url)
            (OpamStd.Format.itemize (fun x -> x) [err]));
   in
-
-  let st = st_opt +! st in
 
   let nv =
     match version with

@@ -2479,18 +2479,25 @@ let pin ?(unpin_only=false) () =
     mk_flag ["dev-repo"] "Pin to the upstream package source for the latest \
                           development version"
   in
-  let guess_names url k =
+  let guess_names st url k =
     let from_opam_files dir =
-      OpamStd.List.filter_map
-        (fun (nameopt, f) ->
-           let opam_opt = OpamFile.OPAM.read_opt f in
-           let name =
-             match nameopt with
-             | None -> OpamStd.Option.replace OpamFile.OPAM.name_opt opam_opt
-             | some -> some
-           in
-           OpamStd.Option.map (fun n -> n, opam_opt) name)
-        (OpamPinned.files_in_source dir)
+      let st, cleanup =
+        OpamPinCommand.generate_opam_file st dir
+      in
+      let opams =
+        OpamStd.List.filter_map
+          (fun (nameopt, f) ->
+             let opam_opt = OpamFile.OPAM.read_opt f in
+             let name =
+               match nameopt with
+               | None -> OpamStd.Option.replace OpamFile.OPAM.name_opt opam_opt
+               | some -> some
+             in
+             OpamStd.Option.map (fun n -> n, opam_opt) name)
+          (OpamPinned.files_in_source dir)
+      in
+      cleanup url;
+      st, opams
     in
     let basename =
       match OpamStd.String.split (OpamUrl.basename url) '.' with
@@ -2500,7 +2507,7 @@ let pin ?(unpin_only=false) () =
           (OpamUrl.to_string url)
       | b::_ -> b
     in
-    let found, cleanup =
+    let (st, found), cleanup =
       match OpamUrl.local_dir url with
       | Some d -> from_opam_files d, None
       | None ->
@@ -2534,7 +2541,7 @@ let pin ?(unpin_only=false) () =
              command-line, e.g. 'opam pin NAME TARGET'"
             (OpamUrl.to_string url)
     in
-    k names_found
+    k st names_found
   in
   let pin_target kind target =
     let looks_like_version_re =
@@ -2638,7 +2645,10 @@ let pin ?(unpin_only=false) () =
          in
          `Error (true, msg)
        | `Source url ->
-         guess_names url @@ fun names ->
+         OpamGlobalState.with_ `Lock_none @@ fun gt ->
+         OpamSwitchState.with_ `Lock_write gt @@ fun st ->
+         guess_names st url @@ fun st names ->
+         let _ = OpamConsole.error "lslslslsls %s" (OpamStd.List.to_string (fun (f,_) -> OpamPackage.Name.to_string f) names) in
          let names = match names with
            | _::_::_ ->
              if OpamConsole.confirm
@@ -2648,8 +2658,6 @@ let pin ?(unpin_only=false) () =
              else OpamStd.Sys.exit_because `Aborted
            | _ -> names
          in
-         OpamGlobalState.with_ `Lock_none @@ fun gt ->
-         OpamSwitchState.with_ `Lock_write gt @@ fun st ->
          let pinned = st.pinned in
          let st =
            List.fold_left (fun st (name, opam_opt) ->

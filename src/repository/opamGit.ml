@@ -316,6 +316,27 @@ module VCS : OpamVCS.VCS = struct
     | { OpamProcess.r_code = 1; _ } -> Done None
     | r -> OpamSystem.process_error r
 
+  let clean_source_tree check repo_root =
+    OpamConsole.error "git cleaning";
+    git repo_root [ "status" ; "--short" ] @@> fun r ->
+    OpamSystem.raise_on_process_error r;
+    let co, rm =
+      List.fold_left (fun (co,rm) line ->
+          match OpamStd.String.split line ' ' with
+          | ("A" | "M" | "AM")::file::[]
+          | ("R"|"RM"|"C"|"CM")::_::"->"::file::[] ->  file::co, rm
+          | "??"::file::[] -> co, file::rm
+          | _ -> co, rm) ([],[]) r.OpamProcess.r_stdout
+    in
+    OpamConsole.error "co %s" (OpamStd.List.to_string (fun x -> x) co);
+    OpamConsole.error "rm %s" (OpamStd.List.to_string (fun x -> x) rm);
+    List.iter OpamFilename.remove (List.filter check (List.map OpamFilename.Op.(fun f -> repo_root // f) rm));
+    if co = [] then Done () else
+    let check f = check (OpamFilename.of_string f) in
+    git repo_root ("checkout"::(List.filter check co)) @@> fun r ->
+    OpamSystem.raise_on_process_error r;
+    Done ()
+
 end
 
 module B = OpamVCS.Make(VCS)

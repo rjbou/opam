@@ -94,6 +94,8 @@ module B = struct
   let get_remote_url ?hash:_ _ =
     Done None
 
+  let clean_generated_opam_file dir = Done ()
+
 end
 
 (* Helper functions used by opam-admin *)
