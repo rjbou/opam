@@ -886,6 +886,8 @@ module Switch_config: sig
   val variable: t -> variable -> variable_contents option
   val path: t -> std_path -> string option
   val wrappers: t -> Wrappers.t
+  val env: t -> env_update list
+  val with_env: env_update list -> t -> t
   include IO_FILE with type t := t
 end
 
