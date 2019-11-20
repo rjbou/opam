@@ -829,7 +829,7 @@ end
 
 (* CONFIG *)
 let config_doc = "Display configuration options for packages."
-let config =
+let config ?(setopt=false) () =
   let doc = config_doc in
   let commands = [
     "env", `env, [],
@@ -899,7 +899,13 @@ let config =
     @ [`S "OPTIONS"]
   in
 
-  let command, params = mk_subcommands commands in
+  let command, params =
+    if setopt then
+      Term.const (Some `set_opt),
+      Arg.(value & pos_all string [] & Arg.info [])
+    else
+      mk_subcommands commands
+  in
   let open Common_config_flags in
   let wrap_gt set =
     OpamGlobalState.with_ `Lock_write @@ fun gt ->
@@ -3403,7 +3409,8 @@ let commands = [
   remove; make_command_alias remove "uninstall";
   reinstall;
   update; upgrade;
-  config; var; exec; env;
+  config (); make_command_alias (config ~setopt:true ()) ~options:" set-opt" "set-opt";
+  var; exec; env;
   repository; make_command_alias repository "remote";
   switch;
   pin (); make_command_alias (pin ~unpin_only:true ()) ~options:" remove" "unpin";
