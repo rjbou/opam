@@ -517,7 +517,7 @@ let allwd_wrappers wdef wrappers with_wrappers =
            let nw = wrappers nc in
            let n_cmd =
              List.filter (fun cmd ->
-                 None = List.find_opt (fun cmd' -> cmd = cmd') (get nw))
+                 None = OpamStd.List.find_opt (fun cmd' -> cmd = cmd') (get nw))
                (get w)
            in
            with_wrappers (set n_cmd w) c)
@@ -560,7 +560,7 @@ let set_opt_switch_t ?inner st field value =
   let allowed_sections =
     let rem_elem nelems elems =
       List.filter (fun (n,p) ->
-          None = List.find_opt (fun (n',p') -> n = n' && p = p')
+          None = OpamStd.List.find_opt (fun (n',p') -> n = n' && p = p')
             nelems)
         elems
     in
@@ -605,7 +605,7 @@ let set_opt_global_t ?inner gt field value =
       (fun nc c ->
          let gv = get nc in
          set (List.filter (fun (k,v,_) ->
-             None = List.find_opt (fun (k',v',_) -> k = k' && v = v') gv)
+             None = OpamStd.List.find_opt (fun (k',v',_) -> k = k' && v = v') gv)
              (get c)) c)
     in
     [ "download-command", Fixed,
