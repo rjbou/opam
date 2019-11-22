@@ -1045,7 +1045,7 @@ let from_2_0_beta_to_2_0_beta5 root conf =
 
 let from_2_0_beta5_to_2_0 _ conf = conf
 
-let v2_1 = OpamVersion.of_string "2.1"
+let _v2_1 = OpamVersion.of_string "2.1"
 
 let _from_2_0_to_2_1 _ conf = conf
 
