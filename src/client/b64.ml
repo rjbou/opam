@@ -23,8 +23,6 @@ type alphabet =
   { emap : int array
   ; dmap : int array }
 
-type sub = string * int * int
-
 let (//) x y =
   if y < 1 then raise Division_by_zero ;
   if x > 0 then 1 + ((x - 1) / y) else 0
@@ -50,11 +48,7 @@ let make_alphabet alphabet =
   String.iteri (fun idx chr -> Array.set dmap (Char.code chr) idx) alphabet ;
   { emap; dmap; }
 
-let length_alphabet { emap; _ } = Array.length emap
-let alphabet { emap; _ } = emap
-
 let default_alphabet = make_alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-let uri_safe_alphabet = make_alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
 let unsafe_set_be_uint16 =
   if Sys.big_endian
@@ -72,7 +66,7 @@ let get_uint8 t off =
 
 let padding = int_of_char '='
 
-let error_msgf fmt = Format.ksprintf (fun err -> Error (`Msg err)) fmt
+let error_msgf fmt = invalid_arg fmt
 
 let encode_sub pad { emap; _ } ?(off = 0) ?len input =
   let len = match len with
@@ -119,27 +113,13 @@ let encode_sub pad { emap; _ } ?(off = 0) ?len input =
   let pad_to_write = ((3 - n mod 3) mod 3) in
 
   if pad
-  then begin unsafe_fix pad_to_write ; Ok (Bytes.unsafe_to_string res, 0, n') end
-  else Ok (Bytes.unsafe_to_string res, 0, (n' - pad_to_write))
+  then begin unsafe_fix pad_to_write ; (Bytes.unsafe_to_string res, 0, n') end
+  else (Bytes.unsafe_to_string res, 0, (n' - pad_to_write))
 (* [pad = false], we don't want to write them. *)
 
-let encode ?(pad = true) ?(alphabet = default_alphabet) ?off ?len input =
-  match encode_sub pad alphabet ?off ?len input with
-  | Ok (res, off, len) -> Ok (String.sub res off len)
-  | Error _ as err -> err
-
-let encode_string ?pad ?alphabet input =
-  match encode ?pad ?alphabet input with
-  | Ok res -> res
-  | Error _ -> assert false
-
-let encode_sub ?(pad = true) ?(alphabet = default_alphabet) ?off ?len input =
-  encode_sub pad alphabet ?off ?len input
-
-let encode_exn ?pad ?alphabet ?off ?len input =
-  match encode ?pad ?alphabet ?off ?len input with
-  | Ok v -> v
-  | Error (`Msg err) -> invalid_arg err
+let encode_string ?(pad = true) input =
+  let res, off, len = encode_sub pad default_alphabet input in
+  String.sub res off len
 
 let decode_sub ?(pad = true) { dmap; _ } ?(off = 0) ?len input =
   let len = match len with
@@ -247,23 +227,15 @@ let decode_sub ?(pad = true) { dmap; _ } ?(off = 0) ?len input =
       | pad -> only_padding pad (i + 4) end in
 
   match dec 0 0 with
-  | 0 -> Ok (Bytes.unsafe_to_string res, 0, n')
-  | pad -> Ok (Bytes.unsafe_to_string res, 0, (n' - pad))
+  | 0 -> (Bytes.unsafe_to_string res, 0, n')
+  | pad -> (Bytes.unsafe_to_string res, 0, (n' - pad))
   | exception Out_of_bounds -> error_msgf "Wrong padding"
       (* appear only when [pad = true] and when length of input is not a multiple of 4. *)
   | exception Not_found ->
       (* appear when one character of [input] ∉ [alphabet] and this character <> '=' *)
       error_msgf "Malformed input"
 
-let decode ?pad ?(alphabet = default_alphabet) ?off ?len input =
-  match decode_sub ?pad alphabet ?off ?len input with
-  | Ok (res, off, len) -> Ok (String.sub res off len)
-  | Error _ as err -> err
+let decode_exn ?pad ?off ?len input =
+  let res, off, len = decode_sub ?pad default_alphabet ?off ?len input in
+  String.sub res off len
 
-let decode_sub ?pad ?(alphabet = default_alphabet) ?off ?len input =
-  decode_sub ?pad alphabet ?off ?len input
-
-let decode_exn ?pad ?alphabet ?off ?len input =
-  match decode ?pad ?alphabet ?off ?len input with
-  | Ok res -> res
-  | Error (`Msg err) -> invalid_arg err
