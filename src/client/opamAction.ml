@@ -368,10 +368,10 @@ let prepare_package_source st nv dir =
     try
       List.iter (fun (base, hash) ->
           let dst = OpamFilename.create dir base in
-          let name = "x-" ^ OpamHash.contents hash in
+          let name = "x-extra-file-" ^ OpamHash.contents hash in
           match OpamStd.String.Map.find_opt name opam.OpamFile.OPAM.extensions with
           | Some (_, String (_, value)) ->
-            let value' = B64.decode_exn value in
+            let value' = Base64.decode_string value in
             let my = OpamHash.compute_from_string ~kind:(OpamHash.kind hash) value' in
             if OpamHash.contents my = OpamHash.contents hash then
               OpamFilename.write dst value'
