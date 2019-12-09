@@ -489,10 +489,10 @@ let read_overlays ~repos_roots (read: package -> OpamFile.OPAM.t option) package
                 if OpamFilename.exists file &&
                    OpamHash.check_file (OpamFilename.to_string file) hash then
                   let value = OpamFilename.read file in
-                  let value' = B64.encode_string value in
-                  let name = "x-" ^ OpamHash.contents hash in
+                  let value' = Base64.encode_string value in
+                  let name = "x-extra-file-" ^ OpamHash.contents hash in
                   OpamFile.OPAM.add_extension opam name
-                    (OpamParserTypes.String (("", 0, 0), value'))
+                    (OpamParserTypes.String (OpamTypesBase.pos_null, value'))
                 else begin
                   OpamConsole.warning "Ignoring file %s with invalid hash"
                     (OpamFilename.to_string file);
@@ -505,7 +505,8 @@ let read_overlays ~repos_roots (read: package -> OpamFile.OPAM.t option) package
     packages
     OpamPackage.Name.Map.empty
 
-let export rt ?(full=false) ?(switch = OpamStateConfig.get_switch ()) filename =
+let export rt ?(full=false) filename =
+  let switch = OpamStateConfig.get_switch () in
   let root = OpamStateConfig.(!r.root_dir) in
   let export =
     OpamFilename.with_flock `Lock_none (OpamPath.Switch.lock root switch)
