@@ -2,7 +2,7 @@ ifeq ($(findstring clean,$(MAKECMDGOALS)),)
 -include Makefile.config
 endif
 
-all: opam
+all: opam opam-installer
 	@
 
 admin:
