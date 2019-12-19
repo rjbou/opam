@@ -62,14 +62,28 @@ exception Fetch_Fail of string
 let get_source_definition ?version ?subpath st nv url =
   let root = st.switch_global.root in
   let srcdir = OpamPath.Switch.pinned_package root st.switch nv.name in
+  let open OpamProcess.Job.Op in
   let fix opam =
     OpamFile.OPAM.with_url url @@
-    (match version with
+    (let version =
+       OpamStd.Option.Op.(
+         version ++
+         (OpamProcess.Job.run @@
+          OpamRepository.revision ~human_readable:true srcdir
+            (OpamFile.URL.url url)) ++
+         ((OpamProcess.Job.run @@
+           OpamRepository.revision srcdir
+             (OpamFile.URL.url url)) >>| fun hash ->
+          let v = OpamPackage.Version.to_string nv.version in
+          let hash = OpamPackage.Version.to_string hash in
+          OpamPackage.Version.of_string (v ^ "-" ^ hash))
+       )
+     in
+     match version with
      | Some v -> OpamFile.OPAM.with_version v
-     | None -> fun o -> o) @@
+     | _ -> fun o -> o) @@
     opam
   in
-  let open OpamProcess.Job.Op in
   OpamUpdate.fetch_dev_package url srcdir ?subpath nv @@| function
   | Not_available (_,s) -> raise (Fetch_Fail s)
   | Up_to_date _ | Result _ ->
