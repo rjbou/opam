@@ -234,7 +234,7 @@ module B = struct
              (OpamUrl.to_string remote_url)
              (OpamUrl.to_string remote_url))
 
-  let revision _ =
+  let revision ?human_readable:_ _ =
     Done None
 
   let sync_dirty ?subpath dir url = pull_url ?subpath dir None url

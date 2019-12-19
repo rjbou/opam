@@ -93,7 +93,7 @@ module VCS = struct
 
   let patch_applied _ _ = Done ()
 
-  let revision repo_root =
+  let revision ~human_readable repo_root =
     (* 'Weak hash' is only supported from 2.10.3, so provide a fallback *)
     darcs repo_root [ "show"; "repo" ] @@> fun r ->
     OpamSystem.raise_on_process_error r;

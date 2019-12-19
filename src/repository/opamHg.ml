@@ -47,7 +47,7 @@ module VCS = struct
     OpamSystem.raise_on_process_error r;
     Done ()
 
-  let revision repo_root =
+  let revision ~human_readable repo_root =
     hg repo_root [ "identify"; "--id" ] @@> fun r ->
     OpamSystem.raise_on_process_error r;
     match r.OpamProcess.r_stdout with

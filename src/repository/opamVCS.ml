@@ -22,7 +22,7 @@ module type VCS = sig
   val patch_applied: dirname -> url -> unit OpamProcess.job
   val diff: dirname -> url -> filename option OpamProcess.job
   val is_up_to_date: dirname -> url -> bool OpamProcess.job
-  val revision: dirname -> string option OpamProcess.job
+  val revision: human_readable:bool -> dirname -> string option OpamProcess.job
   val versioned_files: dirname -> string list OpamProcess.job
   val vc_dir: dirname -> dirname
   val current_branch: dirname -> string option OpamProcess.job
@@ -96,8 +96,8 @@ module Make (VCS: VCS) = struct
        VCS.reset_tree dirname url @@+ fun () ->
        Done (Result None))
 
-  let revision repo_root =
-    VCS.revision repo_root @@+ fun r ->
+  let revision ?(human_readable=false) repo_root =
+    VCS.revision ~human_readable repo_root @@+ fun r ->
     Done (OpamStd.Option.map OpamPackage.Version.of_string r)
 
   let sync_dirty ?subpath repo_root repo_url =

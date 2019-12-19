@@ -86,7 +86,7 @@ module B = struct
     OpamDownload.download ~quiet:true ~overwrite:true ?checksum remote_url dirname
     @@+ fun local_file -> Done (Result (Some local_file))
 
-  let revision _ =
+  let revision ?human_readable:_ _ =
     Done None
 
   let sync_dirty ?subpath:_ dir url = pull_url dir None url

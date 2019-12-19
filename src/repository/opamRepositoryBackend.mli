@@ -65,8 +65,10 @@ module type S = sig
 
   (** Return the (optional) revision of a given repository. Only useful for VCS
       backends. Is not expected to work with [pull_repo_update], which doesn't
-      update the VCS commit information. *)
-  val revision: dirname -> version option OpamProcess.job
+      update the VCS commit information. If [human_readable] is given, when
+      available returns the human readable form of the commit hash (e.g. `git
+      describe`). *)
+  val revision: ?human_readable:bool -> dirname -> version option OpamProcess.job
 
   (** Like [pull_url], except for locally-bound version control backends, where
       it should get the latest, uncommitted source. First, it performs a

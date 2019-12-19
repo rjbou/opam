@@ -284,10 +284,10 @@ let pull_tree
       | url, Result None -> Done (Result (OpamUrl.to_string url))
       | _, (Not_available _ as na) -> Done na
 
-let revision dirname url =
+let revision ?human_readable dirname url =
   let kind = url.OpamUrl.backend in
   let module B = (val find_backend_by_kind kind: OpamRepositoryBackend.S) in
-  B.revision dirname
+  B.revision ?human_readable dirname
 
 let pull_file label ?cache_dir ?(cache_urls=[])  ?(silent_hits=false)
     file checksums remote_urls =

@@ -48,7 +48,7 @@ module type VCS = sig
   val is_up_to_date: dirname -> url -> bool OpamProcess.job
 
   (** Returns an backend-specific identifier for the current revision. *)
-  val revision: dirname -> string option OpamProcess.job
+  val revision: human_readable:bool -> dirname -> string option OpamProcess.job
 
   (** Returns the list of files under version control *)
   val versioned_files: dirname -> string list OpamProcess.job

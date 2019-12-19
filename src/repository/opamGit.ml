@@ -137,8 +137,11 @@ module VCS : OpamVCS.VCS = struct
             else failwith "Commit not found on repository"))
       else OpamSystem.process_error r
 
-  let revision repo_root =
-    git repo_root ~verbose:false [ "rev-parse"; "HEAD" ] @@>
+  let revision ~human_readable repo_root =
+    (if human_readable then
+       git repo_root ~verbose:false ["describe"; "HEAD"]
+     else
+       git repo_root ~verbose:false [ "rev-parse"; "HEAD" ]) @@>
     fun r ->
     if r.OpamProcess.r_code = 128 then
       (OpamProcess.cleanup ~force:true r; Done None)
@@ -147,7 +150,7 @@ module VCS : OpamVCS.VCS = struct
        match r.OpamProcess.r_stdout with
        | []      -> Done None
        | full::_ ->
-         if String.length full > 8 then
+         if not human_readable && String.length full > 8 then
            Done (Some (String.sub full 0 8))
          else
            Done (Some full))
