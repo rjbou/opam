@@ -823,7 +823,7 @@ module Syntax = struct
                    in
                    OpamPrinter.items [f] :: strs
                  with Not_found -> strs
-             with Not_found | OpamPp.Bad_format _ -> strs
+             with Not_found | OpamPp.Bad_format _ -> strs)
           | Section (pos, {section_kind; section_name; section_items}) ->
             (try
                let ppa = List.assoc section_kind sections in
