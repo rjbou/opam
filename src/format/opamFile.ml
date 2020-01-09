@@ -602,6 +602,7 @@ module StateTable = struct
     sel_roots = OpamPackage.Set.empty;
     sel_compiler = OpamPackage.Set.empty;
     sel_pinned = OpamPackage.Set.empty;
+    sel_extra_files = OpamHash.Map.empty;
   }
 
   let pp_state =
@@ -658,6 +659,7 @@ module StateTable = struct
                       OpamPackage.Set.add (OpamPackage.create name version)
                         t.sel_pinned
                     | None -> t.sel_pinned);
+                sel_extra_files = OpamHash.Map.empty;
               })
            map
            empty)
@@ -1574,7 +1576,7 @@ end
 module SwitchSelectionsSyntax = struct
 
   let internal = "switch-state"
-  let format_version = OpamVersion.of_string "2.0"
+  let format_version = OpamVersion.of_string "2.1"
 
   type t = switch_selections
 
@@ -1583,6 +1585,7 @@ module SwitchSelectionsSyntax = struct
     sel_roots = OpamPackage.Set.empty;
     sel_compiler = OpamPackage.Set.empty;
     sel_pinned = OpamPackage.Set.empty;
+    sel_extra_files = OpamHash.Map.empty;
   }
 
   let pp_package =
@@ -1616,7 +1619,14 @@ module SwitchSelectionsSyntax = struct
              contained in the overlay only *)
           Pp.pp (fun ~pos:_ (nv,_) -> nv) (fun nv -> nv, []) -|
           Pp.V.string -| pp_package) -|
-       Pp.of_pair "Package set" OpamPackage.Set.(of_list, elements))
+       Pp.of_pair "Package set" OpamPackage.Set.(of_list, elements));
+    "extra-files", Pp.ppacc
+      (fun sel_extra_files t -> { t with sel_extra_files}) (fun t -> t.sel_extra_files)
+      ((Pp.V.map_list ~depth:2 @@
+       (Pp.V.map_pair
+          (Pp.V.string -| Pp.of_module "checksum" (module OpamHash))
+          Pp.V.string))
+       -| Pp.of_pair "HashMap" OpamHash.Map.(of_list, bindings));
   ]
 
   let pp =

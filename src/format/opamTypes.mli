@@ -338,6 +338,7 @@ type switch_selections = {
   sel_roots: package_set;
   sel_compiler: package_set;
   sel_pinned: package_set;
+  sel_extra_files: string OpamHash.Map.t;
 }
 
 
