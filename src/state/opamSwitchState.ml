@@ -111,8 +111,7 @@ let load lock_kind gt rt switch =
          (switch_config.OpamFile.Switch_config.opam_version))
       (OpamVersion.to_string OpamFormatUpgrade.lastest_compatible_switch_version);
   let { sel_installed = installed; sel_roots = installed_roots;
-        sel_pinned = pinned; sel_compiler = compiler_packages;
-        sel_extra_files = _} =
+        sel_pinned = pinned; sel_compiler = compiler_packages; } =
     load_selections gt switch
   in
   let pinned, pinned_opams =
@@ -342,8 +341,7 @@ let selections st =
   { sel_installed = st.installed;
     sel_roots = st.installed_roots;
     sel_compiler = st.compiler_packages;
-    sel_pinned = st.pinned;
-    sel_extra_files = OpamHash.Map.empty }
+    sel_pinned = st.pinned; }
 
 let unlock st =
   OpamSystem.funlock st.switch_lock;

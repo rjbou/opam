@@ -503,8 +503,7 @@ let from_1_2_to_1_3_dev2 root config =
         { sel_installed = installed;
           sel_roots = installed_roots;
           sel_pinned;
-          sel_compiler = compiler;
-          sel_extra_files= OpamHash.Map.empty; };
+          sel_compiler = compiler };
       OpamFilename.remove installed_f;
       OpamFilename.remove installed_roots_f;
       OpamFilename.remove pinned_f;
