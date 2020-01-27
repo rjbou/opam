@@ -2235,8 +2235,6 @@ let switch =
         ~full
         (if filename = "-" then None
          else Some (OpamFile.make (OpamFilename.of_string filename)));
-      OpamRepositoryState.drop rt;
-      OpamGlobalState.drop gt;
       `Ok ()
     | Some `import, [filename] ->
       OpamGlobalState.with_ `Lock_none @@ fun gt ->
