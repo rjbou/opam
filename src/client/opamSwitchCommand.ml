@@ -491,43 +491,43 @@ let import_t ?ask importfile t =
   end;
   t
 
-let read_overlay warn acc nv opam =
-  if warn && OpamFile.OPAM.extra_files opam <> None then
-    (OpamConsole.warning
-       "Metadata of package %s uses a files%s subdirectory, it may not be \
-        re-imported correctly (skipping definition)"
-       (OpamPackage.to_string nv) Filename.dir_sep;
-     acc)
-  else OpamPackage.Name.Map.add nv.name opam acc
-
-let read_extra_files full ~repos_roots acc opam =
-  if full then
-    match OpamFile.OPAM.get_extra_files ~repos_roots opam with
-    | [] -> acc
-    | files ->
-      (* read file and embed them into opam *)
-      List.fold_left (fun acc (file, _rel_file, hash) ->
-          if OpamFilename.exists file &&
-             OpamHash.check_file (OpamFilename.to_string file) hash then
-            let value = OpamFilename.read file in
-            let value' = Base64.encode_string value in
-            OpamHash.Map.add hash value' acc
-          else begin
-            OpamConsole.warning "Ignoring file %s with invalid hash"
-              (OpamFilename.to_string file);
-            acc
-          end)
-        acc files
-  else
-    acc
-
-let read_pkg_and_fold (f, acc) read packages =
+let read_overlays warn (read: package -> OpamFile.OPAM.t option) packages =
   OpamPackage.Set.fold (fun nv acc ->
       match read nv with
-      | Some opam -> f nv opam acc
+      | Some opam ->
+        if warn && OpamFile.OPAM.extra_files opam <> None then
+          (OpamConsole.warning
+             "Metadata of package %s uses a files%s subdirectory, it may not be \
+              re-imported correctly (skipping definition)"
+             (OpamPackage.to_string nv) Filename.dir_sep;
+           acc)
+        else OpamPackage.Name.Map.add nv.name opam acc
       | None -> acc)
     packages
-    acc
+    OpamPackage.Name.Map.empty
+
+let read_extra_files ~repos_roots (read: package -> OpamFile.OPAM.t option) packages =
+  OpamPackage.Set.fold (fun nv acc ->
+      match read nv with
+      | None -> acc
+      | Some opam ->
+        match OpamFile.OPAM.get_extra_files ~repos_roots opam with
+        | [] -> acc
+        | files ->
+          (* read file and embed them into opam *)
+          List.fold_left (fun acc (file, _rel_file, hash) ->
+              if OpamFilename.exists file &&
+                 OpamHash.check_file (OpamFilename.to_string file) hash then
+                let value = OpamFilename.read file in
+                let value' = Base64.encode_string value in
+                OpamHash.Map.add hash value' acc
+              else begin
+                OpamConsole.warning "Ignoring file %s with invalid hash"
+                  (OpamFilename.to_string file);
+                acc
+              end)
+            acc files)
+    packages OpamHash.Map.empty
 
 let export rt ?(full=false) filename =
   let switch = OpamStateConfig.get_switch () in
@@ -536,32 +536,39 @@ let export rt ?(full=false) filename =
     OpamFilename.with_flock `Lock_none (OpamPath.Switch.lock root switch)
     @@ fun _ ->
     let selections = S.safe_read (OpamPath.Switch.selections root switch) in
-    let repos_roots = OpamRepositoryState.get_root rt in
-    let collect_pkgs_extra_files =
-      (fun nv opam (pkgs, extra_files) ->
-         read_overlay (not full) pkgs nv opam,
-         read_extra_files full ~repos_roots extra_files opam),
-      (OpamPackage.Name.Map.empty, OpamHash.Map.empty)
+    let overlays =
+        read_overlays (not full) (fun nv ->
+            OpamFileTools.read_opam
+              (OpamPath.Switch.Overlay.package root switch nv.name))
+          selections.sel_pinned
     in
-    let overlays, extra_files =
-      read_pkg_and_fold collect_pkgs_extra_files
-        (fun nv -> OpamFileTools.read_opam
-            (OpamPath.Switch.Overlay.package root switch nv.name))
-        selections.sel_pinned
-    in
-    let overlays, extra_files =
+    let overlays =
       if full then
-        let installed_overlays, installed_extra_files =
-          read_pkg_and_fold collect_pkgs_extra_files
-            (fun nv ->
-               OpamFile.OPAM.read_opt
-                 (OpamPath.Switch.installed_opam root switch nv))
+        OpamPackage.Name.Map.union (fun a _ -> a) overlays @@
+        read_overlays (not full) (fun nv ->
+            OpamFile.OPAM.read_opt
+              (OpamPath.Switch.installed_opam root switch nv))
           (selections.sel_installed -- selections.sel_pinned)
-        in
-        OpamPackage.Name.Map.union (fun a _ -> a) overlays installed_overlays,
-        OpamHash.Map.union (fun a _ -> a) extra_files installed_extra_files
       else
-        overlays, extra_files
+        overlays
+    in
+    let extra_files =
+      if full then
+        let repos_roots = OpamRepositoryState.get_root rt in
+        let extra_pinned =
+          read_extra_files ~repos_roots (fun nv ->
+              OpamFileTools.read_opam
+                (OpamPath.Switch.Overlay.package root switch nv.name))
+            selections.sel_pinned
+        and extra_installed =
+          read_extra_files ~repos_roots (fun nv ->
+              OpamFile.OPAM.read_opt
+                (OpamPath.Switch.installed_opam root switch nv))
+            (selections.sel_installed -- selections.sel_pinned)
+        in
+        OpamHash.Map.union (fun a _ -> a) extra_pinned extra_installed
+      else
+        OpamHash.Map.empty
     in
     { OpamFile.SwitchExport.selections; extra_files; overlays }
   in
