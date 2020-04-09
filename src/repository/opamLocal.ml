@@ -133,6 +133,7 @@ let rsync_file ?(args=[]) url dst =
        if OpamFilename.exists dst then Result dst
        else Not_available (None, src_s)
      | Some l ->
+       OpamConsole.msg "\n>>>>>>\nsrc %s dst %s %B\n>>>>>>>>>>>>>>>>\n" (src_s) (OpamFilename.to_string dst) (OpamFilename.exists dst);
        OpamSystem.internal_error
          "unknown rsync output: {%s}"
          (String.concat ", " l))
