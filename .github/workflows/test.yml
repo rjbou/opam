@@ -29,4 +29,8 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+        echo sha $GITHUB_SHA
+        echo ref $GITHUB_REF
+        echo head ref $GITHUB_HEAD_REF
+        echo base ref $GITHUB_BASE_REF
 
