@@ -11,8 +11,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Check changelog
       run: |
-        git fetch origin $GITHUB_BASE_REF --depth=1
+        git fetch origin $GITHUB_BASE_REF --depth=1 --quiet
+        echo "base commit"
+        git show origin/$GITHUB_BASE_REF --format=oneline -s
         echo "diff"
         git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM | tee /tmp/diff
-        echo "failing diff"
         grep -q master_changes.md /tmp/diff
