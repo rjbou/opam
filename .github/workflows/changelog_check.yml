@@ -5,9 +5,8 @@ on:
     branches: master
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Check changelog
@@ -16,5 +15,7 @@ jobs:
         echo ${{ github.sha }}
         echo ${{ github.base_ref }}
         echo ${{ github.head_ref }}
+        git remote show
+        git remote show origin
         git branch -a
         git diff origin/$GITHUB_BASE_REF $GITHUB_REF --name-status --diff-filter=AM | grep -q master_changes.md
