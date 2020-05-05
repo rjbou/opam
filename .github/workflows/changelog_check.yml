@@ -14,7 +14,7 @@ jobs:
         echo "ref  ${{ github.ref }}"
         echo "sha  ${{ github.sha }}"
         echo "base ${{ github.base_ref }}"
-        echo 'head ${{ github.head_ref }}"
+        echo "head ${{ github.head_ref }}"
         git fetch origin $GITHUB_BASE_REF --depth=1
         git branch -a
         git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM | grep -q master_changes.md
