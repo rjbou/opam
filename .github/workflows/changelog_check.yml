@@ -10,11 +10,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - name: Check changelog
       run: |
-        pwd
-        echo github.base_ref
-        echo github.head_ref
+        echo ${{ github.base_ref }}
+        echo ${{ github.head_ref }}
         git branch -a
         git diff $GITHUB_BASE_REF --name-status --diff-filter=AM | grep master_changes.md
