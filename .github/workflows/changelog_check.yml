@@ -17,6 +17,6 @@ jobs:
         echo ${{ github.head_ref }}
         git fetch origin $GITHUB_BASE_REF --depth=1
         git branch -a
-        git log origin/$GITHUB_BASE_REF
+        git show origin/$GITHUB_BASE_REF
         git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM
         git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM | grep -q master_changes.md
