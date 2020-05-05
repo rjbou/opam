@@ -1,0 +1,15 @@
+name: Changelog check
+
+on:
+  pull-request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Check changelog
+      run: git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM | grep master_changes.md
