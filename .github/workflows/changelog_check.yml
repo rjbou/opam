@@ -17,5 +17,5 @@ jobs:
         echo ${{ github.base_ref }}
         echo ${{ github.head_ref }}
         git branch -a
-        git log -3 ${{ github.ref }}
+        git log -3 
         git diff $GITHUB_BASE_REF --name-status --diff-filter=AM | grep -q master_changes.md
