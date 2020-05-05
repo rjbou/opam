@@ -12,4 +12,4 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Check changelog
-      run: git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM | grep master_changes.md
+      run: git diff $GITHUB_BASE_REF --name-status --diff-filter=AM | grep master_changes.md
