@@ -18,7 +18,7 @@ jobs:
         git fetch origin $GITHUB_BASE_REF --depth=1
         git branch -a
         echo "show"
-        git show origin/$GITHUB_BASE_REF
+        git show origin/$GITHUB_BASE_REF --format=oneline -s
         echo "diff"
         git diff origin/$GITHUB_BASE_REF --name-status --diff-filter=AM
         echi "failing diff"
