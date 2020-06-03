@@ -11,4 +11,7 @@ note.
   * Fix arch query [#4200 @rjbou]
   * Fix performance issue of depext under Docker/debian [#4165 @AltGr]
   * Refactor package status [#4152 #4200 @rjbou]
+  * Add environment variables handling [#4200 @rjbou]
   * Add Macport support [#4152 @rjbou]
+  * Homebrew: add no auto update env var for install, accept `pkgname` and `pkgnam@version` on query [#4200 @rjbou]
+
