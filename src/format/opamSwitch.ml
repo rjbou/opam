@@ -19,12 +19,21 @@ let is_external s =
 
 let external_dirname = "_opam"
 
+let check s =
+  String.iter (function
+      | '<' | '>' | '!' | '`' | '$' | '(' | ')' | ':' as c ->
+        failwith (Printf.sprintf "Invalid character '%c' in switch name %S" c s)
+      | _ -> ()) s;
+  s
+
 let of_string s =
+  check @@
   if is_external s then OpamFilename.Dir.(to_string (of_string s))
   else s
 
 let of_dirname d =
   let s = OpamFilename.Dir.to_string d in
+  check @@
   try
     let swdir = Unix.readlink (Filename.concat s external_dirname) in
     let swdir =
