@@ -23,6 +23,7 @@ Possibly scripts breaking changes are prefixed with ✘
 ## Switch
   * Fix Not_found with `opam switch create . --deps` [#4151 @AltGr]
   * Package Var: resolve self `name` variable for orphan packages [#4228 @rjbou - fix #4224]
+  * ✘ Reject (shell) character on switch names [#4237 @rjbou - fix #4231]
 
 ## Pin
   * Don't keep unpinned package version if it exists in repo [#4073 @rjbou - fix #3630]
@@ -38,14 +39,21 @@ Possibly scripts breaking changes are prefixed with ✘
   * Refactor package status [#4152 @rjbou]
   * Add Macport support [#4152 @rjbou]
 
+## Env
+  * Fix `OPAMSWITCH` empty string setting, consider as unset [#4237 @rjbou]
+
 ## Remove
   * Fix autoremove env var handling [#4219 @rjbou - fix #4217]
 
 ## Repository management
   * Fix temp files repository cleaning [#4197 @rjbou]
 
+## Opam installer
+  * For paths, remove use of empty switch in favor of a context-less module [#4237 @rjbou]
+
 ## Internal
   * Disable chrono when timestamps are disables [#4206 @rjbou]
+  * Path: introduce a functor to permit replicating switch layout in different contexts [#4237 @timberston - fix #4030]
 
 ## Test
   * Add show cram test [#4206 @rjbou]
