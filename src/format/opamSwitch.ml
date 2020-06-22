@@ -20,10 +20,17 @@ let is_external s =
 let external_dirname = "_opam"
 
 let check s =
-  String.iter (function
-      | '<' | '>' | '!' | '`' | '$' | '(' | ')' | ':' as c ->
-        failwith (Printf.sprintf "Invalid character '%c' in switch name %S" c s)
-      | _ -> ()) s;
+  let re =
+    Re.(compile @@
+        seq [
+          bol;
+          opt @@ seq [ wordc ; char ':'; char '/' ];
+          rep1 @@ diff any @@ set "<>!`$():";
+          eol
+        ])
+  in
+  (try ignore @@ Re.exec re s with Not_found ->
+     failwith (Printf.sprintf "Invalid character in switch name %S" s));
   s
 
 let of_string s =
