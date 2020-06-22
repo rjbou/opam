@@ -54,3 +54,38 @@ let get_root root s =
   if is_external s
   then OpamFilename.Dir.of_string (Filename.concat s external_dirname)
   else OpamFilename.Op.(root / s)
+
+
+
+(*
+let lst =
+  [
+    "C:/toto" ;
+    "C:/toto/foo" ;
+    "C:/toto:titi/foo";
+    "./hello/lmp";
+    "./hello/ld:mp";
+    "/tlo/prefx/./hello/lmp";
+    "/tlo/prefx/./hello/ld:mp";
+    "/tlo/prefx//hello/lmp";
+    "/tlo/prefx//hello/ld<mp";
+  ]
+;;
+
+
+;;
+
+
+List.map (fun s ->
+    let res =
+      try
+        let r = try Re.(exec re s) with Not_found -> failwith "EXEC" in
+(*         Re.(Group.get r 0) *)
+Re.matches re s
+      with Not_found -> ["GROUP"]
+         | Failure s -> [s]
+    in
+    s,res
+  ) lst
+;;
+*)
