@@ -20,6 +20,7 @@ let is_external s =
 let external_dirname = "_opam"
 
 let check s =
+OpamConsole.error "SWITCHIS %S" s;
   let re =
     Re.(compile @@
         seq [
