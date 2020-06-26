@@ -1,0 +1,135 @@
+name: Opam
+
+on: [push, pull_request]
+
+env:
+  COMMIT_RANGE: ${{ github.event.before }}...${{ github.event.after }}
+
+jobs:
+  linux_build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.10, ubuntu-20.04, macos-latest]
+        ocaml-version: [4.02.3, 4.03.0, 4.04.2, 4.05.0, 4.06.1, 4.07.1, 4.08.1, 4.09.1, 4.10.0]
+    env:
+      OCAML_PORT: ${{ matrix.ocaml-version }}
+      OCAML_VERSION: ${{ matrix.ocaml-version }}
+      BUILD_STAGE_NAME: Build
+    steps:
+      - name: addons
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get install aspcud libglpk-dev busybox
+      - uses: actions/checkout@v2
+      - name: before_install
+        run: bash -exu tests/ci/unix.sh prepare
+      - name: install
+        run: bash -exu tests/ci/unix.sh install
+      - name: script
+        run: bash -exu tests/ci/unix.sh build
+
+  linux_hygiene:
+    runs-on: ubuntu-latest
+    needs: linux_build
+    env:
+      BUILD_STAGE_NAME: Hygiene
+    steps:
+      - uses: actions/checkout@v2
+      - name: script
+        run: bash -exu tests/ci/unix.sh build
+
+  unix_test:
+    runs-on: ${{ matrix.os }}
+    needs: linux_hygiene
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cold: [0, 1]
+        include:
+          - cold: 0
+            ocaml-version: 4.10.0
+            opam-test: 1
+    env:
+      COLD: ${{ matrix.cold }}
+      OCAML_VERSION: ${{ matrix.ocaml-version }}
+      OPAM_TEST: ${{ matrix.opam-test }}
+      BUILD_STAGE_NAME: Test
+    steps:
+      - name: addons
+        run: sudo apt-get install aspcud libglpk-dev busybox
+      - uses: actions/checkout@v2
+      - name: before_install
+        run: bash -exu tests/ci/unix.sh prepare
+      - name: install
+        run: bash -exu tests/ci/unix.sh install
+      - name: script
+        run: bash -exu tests/ci/unix.sh build
+
+  linux_upgrade:
+    runs-on: ubuntu-latest
+    needs: unix_test
+    env:
+      OCAML_VERSION: 4.10.0
+    steps:
+      - name: addons
+        run: sudo apt-get install aspcud libglpk-dev busybox
+      - uses: actions/checkout@v2
+      - name: before_install
+        run: bash -exu tests/ci/unix.sh prepare
+      - name: install
+        run: bash -exu tests/ci/unix.sh install
+      - name: script
+        run: bash -exu tests/ci/unix.sh build
+
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    strategy:
+      fail-fast: false
+      matrix:
+        cyg-root: [cygwin64]
+        cyg-arch: [x86_64]
+        git-for-windows: [0]
+        dep-mode: [lib-ext]
+        ocaml-port: ["", msvc, msvc64, mingw, mingw64]
+        include:
+          - ocaml-port: ""
+            cyg-root: cygwin
+            cyg-arch: x86
+          - ocaml-port: msvc
+            dep-mode: lib-pkg
+            git-for-windows: 1
+          - ocaml-port: mingw64
+            dep-mode: lib-pkg
+            git-for-windows: 1
+    env:
+      CYG_ROOT: ${{ matrix.cyg-root }}
+      CYG_ARCH: ${{ matrix.cyg-arch }}
+      OCAML_PORT: ${{ matrix.ocaml-port }}
+      DEP_MODE: ${{ matrix.dep-mode }}
+      GIT_FOR_WINDOWS: ${{ matrix.git-for-windows }}
+      CYG_CACHE: C:/cygwin/var/cache/setup
+      CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: $GITHUB_WORKSPACE\\bootstrap
+          key: never-flush-cache
+      - uses: actions/cache@v2
+        with:
+          path: $GITHUB_WORKSPACE\\src_ext\\archives
+          key: never-flush-cache
+
+      - name: Opam install
+        run: call "%GITHUB_WORKSPACE%\tests\ci\windows_build.cmd" install
+      - name: Opam build
+        run: call "%GITHUB_WORKSPACE%\tests\ci\windows_build.cmd" build
+      - name: Opam test
+        run: call "%GITHUB_WORKSPACE%\tests\ci\windows_build.cmd" test

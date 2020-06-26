@@ -34,13 +34,13 @@ cache:
   - C:\projects\opam\src_ext\archives
 
 install:
-  - call "%APPVEYOR_BUILD_FOLDER%\appveyor_build.cmd" install
+  - call "%APPVEYOR_BUILD_FOLDER%\tests\ci\windows_build.cmd" install
 
 build_script:
-  - call "%APPVEYOR_BUILD_FOLDER%\appveyor_build.cmd" build
+  - call "%APPVEYOR_BUILD_FOLDER%\tests\ci\windows_build.cmd" build
 
 test_script:
-  - call "%APPVEYOR_BUILD_FOLDER%\appveyor_build.cmd" test
+  - call "%APPVEYOR_BUILD_FOLDER%\tests\ci\windows_build.cmd" test
 
 # Uncomment this to enable Remote Desktop on the build worker at the end of the
 # build. The worker is available for the remainder of the allocated hour.

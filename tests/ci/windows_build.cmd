@@ -18,7 +18,15 @@
 @rem BASICALLY, DO THE TESTING IN BASH...
 
 @rem Do not call setlocal!
-@echo off
+echo on
+
+if "%APPVEYOR%" equ True (
+  set BUILD_FOLDER="%APPVEYOR_BUILD_FOLDER%"
+) else ( if "%GITHUB_ACTIONS%" equ true (
+  set BUILD_FOLDER="%GITHUB_WORKSPACE%"
+) else (
+  set BUILD_FOLDER="%CD%"
+))
 
 goto %1
 
@@ -65,7 +73,7 @@ echo System architecture: %PLATFORM%
 set CYG_ROOT=C:\%CYG_ROOT%
 if not defined CYG_SETUP set CYG_SETUP="%CYG_ROOT%\setup-%CYG_ARCH%.exe"
 
-cd "%APPVEYOR_BUILD_FOLDER%"
+cd "%BUILD_FOLDER%"
 
 :: if "%OCAML_PORT%" equ "" (
 ::   rem Need unreleased Cygwin 3.1.7 for bugfix in acl_get_tag_type and acl_get_permset
@@ -137,7 +145,7 @@ if "%INSTALLED_URL%" neq "%OCAML_URL% %FLEXDLL_URL% %DEP_MODE%" if exist bootstr
   if exist src_ext\archives\nul rd /s/q src_ext\archives
 )
 
-if "%DEP_MODE%" equ "lib-pkg" "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make --no-print-directory -C src_ext lib-pkg-urls | head -n -1 | sort | uniq" > current-lib-pkg-list
+if "%DEP_MODE%" equ "lib-pkg" "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make --no-print-directory -C src_ext lib-pkg-urls | head -n -1 | sort | uniq" > current-lib-pkg-list
 if not exist bootstrap\installed-packages goto SkipCheck
 
 fc bootstrap\installed-packages current-lib-pkg-list > nul
@@ -145,7 +153,7 @@ if %ERRORLEVEL% equ 1 (
   echo lib-pkg packages changed:
   "%CYG_ROOT%\bin\diff.exe" bootstrap/installed-packages current-lib-pkg-list | "%CYG_ROOT%\bin\sed.exe" -ne "s/</Remove/p" -e "s/>/Add/p" | "%CYG_ROOT%\bin\gawk.exe" "BEGIN{FS="" ""}$2!=k{if(k!="""")print o==f?w:o;w=$0;k=$2;f=o=$2"" ""$3;next}{o=""Switch ""o"" --> ""$3}END{print o==f?w:o}"
   echo lib-pkg will be re-built
-  "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make --no-print-directory -C src_ext reset-lib-pkg"
+  "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make --no-print-directory -C src_ext reset-lib-pkg"
   del bootstrap\installed-packages
 ) else (
   del current-lib-pkg-list
@@ -153,10 +161,10 @@ if %ERRORLEVEL% equ 1 (
 
 :SkipCheck
 
-"%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make --no-print-directory -C src_ext cache-archives" || exit /b 1
+"%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make --no-print-directory -C src_ext cache-archives" || exit /b 1
 
 if not exist bootstrap\nul (
-  "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make compiler" || exit /b 1
+  "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make compiler" || exit /b 1
   for /f "delims=" %%U in ('type bootstrap\installed-tarball') do echo %%U %DEP_MODE%> bootstrap\installed-tarball
   if exist bootstrap\ocaml-*.tar.gz del bootstrap\ocaml-*.tar.gz
   if "%OCAML_PORT%" neq "" if exist bootstrap\flexdll-*.tar.gz del bootstrap\flexdll-*.tar.gz
@@ -170,12 +178,12 @@ if not exist bootstrap\nul (
     md bootstrap\%%D
   )
 ) else (
-  if not exist bootstrap\installed-packages "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make --no-print-directory -C src_ext reset-lib-pkg"
-  if exist current-lib-pkg-list "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && GEN_CONFIG_ONLY=1 shell/bootstrap-ocaml.sh %OCAML_PORT%" || exit /b 1
+  if not exist bootstrap\installed-packages "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make --no-print-directory -C src_ext reset-lib-pkg"
+  if exist current-lib-pkg-list "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && GEN_CONFIG_ONLY=1 shell/bootstrap-ocaml.sh %OCAML_PORT%" || exit /b 1
 )
 
 if exist current-lib-pkg-list (
-  "%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER && make lib-pkg" || exit /b 1
+  "%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER && make lib-pkg" || exit /b 1
   move current-lib-pkg-list bootstrap\installed-packages
 )
 
@@ -192,7 +200,7 @@ set PRIVATE_RUNTIME=
 if "%OCAML_PORT:~0,5%" equ "mingw" set PRIVATE_RUNTIME=--with-private-runtime
 set WITH_MCCS=--with-mccs
 if "%DEP_MODE%" equ "lib-pkg" set WITH_MCCS=
-"%CYG_ROOT%\bin\bash.exe" -lc "cd $APPVEYOR_BUILD_FOLDER %LIB_PKG% && ./configure %PRIVATE_RUNTIME% %WITH_MCCS% %LIB_EXT% && make opam %POST_COMMAND%" || exit /b 1
+"%CYG_ROOT%\bin\bash.exe" -lc "cd $BUILD_FOLDER %LIB_PKG% && ./configure %PRIVATE_RUNTIME% %WITH_MCCS% %LIB_EXT% && make opam %POST_COMMAND%" || exit /b 1
 goto :EOF
 
 :test
@@ -211,7 +219,9 @@ if "%OCAML_PORT%" neq "" if "%GIT_FOR_WINDOWS%" equ "1" (
   "C:\Program Files\Git\cmd\git.exe" config --global core.autocrlf true
   "C:\Program Files\Git\cmd\git.exe" config --global core.autocrlf
 )
-"%CYG_ROOT%\bin\bash.exe" -lc "%PATH_SHIM% make -C $APPVEYOR_BUILD_FOLDER tests" || (for %%I in (%APPVEYOR_BUILD_FOLDER%\_build\default\tests\failed-*.log) do appveyor PushArtifact %%I) && exit /b 1
+if "%APPVEYOR%" equ True (
+  "%CYG_ROOT%\bin\bash.exe" -lc "%PATH_SHIM% make -C $BUILD_FOLDER tests" || (for %%I in (%BUILD_FOLDER%\_build\default\tests\failed-*.log) do appveyor PushArtifact %%I) && exit /b 1
+)
 rem Can't yet do an opam init with the native Windows builds
-if "%OCAML_PORT%" equ "" "%CYG_ROOT%\bin\bash.exe" -lc "make -C $APPVEYOR_BUILD_FOLDER run-appveyor-test" || exit /b 1
+if "%OCAML_PORT%" equ "" "%CYG_ROOT%\bin\bash.exe" -lc "make -C $BUILD_FOLDER run-windows-test" || exit /b 1
 goto :EOF

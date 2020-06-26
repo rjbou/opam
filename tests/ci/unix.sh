@@ -10,29 +10,51 @@ COLD=${COLD:-0}
 OPAM_TEST=${OPAM_TEST:-0}
 EXTERNAL_SOLVER=${EXTERNAL_SOLVER:-}
 
+if [[ ${TRAVIS:-} = 'true' ]]; then
+    COMMIT_RANGE=$TRAVIS_COMMIT_RANGE
+    COMMIT=$TRAVIS_COMMIT
+    EVENT_TYPE=$TRAVIS_EVENT_TYPE
+    BUILD_STAGE_NAME=$TRAVIS_BUILD_STAGE_NAME
+    OS_NAME=$TRAVIS_OS_NAME
+    BRANCH=$TRAVIS_BRANCH
+    if [[ $OS_NAME = osx ]]; then OS_NAME=mac0S; fi
+elif [[ ${GITHUB_ACTIONS:-} = 'true' ]]; then
+    COMMIT=$GITHUB_SHA
+    EVENT_TYPE=$GITHUB_EVENT_NAME
+    OS_NAME=$RUNNER_OS
+    BRANCH=$GITHUB_REF
+fi
+
+printf "COMMIT_RANGE=%s" "$COMMIT_RANGE"
+printf "COMMIT=%s" "$COMMIT"
+printf "EVENT_TYPE=%s" "$EVENT_TYPE"
+printf "BUILD_STAGE_NAME=%s" "$BUILD_STAGE_NAME"
+printf "OS_NAME=%s" "$OS_NAME"
+printf "BRANCH=%s" "$BRANCH"
+
 set +x
-echo "TRAVIS_COMMIT_RANGE=$TRAVIS_COMMIT_RANGE"
-echo "TRAVIS_COMMIT=$TRAVIS_COMMIT"
-if [[ $TRAVIS_EVENT_TYPE = 'pull_request' ]] ; then
+echo "COMMIT_RANGE=$COMMIT_RANGE"
+echo "COMMIT=$COMMIT"
+if [[ $EVENT_TYPE = 'pull_request' ]] ; then
   FETCH_HEAD=$(git rev-parse FETCH_HEAD)
   echo "FETCH_HEAD=$FETCH_HEAD"
 else
-  FETCH_HEAD=$TRAVIS_COMMIT
+  FETCH_HEAD=$COMMIT
 fi
 
-if [[ $TRAVIS_EVENT_TYPE = 'push' ]] ; then
-  if ! git cat-file -e "$TRAVIS_COMMIT" 2> /dev/null ; then
-    echo 'TRAVIS_COMMIT does not exist - CI failure'
+if [[ $EVENT_TYPE = 'push' ]] ; then
+  if ! git cat-file -e "$COMMIT" 2> /dev/null ; then
+    echo 'COMMIT does not exist - CI failure'
     exit 1
   fi
 else
-  if [[ $TRAVIS_COMMIT != $(git rev-parse FETCH_HEAD) ]] ; then
-    echo 'WARNING! Travis TRAVIS_COMMIT and FETCH_HEAD do not agree!'
-    if git cat-file -e "$TRAVIS_COMMIT" 2> /dev/null ; then
-      echo 'TRAVIS_COMMIT exists, so going with it'
+  if [[ $COMMIT != $(git rev-parse FETCH_HEAD) ]] ; then
+    echo 'WARNING! COMMIT and FETCH_HEAD do not agree!'
+    if git cat-file -e "$COMMIT" 2> /dev/null ; then
+      echo 'COMMIT exists, so going with it'
     else
-      echo 'TRAVIS_COMMIT does not exist; setting to FETCH_HEAD'
-      TRAVIS_COMMIT=$FETCH_HEAD
+      echo 'COMMIT does not exist; setting to FETCH_HEAD'
+      COMMIT=$FETCH_HEAD
     fi
   fi
 fi
@@ -100,15 +122,15 @@ unset-dev-version () {
 
 case "$TARGET" in
   prepare)
-    if [ "$TRAVIS_BUILD_STAGE_NAME" = "Hygiene" ] ; then
+    if [ "$BUILD_STAGE_NAME" = "Hygiene" ] ; then
       exit 0
     fi
     make --version
     mkdir -p ~/local/bin
 
     # Git should be configured properly to run the tests
-    git config --global user.email "travis@example.com"
-    git config --global user.name "Travis CI"
+    git config --global user.email "ci@example.com"
+    git config --global user.name "CI"
     git config --global gc.autoDetach false
 
   # Disable bubblewrap wrapping, it's not available within Docker
@@ -155,7 +177,7 @@ case "$TARGET" in
     exit 0
     ;;
   install)
-    if [ "$TRAVIS_BUILD_STAGE_NAME" = "Hygiene" ] ; then
+    if [ "$BUILD_STAGE_NAME" = "Hygiene" ] ; then
       exit 0
     fi
     if [[ $COLD -eq 1 ]] ; then
@@ -226,20 +248,20 @@ case "$TARGET" in
 esac
 
 set +x
-if [ "$TRAVIS_BUILD_STAGE_NAME" = "Hygiene" ] ; then
+if [ "$BUILD_STAGE_NAME" = "Hygiene" ] ; then
   ERROR=0
-  if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ] ; then
-    TRAVIS_CUR_HEAD=${TRAVIS_COMMIT_RANGE%%...*}
-    TRAVIS_PR_HEAD=${TRAVIS_COMMIT_RANGE##*...}
+  if [ "$EVENT_TYPE" = "pull_request" ] ; then
+    CUR_HEAD=${COMMIT_RANGE%%...*}
+    PR_HEAD=${COMMIT_RANGE##*...}
     DEEPEN=50
-    while ! git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD" >& /dev/null
+    while ! git merge-base "$CUR_HEAD" "$PR_HEAD" >& /dev/null
     do
-      echo "Deepening $TRAVIS_BRANCH by $DEEPEN commits"
-      git fetch origin --deepen=$DEEPEN "$TRAVIS_BRANCH"
+      echo "Deepening $BRANCH by $DEEPEN commits"
+      git fetch origin --deepen=$DEEPEN "$BRANCH"
       ((DEEPEN*=2))
     done
-    TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
-    if ! git diff "$TRAVIS_MERGE_BASE..$TRAVIS_PR_HEAD" --name-only --exit-code -- shell/install.sh > /dev/null ; then
+    MERGE_BASE=$(git merge-base "$CUR_HEAD" "$PR_HEAD")
+    if ! git diff "$MERGE_BASE..$PR_HEAD" --name-only --exit-code -- shell/install.sh > /dev/null ; then
       echo "shell/install.sh updated - checking it"
       eval $(grep '^\(OPAM_BIN_URL_BASE\|DEV_VERSION\|VERSION\)=' shell/install.sh)
       echo "OPAM_BIN_URL_BASE=$OPAM_BIN_URL_BASE"
@@ -272,13 +294,13 @@ if [ "$TRAVIS_BUILD_STAGE_NAME" = "Hygiene" ] ; then
       fi
     fi
   fi
-  if [[ -z $TRAVIS_COMMIT_RANGE ]]
-  then CheckConfigure "$TRAVIS_COMMIT"
+  if [[ -z $COMMIT_RANGE ]]
+  then CheckConfigure "$COMMIT"
   else
-    if [[ $TRAVIS_EVENT_TYPE = 'pull_request' ]]
-    then TRAVIS_COMMIT_RANGE=$TRAVIS_MERGE_BASE..$TRAVIS_PULL_REQUEST_SHA
+    if [[ $EVENT_TYPE = 'pull_request' ]]
+    then COMMIT_RANGE=$MERGE_BASE..$PULL_REQUEST_SHA
     fi
-    for commit in $(git rev-list "$TRAVIS_COMMIT_RANGE" --reverse)
+    for commit in $(git rev-list "$COMMIT_RANGE" --reverse)
     do
       CheckConfigure "$commit"
     done
@@ -316,7 +338,7 @@ export OCAMLRUNPARAM=b
   if [[ $OPAM_TEST$COLD -eq 0 ]] ; then
     make lib-ext
   fi
-  if [ "$TRAVIS_BUILD_STAGE_NAME" = "Upgrade" ]; then
+  if [ "$BUILD_STAGE_NAME" = "Upgrade" ]; then
     unset-dev-version
   fi
   make all admin
@@ -351,7 +373,7 @@ export OCAMLRUNPARAM=b
     done
     # Compile and run opam-rt
     cd ~/build
-    wget https://github.com/ocaml/opam-rt/archive/$TRAVIS_PULL_REQUEST_BRANCH.tar.gz -O opam-rt.tar.gz || \
+    wget https://github.com/ocaml/opam-rt/archive/$PULL_REQUEST_BRANCH.tar.gz -O opam-rt.tar.gz || \
     wget https://github.com/ocaml/opam-rt/archive/master.tar.gz -O opam-rt.tar.gz
     tar -xzf opam-rt.tar.gz
     cd opam-rt-*
@@ -360,7 +382,7 @@ export OCAMLRUNPARAM=b
 
     opam switch default
     opam switch remove $OPAMBSSWITCH --yes
-  elif [ "$TRAVIS_BUILD_STAGE_NAME" != "Upgrade" ]; then
+  elif [ "$BUILD_STAGE_NAME" != "Upgrade" ]; then
     # Note: these tests require a "system" compiler and will use the one in $OPAMBSROOT
     OPAMEXTERNALSOLVER="$EXTERNAL_SOLVER" make tests ||
       (tail -n 2000 _build/default/tests/fulltest-*.log; echo "-- TESTS FAILED --"; exit 1)
@@ -368,7 +390,7 @@ export OCAMLRUNPARAM=b
   (set +x ; echo -en "travis_fold:end:build\r") 2>/dev/null
 )
 
-if [ "$TRAVIS_BUILD_STAGE_NAME" = "Upgrade" ]; then
+if [ "$BUILD_STAGE_NAME" = "Upgrade" ]; then
   OPAM12DIR=~/opam1.2
   CACHE=$OPAM12DIR/cache
   export OPAMROOT=$CACHE/root20

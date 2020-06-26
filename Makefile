@@ -118,7 +118,7 @@ opam-%.install: $(DUNE_DEP)
 	$(DUNE) build $(DUNE_ARGS) -p opam-$* $@
 
 .PHONY: build-opam-installer
-build-opam-installer: $(DUNE_DEP) 
+build-opam-installer: $(DUNE_DEP)
 	$(DUNE) build --profile=$(DUNE_PROFILE) $(DUNE_ARGS)$(DUNE_PROMOTE_ARG) opam-installer.install
 opam-installer.install: $(DUNE_DEP)
 	$(DUNE) build --profile=$(DUNE_PROFILE) $(DUNE_ARGS)$(DUNE_PROMOTE_ARG) opam-installer.install
@@ -233,9 +233,9 @@ cold: compiler
 cold-%:
 	env PATH="`pwd`/bootstrap/ocaml/bin:$$PATH" $(MAKE) $*
 
-.PHONY: run-appveyor-test
-run-appveyor-test:
-	env PATH="`pwd`/bootstrap/ocaml/bin:$$PATH" ./appveyor_test.sh
+.PHONY: run-windows-test
+run-windows-test:
+	env PATH="`pwd`/bootstrap/ocaml/bin:$$PATH" ./tests/ci/windows_test.sh
 
 .PHONY: reftests%
 reftests: opam
