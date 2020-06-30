@@ -24,7 +24,7 @@ let check s =
     Re.(compile @@
         seq [
           bol;
-          opt @@ seq [ wordc ; char ':'; set "/\\" ];
+          opt @@ seq [ wordc ; char ':'; alt [ char '/' ; seq [ char '\\'; opt @@ char '\\']]];
           rep1 @@ diff any @@ set "<>!`$():";
           eol
         ])
