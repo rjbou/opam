@@ -259,11 +259,10 @@ let packages_status packages =
     let str_pkgs =
       OpamSysPkg.(Set.fold (fun p acc -> to_string p :: acc) packages [])
     in
-    (* First query regular package *)
-    let sys_installed =
+    let dpkg_query str_pkgs =
       (* ouput:
-         >ii  uim-gtk3                 1:1.8.8-6.1  amd64    Universal ...
-         >ii  uim-gtk3-immodule:amd64  1:1.8.8-6.1  amd64    Universal ...
+               >ii  uim-gtk3                 1:1.8.8-6.1  amd64    Universal ...
+               >ii  uim-gtk3-immodule:amd64  1:1.8.8-6.1  amd64    Universal ...
       *)
       let re_pkg =
         Re.(compile @@ seq
@@ -279,19 +278,50 @@ let packages_status packages =
       |> snd
       |> with_regexp_sgl re_pkg
     in
-    let sys_available =
+    (* First query regular package *)
+    let sys_installed = dpkg_query str_pkgs in
+    let _, sys_available, vmap =
       run_query_command "apt-cache"
-        ["search"; names_re ~str_pkgs (); "--names-only"]
-      |> List.fold_left (fun avail l ->
-          match OpamStd.String.cut_at l ' ' with
-          | Some (pkg, _) -> pkg +++ avail
-          | None ->  avail)
-        OpamSysPkg.Set.empty
+        [ "showpkg" ; "--no-generate"; (names_re ~str_pkgs ())]
+      |> List.fold_left (fun (part, amap, vmap) l ->
+          match OpamStd.String.split l ' ', part with
+          | "Package:"::pkg::_, _ ->
+            let pkg = OpamSysPkg.of_string pkg in
+            `pkg pkg,
+            OpamSysPkg.Set.add pkg amap,
+            vmap
+          | "Reverse"::"Provides:"::_, `pkg pkg ->
+            `maybe_concrete pkg, amap, vmap
+          | pkg::_version::_, (`maybe_concrete vpkg | `concrete vpkg)->
+            `concrete vpkg, amap,
+            OpamSysPkg.Map.update vpkg (fun pkgs -> pkg +++ pkgs) OpamSysPkg.Set.empty vmap
+          | _,_ ->
+            part, amap, vmap
+        ) (`drop, OpamSysPkg.Set.empty, OpamSysPkg.Map.empty)
     in
     let available, not_found =
       compute_sets sys_installed ~sys_available
     in
-    let installed = packages %% sys_installed in
+    let virtual_packages, sys_installed_v =
+      let installed =
+        OpamSysPkg.Map.values vmap
+        |> List.fold_left (++) OpamSysPkg.Set.empty
+        |> OpamSysPkg.Set.elements
+        |> List.map OpamSysPkg.to_string
+        |> dpkg_query
+      in
+      OpamSysPkg.Map.keys vmap |> OpamSysPkg.Set.of_list,
+      OpamSysPkg.Map.fold (fun vpkg pkgs set ->
+          if OpamSysPkg.Set.exists (fun pkg -> OpamSysPkg.Set.mem pkg installed) pkgs then
+            OpamSysPkg.Set.add vpkg set else set)
+        vmap OpamSysPkg.Set.empty
+    in
+    msg "virt packages" (`set virtual_packages);
+    msg "virt packages correspondence" (`map vmap);
+    msg "virt packages installed" (`set sys_installed_v);
+    let available = available -- sys_installed_v in
+    let not_found = not_found -- available -- sys_installed_v in
+    let installed = (packages %% sys_installed) ++ sys_installed_v in
     msg "installed" (`set installed);
     msg "available" (`set available);
     msg "not_found" (`set not_found);
