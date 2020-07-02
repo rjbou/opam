@@ -14,7 +14,7 @@ Possibly scripts breaking changes are prefixed with ✘
 ## Build
   * Opam file build using dune, removal of opam-%.install makefile target [#4178 @rjbou - fix #4173]
   * Use version var in opam file instead of equal current version number in opamlib dependencies [#4178 @rjbou]
-  * Upgrade bootstrap OCaml compiler from 4.07.1 to 4.10.0 [#4234 @avsm]
+  * ext: fix extlib url [#4248 @rjbou]
 
 ## Install
   * Add `_build` to rsync exclusion list [#4230 @rjobou - fix #4195]
@@ -32,10 +32,16 @@ Possibly scripts breaking changes are prefixed with ✘
   * ✘ Keep package order given via cli [#4179 @rjbou - fix #4163]
   * `--sort`` apply to with all options, not only `--just-file` [#4179 @rjbou]
 
+
 ## Depext
+  * Fix arch query [#4200 @rjbou]
   * Fix performance issue of depext under Docker/debian [#4165 @AltGr]
-  * Refactor package status [#4152 @rjbou]
+  * Refactor package status [#4152 #4200 @rjbou]
+  * Add environment variables handling [#4200 @rjbou]
   * Add Macport support [#4152 @rjbou]
+  * Homebrew: add no auto update env var for install, accept `pkgname` and `pkgnam@version` on query [#4200 @rjbou]
+  * Force LC_ALL=C for query commands [#4200 @rjbou]
+  * Fix install command dryrun [#4200 @rjbou]
 
 
 ## Remove
@@ -55,3 +61,11 @@ Possibly scripts breaking changes are prefixed with ✘
 
 ## Doc
   * add doc/warning for  Filename.rmdir_cleanup [#4197 @rjbou]
+
+## Var
+  * Not found message show scope [#4192 @rjbou]
+  * No scope needed for variable display [#4192 @rjbou - fix #4183]
+  * Fix package variable resolution [#4192 @rjbou - fix #4182]
+
+## Infrastructure
+  * Use OCaml 4.09.1 for the make cold target [#4257 @dra27]

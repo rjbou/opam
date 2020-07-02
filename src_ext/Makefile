@@ -11,11 +11,11 @@ endif
 
 PATCH ?= patch
 
-URL_ocaml = http://caml.inria.fr/pub/distrib/ocaml-4.10/ocaml-4.10.0.tar.gz
-MD5_ocaml = 34de3225e40d92a6a8b03f1626a01dd3
+URL_ocaml = https://caml.inria.fr/pub/distrib/ocaml-4.09/ocaml-4.09.1.tar.gz
+MD5_ocaml = 1a7fc32aebbad6cb821ef26a396f78e7
 
-URL_flexdll = https://github.com/alainfrisch/flexdll/archive/0.37.tar.gz
-MD5_flexdll = cc456a89382e60d84130cddd53977486
+URL_flexdll = https://github.com/alainfrisch/flexdll/archive/0.38.tar.gz
+MD5_flexdll = c0fcfd7554b68547435fb69db8cde260
 
 ifndef FETCH
   ifneq ($(shell command -v curl 2>/dev/null),)
