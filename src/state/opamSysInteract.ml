@@ -296,52 +296,6 @@ let packages_status packages =
     msg "available" (`set available);
     msg "not_found" (`set not_found);
     available, not_found
-  (* Disable for time saving
-        let installed =
-          if OpamSysPkg.Set.is_empty not_found then
-            installed
-          else
-          (* If package are not_found look for virtual package. *)
-          let resolve_virtual name =
-            let lines =
-              run_query_command "apt-cache"
-                ["--names-only"; "search"; "^"^name^"$"]
-                (* name need to be escaped, its a regexp *)
-            in
-            List.fold_left
-              (fun acc l -> match OpamStd.String.split l ' ' with
-                 | pkg :: _ ->
-                 pkg +++ acc
-                 | [] -> acc)
-              OpamSysPkg.Set.empty lines
-          in
-          let virtual_map =
-            OpamSysPkg.Set.fold (fun vpkg acc ->
-                OpamSysPkg.Set.fold (fun pkg acc ->
-                    let old =
-                      try OpamSysPkg.Map.find pkg acc
-                      with Not_found -> OpamSysPkg.Set.empty
-                    in
-                    OpamSysPkg.Map.add pkg
-                    (OpamSysPkg.Set.add (OpamSysPkg.of_string vpkg) old) acc)
-                  (resolve_virtual vpkg)acc)
-              not_found OpamSysPkg.Map.empty
-          in
-          let real_packages =
-            List.map fst (OpamSysPkg.Map.bindings virtual_map)
-          in
-          let dpkg_args pkgs = if pkgs = [] then [] else "-l" :: pkgs in
-          let lines = run_query_command "dpkg-query" (dpkg_args real_packages) in
-          List.fold_left
-            (fun acc l -> match OpamStd.String.split l ' ' with
-               | [pkg;_;_;"installed"] ->
-                 (match OpamSysPkg.Map.find_opt pkg virtual_map with
-                  | Some p -> p ++ acc
-                  | None -> acc)
-               | _ -> acc)
-            installed lines
-        in
-  *)
   | Freebsd ->
     let sys_installed =
       run_query_command "pkg" ["query"; "%n"]
