@@ -196,7 +196,7 @@ let get_sysdeps_map ~depexts global_config switch_config packages =
         msg;
       OpamPackage.Map.empty
   in
-  log "depexts loaded in %.3fs" (chronos());
+  OpamConsole.note "depexts loaded in %.3fs" (chronos());
   ret
 
 
