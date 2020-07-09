@@ -15,6 +15,7 @@ let log fmt = OpamConsole.log "XSYS" fmt
 
 let run_command
     ?vars ?(discard_err=false) ?allow_stdin ?verbose ?(dryrun=false) cmd args =
+ let t = OpamConsole.timer () in
   let clean_output =
     if not discard_err then
       fun k -> k None
@@ -66,6 +67,7 @@ let run_command
   let code = r.r_code in
   let out = r.r_stdout in
   OpamProcess.cleanup r;
+  OpamConsole.note "chrono for %s %0.3fs" cmd (t ());
   Done (code, out)
 
 let run_query_command ?vars cmd args =

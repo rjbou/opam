@@ -62,7 +62,7 @@ module type OrderedType = sig
   val of_json: OpamJson.t -> t option
 end
 
-let max_print = 100
+let max_print = 1000
 
 module OpamList = struct
 
