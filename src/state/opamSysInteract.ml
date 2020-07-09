@@ -124,6 +124,24 @@ let family =
   ) in
   fun () -> Lazy.force family
 
+let print elems ?c str sm =
+  let c = OpamStd.Option.default "\n  - " c in
+  c^ (elems sm |> OpamStd.List.concat_map c str)
+
+let msg name sm =
+  let card, elems =
+    match sm with
+    | `set s ->
+      (OpamSysPkg.Set.cardinal s), OpamSysPkg.(print Set.elements to_string s)
+    | `map m ->
+      (OpamSysPkg.Map.cardinal m),
+      OpamSysPkg.(Map.bindings m
+                  |> List.map (fun (k,s) -> List.map (fun v -> (k,v)) (Set.elements s))
+                  |> List.flatten
+                  |> print (fun x -> x) (fun (k,v) -> to_string k ^ ": " ^ to_string v))
+  in
+  let pad = String.init 20 (fun _ -> '#') in
+  OpamConsole.errmsg "\n%s\n%s\n* %s (%d):%s\n" pad pad name card elems
 
 let packages_status packages =
   let (+++) pkg set = OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) set in
@@ -270,7 +288,14 @@ let packages_status packages =
           | None ->  avail)
         OpamSysPkg.Set.empty
     in
-    compute_sets sys_installed ~sys_available
+    let available, not_found =
+      compute_sets sys_installed ~sys_available
+    in
+    let installed = packages %% sys_installed in
+    msg "installed" (`set installed);
+    msg "available" (`set available);
+    msg "not_found" (`set not_found);
+    available, not_found
   (* Disable for time saving
         let installed =
           if OpamSysPkg.Set.is_empty not_found then
