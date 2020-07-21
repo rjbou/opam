@@ -367,7 +367,7 @@ if [ "$TRAVIS_BUILD_STAGE_NAME" = "Upgrade" ]; then
   export OPAMROOT=/tmp/opamroot
   rm -rf $OPAMROOT
   if [[ ! -d $CACHE/root ]]; then
-    $CACHE/bin/opam init git+https://github.com/ocaml/opam-repository#$OPAM_REPO_SHA
+    $CACHE/bin/opam init
     cp -r /tmp/opamroot/ $CACHE/root
   else
     cp -r $CACHE/root /tmp/opamroot
