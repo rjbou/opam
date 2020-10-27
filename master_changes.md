@@ -123,6 +123,8 @@ New option/command/subcommand are prefixed with ◈.
   * Be more robust w.r.t. new caches updates when `--read-only` is not used [#4467 @AltGr - fix #4354]
 
 ## Test
+  * Make the reference tests dune-friendly [#4376 @emillon]
+  * Rewrite the very old tests and unify them with the newer ones [@AltGr]
   * Ensure that a cold `dune runtest` works [#4375 @emillon]
   * Use dune "expected" convention for patcher test [#4395 @emillon]
   * Add var/option test [#4428 @rjbou]
@@ -139,4 +141,4 @@ New option/command/subcommand are prefixed with ◈.
 ## Doc
   * Change `opam config list` into `opam var [--package]` [#4428 @rjbou]
   * Update maintainer name [#4456 @nbraud]
-  * Specify url syntaxe in usage/opam pin [#4460 @rjbou - fix #4459]
+  * Specify url syntax in usage/opam pin [#4460 @rjbou - fix #4459]
