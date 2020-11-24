@@ -1,0 +1,9 @@
+diff -Naur a/tests/dune b/tests/dune
+--- a/tests/dune	2020-11-11 20:20:51.000000000 +0100
++++ b/tests/dune	2020-11-24 16:22:47.370622172 +0100
+@@ -1,5 +1,4 @@
+ (test
+   (name tests)
+   (deps sample.opam)
+-  (package opam-file-format)
+   (libraries alcotest opam-file-format))
