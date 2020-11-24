@@ -42,7 +42,7 @@ dose3.pkgbuild: findlib.pkgbuild ocamlbuild.pkgbuild cppo.pkgbuild extlib.pkgbui
 mccs.pkgbuild: dune-local.pkgbuild cudf.pkgbuild findlib.pkgbuild
 
 opam-file-format-pkg-build:
-	make LIBDIR=$(SITELIB) all install
+	dune build @install -p opam-file-format
 
 findlib-pkg-build:
 	./configure
