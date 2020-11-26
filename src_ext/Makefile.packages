@@ -13,7 +13,7 @@ SITELIB=$(shell PATH="$(PATH)" ocamlfind printconf path | cygpath -f - -m)
 endif
 
 # Package dependencies
-opam-file-format.pkgbuild: findlib.pkgbuild
+opam-file-format.pkgbuild: findlib.pkgbuild dune-local.pkgbuild
 
 cppo.pkgbuild: dune-local.pkgbuild
 
