@@ -43,6 +43,7 @@ mccs.pkgbuild: dune-local.pkgbuild cudf.pkgbuild findlib.pkgbuild
 
 opam-file-format-pkg-build:
 	dune build @install -p opam-file-format
+	dune instal -p opam-file-format
 
 findlib-pkg-build:
 	./configure
