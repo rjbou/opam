@@ -24,6 +24,14 @@ goto %1
 
 goto :EOF
 
+:DownloadCygwinSetup
+if not exist "%CYG_SETUP%" (
+  @rem Windows 7 and up
+  @rem https://superuser.com/questions/25538/how-to-download-files-from-command-line-in-windows-like-wget-is-doing
+  bitsadmin /transfer downloadCygwin /download /priority normal https://cygwin.com/setup-%CYG_ARCH%.exe "%CYG_SETUP%"
+)
+goto :EOF
+
 :CheckPackage
 "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %1" | findstr %1 > nul
 if %ERRORLEVEL% equ 1 (
@@ -89,6 +97,8 @@ if "%OCAML_PORT%" equ "" (
 
 set CYGWIN_INSTALL_PACKAGES=
 set CYGWIN_UPGRADE_REQUIRED=0
+
+call DownloadCygwinSetup
 
 rem Check that all packages are installed
 for %%P in (%CYGWIN_PACKAGES%) do call :CheckPackage %%P
