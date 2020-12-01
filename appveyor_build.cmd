@@ -42,7 +42,7 @@ if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
 )
 if "%CYGWIN_INSTALL_PACKAGES%" neq "" set CYGWIN_INSTALL_PACKAGES=--packages %CYGWIN_INSTALL_PACKAGES:~1%
 if "%CYGWIN_INSTALL_PACKAGES%%FLAG%" equ "" goto UpgradeCygwin_next
-"%CYG_ROOT%\setup-%CYG_ARCH%.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_INSTALL_PACKAGES% %CYGWIN_UPGRADE_FLAG% > nul
+"%CYG_SETUP%" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_INSTALL_PACKAGES% %CYGWIN_UPGRADE_FLAG% > nul
 set CYGWIN_INSTALL_PACKAGES=
 :UpgradeCygwin_next
 if "%CYGWIN_UPGRADE_FLAG%" equ "" for %%P in (%CYGWIN_COMMANDS%) do "%CYG_ROOT%\bin\bash.exe" -lc "%%P --help" > nul || set CYGWIN_UPGRADE_REQUIRED=1
@@ -55,6 +55,7 @@ echo Build Worker Image: %APPVEYOR_BUILD_WORKER_IMAGE%
 systeminfo 2>nul | findstr /B /C:"OS Name" /C:"OS Version"
 echo System architecture: %PLATFORM%
 set CYG_ROOT=C:\%CYG_ROOT%
+if not defined CYG_SETUP set CYG_SETUP="%CYG_ROOT%\setup-%CYG_ARCH%.exe"
 
 cd "%APPVEYOR_BUILD_FOLDER%"
 
