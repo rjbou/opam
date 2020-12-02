@@ -79,7 +79,7 @@ export OCAMLRUNPARAM=b
       git checkout master
       git reset --hard origin/master
     fi
-    test -d _opam opam || switch create . --empty 
+    test -d _opam || switch create . --empty 
     eval $(opam env)
     opam pin --kind=path $GITHUB_WORKSPACE --yes --no-action
     opam pin . -yn
