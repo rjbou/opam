@@ -111,6 +111,8 @@ jobs:
         os: [ ubuntu-latest ]
         ocamlv: [ 4.11.1 ]
       fail-fast: false
+    env:
+      OPAM_TEST: 1
     steps:
     - uses: actions/checkout@v2
     - name: install deps
@@ -125,7 +127,6 @@ jobs:
     - name: Building ocaml ${{ env.OCAML_VERSION }} cache
       if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
       env:
-        OPAM_TEST: 1
         OCAML_VERSION: ${{ matrix.ocamlv }}
       run: bash -exu .github/scripts/ocaml-cache.sh ocaml
     - name: opam bootstrap cache
@@ -138,8 +139,6 @@ jobs:
         key: opam-${{ env.OPAMBSVERSION }}-${{ env.OPAM_REPO_SHA }}-${{ hashFiles ('.github/scripts/opam-bs-cache.sh', '.github/scripts/preamble.sh') }}
     - name: opam root cache
       if: steps.opam-bootstrap.outputs.cache-hit != 'true'
-      env:
-        OPAM_TEST: 1
       run: bash -exu .github/scripts/opam-bs-cache.sh
     - name: opam-rt cache
       id: opam-rt
@@ -150,7 +149,6 @@ jobs:
     - name: Test
       env:
         OCAML_VERSION: ${{ matrix.ocamlv }}
-        OPAM_TEST: 1
       run: bash -exu .github/scripts/main.sh
 
   cold:
