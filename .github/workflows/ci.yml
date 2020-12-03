@@ -11,6 +11,8 @@ env:
   OPAM_REPO_SHA: 88c17a663
   # Default ocaml version for some jobs
   OCAML_VERSION: 4.11.1
+  ## variables for cache paths
+  GH_OCAML_CACHE: ~/.cache/ocaml-local/**
 
 defaults:
   run:
@@ -37,7 +39,7 @@ jobs:
       id: ocaml-cache
       uses: actions/cache@v2
       with:
-        path: ~/.cache/ocaml-local/**
+        path: ${{ env.GH_OCAML_CACHE }}
         key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}
     - name: Building ocaml ${{ matrix.ocamlv }} cache
       if: steps.ocaml-cache.outputs.cache-hit != 'true'
@@ -90,7 +92,7 @@ jobs:
     - name: ocaml ${{ matrix.ocamlv }} cache
       uses: actions/cache@v2
       with:
-        path: ~/.cache/ocaml-local/**
+        path: ${{ env.GH_OCAML_CACHE }}
         key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}
     - name: Build
       env:
@@ -118,7 +120,7 @@ jobs:
       id: ocaml-cache-test
       uses: actions/cache@v2
       with:
-        path: ~/.cache/ocaml-local/**
+        path: ${{ env.GH_OCAML_CACHE }}
         key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
     - name: Building ocaml ${{ env.OCAML_VERSION }} cache
       if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
@@ -187,7 +189,7 @@ jobs:
     - name: ocaml ${{ env.OCAML_VERSION }} cache
       uses: actions/cache@v2
       with:
-        path: ~/.cache/ocaml-local/**
+        path: ${{ env.GH_OCAML_CACHE }}
         key: ${{ runner.os }}-ocaml-${{ env.OCAML_VERSION }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}
     - name: Upgrade
       env:
