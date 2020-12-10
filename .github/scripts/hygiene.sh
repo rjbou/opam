@@ -2,17 +2,17 @@
 
 . .github/scripts/preamble.sh
 
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && \
-   [ "x" = "x$BASE_REF_SHA" ] || [ "x" = "x$PR_REF_SHA" ] ; then
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "x" = "x$BASE_REF_SHA$PR_REF_SHA" ] ; then
   echo "Variables BASE_REF_SHA and PR_REF_SHA must be defined in a pull request job"
   exit 2
 fi
-# Don't use  BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
+# Don't use BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
 # defined. See .github/workflows/ci.yml hygiene job.
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   # needed or git diffs and rev-list
   git fetch origin $GITHUB_BASE_REF
+  git fetch origin $GITHUB_REF
 fi
 
 CheckConfigure () {
