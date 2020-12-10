@@ -2,6 +2,9 @@
 
 . .github/scripts/preamble.sh
 
+set -e
+set -u
+
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
