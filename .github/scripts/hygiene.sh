@@ -2,9 +2,13 @@
 
 . .github/scripts/preamble.sh
 
-if [ "x" = "x$BASE_REF_SHA" ] || [ "x" = "x$PR_REF_SHA" ] ; then
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && \
+   [ "x" = "x$BASE_REF_SHA" ] || [ "x" = "x$PR_REF_SHA" ] ; then
+	echo "Variables BASE_REF_SHA and PR_REF_SHA must be defined in a pull request job"
 	exit 2
 fi
+# Don't use  BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
+# defined. See .github/workflows/ci.yml hygiene job.
 
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
