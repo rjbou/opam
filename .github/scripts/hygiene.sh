@@ -4,12 +4,6 @@
 
 env
 
-PR_COMMIT_RANGE=
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-  PR_COMMIT_RANGE="$GITHUB_REF_SHA...$GITHUB_SHA"
-fi
-
-echo "PR_COMMIT_RANGE=$PR_COMMIT_RANGE"
 echo "GITHUB_SHA=$GITHUB_SHA"
 if [[ $GITHUB_EVENT_NAME = 'pull_request' ]] ; then
   FETCH_HEAD=$(git rev-parse FETCH_HEAD)
@@ -33,6 +27,19 @@ else
       GITHUB_SHA=$FETCH_HEAD
     fi
   fi
+fi
+
+# find base ref head
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
+  cont=1
+  HEAD=$GITHUB_SHA
+  while [ $cont -ne 0 ]; do
+    PREV_HEAD=$HEAD
+    HEAD=`git rev-parse $HEAD^`
+    git branch -a --contains $HEAD | grep -q origin/$GITHUB_BASE_REF
+    cont=$?
+  done
+  BASE_REF_SHA=$PREV_HEAD
 fi
 
 CheckConfigure () {
@@ -67,14 +74,13 @@ set +x
 
 ERROR=0
 
-
 ###
 # Check install.sh
 ###
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
   (set +x ; echo -en "::group::check install.sh\r") 2>/dev/null
-  CUR_HEAD=$GITHUB_REF_SHA
+  CUR_HEAD=$BASE_REF_SHA
   PR_HEAD=$GITHUB_SHA
   DEEPEN=50
   while ! git merge-base "$CUR_HEAD" "$PR_HEAD" >& /dev/null
@@ -124,17 +130,20 @@ fi
 # Check configure
 ###
 
-if [[ -z $PR_COMMIT_RANGE ]]
-then CheckConfigure "$GITHUB_SHA"
-else
-  if [[ $GITHUB_EVENT_NAME = 'pull_request' ]]
-  then PR_COMMIT_RANGE=$MERGE_BASE..$GITHUB_SHA
-  fi
-  for commit in $(git rev-list "$PR_COMMIT_RANGE" --reverse)
-  do
-    CheckConfigure "$commit"
-  done
-fi
+case $GITHUB_EVENT_NAME in
+  push)
+    CheckConfigure "$GITHUB_SHA"
+    ;;
+  pull_request)
+    for commit in $(git rev-list $BASE_REF_SHA...$GITHUB_SHA --reverse)
+    do
+      CheckConfigure "$commit"
+    done
+    ;;
+  *)
+    echo "no configure to check for unknown event"
+    ;;
+esac
 
 
 ###
