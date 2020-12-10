@@ -29,17 +29,18 @@ else
   fi
 fi
 
-# find base ref head
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
-  cont=1
-  HEAD=$GITHUB_SHA
-  while [ $cont -ne 0 ]; do
-		HEAD=`git cat-file -p $HEAD | grep parent | cut -f 2 -d ' '`
-    git branch -a --contains $HEAD | grep -q origin/$GITHUB_BASE_REF
-    cont=$?
-  done
-  BASE_REF_SHA=$PREV_HEAD
-fi
+## find base ref head
+#git log -4
+#if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
+#  cont=1
+#  HEAD=`git rev-parse origin
+#  while [ $cont -ne 0 ]; do
+#		HEAD=`git cat-file -p $HEAD | grep parent | cut -f 2 -d ' '`
+#    git branch -a --contains $HEAD | grep -q origin/$GITHUB_BASE_REF
+#    cont=$?
+#  done
+#  BASE_REF_SHA=$PREV_HEAD
+#fi
 
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null

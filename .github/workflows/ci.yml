@@ -231,4 +231,6 @@ jobs:
         path: src_ext/archives
         key: archives-${{ hashFiles('src_ext/Makefile.sources', 'src_ext/Makefile') }}
     - name: Hygiene
+      env:
+        BASE_REF_SHA: ${{ github.event.before }}
       run: bash -exu .github/scripts/hygiene.sh
