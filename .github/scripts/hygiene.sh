@@ -2,8 +2,9 @@
 
 . .github/scripts/preamble.sh
 
-set -e
-set -u
+if [ "x" = "x$BASE_REF_SHA" ] || [ "x" = "x$PR_REF_SHA" ] ; then
+	exit 2
+fi
 
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
