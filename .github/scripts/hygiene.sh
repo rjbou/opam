@@ -2,8 +2,6 @@
 
 . .github/scripts/preamble.sh
 
-env
-
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
@@ -32,7 +30,7 @@ please run make configure and fixup the commit"
   (set +x ; echo -en "::endgroup::check configure\r") 2>/dev/null
 }
 
-set +x
+#set +x
 
 ERROR=0
 
