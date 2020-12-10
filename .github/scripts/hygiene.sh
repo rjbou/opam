@@ -4,46 +4,6 @@
 
 env
 
-GITHUB_SHA=$PR_REF_SHA
-
-echo "GITHUB_SHA=$GITHUB_SHA"
-if [[ $GITHUB_EVENT_NAME = 'pull_request' ]] ; then
-  FETCH_HEAD=$(git rev-parse FETCH_HEAD)
-  echo "FETCH_HEAD=$FETCH_HEAD"
-else
-  FETCH_HEAD=$GITHUB_SHA
-fi
-
-if [[ $GITHUB_EVENT_NAME = 'push' ]] ; then
-  if ! git cat-file -e "$GITHUB_SHA" 2> /dev/null ; then
-    echo 'GITHUB_SHA does not exist - CI failure'
-    exit 1
-  fi
-else
-  if [[ $GITHUB_SHA != $(git rev-parse $FETCH_HEAD) ]] ; then
-    echo 'WARNING! GHA GITHUB_SHA and FETCH_HEAD do not agree!'
-    if git cat-file -e "$GITHUB_SHA" 2> /dev/null ; then
-      echo 'GITHUB_SHA exists, so going with it'
-    else
-      echo 'GITHUB_SHA does not exist; setting to FETCH_HEAD'
-      GITHUB_SHA=$FETCH_HEAD
-    fi
-  fi
-fi
-
-## find base ref head
-#git log -4
-#if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
-#  cont=1
-#  HEAD=`git rev-parse origin
-#  while [ $cont -ne 0 ]; do
-#		HEAD=`git cat-file -p $HEAD | grep parent | cut -f 2 -d ' '`
-#    git branch -a --contains $HEAD | grep -q origin/$GITHUB_BASE_REF
-#    cont=$?
-#  done
-#  BASE_REF_SHA=$PREV_HEAD
-#fi
-
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
@@ -82,17 +42,7 @@ ERROR=0
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
   (set +x ; echo -en "::group::check install.sh\r") 2>/dev/null
-  CUR_HEAD=$BASE_REF_SHA
-  PR_HEAD=$GITHUB_SHA
-  DEEPEN=50
-  while ! git merge-base "$CUR_HEAD" "$PR_HEAD" >& /dev/null
-  do
-    echo "Deepening $BRANCH by $DEEPEN commits"
-    git fetch origin --deepen=$DEEPEN "$BRANCH"
-    ((DEEPEN*=2))
-  done
-  MERGE_BASE=$(git merge-base "$CUR_HEAD" "$PR_HEAD")
-  if ! git diff "$MERGE_BASE..$PR_HEAD" --name-only --exit-code -- shell/install.sh > /dev/null ; then
+  if ! git diff "$BASE_REF_SHA..$PR_REF_SHA" --name-only --exit-code -- shell/install.sh > /dev/null ; then
     echo "shell/install.sh updated - checking it"
     eval $(grep '^\(OPAM_BIN_URL_BASE\|DEV_VERSION\|VERSION\)=' shell/install.sh)
     echo "OPAM_BIN_URL_BASE=$OPAM_BIN_URL_BASE"
@@ -137,7 +87,7 @@ case $GITHUB_EVENT_NAME in
     CheckConfigure "$GITHUB_SHA"
     ;;
   pull_request)
-    for commit in $(git rev-list $BASE_REF_SHA...$GITHUB_SHA --reverse)
+    for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
     do
       CheckConfigure "$commit"
     done
