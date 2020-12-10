@@ -10,8 +10,10 @@ fi
 # Don't use  BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
 # defined. See .github/workflows/ci.yml hygiene job.
 
-git remote -v
-git fetch origin
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+  # needed or git diffs and rev-list
+  git fetch origin $GITHUB_BASE_REF
+fi
 
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
@@ -41,7 +43,7 @@ please run make configure and fixup the commit"
   (set +x ; echo -en "::endgroup::check configure\r") 2>/dev/null
 }
 
-#set +x
+set +x
 
 ERROR=0
 
