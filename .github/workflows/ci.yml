@@ -234,5 +234,5 @@ jobs:
       env:
         BASE_REF_SHA: ${{ github.base.sha }}
         PR_REF_SHA: ${{ github.head.sha }}
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+#        GITHUB_CONTEXT: ${{ toJson(github) }}
       run: bash -exu .github/scripts/hygiene.sh
