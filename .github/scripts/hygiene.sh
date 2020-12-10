@@ -4,6 +4,8 @@
 
 env
 
+GITHUB_SHA=$PR_REF_SHA
+
 echo "GITHUB_SHA=$GITHUB_SHA"
 if [[ $GITHUB_EVENT_NAME = 'pull_request' ]] ; then
   FETCH_HEAD=$(git rev-parse FETCH_HEAD)
