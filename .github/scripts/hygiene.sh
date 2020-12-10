@@ -18,7 +18,7 @@ if [[ $GITHUB_EVENT_NAME = 'push' ]] ; then
     exit 1
   fi
 else
-  if [[ $GITHUB_SHA != $(git rev-parse FETCH_HEAD) ]] ; then
+  if [[ $GITHUB_SHA != $(git rev-parse $FETCH_HEAD) ]] ; then
     echo 'WARNING! GHA GITHUB_SHA and FETCH_HEAD do not agree!'
     if git cat-file -e "$GITHUB_SHA" 2> /dev/null ; then
       echo 'GITHUB_SHA exists, so going with it'
