@@ -48,6 +48,28 @@ set +x
 ERROR=0
 
 ###
+# Check configure
+###
+
+echo "check configure"
+case $GITHUB_EVENT_NAME in
+  push)
+    CheckConfigure "$GITHUB_SHA"
+    ;;
+  pull_request)
+    for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
+    do
+      echo "check configure for $commit"
+      CheckConfigure "$commit"
+    done
+    ;;
+  *)
+    echo "no configure to check for unknown event"
+    ;;
+esac
+
+
+###
 # Check install.sh
 ###
 
@@ -89,29 +111,6 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
   fi
   (set +x ; echo -en "::endgroup::check install.sh\r") 2>/dev/null
 fi
-
-
-###
-# Check configure
-###
-
-echo "check configure"
-case $GITHUB_EVENT_NAME in
-  push)
-    echo "push check configure for $commit"
-    CheckConfigure "$GITHUB_SHA"
-    ;;
-  pull_request)
-    for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
-    do
-      echo "check configure for $commit"
-      CheckConfigure "$commit"
-    done
-    ;;
-  *)
-    echo "no configure to check for unknown event"
-    ;;
-esac
 
 
 ###
