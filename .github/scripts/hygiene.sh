@@ -14,8 +14,10 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   git fetch origin
 fi
 
+git branch -a --contains $BASE_REF_SHA
+git branch -a --contains $PR_REF_SHA
+
 CheckConfigure () {
-  (set +x ; echo -en "::group::check configure\r") 2>/dev/null
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
   git diff-tree --diff-filter=d --no-commit-id --name-only -r "$1" \
     | (while IFS= read -r path
@@ -39,7 +41,6 @@ please run make configure and fixup the commit"
       ERROR=1
     fi
   fi
-  (set +x ; echo -en "::endgroup::check configure\r") 2>/dev/null
 }
 
 set +x
@@ -50,7 +51,7 @@ ERROR=0
 # Check configure
 ###
 
-echo "check configure"
+(set +x ; echo -en "::group::check configure\r") 2>/dev/null
 case $GITHUB_EVENT_NAME in
   push)
     CheckConfigure "$GITHUB_SHA"
@@ -66,6 +67,7 @@ case $GITHUB_EVENT_NAME in
     echo "no configure to check for unknown event"
     ;;
 esac
+(set +x ; echo -en "::endgroup::check configure\r") 2>/dev/null
 
 
 ###
