@@ -4,11 +4,14 @@
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && \
    [ "x" = "x$BASE_REF_SHA" ] || [ "x" = "x$PR_REF_SHA" ] ; then
-	echo "Variables BASE_REF_SHA and PR_REF_SHA must be defined in a pull request job"
-	exit 2
+  echo "Variables BASE_REF_SHA and PR_REF_SHA must be defined in a pull request job"
+  exit 2
 fi
 # Don't use  BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
 # defined. See .github/workflows/ci.yml hygiene job.
+
+git remote -v
+git fetch origin
 
 CheckConfigure () {
   (set +x ; echo -en "::group::check configure\r") 2>/dev/null
@@ -80,7 +83,7 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
       ERROR=1
     fi
   else
-		echo "No changes in install.sh"
+    echo "No changes in install.sh"
   fi
   (set +x ; echo -en "::endgroup::check install.sh\r") 2>/dev/null
 fi
@@ -90,14 +93,16 @@ fi
 # Check configure
 ###
 
+echo "check configure"
 case $GITHUB_EVENT_NAME in
   push)
+    echo "push check configure for $commit"
     CheckConfigure "$GITHUB_SHA"
     ;;
   pull_request)
     for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
     do
-			echo "check configure for $commit"
+      echo "check configure for $commit"
       CheckConfigure "$commit"
     done
     ;;
