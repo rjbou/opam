@@ -9,19 +9,11 @@ fi
 # Don't use BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
 # defined. See .github/workflows/ci.yml hygiene job.
 
-git remote -v
-
-git branch -a --contains $BASE_REF_SHA || echo fail
-git branch -a --contains $PR_REF_SHA || echo fail
-
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   # needed or git diffs and rev-list
   git fetch origin master
-  git fetch origin $GITHUB_REF || echo fail
+  git fetch origin $GITHUB_REF
 fi
-
-git branch -a --contains $BASE_REF_SHA || echo fail
-git branch -a --contains $PR_REF_SHA || echo fail
 
 CheckConfigure () {
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
@@ -45,6 +37,8 @@ CheckConfigure () {
       echo -e "[\e[31mERROR\e[0m] configure.ac in $1 doesn't generate configure, \
 please run make configure and fixup the commit"
       ERROR=1
+    else
+      echo "configure ok for $1"
     fi
   fi
 }
