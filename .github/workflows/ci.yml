@@ -233,4 +233,5 @@ jobs:
     - name: Hygiene
       env:
         BASE_REF_SHA: ${{ github.event.before }}
+        GITHUB_CONTEXT: ${{ toJson(github) }}
       run: bash -exu .github/scripts/hygiene.sh
