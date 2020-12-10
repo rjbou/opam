@@ -35,7 +35,9 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
   HEAD=$GITHUB_SHA
   while [ $cont -ne 0 ]; do
     PREV_HEAD=$HEAD
-    HEAD=`git rev-parse $HEAD^`
+		git show --summary $HEAD
+		git show --summary $HEAD^
+    HEAD=`git rev-parse "$HEAD^"`
     git branch -a --contains $HEAD | grep -q origin/$GITHUB_BASE_REF
     cont=$?
   done
