@@ -11,16 +11,17 @@ fi
 
 git remote -v
 
-git branch -a --contains $BASE_REF_SHA
-git branch -a --contains $PR_REF_SHA
+git branch -a --contains $BASE_REF_SHA || echo fail
+git branch -a --contains $PR_REF_SHA || echo fail
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   # needed or git diffs and rev-list
   git fetch origin master
+  git fetch origin $GITHUB_REF || echo fail
 fi
 
-git branch -a --contains $BASE_REF_SHA
-git branch -a --contains $PR_REF_SHA
+git branch -a --contains $BASE_REF_SHA || echo fail
+git branch -a --contains $PR_REF_SHA || echo fail
 
 CheckConfigure () {
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
