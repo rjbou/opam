@@ -11,8 +11,7 @@ fi
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   # needed or git diffs and rev-list
-  git fetch origin $GITHUB_BASE_REF
-  git fetch origin $GITHUB_REF
+  git fetch origin
 fi
 
 CheckConfigure () {
