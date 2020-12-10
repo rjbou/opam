@@ -75,6 +75,8 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ] ; then
       echo "That can't be right..."
       ERROR=1
     fi
+  else
+		echo "No changes in install.sh"
   fi
   (set +x ; echo -en "::endgroup::check install.sh\r") 2>/dev/null
 fi
@@ -91,6 +93,7 @@ case $GITHUB_EVENT_NAME in
   pull_request)
     for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
     do
+			echo "check configure for $commit"
       CheckConfigure "$commit"
     done
     ;;

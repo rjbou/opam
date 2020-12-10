@@ -232,7 +232,7 @@ jobs:
         key: archives-${{ hashFiles('src_ext/Makefile.sources', 'src_ext/Makefile') }}
     - name: Hygiene
       env:
-        BASE_REF_SHA: ${{ github.base.sha }}
-        PR_REF_SHA: ${{ github.head.sha }}
+        BASE_REF_SHA: ${{ github.event.base.sha }}
+        PR_REF_SHA: ${{ github.event.head.sha }}
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: bash -exu .github/scripts/hygiene.sh
