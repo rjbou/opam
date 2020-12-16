@@ -874,8 +874,8 @@ let extract_explanations packages cudfnv2opam unav_reasons reasons =
         if va && not vb then -1 else
         if vb && not va then 1 else
           (match compare (clen l1 + clen r1) (clen l2 + clen r2) with
-           | 0 -> (match Package.compare l1 l2 with
-               | 0 -> Package.compare r1 r2
+           | 0 -> (match - Package.compare l1 l2 with
+               | 0 -> - Package.compare r1 r2
                | n -> n)
            | n -> n)
       | _, Conflict _ -> 1
