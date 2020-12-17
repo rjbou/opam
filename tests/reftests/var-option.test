@@ -50,7 +50,7 @@ Faking installation of ocaml-base-compiler.4.08.0
 Faking installation of ocaml-config.1
 Faking installation of ocaml.4.08.0
 Done.
-### OPAMDEBUG=-1 OPAMDEBUGSECTIONS="GSTATE STATE" opam var
+### OPAMDEBUG=-1 OPAMDEBUGSECTIONS="GSTATE STATE" opam var | sed -e 's/\t/  /g'
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 
 <><> Global opam variables ><><><><><><><><><><><><><><><><><><><><><><><><><><>
@@ -173,7 +173,7 @@ GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 STATE                           LOAD-SWITCH-STATE @ var-option
 STATE                           Switch state loaded in 0.000s
 4.08.0
-### opam var --package ocaml | grep -v build-id | grep -v opamfile
+### opam var --package ocaml | grep -v build-id | grep -v opamfile | sed -e 's/\t/  /g'
 ocaml:name      ocaml                                                                    # Name of the package
 ocaml:version   4.08.0                                                                   # Version of the package
 ocaml:depends   ocaml-base-compiler.4.08.0 ocaml-config.1                                # Resolved direct dependencies of the package
