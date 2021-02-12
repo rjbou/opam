@@ -2,6 +2,10 @@ Changes prefixed with "(*)" are potentially breaking to scripts or existing
 repositories (changes that are automatically handled by the format upgrade tools
 are not marked).
 
+2.0.9:
+* Fix the conflict with the environment variable name used by dune
+  [#4535 @smorimoto]
+
 2.0.8:
 * Add colon for fish MANPATH fix. [#4084 @rjbou - fix #4078]
 * No error when linked directory doesn't exist (e.g. XDG defined)
