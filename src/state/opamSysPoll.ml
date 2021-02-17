@@ -93,8 +93,8 @@ let is_android, android_release =
 let os_distribution_lazy = lazy (
   match os () with
   | Some "macos" as macos ->
-    if OpamSystem.resolve_command "brew" <> None then Some "homebrew"
-    else if OpamSystem.resolve_command "port" <> None then Some "macports"
+    if OpamSystem.resolve_command "port" <> None then Some "macports"
+    else if OpamSystem.resolve_command "brew" <> None then Some "homebrew"
     else macos
   | Some "linux" as linux ->
     (if is_android () then Some "android" else
