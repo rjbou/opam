@@ -451,7 +451,8 @@ let packages_status packages =
               ])
       in
       let avail =
-        run_query_command "port" ([ "search"; "--line"; "--exact" ] @ str_pkgs)
+        run_query_command "port"
+          [ "search"; "--line"; "--regex"; names_re ~str_pkgs () ]
         |> with_regexp_sgl re_pkg
       in
       (* variants handling *)
