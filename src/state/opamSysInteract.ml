@@ -450,6 +450,8 @@ let packages_status packages =
                 rep1 @@ alt [digit; punct];
               ])
       in
+      OpamConsole.error "pkgs %s" (OpamStd.List.concat_map " " (fun x -> x) str_pkgs);
+      OpamConsole.error "regexp pkgs %s" (names_re ());
       let avail =
         run_query_command "port" ([ "search"; "--line"; "--exact" ] @ str_pkgs)
         |> with_regexp_sgl re_pkg
