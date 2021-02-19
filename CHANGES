@@ -5,6 +5,8 @@ are not marked).
 2.0.9:
 * Fix the conflict with the environment variable name used by dune
   [#4535 @smorimoto]
+* Fix W59 & E60 with conf flag handling (no url required)
+  [#4550 @rjbou - fix #4549]
 
 2.0.8:
 * Add colon for fish MANPATH fix. [#4084 @rjbou - fix #4078]
