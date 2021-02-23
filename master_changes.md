@@ -12,8 +12,8 @@ New option/command/subcommand are prefixed with ◈.
 ## Init
   *
 
-## Config Upgrade
-  *
+## Config report
+  * Fix `Not_found` error [#4570 @rjbou]
 
 ## Install
   * Don't patch twice [#4529 @rjbou]
