@@ -1,5 +1,6 @@
 #!/bin/bash -xue
 
+set -x 
 . .github/scripts/preamble.sh
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "x" = "x$BASE_REF_SHA$PR_REF_SHA" ] ; then
@@ -10,12 +11,23 @@ fi
 # defined. See .github/workflows/ci.yml hygiene job.
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-  # needed or git diffs and rev-list
+  # needed for git diffs and rev-list
+	depth=10
+	set +e
+	git cat-file -e $BASE_REF_SHA
+	r=$?
+	while [ $r -ne 0 ] ; do
+		git fetch origin $GITHUB_REF --depth=$depth
+		depth=$(( $depth + 10 ))
+	  git cat-file -e $BASE_REF_SHA
+	  r=$?
+	done
+  set -e
   git fetch origin master
-  git fetch origin $GITHUB_REF
 fi
 
 CheckConfigure () {
+echo "-----------------------> check configure"
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
   git diff-tree --diff-filter=d --no-commit-id --name-only -r "$1" \
     | (while IFS= read -r path
@@ -43,8 +55,6 @@ please run make configure and fixup the commit"
   fi
 }
 
-set +x
-
 ERROR=0
 
 ###
@@ -56,16 +66,19 @@ case $GITHUB_EVENT_NAME in
   push)
     CheckConfigure "$GITHUB_SHA"
     ;;
-  pull_request)
-    for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
-    do
-      echo "check configure for $commit"
-      CheckConfigure "$commit"
-    done
-    ;;
-  *)
-    echo "no configure to check for unknown event"
-    ;;
+	pull_request)
+		echo "list of commits"
+		git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse
+		for commit in $(git rev-list $BASE_REF_SHA...$PR_REF_SHA --reverse)
+		do
+			echo "check configure for $commit"
+			git show $commit -s
+			CheckConfigure "$commit"
+		done
+		;;
+	*)
+		echo "no configure to check for unknown event"
+		;;
 esac
 (set +x ; echo -en "::endgroup::check configure\r") 2>/dev/null
 
