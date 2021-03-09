@@ -29,6 +29,7 @@ fi
 CheckConfigure () {
 echo "-----------------------> check configure"
   GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
+  git diff-tree --diff-filter=d --no-commit-id --name-only -r "$1" 
   git diff-tree --diff-filter=d --no-commit-id --name-only -r "$1" \
     | (while IFS= read -r path
   do
