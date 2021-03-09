@@ -5,7 +5,7 @@ diff -Naur a/src/cmdliner_docgen.ml b/src/cmdliner_docgen.ml
    | Cmdliner_info.Val v ->
        match Lazy.force v with
        | "" -> strf "%s" (or_env ~value:false a)
--      | v -> strf "absent=%s%s" v (or_env ~value:true a)
+-      * v -> strf "absent=%s%s" v (or_env ~value:true a)
 +      | v -> strf "absent=%s%s" (esc v) (or_env ~value:true a)
    in
    let optvopt = match Cmdliner_info.arg_opt_kind a with
