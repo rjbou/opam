@@ -19,6 +19,9 @@ are not marked).
   [#4559 @AltGr]
 * Release scripts: switch to OCaml 4.10.2 by default, add macos/arm64 builds by
   default [#4559 @AltGr]
+* Fix opam-devel's tests on platforms without openssl, GNU-diff and a
+  system-wide ocaml [#4500 @kit-ty-kate]
+* Untag dune as a build dependency [#4229 @kit-ty-kate]
 * Fix configure check in github actions [#4593 @rjbou]
 
 2.0.8:
