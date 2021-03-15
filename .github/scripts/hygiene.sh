@@ -147,7 +147,6 @@ cd ..
 # Default cli version check
 ###
 
-set -x
 if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "${GITHUB_REF##*/}" = "defcli" ]; then
   (set +x ; echo -en "::group::check default cli\r") 2>/dev/null
   CURRENT_MAJOR="`sed -n "s/^AC_INIT(opam,\([0-9]\+\)[^0-9]*.*)$/\1/p" configure.ac`"
