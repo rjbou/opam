@@ -242,7 +242,6 @@ jobs:
 # Default cli version check
 ####
   cli version:
-    on: push
     steps:
     - uses: actions/checkout@v2
     - name: check cli default cli version
@@ -251,3 +250,4 @@ jobs:
         DEFAULT_CLI_MAJOR="`sed -n "/let *default *=/s/.*(\([0-9]*\)[^0-9]*.*/\1/p" src/client/opamCLIVersion.ml`"
         echo "Default cli is $DEFAUL_CLI_MAJOR and current major version is $CURRENT_MAJOR"
         test $CURRENT_MAJOR -eq $DEFAULT_CLI_MAJOR
+      if: ${{ github.event_name == 'push' }}
