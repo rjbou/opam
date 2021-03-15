@@ -148,7 +148,7 @@ cd ..
 ###
 
 set -x
-if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF" = "master" ]; then
+if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF" = "defcli" ]; then
   (set +x ; echo -en "::group::check default cli\r") 2>/dev/null
   CURRENT_MAJOR="`sed -n "s/^AC_INIT(opam,\([0-9]\+\)[^0-9]*.*)$/\1/p" configure.ac`"
   DEFAULT_CLI_MAJOR="`sed -n "/let *default *=/s/.*(\([0-9]*\)[^0-9]*.*/\1/p" src/client/opamCLIVersion.ml`"
