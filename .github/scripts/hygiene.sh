@@ -143,4 +143,23 @@ fi
 cd ..
 (set +x ; echo -en "::endgroup::check src_ext patches\r") 2>/dev/null
 
+###
+# Default cli version check
+###
+
+set -x
+if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF" = "master" ]; then
+  (set +x ; echo -en "::group::check default cli\r") 2>/dev/null
+  CURRENT_MAJOR="`sed -n "s/^AC_INIT(opam,\([0-9]\+\)[^0-9]*.*)$/\1/p" configure.ac`"
+  DEFAULT_CLI_MAJOR="`sed -n "/let *default *=/s/.*(\([0-9]*\)[^0-9]*.*/\1/p" src/client/opamCLIVersion.ml`"
+  echo "Default cli is $DEFAUL_CLI_MAJOR and current major version is $CURRENT_MAJOR"
+  if [ $CURRENT_MAJOR -eq $DEFAULT_CLI_MAJOR ]; then
+    echo "Major vrsion is default cli one: $CURRENT_MAJOR"
+  else
+    echo "[\e[31mERROR\e[0m] Major version $CURRENT_MAJOR and default cli version $DEFAULT_CLI_MAJOR mismatches"
+  (set +x ; echo -en "::endgroup::check default cli\r") 2>/dev/null
+    ERROR=1
+  fi
+fi
+
 exit $ERROR
