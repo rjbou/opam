@@ -112,7 +112,7 @@ jobs:
     strategy:
       matrix:
 #         os: [ ubuntu-latest, macos-latest ]
-        os: macos-latest
+        os: [ macos-latest ]
         ocamlv: [ 4.11.1 ]
       fail-fast: false
     env:
