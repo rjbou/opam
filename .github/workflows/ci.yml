@@ -107,7 +107,7 @@ jobs:
 # Opam tests
 ####
   test:
-    needs: [ build, archives-cache ]
+#    needs: [ build, archives-cache ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
