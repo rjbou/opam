@@ -90,6 +90,7 @@ export OCAMLRUNPARAM=b
     # opam lib pins defined in opam-rt are ignored as there is a local pin
     opam pin . -yn --ignore-pin-depends
     opam install opam-rt --deps-only
+    opam-clean
     make
     (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
   fi
@@ -136,7 +137,7 @@ if [ $OPAM_UPGRADE -eq 1 ]; then
   exit 0
 fi
 
-( # Finally run the tests, in a clean environment
+( # Finally run opam-rt tests, in a clean environment
   export OPAMKEEPLOGS=1
 
   if [[ $OPAM_TEST -eq 1 ]] ; then

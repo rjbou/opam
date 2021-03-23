@@ -29,6 +29,13 @@ git config --global user.email "gha@example.com"
 git config --global user.name "Github Actions CI"
 git config --global gc.autoDetach false
 
+export OPAMLOGS=/tmp/log
+
+# clean opam logs, switch, etc.
+opam-clean () {
+  opam clean --switch-cleanup --logs --repo-cache --download-cache
+}
+
 # used only for TEST jobs
 init-bootstrap () {
   if [ "$OPAM_TEST" = "1" ]; then
@@ -51,6 +58,6 @@ init-bootstrap () {
     # order. See also the removal of uChar and uTF8 in src_ext/jbuild-extlib-src
     opam install . --deps-only --yes
 
-    rm -f "$OPAMBSROOT"/log/*
+    opam-clean
   fi
 }
