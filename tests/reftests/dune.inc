@@ -176,6 +176,22 @@
    (run ./run.exe %{bin:opam} %{dep:show.test} %{read-lines:testing-env}))))
 
 (alias
+ (name reftest-switch-locking)
+ (action
+  (diff switch-locking.test switch-locking.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-switch-locking)))
+
+(rule
+ (deps root-009e00fa)
+ (action
+  (with-stdout-to
+   switch-locking.out
+   (run ./run.exe %{bin:opam} %{dep:switch-locking.test} %{read-lines:testing-env}))))
+
+(alias
  (name reftest-upgrade-format)
  (action
   (diff upgrade-format.test upgrade-format.out)))

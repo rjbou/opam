@@ -1,0 +1,36 @@
+009e00fa
+### <test-repo/packages/foo/foo.1/opam>
+opam-version: "2.0"
+synopsis: "One-line description"
+description: """
+Longer description
+"""
+maintainer: "Name <email>"
+authors: "Name <email>"
+license: " "
+homepage: " "
+bug-reports: " "
+dev-repo: "git://github.com/foo"
+build: ["opam" "var" "prefix" "--safe"]
+flags: compiler
+### <test-repo/packages/bar/bar.1/opam>
+opam-version: "2.0"
+synopsis: "One-line description"
+description: """
+Longer description
+"""
+maintainer: "Name <email>"
+authors: "Name <email>"
+license: " "
+homepage: " "
+bug-reports: " "
+dev-repo: "git://github.com/foo"
+build: ["opam" "var" "prefix" "--safe"]
+### opam switch create nohang --repo=sw-lock=test-repo foo bar | grep 'ERROR'
+[ERROR] The compilation of bar.1 failed at "opam var prefix --safe".
+[ERROR] The compilation of foo.1 failed at "opam var prefix --safe".
+#=== ERROR while compiling foo.1 ==============================================#
+# [ERROR] No switch is currently set. Please use 'opam switch' to set or install a switch
+#=== ERROR while compiling bar.1 ==============================================#
+# [ERROR] No switch is currently set. Please use 'opam switch' to set or install a switch
+# Return code 31 #
