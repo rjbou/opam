@@ -11,7 +11,7 @@ license: " "
 homepage: " "
 bug-reports: " "
 dev-repo: "git://github.com/foo"
-build: ["opam" "option" "jobs" "--safe" "--cli=2.1"]
+build: ["opam" "var" "prefix" "--safe"]
 flags: compiler
 ### <test-repo/packages/bar/bar.1/opam>
 opam-version: "2.0"
@@ -25,20 +25,12 @@ license: " "
 homepage: " "
 bug-reports: " "
 dev-repo: "git://github.com/foo"
-build: ["opam" "option" "jobs" "--safe" "--cli=2.1"]
-### opam switch create nohang --repo=sw-lock=test-repo foo bar | unordered
-Creating repository sw-lock...
-[sw-lock] Initialised
-[WARNING] The repository 'sw-lock' at file://${BASEDIR}/test-repo doesn't have a 'repo' file, and might not be compatible with this version of opam.
-[NOTE] Repository at file://${BASEDIR}/test-repo doesn't define its version, assuming it's 1.2.
-
-<><> Upgrading repositories from older opam format ><><><><><><><><><><><><><><>
-Upgrading repository "sw-lock"...
-
-<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
-Switch invariant: ["foo" "bar"]
-
-<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed bar.1
--> installed foo.1
-Done.
+build: ["opam" "var" "prefix" "--safe"]
+### opam switch create nohang --repo=sw-lock=test-repo foo bar | grep 'ERROR'
+[ERROR] The compilation of bar.1 failed at "opam var prefix --safe".
+[ERROR] The compilation of foo.1 failed at "opam var prefix --safe".
+#=== ERROR while compiling foo.1 ==============================================#
+# [ERROR] No switch is currently set. Please use 'opam switch' to set or install a switch
+#=== ERROR while compiling bar.1 ==============================================#
+# [ERROR] No switch is currently set. Please use 'opam switch' to set or install a switch
+# Return code 31 #
