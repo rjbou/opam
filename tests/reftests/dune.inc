@@ -153,7 +153,7 @@
  (deps (alias reftest-pat-sub)))
 
 (rule
- (deps root-009e00fa)
+ (deps root-632bc2e)
  (action
   (with-stdout-to
    pat-sub.out
@@ -185,7 +185,7 @@
  (deps (alias reftest-switch-locking)))
 
 (rule
- (deps root-009e00fa)
+ (deps root-632bc2e)
  (action
   (with-stdout-to
    switch-locking.out
