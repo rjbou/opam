@@ -105,6 +105,7 @@ let base_env =
     "OPAMKEEPBUILDDIR", "1";
     "OPAMCOLOR", "never";
     "OPAMUTF8", "never";
+    "OPAMUTF8MSGS", "never";
     "OPAMNOENVNOTICE", "1";
     "OPAMNODEPEXTS", "1";
     "OPAMDOWNLOADJOBS", "1";
