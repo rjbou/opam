@@ -1406,7 +1406,12 @@ module ConfigSyntax = struct
     Pp.I.map_file @@
     Pp.I.check_opam_version ~format_version () -|
     Pp.I.fields ~name ~empty fields -|
-    Pp.I.show_errors ~name ~strict:OpamCoreConfig.(not !r.safe_mode) ()
+    Pp.I.show_errors ~name
+      ~condition:(function
+          | { opam_root_version = Some v; _ } ->
+            OpamVersion.compare v OpamVersion.current <= 0
+          | _ -> true)
+      ()
 
   let to_list = Syntax.to_list pp
 end
