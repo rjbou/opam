@@ -1170,12 +1170,12 @@ end
 module ConfigSyntax = struct
 
   let internal = "config"
-  (* This version is used as a marker for the whole opam root, so it's not
-     strictly speaking the actual format of the config file *)
   let format_version = OpamVersion.of_string "2.1"
+  let root_version = OpamVersion.current
 
   type t = {
     opam_version : opam_version;
+    opam_root_version: opam_version option;
     repositories : repository_name list;
     installed_switches : switch list;
     switch : switch option;
@@ -1199,6 +1199,7 @@ module ConfigSyntax = struct
   }
 
   let opam_version t = t.opam_version
+  let opam_root_version t = t.opam_root_version
   let repositories t = t.repositories
   let installed_switches t = t.installed_switches
   let switch t = t.switch
@@ -1228,6 +1229,8 @@ module ConfigSyntax = struct
 
 
   let with_opam_version opam_version t = { t with opam_version }
+  let with_opam_root_version opam_root_version t =
+    { t with opam_root_version = Some opam_root_version }
   let with_repositories repositories t = { t with repositories }
   let with_installed_switches installed_switches t =
     { t with installed_switches }
@@ -1264,6 +1267,7 @@ module ConfigSyntax = struct
 
   let empty = {
     opam_version = format_version;
+    opam_root_version = Some root_version;
     repositories = [];
     installed_switches = [];
     switch = None;
@@ -1299,6 +1303,9 @@ module ConfigSyntax = struct
     [
       "opam-version", Pp.ppacc
         with_opam_version opam_version
+        (Pp.V.string -| Pp.of_module "opam-version" (module OpamVersion));
+      "opam-root-version", Pp.ppacc_opt
+        with_opam_root_version opam_root_version
         (Pp.V.string -| Pp.of_module "opam-version" (module OpamVersion));
       "repositories", Pp.ppacc
         with_repositories repositories

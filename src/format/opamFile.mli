@@ -124,6 +124,7 @@ module Config: sig
 
   (** Update opam-version *)
   val with_opam_version: OpamVersion.t -> t -> t
+  val with_opam_root_version: OpamVersion.t -> t -> t
 
   val with_criteria: (solver_criteria * string) list -> t -> t
   val with_best_effort_prefix: string -> t -> t
@@ -155,8 +156,11 @@ module Config: sig
   val with_depext_cannot_install: bool -> t -> t
   val with_depext_bypass: OpamSysPkg.Set.t -> t -> t
 
-  (** Return the OPAM version *)
+  (** Return the opam version *)
   val opam_version: t  -> opam_version
+
+  (** Return the opam root version *)
+  val opam_root_version: t -> opam_version option
 
   (** Return the list of repository *)
   val repositories: t  -> repository_name list
