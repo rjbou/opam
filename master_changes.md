@@ -4,7 +4,7 @@ Possibly scripts breaking changes are prefixed with ✘.
 New option/command/subcommand are prefixed with ◈.
 
 ## Version
-  *
+  * Bump to `release candidate [#4645 @rjbou]
 
 ## Global CLI
   * Add default cli mechanism: deprecated options are accepted (in the major version) if no cli is specified [#4575 @rjbou]
