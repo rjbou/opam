@@ -200,19 +200,29 @@ crowbar-afl: $(DUNE_DEP)
 
 # tests-local, tests-git
 tests-%: $(DUNE_DEP)
+	touch src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . @reftest-legacy-$* --force
+	rm src/client/no-git-version
 
 reftest-gen: $(DUNE_DEP)
+	touch src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . @reftest-gen --auto-promote --force
+	rm src/client/no-git-version
 
 reftest-runner: $(DUNE_DEP)
+	touch src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . tests/reftests/run.exe
+	rm src/client/no-git-version
 
 reftests: $(DUNE_DEP)
+	touch src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . @reftest
+	rm src/client/no-git-version
 
 reftests-%: $(DUNE_DEP)
+	touch src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . @reftest-$* --force
+	rm src/client/no-git-version
 
 reftests-meld:
 	meld `for t in tests/reftests/*.test; do echo --diff $$t _build/default/$${t%.test}.out; done`
