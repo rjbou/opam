@@ -29,7 +29,7 @@ val latest_version: OpamVersion.t
     (loaded state, not written) if possible: no hard upgrade needed, and no
     write lock required ([requested_lock]). If upgrade need to be written (hard
     upgrade), a write lock on the global state ([global_lock]) is taken and
-    when it's done raises [Upgrade_done updated_config].  Otherwise, it returns
+    when it's done raises [Upgrade_done updated_config]. Otherwise, it returns
     the upgraded or unchanged config file.*)
 val as_necessary:
   'a lock -> OpamSystem.lock -> dirname -> OpamFile.Config.t -> OpamFile.Config.t

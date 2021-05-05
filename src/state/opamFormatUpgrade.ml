@@ -705,7 +705,7 @@ let from_1_3_dev6_to_1_3_dev7 root conf =
       let switch_dir = root / OpamSwitch.to_string switch in
       let meta_dir =  switch_dir / ".opam-switch" in
       let installed =
-        (OpamFile.SwitchSelections.safe_read
+        (OpamFile.SwitchSelections.NoError.safe_read
            (OpamFile.make (meta_dir // "switch-state")))
         .sel_installed
       in
@@ -808,7 +808,7 @@ let from_2_0_alpha_to_2_0_alpha2 root conf =
          let the wrapper 'ocaml' package be pulled from the repository later
          on to detect and set the 'ocaml:*' variables *)
       let selections_file = OpamFile.make (meta_dir // "switch-state") in
-      let selections = OpamFile.SwitchSelections.safe_read selections_file in
+      let selections = OpamFile.SwitchSelections.NoError.safe_read selections_file in
       let new_compilers =
         OpamPackage.Set.map (fun nv ->
             if nv.name <> OpamPackage.Name.of_string "ocaml" then nv else
@@ -957,7 +957,7 @@ let from_2_0_alpha3_to_2_0_beta root conf =
       let packages_dev_dir = switch_meta_dir / "packages.dev" in (* old *)
       let sources_dir = switch_meta_dir / "sources" in (* new *)
       let state =
-        OpamFile.SwitchSelections.safe_read
+        OpamFile.SwitchSelections.NoError.safe_read
           (OpamFile.make (switch_meta_dir // "switch-state"))
       in
       OpamFilename.mkdir sources_dir;
@@ -1011,7 +1011,7 @@ let from_2_0_beta_to_2_0_beta5 root conf =
       in
       let switch_config = OpamFile.make (switch_meta_dir // "switch-config") in
       let module C = OpamFile.Switch_config in
-      let config = C.safe_read switch_config in
+      let config = C.NoError.safe_read switch_config in
       let rem_variables = List.map OpamVariable.of_string ["os"; "make"] in
       let config =
         { config with
@@ -1046,29 +1046,49 @@ let from_2_0_beta_to_2_0_beta5 root conf =
 
 let from_2_0_beta5_to_2_0 _ conf = conf
 
+let _v2_1_alpha = OpamVersion.of_string "2.1.0~alpha"
+(* config - 2.1 -  alpha2 https://github.com/ocaml/opam/pull/4280 *)
+let v2_1_alpha2 = OpamVersion.of_string "2.1.0~alpha2"
+(* sw config - 2.1 - alpha https://github.com/ocaml/opam/pull/3894 *)
+let v2_1_rc = OpamVersion.of_string "2.1.0~rc"
+(* config & sw config -> back to 2.0 *)
 let v2_1 = OpamVersion.of_string "2.1"
 
-let from_2_0_to_2_1 _ conf =
-  OpamFile.Config.with_opam_root_version v2_1 conf
+let from_2_0_to_2_1_alpha2 _ conf =
+  conf
 
-let latest_version = OpamFile.Config.format_version
+(* default invariant added with the reinit *)
+(* should we update & remove the default-compiler here ? *)
+let from_v2_1_alpha2_to_v2_1_rc root conf =
+  List.iter (fun switch ->
+      let f = OpamPath.Switch.switch_config root switch in
+      let switch_config = OpamFile.Switch_config.NoError.safe_read f in
+      if OpamVersion.compare
+          switch_config.OpamFile.Switch_config.opam_version v2_1 = 0 then
+        OpamFile.Switch_config.write f
+          { switch_config with OpamFile.Switch_config.opam_version = v2_0 })
+    (OpamFile.Config.installed_switches conf);
+      if OpamVersion.compare (OpamFile.Config.opam_version conf) v2_1 = 0
+      && OpamFile.Config.opam_root_version conf = None then
+        OpamFile.Config.with_opam_version v2_0 conf
+      else conf
 
-let latest_hard_upgrade = (* to *) v2_0_beta5
+let latest_version = OpamFile.Config.root_version
+
+let latest_hard_upgrade = (* to *) v2_1_rc
 
 let as_necessary requested_lock global_lock root config =
-  let config_version = OpamFile.Config.opam_version config in
-  let cmp =
-    OpamVersion.(compare OpamFile.Config.format_version config_version)
+  let root_version =
+    match OpamFile.Config.opam_root_version config with
+    | None ->
+      let v = OpamFile.Config.opam_version config in
+      if v = v2_1 then v2_1_alpha2 else v
+    | Some v -> v
   in
-  if cmp = 0 then config else
-  if cmp < 0 then
-    if OpamFormatConfig.(!r.skip_version_checks) then config else
-      OpamConsole.error_and_exit `Configuration_error
-        "%s reports a newer opam version, aborting."
-        (OpamFilename.Dir.to_string root)
-  else
+  let cmp = OpamVersion.(compare OpamFile.Config.root_version root_version) in
+  if cmp <= 0 then config (* newer or same *) else
   let need_hard_upg =
-    OpamVersion.compare config_version latest_hard_upgrade < 0
+    OpamVersion.compare root_version latest_hard_upgrade < 0
   in
   let on_the_fly, global_lock_kind =
     if not need_hard_upg && requested_lock <> `Lock_write then
@@ -1090,9 +1110,10 @@ let as_necessary requested_lock global_lock root config =
       v2_0_beta,   from_2_0_alpha3_to_2_0_beta;
       v2_0_beta5,  from_2_0_beta_to_2_0_beta5;
       v2_0,        from_2_0_beta5_to_2_0;
-      v2_1,        from_2_0_to_2_1;
+      v2_1_alpha2, from_2_0_to_2_1_alpha2;
+      v2_1_rc,     from_v2_1_alpha2_to_v2_1_rc;
     ]
-    |> List.filter (fun (v,_) -> OpamVersion.compare config_version v < 0)
+    |> List.filter (fun (v,_) -> OpamVersion.compare root_version v < 0)
     |> List.partition (fun (v,_) ->
         OpamVersion.compare v latest_hard_upgrade <= 0)
   in
@@ -1105,7 +1126,7 @@ let as_necessary requested_lock global_lock root config =
   let light config =
     let config =
       List.fold_left (fun config (v, from) ->
-          from root config |> OpamFile.Config.with_opam_version v)
+          from root config |> OpamFile.Config.with_opam_root_version v)
         config light_upg
     in
     if not on_the_fly then begin
@@ -1116,7 +1137,7 @@ let as_necessary requested_lock global_lock root config =
   in
   let hard config =
     List.fold_left (fun config (v, from) ->
-        let config = from root config |> OpamFile.Config.with_opam_version v in
+        let config = from root config |> OpamFile.Config.with_opam_root_version v in
         (* save the current version to mitigate damage is the upgrade goes
            wrong afterwards *)
         OpamFile.Config.write (OpamPath.config root) config;
@@ -1128,7 +1149,7 @@ let as_necessary requested_lock global_lock root config =
   log "%s config upgrade, from %s to %s"
     (if on_the_fly then "On-the-fly" else
      if need_hard_upg then "Hard" else "Light")
-    (OpamVersion.to_string config_version)
+    (OpamVersion.to_string root_version)
     (OpamVersion.to_string latest_version);
   if not on_the_fly then
     OpamConsole.formatted_msg
@@ -1137,7 +1158,7 @@ let as_necessary requested_lock global_lock root config =
        You may want to back it up before going further.\n"
       (if is_dev then "development " else "")
       (OpamFilename.Dir.to_string root)
-      (OpamVersion.to_string config_version)
+      (OpamVersion.to_string root_version)
       (OpamVersion.to_string latest_version);
   let dontblock =
     (* Deadlock until one is killed in interactive mode, but abort in batch *)

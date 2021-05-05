@@ -18,12 +18,13 @@ let slog = OpamConsole.slog
 
 open OpamStateTypes
 
-let load_selections gt switch =
-  OpamFile.SwitchSelections.safe_read (OpamPath.Switch.selections gt.root switch)
+let load_selections ?lock_kind gt switch =
+  OpamStateConfig.Switch.safe_read_selections ?lock_kind gt switch
 
-let load_switch_config gt switch =
-  let f = OpamPath.Switch.switch_config gt.root switch in
-  match OpamFile.Switch_config.read_opt f with
+let load_switch_config ?lock_kind gt switch =
+  match OpamStateConfig.load_if_possible ?lock_kind gt
+          OpamFile.Switch_config.(read_opt, NoError.read_opt)
+          (OpamPath.Switch.switch_config gt.root switch) with
   | Some c -> c
   | None ->
     OpamConsole.error
@@ -245,7 +246,12 @@ let load lock_kind gt rt switch =
   let lock =
     OpamFilename.flock lock_kind (OpamPath.Switch.lock gt.root switch)
   in
-  let switch_config = load_switch_config gt switch in
+  let switch_config = load_switch_config ~lock_kind gt switch in
+  if OpamStateConfig.is_readonly_opamroot gt then
+    log "Opam root version (%s) if greater than binary one (%s), load anyway"
+      (OpamStd.Option.to_string OpamVersion.to_string
+         (OpamFile.Config.opam_root_version gt.config))
+      (OpamVersion.to_string (OpamFile.Config.root_version));
   if OpamVersion.compare
       switch_config.OpamFile.Switch_config.opam_version
       OpamFile.Switch_config.oldest_compatible_format_version
@@ -260,7 +266,7 @@ let load lock_kind gt rt switch =
          OpamFile.Switch_config.oldest_compatible_format_version);
   let { sel_installed = installed; sel_roots = installed_roots;
         sel_pinned = pinned; sel_compiler = compiler_packages; } =
-    load_selections gt switch
+    load_selections ~lock_kind gt switch
   in
   let pinned, pinned_opams =
     OpamPackage.Set.fold (fun nv (pinned,opams) ->
@@ -392,11 +398,12 @@ let load lock_kind gt rt switch =
     else switch_config
   in
   let switch_config, switch_invariant =
-    if OpamVersion.compare
-        switch_config.OpamFile.Switch_config.opam_version
-        (OpamVersion.of_string "2.1")
-       >= 0
-    || switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
+  (* tweak this check, but with what ? *)
+    if (match OpamFile.Config.opam_root_version gt.config with
+        | None -> false
+        | Some c ->
+          OpamVersion.compare c (OpamVersion.of_string "2.1.0~rc") >= 0)
+    && switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
     then switch_config, switch_config.OpamFile.Switch_config.invariant
     else
       let invariant =
@@ -409,14 +416,7 @@ let load lock_kind gt rt switch =
         (slog @@ fun () ->
          OpamPackage.Set.to_string (compiler_packages %% installed_roots)) ()
         (slog OpamFileTools.dep_formula_to_string) invariant;
-      let min_opam_version = OpamVersion.of_string "2.1" in
-      let opam_version =
-        if OpamVersion.compare switch_config.opam_version min_opam_version < 0
-        then min_opam_version
-        else switch_config.opam_version
-      in
-      {switch_config with invariant; opam_version},
-      invariant
+      {switch_config with invariant}, invariant
   in
   let conf_files =
     let conf_files =
@@ -631,6 +631,9 @@ let drop st =
   let _ = unlock st in ()
 
 let with_write_lock ?dontblock st f =
+  if OpamStateConfig.is_readonly_opamroot st.switch_global then
+    OpamConsole.error_and_exit `Configuration_error
+      "Global state try to get write loçck whil opam root is readonly";
   let ret, st =
     OpamFilename.with_flock_upgrade `Lock_write ?dontblock st.switch_lock
     @@ fun _ -> f ({ st with switch_lock = st.switch_lock } : rw switch_state)
@@ -1136,7 +1139,9 @@ let do_backup lock st = match lock with
       | true -> OpamFilename.remove (OpamFile.filename file)
       | false ->
         (* Reload, in order to skip the message if there were no changes *)
-        let new_selections = load_selections st.switch_global st.switch in
+        let new_selections =
+          load_selections ~lock_kind:lock st.switch_global st.switch
+        in
         if new_selections.sel_installed = previous_selections.sel_installed
         then OpamFilename.remove (OpamFile.filename file)
         else
@@ -1145,14 +1150,14 @@ let do_backup lock st = match lock with
                (Printf.sprintf
                   "\nThe former state can be restored with:\n\
                   \    %s switch import %S\n"
-                  Sys.executable_name (OpamFile.to_string file) ^
+                Sys.executable_name (OpamFile.to_string file) ^
                 if OpamPackage.Set.is_empty
                     (new_selections.sel_roots -- new_selections.sel_installed)
                 then "" else
                   Printf.sprintf
                     "Or you can retry to install your package selection with:\n\
                     \    %s install --restore\n"
-                  Sys.executable_name)))
+                    Sys.executable_name)))
   | _ -> fun _ -> ()
 
 let with_ lock ?rt ?(switch=OpamStateConfig.get_switch ()) gt f =
@@ -1171,7 +1176,7 @@ let with_ lock ?rt ?(switch=OpamStateConfig.get_switch ()) gt f =
 let update_repositories gt update_fun switch =
   OpamFilename.with_flock `Lock_write (OpamPath.Switch.lock gt.root switch)
   @@ fun _ ->
-  let conf = load_switch_config gt switch in
+  let conf = load_switch_config ~lock_kind:`Lock_write gt switch in
   let repos =
     match conf.OpamFile.Switch_config.repos with
     | None -> OpamGlobalState.repos_list gt
