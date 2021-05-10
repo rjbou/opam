@@ -198,11 +198,13 @@ crowbar-afl: $(DUNE_DEP)
 	echo foo > /tmp/opam-crowbar-input/foo
 	afl-fuzz -i /tmp/opam-crowbar-input -o /tmp/opam-crowbar-output dune exec src/crowbar/test.exe @@
 
-# tests-local, tests-git
-tests-%: $(DUNE_DEP)
+INTERMEDIATE: src/client/no-git-version
+src/client/no-git-version:
 	touch src/client/no-git-version
+
+# tests-local, tests-git
+tests-%: $(DUNE_DEP) src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) --profile=$(DUNE_PROFILE) --root . @reftest-legacy-$* --force
-	rm src/client/no-git-version
 
 reftest-gen: $(DUNE_DEP)
 	touch src/client/no-git-version
