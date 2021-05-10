@@ -232,7 +232,7 @@ let load_config_root ?lock_kind readf opamroot =
   let f = OpamPath.config opamroot in
   load_if_possible_raw ?lock_kind
     (OpamFile.Config.raw_root_version f)
-  readf f
+    readf f
 
 let safe_load ?lock_kind opamroot =
   load_config_root ?lock_kind

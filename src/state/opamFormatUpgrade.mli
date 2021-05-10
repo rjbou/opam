@@ -34,6 +34,9 @@ val latest_version: OpamVersion.t
 val as_necessary:
   'a lock -> OpamSystem.lock -> dirname -> OpamFile.Config.t -> OpamFile.Config.t
 
+val downgrade_opam_version_from_2_1_to_2_0:
+  'a OpamFile.t -> bool
+
 (** Converts the opam file format, including rewriting availability conditions
     based on OCaml-related variables into dependencies. The filename is used to
     report errors *)

@@ -1426,12 +1426,229 @@ module ConfigSyntax = struct
       (fun (fld, ppacc) -> fld, Pp.embed with_wrappers wrappers ppacc)
       Wrappers.fields
 
+(*
+  let check_opam_version
+      ~format_version
+      ()
+    =
+    let name = "opam-version" in
+    let opam_v = Pp.V.string -| Pp.of_module "opam-version" (module OpamVersion) in
+    let f =fun v -> OpamVersion.(compare format_version (nopatch v) >= 0) in
+    let f v =
+      OpamFormatConfig.(!r.skip_version_checks) || match v with
+      | Some v -> f v
+      | None -> false 
+    in
+    let f _ = true in
+    let errmsg =
+      Printf.sprintf
+        "unsupported or missing file format version; should be %s or older"
+        (OpamVersion.to_string format_version)
+    in
+    let legacy =
+    Pp.I.field name (Pp.parse opam_v) -|
+    Pp.map_fst (Pp.check ~name ~errmsg f) -|
+    Pp.pp
+      (fun ~pos:_ (_,x) -> x)
+      (fun x ->
+         (* re-extract the field using parse when printing, to check *)
+         Pp.parse ~pos:pos_null (Pp.I.field name (Pp.parse opam_v)) x)
+    in
+    let open OpamPp in
+    let open OpamFormat in
+    let open OpamFormat.I in
+    let name = "opam-version" in
+    let opam_v = V.string -| of_module "opam-version" (module OpamVersion) in
+    let root_v =
+       V.string -| of_module "opam-root-version" (module OpamVersion)
+    in
+    let f (ov,(rv: OpamVersion.t option)) =
+      OpamFormatConfig.(!r.skip_version_checks)
+      || rv = None
+      || match ov with
+      | Some v -> f v
+      | None -> false in
+    let errmsg =
+      Printf.sprintf
+        "unsupported or missing file format version; should be %s or older"
+        (OpamVersion.to_string format_version)
+    in
+    let parsed_opam_v = field name (parse opam_v) in
+    let parsed_root_v :
+      (opamfile_item_kind with_pos list,
+       OpamVersion.t option * opamfile_item_kind with_pos list) OpamPp.t
+      = field name (parse root_v) in
+    let both: 
+      (opamfile_item_kind with_pos list * opamfile_item_kind with_pos list,
+       (OpamVersion.t option * opamfile_item_kind with_pos list) *
+       (OpamVersion.t option * opamfile_item_kind with_pos list)) OpamPp.t
+      = map_pair parsed_opam_v parsed_root_v in
+    let checked :
+      (OpamVersion.t option * OpamVersion.t option,
+       OpamVersion.t option * OpamVersion.t option) OpamPp.t
+      = check ~name ~errmsg f in
+    let mapped
+      : ((OpamVersion.t option * OpamVersion.t option)
+         * 'a,
+         (OpamVersion.t option * OpamVersion.t option)
+         * 'a) OpamPp.t
+      = map_fst checked in
+(*
+    let fst_comb 
+      =
+      both -|
+      mapped
+    in
+*)
+    let parse_field name parse =
+      let r 
+        : pos:pos -> opamfile_item list -> 'a option * opamfile_item list
+        = 
+        (Pp.I.field name parse).parse
+      in
+      r
+    in
+    let pp_two_fields =
+      let name1 = "opam-version" in
+      let parse1 = parse opam_v in
+      let name2 = "opam-root-version" in
+      let parse2 = parse root_v in
+      pp
+        (fun ~pos items ->
+           let (field1,_) = (Pp.I.field name1 parse1).parse ~pos items in
+           let (field2,_) = (Pp.I.field name2 parse2).parse ~pos items in
+           (field1, field2), items)
+        snd
+    in
+    let _
+      : (opamfile_item list, ('a option * 'b option) * opamfile_item list)
+          OpamPp.t
+      = pp_two_fields in
+    let check_fun (ov,rv) =
+      OpamFormatConfig.(!r.skip_version_checks)
+      || rv = None
+      || match ov with
+      | Some v -> f v
+      | None -> false 
+    in
+    let checkk = check ~name ~errmsg f in
+    let mapped = Pp.map_fst checkk in
+    let finalpp
+      : ((OpamVersion.t option * OpamVersion.t option)
+         * opamfile_item_kind with_pos list,
+         opamfile_item_kind with_pos list) OpamPp.t
+      =
+      Pp.pp
+        (fun ~pos:_ (_,x) -> x)
+        (fun x ->
+           (* re-extract the field using parse when printing, to check *)
+           let v, items =
+           Pp.parse ~pos:pos_null (Pp.I.field name (Pp.parse opam_v)) x
+           in
+           (v, None), items)
+    in
+    let _
+      : (opamfile_item_kind with_pos list,
+         opamfile_item_kind with_pos list) OpamPp.t
+      = pp_two_fields -| mapped -| finalpp
+    in
+    let checked = 
+      let _fst_appl : 
+        (opamfile_item_kind with_pos list,
+         OpamVersion.t option * opamfile_item_kind with_pos list) OpamPp.t
+        =
+        let ff 
+          : (opamfile_item_kind with_pos list,
+             OpamVersion.t option * opamfile_item_kind with_pos list)
+              OpamPp.t
+          = field name (parse opam_v) 
+        in
+        let checkf
+          : (OpamVersion.t option, OpamVersion.t option) OpamPp.t
+          =  check ~name ~errmsg (fun x -> f (x,None)) 
+        in
+        let mapped
+          : (OpamVersion.t option * 'a, OpamVersion.t option * 'a) OpamPp.t
+          = map_fst checkf
+        in
+        ff -| mapped
+      in
+      let finalpp 
+        : (OpamVersion.t option * opamfile_item_kind with_pos list,
+           opamfile_item_kind with_pos list) OpamPp.t
+        =
+        let pparse
+          : pos:pos ->
+            (OpamVersion.t option * opamfile_item_kind with_pos list) ->
+            opamfile_item_kind with_pos list
+          = (fun ~pos:_ (_,x) -> x)
+        in
+        let pprint
+          : opamfile_item_kind with_pos list
+            -> (OpamVersion.t option * opamfile_item_kind with_pos list)
+          = (fun x ->
+              (* re-extract the field using parse when printing, to check *)
+              parse ~pos:pos_null (field name (parse opam_v)) x)
+        in
+        pp pparse pprint
+      in
+      let _
+        : (opamfile_item_kind with_pos list,
+           opamfile_item_kind with_pos list) OpamPp.t
+        = _fst_appl -| finalpp
+      in
+      ()
+    in
+    legacy
+*)
+
+
+  let check_opam_version
+      ~format_version
+      ()
+    =
+    let name_opam_v = "opam-version" in
+    let name_root_v = "opam-root-version" in
+    let parse_opam_v =
+      Pp.V.string -| Pp.of_module name_opam_v (module OpamVersion)
+      |> Pp.parse
+    in
+    let parse_root_v =
+      Pp.V.string -| Pp.of_module name_root_v (module OpamVersion)
+      |> Pp.parse
+    in
+    let f (ov,rv) =
+      OpamFormatConfig.(!r.skip_version_checks)
+      || rv = None
+      || match ov with
+      | Some v -> OpamVersion.(compare format_version (nopatch v) >= 0)
+      | None -> false in
+    let errmsg =
+      Printf.sprintf
+        "unsupported or missing file format version; should be %s or older"
+        (OpamVersion.to_string format_version)
+    in
+    Pp.pp
+      (fun ~pos items ->
+         let (ov,_) = (Pp.I.field name_opam_v parse_opam_v).parse ~pos items in
+         let (rv,_) = (Pp.I.field name_root_v parse_root_v).parse ~pos items in
+         (ov,rv), items)
+      snd
+    -| Pp.map_fst (Pp.check ~name:name_opam_v ~errmsg f) 
+    -| Pp.pp
+      (fun ~pos:_ (_,x) -> x)
+      (fun x ->
+         (* re-extract the field using parse when printing, to check *)
+         let v, items =
+           Pp.parse ~pos:pos_null (Pp.I.field name_opam_v parse_opam_v) x
+         in
+         (v, None), items)
+
   let pp_cond ?condition () =
     let name = internal in
     let format_version = file_format_version in
     Pp.I.map_file @@
-    Pp.I.check_opam_version ~format_version
-    ~f:(fun v -> OpamVersion.compare v file_format_version =0) () -|
+    check_opam_version ~format_version () -|
     Pp.I.fields ~name ~empty fields -|
     Pp.I.show_errors ~name ?condition ()
 
@@ -1447,14 +1664,17 @@ module Config = struct
   module NoError = Errorless(ConfigSyntax)
 
   let raw_root_version f =
+    let open OpamParserTypes.FullPos in
     try
+      let opamfile = OpamParser.file (OpamFilename.to_string (filename f)) in
       Some (OpamStd.List.find_map (function
-          | "opam-root-version:"::v::_ | "opam-root-version"::":"::v::_ ->
-            let v = String.sub v 1 (String.length v - 2) in
-            Some (OpamVersion.of_string v)
+          | { pelem = Variable ({ pelem = "opam-root-version"; _},
+                                {pelem = String version; _}); _} ->
+            Some (OpamVersion.of_string version)
           | _ -> None)
-          (Lines.safe_read f))
-    with Not_found -> None
+          opamfile.file_contents)
+    with 
+    | Sys_error _ | Not_found -> None
 end
 
 module InitConfigSyntax = struct

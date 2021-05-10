@@ -1046,32 +1046,69 @@ let from_2_0_beta_to_2_0_beta5 root conf =
 
 let from_2_0_beta5_to_2_0 _ conf = conf
 
-let _v2_1_alpha = OpamVersion.of_string "2.1.0~alpha"
+(* sw config - 2.1 - alpha https://github.com/ocaml/opam/pull/3894 *)
+let v2_1_alpha = OpamVersion.of_string "2.1.0~alpha"
 (* config - 2.1 -  alpha2 https://github.com/ocaml/opam/pull/4280 *)
 let v2_1_alpha2 = OpamVersion.of_string "2.1.0~alpha2"
-(* sw config - 2.1 - alpha https://github.com/ocaml/opam/pull/3894 *)
+(* config & sw config - 2.1 -  downgrade to 2.0 and add opam root version *)
 let v2_1_rc = OpamVersion.of_string "2.1.0~rc"
 (* config & sw config -> back to 2.0 *)
 let v2_1 = OpamVersion.of_string "2.1"
 
-let from_2_0_to_2_1_alpha2 _ conf =
+let from_2_0_to_2_1_alpha _ conf = conf
+
+let downgrade_opam_version_from_2_1_to_2_0 f =
+  let filename = OpamFile.filename f in
+  let str_f = OpamFilename.to_string filename in
+  let opamfile = OpamParser.FullPos.file str_f in
+  let opamfile' =
+  let open OpamParserTypes.FullPos in
+    { opamfile with
+      file_contents = 
+        let has_opam_root_version =
+          try
+            ignore @@
+            List.find (function
+                | { pelem = Variable ({ pelem = "opam-root-version";
+                                        _},_); _ } -> true
+                | _ -> false) opamfile.file_contents;
+            true
+          with Not_found -> false
+        in
+        List.map (fun item ->
+            match item.pelem with
+            | Variable (({pelem = "opam-version"; _} as opam_v),
+                        ({pelem = String "2.1"; _} as v))
+              when not has_opam_root_version ->
+              { item with
+                pelem = Variable ({opam_v with pelem = "opam-version"},
+                                  {v with pelem = String "2.0"})}
+            | _ -> item) opamfile.file_contents}
+  in
+  let updated = opamfile' <> opamfile in
+  if updated then
+    OpamFilename.write filename (OpamPrinter.FullPos.opamfile opamfile');
+  updated
+
+let downgrade_2_1_switches root conf =
+  List.iter (fun switch ->
+      let f = OpamPath.Switch.switch_config root switch in
+      ignore @@ downgrade_opam_version_from_2_1_to_2_0 f;
+      ignore @@ OpamFile.Switch_config.safe_read f)
+    (OpamFile.Config.installed_switches conf)
+
+let from_2_1_alpha_to_2_1_alpha2 root conf =
+  downgrade_2_1_switches root conf;
   conf
 
 (* default invariant added with the reinit *)
 (* should we update & remove the default-compiler here ? *)
 let from_v2_1_alpha2_to_v2_1_rc root conf =
-  List.iter (fun switch ->
-      let f = OpamPath.Switch.switch_config root switch in
-      let switch_config = OpamFile.Switch_config.NoError.safe_read f in
-      if OpamVersion.compare
-          switch_config.OpamFile.Switch_config.opam_version v2_1 = 0 then
-        OpamFile.Switch_config.write f
-          { switch_config with OpamFile.Switch_config.opam_version = v2_0 })
-    (OpamFile.Config.installed_switches conf);
-      if OpamVersion.compare (OpamFile.Config.opam_version conf) v2_1 = 0
-      && OpamFile.Config.opam_root_version conf = None then
-        OpamFile.Config.with_opam_version v2_0 conf
-      else conf
+  downgrade_2_1_switches root conf;
+  if OpamVersion.compare (OpamFile.Config.opam_version conf) v2_1 = 0
+  && OpamFile.Config.opam_root_version conf = None then
+    OpamFile.Config.with_opam_version v2_0 conf
+  else conf
 
 let latest_version = OpamFile.Config.root_version
 
@@ -1110,7 +1147,8 @@ let as_necessary requested_lock global_lock root config =
       v2_0_beta,   from_2_0_alpha3_to_2_0_beta;
       v2_0_beta5,  from_2_0_beta_to_2_0_beta5;
       v2_0,        from_2_0_beta5_to_2_0;
-      v2_1_alpha2, from_2_0_to_2_1_alpha2;
+      v2_1_alpha,  from_2_0_to_2_1_alpha;
+      v2_1_alpha2, from_2_1_alpha_to_2_1_alpha2;
       v2_1_rc,     from_v2_1_alpha2_to_v2_1_rc;
     ]
     |> List.filter (fun (v,_) -> OpamVersion.compare root_version v < 0)

@@ -1,5 +1,5 @@
 632bc2e
-### OPAMYES=1 OPAMDEBUG=-1
+### OPAMYES=1 OPAMDEBUG=-1 OPAMSTRICT=0
 ### OPAMDEBUGSECTIONS="FMT_UPG FORMAT GSTATE RSTATE STATE"
 ### : setup
 ### <generate.ml>
@@ -74,7 +74,8 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
             - At ${BASEDIR}/OPAM/repo/repos-config:2:0-2:8::
               Invalid field neant
 
-RSTATE                          Cache found
+RSTATE                          No cache found
+RSTATE                          loaded opam files from repo default in 0.000s
 # No matches found
 ### # ro global state, rw repo state
 ### opam repo add root-config ./root-config --set-default
@@ -344,7 +345,7 @@ done
 ### <generate.ml>
 let opam_version = Printf.sprintf "opam-version: %S"
 let opam_version_2_0 = opam_version "2.0"
-let opam_version_2_1 = opam_version "2.0"
+let opam_version_2_1 = opam_version "2.1"
 let repo = {|repositories: "default"|}
 let installed_switches = {|
 installed-switches: ["sw-sys-comp" "sw-comp" "default"]
@@ -588,7 +589,7 @@ installed: ["i-am-compiler.2" "i-am-package.2"]
 ### :III:3: From 2.1.0~alpha2 root
 ### sh switch-root.sh 2.1.0~alpha2
 ### opam list
-This version of opam requires an update to the layout of ${BASEDIR}/OPAM from version 2.0 to version 2.1.0~rc, which can't be reverted.
+This version of opam requires an update to the layout of ${BASEDIR}/OPAM from version 2.1.0~alpha2 to version 2.1.0~rc, which can't be reverted.
 You may want to back it up before going further.
 Perform the update and continue? [Y/n] y
 Format upgrade done.

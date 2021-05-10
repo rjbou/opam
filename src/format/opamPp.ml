@@ -57,6 +57,7 @@ type ('a,'b) t = {
   name_constr: string -> string;
 }
 
+(* (pos:OpamParserTypes.FullPos.pos -> 'a -> 'b) -> ('b -> 'a) -> ('a, 'b) t *)
 let pp ?(name="") ?(name_constr=fun x -> x) parse print =
   {
     parse; print; ppname = name; name_constr;
@@ -120,6 +121,7 @@ let ignore = {
   name_constr = (fun _ -> "<ignored>");
 }
 
+(* name:string -> ?errmsg:string -> ('a -> bool) -> ('a, 'a) t *) 
 let check ?name ?errmsg f =
   pp
     ?name
@@ -151,6 +153,7 @@ let map_pair ?name ?posf1 ?posf2 (pp1: ('a,'b) t) (pp2: ('c,'d) t) =
        parse pp2 ~pos:(posf2 b) b)
     (fun (a,b) -> print pp1 a, print pp2 b)
 
+(*('a, 'b) t -> ('a * 'c, 'b * 'c) t *)
 let map_fst pp1 =
   pp
     (fun ~pos (a,b) -> pp1.parse ~pos a, b)
