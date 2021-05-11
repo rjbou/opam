@@ -1043,7 +1043,10 @@ end
 (* Error less reading for forward compatibility of opam roots *)
 module type ErrorlessArg = sig
   include SyntaxFileArg
-  val pp_cond: ?condition:(t -> bool) -> unit ->  (opamfile, filename * t) Pp.t
+  val file_format_version: OpamVersion.t
+  val pp_cond:
+    ?f:(OpamVersion.t -> bool) -> ?condition:(t -> bool) -> unit ->
+    (opamfile, filename * t) Pp.t
 end
 
 module type ReadWOError = sig
@@ -1058,7 +1061,18 @@ end
 module Errorless (S: ErrorlessArg) : ReadWOError with type t := S.t = struct
   module ES = struct
     include S
-    let pp = pp_cond ~condition:(fun _ -> false) ()
+    let pp =
+    pp_cond ~f:(fun v ->
+(*
+    OpamConsole.error "in f format %s < v %s -> %B" 
+    (OpamVersion.to_string file_format_version)
+    (OpamVersion.to_string v)
+(OpamVersion.(compare file_format_version (nopatch v) < 0));
+*)
+(*     OpamVersion.(compare file_format_version (nopatch v) < 0)) *)
+true)
+    ~condition:(fun _ -> false) ()
+(*       ?(f=fun v -> OpamVersion.(compare format_version (nopatch v) >= 0)) *)
   end
   include ES
   include SyntaxFile(ES)
@@ -1604,6 +1618,7 @@ module ConfigSyntax = struct
 
 
   let check_opam_version
+      ?(f=fun v -> OpamVersion.(compare file_format_version (nopatch v) = 0))
       ~format_version
       ()
     =
@@ -1618,10 +1633,20 @@ module ConfigSyntax = struct
       |> Pp.parse
     in
     let f (ov,rv) =
+(*
+      OpamConsole.error "format  %s ov %s rv %s -> %B" 
+        (OpamVersion.to_string format_version)
+        (OpamStd.Option.to_string OpamVersion.to_string ov)
+        (OpamStd.Option.to_string OpamVersion.to_string rv)
+        (match ov with
+         | Some v -> f v
+         | None -> false)
+      ;
+*)
       OpamFormatConfig.(!r.skip_version_checks)
       || rv = None
       || match ov with
-      | Some v -> OpamVersion.(compare format_version (nopatch v) >= 0)
+      | Some v -> f v
       | None -> false in
     let errmsg =
       Printf.sprintf
@@ -1644,11 +1669,11 @@ module ConfigSyntax = struct
          in
          (v, None), items)
 
-  let pp_cond ?condition () =
+  let pp_cond ?f ?condition () =
     let name = internal in
     let format_version = file_format_version in
     Pp.I.map_file @@
-    check_opam_version ~format_version () -|
+    check_opam_version ?f ~format_version () -|
     Pp.I.fields ~name ~empty fields -|
     Pp.I.show_errors ~name ?condition ()
 
@@ -1934,11 +1959,11 @@ module Repos_configSyntax = struct
          OpamRepositoryName.Map.(of_list, bindings));
   ]
 
-  let pp_cond ?condition () =
+  let pp_cond ?f ?condition () =
     let name = internal in
     let format_version = file_format_version in
     Pp.I.map_file @@
-    Pp.I.check_opam_version ~optional:true ~format_version () -|
+    Pp.I.check_opam_version ~optional:true ?f ~format_version () -|
     Pp.I.fields ~name ~empty fields -|
     Pp.I.show_errors ~name ?condition ()
 
@@ -2037,11 +2062,11 @@ module Switch_configSyntax = struct
          fld, Pp.embed (fun wrappers t -> {t with wrappers}) (fun t -> t.wrappers) ppacc)
       Wrappers.fields
 
-  let pp_cond ?condition () =
+  let pp_cond ?f ?condition () =
     let name = internal in
     let format_version = file_format_version in
     Pp.I.map_file @@
-    Pp.I.check_opam_version ~format_version () -|
+    Pp.I.check_opam_version ?f ~format_version () -|
     Pp.I.fields ~name ~empty ~sections fields -|
     Pp.I.show_errors ~name ?condition ()
 
@@ -2070,6 +2095,7 @@ module SwitchSelectionsSyntax = struct
 
   let internal = "switch-state"
   let format_version = OpamVersion.of_string "2.0"
+  let file_format_version = OpamVersion.of_string "2.0"
 
   type t = switch_selections
 
@@ -2114,10 +2140,10 @@ module SwitchSelectionsSyntax = struct
        Pp.of_pair "Package set" OpamPackage.Set.(of_list, elements))
   ]
 
-  let pp_cond ?condition () =
+  let pp_cond ?f ?condition () =
     let name = "switch-state" in
     Pp.I.map_file @@
-    Pp.I.check_opam_version ~optional:true ~format_version () -|
+    Pp.I.check_opam_version ~optional:true ?f ~format_version () -|
     Pp.I.fields ~name ~empty fields -|
     Pp.I.show_errors ~name ?condition ()
 

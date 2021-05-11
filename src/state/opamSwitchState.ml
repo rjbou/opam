@@ -22,9 +22,7 @@ let load_selections ?lock_kind gt switch =
   OpamStateConfig.Switch.safe_read_selections ?lock_kind gt switch
 
 let load_switch_config ?lock_kind gt switch =
-  match OpamStateConfig.load_if_possible ?lock_kind gt
-          OpamFile.Switch_config.(read_opt, NoError.read_opt)
-          (OpamPath.Switch.switch_config gt.root switch) with
+  match OpamStateConfig.Switch.read_opt ?lock_kind gt switch with
   | Some c -> c
   | None ->
     OpamConsole.error
@@ -403,7 +401,7 @@ let load lock_kind gt rt switch =
         | None -> false
         | Some c ->
           OpamVersion.compare c (OpamVersion.of_string "2.1.0~rc") >= 0)
-    && switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
+    || switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
     then switch_config, switch_config.OpamFile.Switch_config.invariant
     else
       let invariant =

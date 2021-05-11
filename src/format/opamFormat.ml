@@ -853,8 +853,17 @@ module I = struct
     let opam_v = V.string -| of_module "opam-version" (module OpamVersion) in
     let f v =
       OpamFormatConfig.(!r.skip_version_checks) || match v with
-      | Some v -> f v
-      | None -> optional
+      | Some v ->
+(*
+      OpamConsole.error "format  %s v %s -> %B" 
+      (OpamVersion.to_string format_version)
+      (OpamVersion.to_string v)
+      (f v);
+*)
+      f v
+      | None ->
+(*       OpamConsole.error "optionel ?"; *)
+      optional
     in
     let errmsg =
       Printf.sprintf

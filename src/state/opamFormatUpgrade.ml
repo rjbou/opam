@@ -1097,14 +1097,16 @@ let downgrade_2_1_switches root conf =
       ignore @@ OpamFile.Switch_config.safe_read f)
     (OpamFile.Config.installed_switches conf)
 
-let from_2_1_alpha_to_2_1_alpha2 root conf =
-  downgrade_2_1_switches root conf;
+let from_2_1_alpha_to_2_1_alpha2 ~on_the_fly root conf =
+  if not on_the_fly then
+    downgrade_2_1_switches root conf;
   conf
 
 (* default invariant added with the reinit *)
 (* should we update & remove the default-compiler here ? *)
-let from_v2_1_alpha2_to_v2_1_rc root conf =
-  downgrade_2_1_switches root conf;
+let from_v2_1_alpha2_to_v2_1_rc ~on_the_fly root conf =
+  if not on_the_fly then
+    downgrade_2_1_switches root conf;
   if OpamVersion.compare (OpamFile.Config.opam_version conf) v2_1 = 0
   && OpamFile.Config.opam_root_version conf = None then
     OpamFile.Config.with_opam_version v2_0 conf
@@ -1112,7 +1114,7 @@ let from_v2_1_alpha2_to_v2_1_rc root conf =
 
 let latest_version = OpamFile.Config.root_version
 
-let latest_hard_upgrade = (* to *) v2_1_rc
+let latest_hard_upgrade = (* to *) v2_0_beta5
 
 let as_necessary requested_lock global_lock root config =
   let root_version =
@@ -1148,8 +1150,8 @@ let as_necessary requested_lock global_lock root config =
       v2_0_beta5,  from_2_0_beta_to_2_0_beta5;
       v2_0,        from_2_0_beta5_to_2_0;
       v2_1_alpha,  from_2_0_to_2_1_alpha;
-      v2_1_alpha2, from_2_1_alpha_to_2_1_alpha2;
-      v2_1_rc,     from_v2_1_alpha2_to_v2_1_rc;
+      v2_1_alpha2, from_2_1_alpha_to_2_1_alpha2 ~on_the_fly;
+      v2_1_rc,     from_v2_1_alpha2_to_v2_1_rc ~on_the_fly;
     ]
     |> List.filter (fun (v,_) -> OpamVersion.compare root_version v < 0)
     |> List.partition (fun (v,_) ->
