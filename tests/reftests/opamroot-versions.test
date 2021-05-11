@@ -188,31 +188,31 @@ Invalid field neant
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 FORMAT                          File errors in ${BASEDIR}/OPAM/config, ignored fields: At ${BASEDIR}/OPAM/config:3:0-3:8::
 Invalid field neant
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 #  switch  compiler  description
 ### :II:1:b: Good config file
 ### cp config.2.2.0 $OPAMROOT/config
 ### # ro global state
 ### opam switch
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 #  switch  compiler  description
 ### :II:2:a: Bad repo config file :
 ### cp repos-config.err $OPAMROOT/repo/repos-config
 ### # ro global state, ro repo state
 ### opam list --no-switch
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 FORMAT                          File errors in ${BASEDIR}/OPAM/repo/repos-config, ignored fields: At ${BASEDIR}/OPAM/repo/repos-config:2:0-2:8::
 Invalid field neant
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 # No matches found
 ### # ro global state, rw repo state
 ### opam repo add root-config ./root-config --set-default
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 [ERROR] Write lock and root more recent, abort!
 # Return code 50 #
@@ -221,15 +221,15 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 ### # ro global state, ro repo state
 ### opam list --no-switch
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 # No matches found
 ### # ro global state, rw repo state
 ### opam repo add root-config ./root-config --set-default
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 [ERROR] Write lock and root more recent, abort!
 # Return code 50 #
@@ -241,14 +241,14 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 ### # ro global state, ro repo state, ro switch state
 ### opam list
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 STATE                           LOAD-SWITCH-STATE @ foo
 FORMAT                          File errors in ${BASEDIR}/OPAM/foo/.opam-switch/switch-config, ignored fields: At ${BASEDIR}/OPAM/foo/.opam-switch/switch-config:5:0-5:8::
 Invalid field neant
-STATE                           Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+STATE                           root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 STATE                           Inferred invariant: from base packages {}, (roots {}) => []
 STATE                           Switch state loaded in 0.000s
 # Packages matching: installed
@@ -256,9 +256,9 @@ STATE                           Switch state loaded in 0.000s
 ### # ro global state, ro repo state, rw switch state
 ### opam install bar
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 STATE                           LOAD-SWITCH-STATE @ foo
 [ERROR] Write lock and root more recent, abort!
@@ -268,12 +268,12 @@ STATE                           LOAD-SWITCH-STATE @ foo
 ### # ro global state, ro repo state, ro switch state
 ### opam list
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 STATE                           LOAD-SWITCH-STATE @ foo
-STATE                           Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+STATE                           root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 STATE                           Inferred invariant: from base packages {}, (roots {}) => []
 STATE                           Switch state loaded in 0.000s
 # Packages matching: installed
@@ -281,9 +281,9 @@ STATE                           Switch state loaded in 0.000s
 ### # ro global state, ro repo state, rw switch state
 ### opam install bar
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
-GSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+GSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
-RSTATE                          Opam root version (2.2.0) if greater than binary one (2.1.0~rc), load anyway
+RSTATE                          root version (2.2.0) is greater than running binary's (2.1.0~rc); load with best-effort (read-only)
 RSTATE                          Cache found
 STATE                           LOAD-SWITCH-STATE @ foo
 [ERROR] Write lock and root more recent, abort!
