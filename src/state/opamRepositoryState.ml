@@ -149,7 +149,7 @@ let load lock_kind gt =
   let lock = OpamFilename.flock lock_kind (OpamPath.repos_lock gt.root) in
   let repos_map = OpamStateConfig.Repos.safe_read ~lock_kind gt in
   if OpamStateConfig.is_readonly_opamroot gt then
-    log "Opam root version (%s) if greater than binary one (%s), load anyway"
+    log "root version (%s) is greater than running binary's (%s); load with best-effort (read-only)"
       (OpamStd.Option.to_string OpamVersion.to_string
          (OpamFile.Config.opam_root_version gt.config))
       (OpamVersion.to_string (OpamFile.Config.root_version));
@@ -300,4 +300,3 @@ let check_last_update () =
     OpamConsole.note "It seems you have not updated your repositories \
                       for a while. Consider updating them with:\n%s\n"
       (OpamConsole.colorise `bold "opam update");
-

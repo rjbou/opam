@@ -112,7 +112,7 @@ val local_switch_exists: OpamFilename.Dir.t -> switch -> bool
     (return unchanged otherwise) *)
 val resolve_local_switch: OpamFilename.Dir.t -> switch -> switch
 
-(** Given opam root and binary version, the opam root can be loaded only for read-only actions. *)
+(** Returns [true] if the opam root can only be loaded read-only by the current binary. *)
 val is_readonly_opamroot: ?lock_kind:'a lock -> 'b global_state -> bool
 val more_recent: OpamFile.Config.t ->  bool
 

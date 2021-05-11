@@ -27,9 +27,9 @@ val all_installed: 'a global_state -> package_set
 
 val switches: 'a global_state -> switch list
 
-(* Fold over switches, using switch selections. Switch selection file
-   [switch-state] is loaded only as read-only, no further check given opam root
-   version is done. *)
+(** Fold over switches, using switch selections. Switch selection file
+   [switch-state] is loaded only read-only; no further checks are done on the opam root
+   version. *)
 val fold_switches:
   (switch -> switch_selections -> 'a -> 'a) -> 'b global_state -> 'a -> 'a
 

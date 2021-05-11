@@ -58,7 +58,7 @@ let load lock_kind =
   let config_lock = OpamFilename.flock lock_kind (OpamPath.config_lock root) in
   let config = load_config lock_kind global_lock root in
   if OpamStateConfig.more_recent config && lock_kind <> `Lock_write then
-    log "Opam root version (%s) if greater than binary one (%s), load anyway"
+    log "root version (%s) is greater than running binary's (%s); load with best-effort (read-only)"
       (OpamStd.Option.to_string OpamVersion.to_string
          (OpamFile.Config.opam_root_version config))
       (OpamVersion.to_string (OpamFile.Config.root_version));
@@ -162,7 +162,7 @@ let drop gt =
 let with_write_lock ?dontblock gt f =
   if OpamStateConfig.is_readonly_opamroot gt then
     OpamConsole.error_and_exit `Configuration_error
-      "Global state try to get write loçck whil opam root is readonly";
+      "The opam root has been upgraded by a newer version of opam-state and cannot be written to";
   let ret, gt =
     OpamFilename.with_flock_upgrade `Lock_write ?dontblock gt.global_lock
     @@ fun _ -> f ({ gt with global_lock = gt.global_lock } : rw global_state)
@@ -201,4 +201,3 @@ let fix_switch_list gt =
       write gt, gt
     with OpamSystem.Locked -> gt
   else gt
-
