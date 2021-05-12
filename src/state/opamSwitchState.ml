@@ -22,7 +22,15 @@ let load_selections ?lock_kind gt switch =
   OpamStateConfig.Switch.safe_read_selections ?lock_kind gt switch
 
 let load_switch_config ?lock_kind gt switch =
-  match OpamStateConfig.Switch.read_opt ?lock_kind gt switch with
+  let switch_config =
+    try
+      OpamStateConfig.Switch.read_opt ?lock_kind gt switch
+    with OpamStateConfig.Need_root_upgrade config ->
+      ignore @@
+      OpamFormatUpgrade.as_necessary `Lock_write gt.global_lock gt.root config;
+      OpamStateConfig.Switch.read_opt ?lock_kind gt switch
+  in
+  match switch_config with
   | Some c -> c
   | None ->
     OpamConsole.error
@@ -401,10 +409,10 @@ let load lock_kind gt rt switch =
         | None -> false
         | Some c ->
           OpamVersion.compare c (OpamVersion.of_string "2.1.0~rc") >= 0)
-    || switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
+    && switch_config.OpamFile.Switch_config.invariant <> OpamFormula.Empty
     then switch_config, switch_config.OpamFile.Switch_config.invariant
     else
-      let invariant =
+      (let invariant =
         infer_switch_invariant_raw
           gt switch switch_config opams
           packages compiler_packages installed_roots available_packages
@@ -414,7 +422,12 @@ let load lock_kind gt rt switch =
         (slog @@ fun () ->
          OpamPackage.Set.to_string (compiler_packages %% installed_roots)) ()
         (slog OpamFileTools.dep_formula_to_string) invariant;
-      {switch_config with invariant}, invariant
+      let switch_config = {switch_config with invariant} in
+      if lock_kind = `Lock_write then (* auto-repair *)
+        OpamFile.Switch_config.write
+          (OpamPath.Switch.switch_config gt.root switch)
+          switch_config;
+      switch_config, invariant)
   in
   let conf_files =
     let conf_files =

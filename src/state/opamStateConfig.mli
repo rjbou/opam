@@ -121,6 +121,7 @@ val load_config_root:
   ((OpamFile.Config.t OpamFile.t -> 'b) * (OpamFile.Config.t OpamFile.t -> 'b)) ->
   dirname -> 'b
 
+exception Need_root_upgrade of OpamFile.Config.t
 module Switch : sig
   val safe_load_t:
     ?lock_kind: 'a lock -> dirname -> switch -> OpamFile.Switch_config.t

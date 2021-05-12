@@ -200,11 +200,31 @@ let more_recent_raw version =
 let more_recent config =
     more_recent_raw (OpamFile.Config.opam_root_version config)
 
+(** none -> shouldn't load (write attempt in readonly)
+    Some true -> everything is fine normal read
+    Some false -> readonly accorded, load with best effort *)
 let is_readonly_opamroot_raw ?(lock_kind=`Lock_write) version =
+(*
   let newer = more_recent_raw version in
   let write = lock_kind = `Lock_write in
   if newer && write then None else
     Some (newer && not write)
+*)
+  let write = lock_kind = `Lock_write in
+  let newer = more_recent_raw version in
+  let older = 
+    match version with
+    | Some v ->
+      OpamVersion.compare v OpamFile.Config.root_version < 0
+    | None -> true 
+  in
+(*
+  OpamConsole.error "older %B newer %B version is %s"
+  older newer
+  (OpamStd.Option.to_string OpamVersion.to_string version );
+*)
+  if (older || newer) && write then None else
+    Some ((older || newer) && not write) 
 
 let is_readonly_opamroot_t ?lock_kind gt =
   is_readonly_opamroot_raw ?lock_kind
@@ -246,33 +266,34 @@ let load ?lock_kind opamroot =
   load_config_root ?lock_kind
     OpamFile.Config.(read_opt, NoError.read_opt) opamroot
 
+exception Need_root_upgrade of OpamFile.Config.t
+
 (* switches *)
 module Switch = struct
-  
-(*
-  let tweak421 ?(lock_kind=`Lock_write) gt =
-    let config = safe_load ~lock_kind:`Lock_read gt.root in
+
+  let tweak421 ?(lock_kind=`Lock_write) config =
     if OpamFile.Config.opam_root_version config = None
     && lock_kind = `Lock_write then
-    let config =
-    OpamFormatUpgrade.as_necessary `Lock_write gt.global_lock
-    gt.root config
-    in
-    ()
-*)
+(*       let _ = OpamConsole.error "need to upgrade root" in *)
+      raise (Need_root_upgrade config)
+
 
   let load_raw ?lock_kind root config readf switch =
+    tweak421 ?lock_kind config;
     load_if_possible_t ?lock_kind config readf
       (OpamPath.Switch.switch_config root switch)
 
   let safe_load_t ?lock_kind root switch =
     let config = safe_load ~lock_kind:`Lock_read root in
+    tweak421 ?lock_kind config;
     load_raw ?lock_kind root config
       OpamFile.Switch_config.(safe_read, NoError.safe_read)
       switch
 
   let load ?lock_kind gt readf switch =
-    load_if_possible ?lock_kind gt readf
+    let config = safe_load ~lock_kind:`Lock_read gt.root in
+    tweak421 ?lock_kind config;
+    load_if_possible_t ?lock_kind config readf
       (OpamPath.Switch.switch_config gt.root switch)
 
   let safe_load ?lock_kind gt switch =

@@ -573,7 +573,12 @@ let with_switch:
   | None ->
     let switch = OpamStateConfig.get_switch () in
     let switch_config =
-      OpamStateConfig.Switch.safe_load ~lock_kind gt switch
+      try
+        OpamStateConfig.Switch.safe_load ~lock_kind gt switch
+      with OpamStateConfig.Need_root_upgrade config ->
+        ignore @@
+        OpamFormatUpgrade.as_necessary `Lock_write gt.global_lock gt.root config;
+        OpamStateConfig.Switch.safe_load ~lock_kind gt switch
     in
     let lock_file = OpamPath.Switch.lock gt.root switch in
     if switch_config = OpamFile.Switch_config.empty then
