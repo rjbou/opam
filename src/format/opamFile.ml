@@ -898,6 +898,45 @@ module SyntaxFile(X: SyntaxFileArg) : IO_FILE with type t := X.t = struct
     end)
 end
 
+(* Error less reading for forward compatibility of opam roots *)
+module type BestEffortArg = sig
+  include SyntaxFileArg
+
+  (* Construct the syntax pp, under some conditions. If [condition] is given,
+     it is passed to [OpamFormat.show_erros] call, for error display
+     conditions, default is to display it as a warning. If [f] is given, it is
+     passed to [OpamFormat.check_opam_version] call, it is the check function,
+     default is to check regarding [file_format_version]. *)
+  val pp_cond:
+    ?f:(OpamVersion.t -> bool) -> ?condition:(t -> bool) -> unit ->
+    (opamfile, filename * t) Pp.t
+end
+
+module type BestEffortRead = sig
+  type t
+  val read: t typed_file -> t
+  val read_opt: t typed_file -> t option
+  val safe_read: t typed_file -> t
+  val read_from_channel: ?filename:t typed_file -> in_channel -> t
+  val read_from_string: ?filename:t typed_file -> string -> t
+end
+
+module MakeBestEffort (S: BestEffortArg) : BestEffortRead
+  with type t := S.t = struct
+  module ES = struct
+    include S
+    let pp =
+      pp_cond
+        (* to read newer oapm root with newer `opam-version` field, we need to
+           be less strict on the check_opam_version
+           ~f:(fun _ -> true)
+        *)
+        ~condition:(fun _ -> false) ()
+  end
+  include ES
+  include SyntaxFile(ES)
+end
+
 (** (1) Internal files *)
 
 (** Structure shared by a few file formats *)
@@ -1214,16 +1253,22 @@ module ConfigSyntax = struct
       (fun (fld, ppacc) -> fld, Pp.embed with_wrappers wrappers ppacc)
       Wrappers.fields
 
-  let pp =
+  let pp_cond ?f ?condition () =
     let name = internal in
     Pp.I.map_file @@
+    Pp.I.check_opam_version () -|
     Pp.I.fields ~name ~empty fields -|
-    Pp.I.show_errors ~name ~strict:OpamCoreConfig.(not !r.safe_mode) ()
+    Pp.I.show_errors ~name ?condition ()
+
+  let pp = pp_cond ()
 
 end
+
 module Config = struct
   include ConfigSyntax
   include SyntaxFile(ConfigSyntax)
+
+  module BestEffort = MakeBestEffort(ConfigSyntax)
 
   let raw_root_version f =
     try
@@ -1486,16 +1531,19 @@ module Repos_configSyntax = struct
          OpamRepositoryName.Map.(of_list, bindings));
   ]
 
-  let pp =
+  let pp_cond ?f ?condition () =
     let name = internal in
     Pp.I.map_file @@
     Pp.I.fields ~name ~empty fields -|
-    Pp.I.show_errors ~name ()
+    Pp.I.show_errors ~name ?condition ()
+
+  let pp = pp_cond ()
 
 end
 module Repos_config = struct
   include Repos_configSyntax
   include SyntaxFile(Repos_configSyntax)
+  module BestEffort = MakeBestEffort(Repos_configSyntax)
 end
 
 module Switch_configSyntax = struct
@@ -1564,11 +1612,13 @@ module Switch_configSyntax = struct
          fld, Pp.embed (fun wrappers t -> {t with wrappers}) (fun t -> t.wrappers) ppacc)
       Wrappers.fields
 
-  let pp =
+  let pp_cond ?f ?condition () =
     let name = internal in
     Pp.I.map_file @@
     Pp.I.fields ~name ~empty ~sections fields -|
-    Pp.I.show_errors ~name ()
+    Pp.I.show_errors ~name ?condition ()
+
+  let pp = pp_cond ()
 
   let variable t s =
     try Some (List.assoc s t.variables)
@@ -1581,9 +1631,11 @@ module Switch_configSyntax = struct
   let wrappers t = t.wrappers
 
 end
+
 module Switch_config = struct
   include Switch_configSyntax
   include SyntaxFile(Switch_configSyntax)
+  module BestEffort = MakeBestEffort(Switch_configSyntax)
 end
 
 module SwitchSelectionsSyntax = struct
@@ -1633,18 +1685,21 @@ module SwitchSelectionsSyntax = struct
        Pp.of_pair "Package set" OpamPackage.Set.(of_list, elements))
   ]
 
-  let pp =
+  let pp_cond ?f ?condition () =
     let name = "switch-state" in
     Pp.I.map_file @@
     Pp.I.check_opam_version () -|
     Pp.I.fields ~name ~empty fields -|
-    Pp.I.show_errors ~name ()
+    Pp.I.show_errors ~name ?condition ()
+
+  let pp = pp_cond ()
 
 end
 
 module SwitchSelections = struct
   type t = switch_selections
   include SyntaxFile(SwitchSelectionsSyntax)
+  module BestEffort = MakeBestEffort(SwitchSelectionsSyntax)
 end
 
 (** Local repository config file (repo/<repo>/config) *)
