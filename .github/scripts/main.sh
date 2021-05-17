@@ -86,7 +86,7 @@ export OCAMLRUNPARAM=b
 
     test -d _opam || opam switch create . --no-install --formula '"ocaml-system"'
     eval $(opam env)
-    opam pin $GITHUB_WORKSPACE -y
+    opam pin $GITHUB_WORKSPACE -yn
     # opam lib pins defined in opam-rt are ignored as there is a local pin
     opam pin . -yn --ignore-pin-depends
     opam show --raw opam-rt
