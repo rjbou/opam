@@ -57,7 +57,7 @@ let preinit_environment_variables =
     ] in
   core @ client
 
-let preinit_opam_envvariables, doc_opam_envvariables_pre =
+let preinit_opam_envvariable, doc_opam_envvariables_pre =
   let preinit () =
     OpamStd.Config.E.updates @@
     List.map (fun (var, cons, _doc) -> cons var)
