@@ -281,7 +281,7 @@
  (deps (alias reftest-var-option)))
 
 (rule
- (deps root-009e00fa)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    var-option.out
