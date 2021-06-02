@@ -35,8 +35,9 @@ init-bootstrap () {
     set -e
     export OPAMROOT=$OPAMBSROOT
     cat $OPAMROOT/config || echo "NO CONFIG"
+    cat /home/runner/.cache/.opam.cached/config || echo "NO CONFIG"
     # The system compiler will be picked up
-    opam init --yes --no-setup git+https://github.com/ocaml/opam-repository#$OPAM_REPO_SHA
+    opam init --yes --no-setup git+https://github.com/ocaml/opam-repository#$OPAM_REPO_SHA -vv --debug
     eval $(opam env)
 #    opam update
     CURRENT_SWITCH=$(opam var switch)
