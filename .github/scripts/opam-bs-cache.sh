@@ -5,6 +5,7 @@
 rm -f $OPAM_LOCAL/bin/opam-bootstrap
 mkdir -p $OPAM_LOCAL/bin/
 
+
 os=$( (uname -s || echo unknown) | awk '{print tolower($0)}')
 if [ "$os" = "darwin" ] ; then
   os=macos
