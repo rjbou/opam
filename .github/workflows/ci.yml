@@ -54,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, macos-latest ]
         ocamlv: [ 4.11.2 ]
       fail-fast: false
     env:
