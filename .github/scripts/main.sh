@@ -18,6 +18,7 @@ export OCAMLRUNPARAM=b
     which opam
     opam config report || echo error
     cat $OPAMROOT/config || echo "NO CONFIG"
+    cat /home/runner/.cache/.opam.cached/config || echo "NO CONFIG"
     export OPAMDEBUG=1
     export OPAMVERBOSE=2
     opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
