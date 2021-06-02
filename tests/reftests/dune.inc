@@ -9,7 +9,7 @@
  (deps (alias reftest-cli-versioning)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    cli-versioning.out
@@ -121,7 +121,7 @@
  (deps (alias reftest-dot-install)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    dot-install.out
@@ -169,7 +169,7 @@
  (deps (alias reftest-legacy-git)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    legacy-git.out
@@ -185,7 +185,7 @@
  (deps (alias reftest-legacy-local)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    legacy-local.out
@@ -201,7 +201,7 @@
  (deps (alias reftest-opamroot-versions)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    opamroot-versions.out
@@ -217,7 +217,7 @@
  (deps (alias reftest-pat-sub)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    pat-sub.out
@@ -249,7 +249,7 @@
  (deps (alias reftest-switch-creation)))
 
 (rule
- (deps root-632bc2e)
+ (deps root-N0REP0)
  (action
   (with-stdout-to
    switch-creation.out
@@ -288,6 +288,24 @@
    (run ./run.exe %{bin:opam} %{dep:var-option.test} %{read-lines:testing-env}))))
 
 (rule
+ (targets opam-repo-N0REP0)
+ (action
+  (progn
+   (run mkdir -p %{targets}/packages)
+   (write-file repo "opam-version:\"2.0\"")
+   (run cp repo %{targets}/repo)
+  )))
+
+(rule
+  (targets root-N0REP0)
+  (action
+   (progn
+    (ignore-stdout
+    (run %{bin:opam} init --root=%{targets}
+           --no-setup --bypass-checks --no-opamrc --bare
+           file://%{dep:opam-repo-N0REP0})))))
+
+(rule
  (targets opam-archive-009e00fa.tar.gz)
  (action (run wget --quiet -O %{targets} https://github.com/ocaml/opam-repository/archive/009e00fa.tar.gz)))
 
@@ -306,26 +324,6 @@
     (run %{bin:opam} init --root=%{targets}
            --no-setup --bypass-checks --no-opamrc --bare
            file://%{dep:opam-repo-009e00fa})))))
-
-(rule
- (targets opam-archive-632bc2e.tar.gz)
- (action (run wget --quiet -O %{targets} https://github.com/ocaml/opam-repository/archive/632bc2e.tar.gz)))
-
-(rule
-  (targets opam-repo-632bc2e)
-  (action
-   (progn
-    (run mkdir %{targets})
-    (run tar -C %{targets} -xzf %{dep:opam-archive-632bc2e.tar.gz} --strip-components=1))))
-
-(rule
-  (targets root-632bc2e)
-  (action
-   (progn
-    (ignore-stdout
-    (run %{bin:opam} init --root=%{targets}
-           --no-setup --bypass-checks --no-opamrc --bare
-           file://%{dep:opam-repo-632bc2e})))))
 
 (rule
  (targets opam-archive-ad4dd344.tar.gz)
