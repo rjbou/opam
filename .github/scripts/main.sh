@@ -14,7 +14,7 @@ export OCAMLRUNPARAM=b
   (set +x ; echo -en "::group::build opam\r") 2>/dev/null
   if [[ $OPAM_TEST -eq 1 ]] ; then
     export OPAMROOT=$OPAMBSROOT
-    cat $OPAMROOT/config || echo "NO CONFIG"
+    cat /home/runner/.cache/.opam.cached/config || echo "NO CONFIG"
     # If the cached root is newer, regenerate a binary compatible root
     opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
     eval $(opam env)
