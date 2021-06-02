@@ -15,6 +15,9 @@ export OCAMLRUNPARAM=b
   if [[ $OPAM_TEST -eq 1 ]] ; then
     export OPAMROOT=$OPAMBSROOT
     # If the cached root is newer, regenerate a binary compatible root
+    which opam
+    opam config report || echo error
+    cat $OPAMROOT/config || echo "NO CONFIG"
     opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
     eval $(opam env)
   fi
