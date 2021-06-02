@@ -199,6 +199,7 @@ New option/command/subcommand are prefixed with ◈.
   * Add a test to test various case of opam root loading (several version, and several lock kinds) [#4638 @rjbou]
   * GHA: Bump bootstrap opam version to beta4 [#4695 @rjbou]
   * GHA: fix tilde expansion that was blockign opam bootstrap cache regeneration [#4695 @rjbou]
+  * Don't depend on opam repository for headles tests [#XXXX @rjbou]
 
 ## Shell
   * Run the shell hooks with closed stdin (bash, zsh) [#4692 @AltGr]
