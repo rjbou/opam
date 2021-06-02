@@ -34,7 +34,7 @@ init-bootstrap () {
   if [ "$OPAM_TEST" = "1" ]; then
     set -e
     export OPAMROOT=$OPAMBSROOT
-    cat $OPAMROOT/config
+    cat $OPAMROOT/config || echo "NO CONFIG"
     # The system compiler will be picked up
     opam init --yes --no-setup git+https://github.com/ocaml/opam-repository#$OPAM_REPO_SHA
     eval $(opam env)
