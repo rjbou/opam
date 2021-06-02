@@ -10,11 +10,12 @@ unset-dev-version () {
 export OPAMYES=1
 export OCAMLRUNPARAM=b
 
+exit 0
 ( # Run subshell in bootstrap root env to build
   (set +x ; echo -en "::group::build opam\r") 2>/dev/null
   if [[ $OPAM_TEST -eq 1 ]] ; then
     export OPAMROOT=$OPAMBSROOT
-    cat $OPAMROOT/config
+    cat $OPAMROOT/config || echo "NO CONFIG"
     # If the cached root is newer, regenerate a binary compatible root
     opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
     eval $(opam env)
