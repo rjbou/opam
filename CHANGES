@@ -25,6 +25,11 @@ are not marked).
   system-wide ocaml [#4500 @kit-ty-kate]
 * Untag dune as a build dependency [#4229 @kit-ty-kate]
 * Fix configure check in github actions [#4593 @rjbou]
+* Add missing shell quoting to support space and special shell characters in
+  switch directory path [#4707 @kit-ty-kate]
+* The options `--root` and `--switch` are now reflected in environment
+  variables when building packages so that calls to `opam` during build access
+  the correct root and switch [#4668 @LasseBlaauwbroek]
 
 2.0.8:
 * Add colon for fish MANPATH fix. [#4084 @rjbou - fix #4078]
