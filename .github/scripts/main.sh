@@ -90,7 +90,7 @@ export OCAMLRUNPARAM=b
     opam pin $GITHUB_WORKSPACE -yn --with-version to-test
     # opam lib pins defined in opam-rt are ignored as there is a local pin
     opam pin . -yn --ignore-pin-depends
-    opam install opam-rt --deps-only opam-devel.to-test
+    opam install opam-rt --deps-only opam-client.to-test
     make || { opam reinstall opam-client -y; make; }
     (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
   fi
