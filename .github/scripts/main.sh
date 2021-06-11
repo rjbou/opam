@@ -63,8 +63,6 @@ export OCAMLRUNPARAM=b
     set -e
 
     # Note: these tests require a "system" compiler and will use the one in $OPAMBSROOT
-    make tests
-
     make distclean
 
     # Compile and run opam-rt
