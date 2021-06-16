@@ -3,6 +3,13 @@ repositories (changes that are automatically handled by the format upgrade tools
 are not marked). Those prefixed with "(+)" are new command/option (since
 2.1.0~alpha2).
 
+2.1.0~rc2:
+* Fix format upgrade when there is missing local switches in the config file
+  [#4715 @rjbou - fix #4713]
+* Fix not recorded local switch handling, with format upgrade [#4715 @rjbou]
+* Set opam root version to 2.1 [#4715 @rjbou]
+* Improved and extended tests [#4715 @rjbou]
+
 2.1.0~rc:
 * (*) Environment variables initialised only at opam client launch, no more via
   libraries [#4606 #4703 @rjbou]
