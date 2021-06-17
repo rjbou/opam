@@ -137,3 +137,6 @@ module Repos : sig
   val safe_read:
     ?lock_kind: 'a lock -> 'b global_state -> OpamFile.Repos_config.t
 end
+
+val downgrade_2_1_switch:
+  OpamFile.Switch_config.t OpamFile.t -> OpamFile.Switch_config.t option
