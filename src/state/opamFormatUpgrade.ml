@@ -1058,22 +1058,6 @@ let v2_1 = OpamVersion.of_string "2.1"
 
 let from_2_0_to_2_1_alpha _ conf = conf
 
-let get_unrecorded_local_switch conf =
-  OpamFilename.cwd ()
-  |> OpamFilename.find_in_parents (fun dir ->
-      (*   OpamConsole.warning "looking in %s" (OpamFilename.Dir.to_string dir); *)
-      let switch = OpamSwitch.of_string (OpamFilename.Dir.to_string dir) in
-      not (List.mem switch (OpamFile.Config.installed_switches conf)) &&
-      OpamPath.Switch.switch_config dir switch
-      |> OpamFile.filename
-      |> OpamFilename.exists)
-  |> OpamStd.Option.map (fun local_switch ->
-      let switch =
-        OpamFilename.Dir.to_string local_switch
-        |> OpamSwitch.of_string
-      in
-      switch, OpamPath.Switch.switch_config local_switch switch)
-
 let downgrade_2_1_switches root conf =
   let downgrade f =
     let filename = OpamFile.filename f in
@@ -1101,13 +1085,7 @@ let downgrade_2_1_switches root conf =
       downgrade f;
       ignore @@ OpamFile.Switch_config.BestEffort.read f)
     (OpamFile.Config.installed_switches conf);
-  match get_unrecorded_local_switch conf with
-  | Some (switch, f) ->
-    downgrade f;
-    (OpamFile.Config.with_installed_switches
-       (switch::OpamFile.Config.installed_switches conf)
-       conf)
-  | None -> conf
+  conf
 
 let from_2_1_alpha_to_2_1_alpha2 root conf =
   downgrade_2_1_switches root conf
