@@ -960,6 +960,12 @@ wrap-remove-commands:
 opam-version: "2.0"
 synopsis: "switch with compiler"
 invariant: ["i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat $OPAMROOT/sw-comp/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-compiler.2"]
@@ -1035,8 +1041,14 @@ wrap-remove-commands:
 ### cat _opam/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "local switch"
-invariant: ["i-am-sys-compiler" | "i-am-compiler"]
 opam-root: "${BASEDIR}/OPAM"
+invariant: ["i-am-sys-compiler" | "i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat _opam/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-sys-compiler.2"]
@@ -1084,12 +1096,7 @@ Done.
 opam-version: "2.0"
 opam-root-version: "2.1"
 repositories: "default"
-installed-switches: [
-  "${BASEDIR}"
-  "sw-sys-comp"
-  "sw-comp"
-  "default"
-]
+installed-switches: ["sw-sys-comp" "sw-comp" "default"]
 switch: "sw-sys-comp"
 download-jobs: 3
 eval-variables: [
@@ -1113,8 +1120,14 @@ wrap-remove-commands:
 ### cat _opam/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "local switch"
-invariant: ["i-am-sys-compiler" | "i-am-compiler"]
 opam-root: "${BASEDIR}/OPAM"
+invariant: ["i-am-sys-compiler" | "i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat _opam/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-sys-compiler.2"]
@@ -1208,6 +1221,12 @@ wrap-remove-commands:
 opam-version: "2.0"
 synopsis: "switch with compiler"
 invariant: ["i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat $OPAMROOT/sw-comp/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-compiler.2"]
@@ -1285,8 +1304,14 @@ wrap-remove-commands:
 ### cat _opam/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "local switch"
-invariant: ["i-am-sys-compiler" | "i-am-compiler"]
 opam-root: "${BASEDIR}/OPAM"
+invariant: ["i-am-sys-compiler" | "i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat _opam/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-sys-compiler.2"]
@@ -1336,12 +1361,7 @@ Done.
 opam-version: "2.0"
 opam-root-version: "2.1"
 repositories: "default"
-installed-switches: [
-  "${BASEDIR}"
-  "sw-sys-comp"
-  "sw-comp"
-  "default"
-]
+installed-switches: ["sw-sys-comp" "sw-comp" "default"]
 switch: "sw-sys-comp"
 download-jobs: 3
 eval-variables: [
@@ -1365,8 +1385,14 @@ wrap-remove-commands:
 ### cat _opam/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "local switch"
-invariant: ["i-am-sys-compiler" | "i-am-compiler"]
 opam-root: "${BASEDIR}/OPAM"
+invariant: ["i-am-sys-compiler" | "i-am-compiler"]
+paths {
+  
+}
+variables {
+  
+}
 ### cat _opam/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-sys-compiler.2"]
