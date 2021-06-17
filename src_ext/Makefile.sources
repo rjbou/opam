@@ -49,7 +49,7 @@ MD5_0install-solver = 50daf035b04b29399a3c6e6f965ac447
 $(call PKG_SAME,0install-solver)
 
 URL_opam-file-format = https://github.com/rjbou/opam-file-format/archive/debug-ci.tar.gz
-MD5_opam-file-format = a444331271e6361c7c33b48acf4c13e2
+MD5_opam-file-format = 81df6d435d91bed511c64939b079063a
 
 $(call PKG_SAME,opam-file-format)
 
