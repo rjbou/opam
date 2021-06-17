@@ -186,7 +186,7 @@ Switch foo and all its packages will be wiped. Are you sure? [Y/n] y
 ### :                                                :
 ### :II:1: config with newer opam version file & no update of root version
 ### cp config.2.1.wrong $OPAMROOT/config
-### # cat $OPAMROOT/config
+### # opam-cat $OPAMROOT/config
 ### # ro global state
 ### opam switch
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
@@ -487,12 +487,12 @@ let _ =
 ### <disp-root.sh>
 # Debugging script when there are problems, mainly on Windows!
 echo "*** $OPAMROOT/config"
-cat "$OPAMROOT/config"
+opam-cat "$OPAMROOT/config"
 for switch in `find "$OPAMROOT" -maxdepth 1 -mindepth 1 -type d`; do
   for file in switch-config environment switch-state ; do
     if [ -e "$switch/.opam-switch/$file" ] ; then
       echo "*** $switch/.opam-switch/$file"
-      cat "$switch/.opam-switch/$file"
+      opam-cat "$switch/.opam-switch/$file"
     fi
   done
 done
@@ -714,7 +714,7 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 STATE                           LOAD-SWITCH-STATE @ sw-comp
 STATE                           Switch state loaded in 0.000s
-### cat $OPAMROOT/config
+### opam-cat $OPAMROOT/config
 opam-version: "2.0"
 opam-root-version: "2.1"
 repositories: "default"
@@ -730,7 +730,7 @@ default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
 depext: true
 depext-run-installs: true
 depext-cannot-install: false
-### cat $OPAMROOT/sw-comp/.opam-switch/switch-config
+### opam-cat $OPAMROOT/sw-comp/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "switch with compiler"
 invariant: [
@@ -742,7 +742,7 @@ paths {
 variables {
   
 }
-### cat $OPAMROOT/sw-comp/.opam-switch/switch-state
+### opam-cat $OPAMROOT/sw-comp/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-compiler.2"]
 roots: ["i-am-another-package.2" "i-am-compiler.2" "i-am-package.2"]
@@ -791,7 +791,7 @@ You may want to back it up before going further.
 Continue? [Y/n] y
 Format upgrade done.
 Set to '4' the field jobs in global configuration
-### cat $OPAMROOT/config
+### opam-cat $OPAMROOT/config
 opam-version: "2.0"
 opam-root-version: "2.1"
 repositories: "default"
@@ -813,7 +813,7 @@ default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
 depext: true
 depext-run-installs: true
 depext-cannot-install: false
-### cat _opam/.opam-switch/switch-config
+### opam-cat _opam/.opam-switch/switch-config
 opam-version: "2.0"
 synopsis: "local switch"
 opam-root: "${BASEDIR}/OPAM"
@@ -824,7 +824,7 @@ paths {
 variables {
   
 }
-### cat _opam/.opam-switch/switch-state
+### opam-cat _opam/.opam-switch/switch-state
 opam-version: "2.0"
 compiler: ["i-am-sys-compiler.2"]
 roots: ["i-am-package.2" "i-am-sys-compiler.2"]
