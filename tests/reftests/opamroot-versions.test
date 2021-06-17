@@ -626,6 +626,7 @@ No configuration file found, using built-in defaults.
 ### mkdir -p $OPAMROOT $OPAMROOT/repo $OPAMROOT/default/.opam-switch  $OPAMROOT/sw-comp/.opam-switch $OPAMROOT/sw-sys-comp/.opam-switch
 ### :V:1:a: From 2.0 root, global
 ### sh switch-root.sh 2.0
+### cat $OPAMROOT/config
 ### # ro global state
 ### opam option jobs
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
