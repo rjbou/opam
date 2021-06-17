@@ -484,6 +484,18 @@ let _ =
       List.iter (fun l -> output_string fd (l^"\n")) content;
       close_out fd)
     (List.map (fun (n,c) -> "default/"^n, c) files)
+### <disp-root.sh>
+# Debugging script when there are problems, mainly on Windows!
+echo "*** $OPAMROOT/config"
+cat "$OPAMROOT/config"
+for switch in `find "$OPAMROOT" -maxdepth 1 -mindepth 1 -type d`; do
+  for file in switch-config environment switch-state ; do
+    if [ -e "$switch/.opam-switch/$file" ] ; then
+      echo "*** $switch/.opam-switch/$file"
+      cat "$switch/.opam-switch/$file"
+    fi
+  done
+done
 ### <generate_dirs.sh>
 for d in i-am-compiler i-am-sys-compiler i-am-package i-am-another-package; do
   for v in 1 2 ; do
