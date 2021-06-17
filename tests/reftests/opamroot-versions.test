@@ -1104,6 +1104,7 @@ RSTATE                          Cache found
 Update done, please now retry your command.
 # Return code 10 #
 ### opam install i-am-package
+FILE(switch-config)             Wrote ${BASEDIR}/_opam/.opam-switch/switch-config in 0.000s
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -1367,6 +1368,7 @@ RSTATE                          Cache found
 Update done, please now retry your command.
 # Return code 10 #
 ### opam install i-am-package
+FILE(switch-config)             Wrote ${BASEDIR}/_opam/.opam-switch/switch-config in 0.000s
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
