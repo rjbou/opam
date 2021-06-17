@@ -510,16 +510,18 @@ done
 let rec mkdir_p dir =
   if Sys.file_exists dir then ()
   else let () = mkdir_p (Filename.dirname dir) in
-       if not (Sys.file_exists dir) then
-         Unix.mkdir dir 0o777
-       else ()
+    if not (Sys.file_exists dir) then
+      Unix.mkdir dir 0o777
+    else ()
 
 let mode =
-  if Array.length Sys.argv = 2 then
-    `Root
-  else match Sys.argv.(2) with
-  | "local" -> `Local
-  | "orphaned" -> `Orphaned
+  if Array.length Sys.argv = 2 then `Root else
+  let version =
+    if Array.length Sys.argv = 3 then Sys.argv.(1) else Sys.argv.(3)
+  in
+  match Sys.argv.(2) with
+  | "local" -> `Local version
+  | "orphaned" -> `Orphaned version
   | _ -> assert false
 
 let opam_version = Printf.sprintf "opam-version: %S"
@@ -527,13 +529,12 @@ let opam_version_2_0 = opam_version "2.0"
 let opam_version_2_1 = opam_version "2.1"
 let repo = {|repositories: "default"|}
 let installed_switches =
-let local_switch =
-  if mode = `Local then
-    Printf.sprintf " %S" (Sys.getcwd ())
-  else
-    ""
-in
-Format.sprintf {|
+  let local_switch =
+    match mode with
+    | `Local _ -> Printf.sprintf " %S" (Sys.getcwd ())
+    | _ -> ""
+  in
+  Format.sprintf {|
 installed-switches: ["sw-sys-comp" "sw-comp"%s "default" %S "this-internal-error"]
 switch: "sw-sys-comp"
 |} local_switch (Filename.concat (Sys.getcwd ()) "why-did-you-delete-me")
@@ -568,73 +569,73 @@ let root_version_21 =  {|opam-root-version: "2.1"|}
 let synopsis = Printf.sprintf "synopsis: %S"
 let opam_root = Printf.sprintf "opam-root: %S" (Sys.getenv "OPAMROOT")
 let opam_20 =
-[ "config", [ opam_version_2_0; repo; installed_switches; eval; default_compiler ];
-  "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch" ];
-  "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-  "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler" ];
-  "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
-  "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler" ];
-  "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
-], [
-  "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; opam_root ];
-  "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-]
+  [ "config", [ opam_version_2_0; repo; installed_switches; eval; default_compiler ];
+    "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch" ];
+    "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+    "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler" ];
+    "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
+    "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler" ];
+    "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
+  ], [
+    "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; opam_root ];
+    "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+  ]
 let opam_21alpha =
-[ "config", [ opam_version_2_0; repo; installed_switches; eval; default_compiler ];
-  "default/.opam-switch/switch-config", [ opam_version_2_1; synopsis "default switch"; invariant_default ];
-  "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-  "sw-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with compiler"; invariant_sw_comp ];
-  "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
-  "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
-  "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
-], [
-  "_opam/.opam-switch/switch-config", [ opam_version_2_1; synopsis "local switch"; invariant_default; opam_root ];
-  "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-]
+  [ "config", [ opam_version_2_0; repo; installed_switches; eval; default_compiler ];
+    "default/.opam-switch/switch-config", [ opam_version_2_1; synopsis "default switch"; invariant_default ];
+    "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+    "sw-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with compiler"; invariant_sw_comp ];
+    "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
+    "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
+    "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
+  ], [
+    "_opam/.opam-switch/switch-config", [ opam_version_2_1; synopsis "local switch"; invariant_default; opam_root ];
+    "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+  ]
 let opam_21alpha2 =
-[ "config", [ opam_version_2_1; repo; installed_switches; eval; default_compiler; depext; ];
-  "default/.opam-switch/switch-config", [ opam_version_2_1; synopsis "default switch"; invariant_default ];
-  "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-  "sw-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with compiler"; invariant_sw_comp ];
-  "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
-  "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
-  "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
-], [
-  "_opam/.opam-switch/switch-config", [ opam_version_2_1; synopsis "local switch"; invariant_default; opam_root ];
-  "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-]
+  [ "config", [ opam_version_2_1; repo; installed_switches; eval; default_compiler; depext; ];
+    "default/.opam-switch/switch-config", [ opam_version_2_1; synopsis "default switch"; invariant_default ];
+    "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+    "sw-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with compiler"; invariant_sw_comp ];
+    "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
+    "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_1; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
+    "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
+  ], [
+    "_opam/.opam-switch/switch-config", [ opam_version_2_1; synopsis "local switch"; invariant_default; opam_root ];
+    "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+  ]
 let opam_21rc =
-[ "config", [ opam_version_2_0; root_version; repo; installed_switches; eval; default_compiler; default_invariant; depext ];
-  "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch"; invariant_default ];
-  "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-  "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler"; invariant_sw_comp ];
-  "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
-  "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
-  "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
-], [
-  "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; invariant_default; opam_root ];
-  "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-]
+  [ "config", [ opam_version_2_0; root_version; repo; installed_switches; eval; default_compiler; default_invariant; depext ];
+    "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch"; invariant_default ];
+    "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+    "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler"; invariant_sw_comp ];
+    "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
+    "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
+    "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
+  ], [
+    "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; invariant_default; opam_root ];
+    "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+  ]
 let opam_21 =
-[ "config", [ opam_version_2_0; root_version_21; repo; installed_switches; eval; default_compiler; default_invariant; depext ];
-  "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch"; invariant_default ];
-  "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-  "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler"; invariant_sw_comp ];
-  "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
-  "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
-  "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
-], [
-  "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; invariant_default; opam_root ];
-  "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
-]
+  [ "config", [ opam_version_2_0; root_version_21; repo; installed_switches; eval; default_compiler; default_invariant; depext ];
+    "default/.opam-switch/switch-config", [ opam_version_2_0; synopsis "default switch"; invariant_default ];
+    "default/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+    "sw-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with compiler"; invariant_sw_comp ];
+    "sw-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_comp ];
+    "sw-sys-comp/.opam-switch/switch-config", [ opam_version_2_0; synopsis "switch with system compiler"; invariant_sw_sys_comp ];
+    "sw-sys-comp/.opam-switch/switch-state", [ opam_version_2_0; sw_state_sw_sys_comp ]
+  ], [
+    "_opam/.opam-switch/switch-config", [ opam_version_2_0; synopsis "local switch"; invariant_default; opam_root ];
+    "_opam/.opam-switch/switch-state", [ opam_version_2_0; sw_state_default ];
+  ]
 let _ =
-  let (root, local) = match Sys.argv.(1) with
-  | "2.0" -> opam_20
-  | "2.1~alpha" -> opam_21alpha
-  | "2.1~alpha2" -> opam_21alpha2
-  | "2.1~rc" -> opam_21rc
-  | "2.1" -> opam_21
-  | _ -> assert false
+  let get_files = function
+    | "2.0" -> opam_20
+    | "2.1~alpha" -> opam_21alpha
+    | "2.1~alpha2" -> opam_21alpha2
+    | "2.1~rc" -> opam_21rc
+    | "2.1" -> opam_21
+    | _ -> assert false
   in
   let write dir (name, content) =
     let name = Filename.concat dir name in
@@ -643,9 +644,13 @@ let _ =
     List.iter (fun l -> output_string fd (l^"\n")) content;
     close_out fd
   in
+  let root,_ = get_files Sys.argv.(1) in
   List.iter (write (Sys.getenv "OPAMROOT")) root;
-  if mode <> `Root then List.iter (write (Sys.getcwd ())) local;
-### # OPAMDEBUG=0 OPAMDEBUGLEVEL=0
+  match mode with
+  | `Local v | `Orphaned v ->
+    let _, local = get_files v in
+    List.iter (write (Sys.getcwd ())) local
+  | _ -> ()
 ### rm -rf $OPAMROOT
 ### opam init -na default ./default --bare --bypass-checks --no-opamrc --debug-level=0
 No configuration file found, using built-in defaults.
