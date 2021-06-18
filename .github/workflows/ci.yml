@@ -277,7 +277,7 @@ jobs:
       run: bash -exu .github/scripts/opam-bs-cache.sh
     - name: Compile
       env:
-        SOLVER=z3
+        SOLVER: z3
         OCAML_VERSION: ${{ matrix.ocamlv }}
       run: bash -exu .github/scripts/solvers.sh
 
