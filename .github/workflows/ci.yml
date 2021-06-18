@@ -13,6 +13,7 @@ env:
   OCAML_VERSION: 4.11.2
   ## variables for cache paths
   GH_OCAML_CACHE: ~/.cache/ocaml-local/**
+  SOLVER:
 
 defaults:
   run:
@@ -245,6 +246,7 @@ jobs:
         ocamlv: [ 4.11.2 ]
       fail-fast: false
     env:
+      SOLVER: z3
       OPAMBSROOT: ~/.cache/opam.z3.cached
     steps:
     - uses: actions/checkout@v2
@@ -277,7 +279,6 @@ jobs:
       run: bash -exu .github/scripts/opam-bs-cache.sh
     - name: Compile
       env:
-        SOLVER: z3
         OCAML_VERSION: ${{ matrix.ocamlv }}
       run: bash -exu .github/scripts/solvers.sh
 
