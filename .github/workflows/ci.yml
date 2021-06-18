@@ -249,7 +249,7 @@ jobs:
     env:
       SOLVER: ${{ matrix.solver }}
       OPAM_REPO_SHA: 02ead5a557
-      OPAMBSROOT: ~/.cache/opam.z3.cached
+      OPAMBSROOT: ~/.cache/opam.${{ matrix.solver }}.cached
     steps:
     - uses: actions/checkout@v2
     - name: install deps
