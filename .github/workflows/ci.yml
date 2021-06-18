@@ -253,17 +253,17 @@ jobs:
     - name: install deps
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt install bubblewrap
-#    - name: ocaml ${{ matrix.ocamlv }} cache - test
-#      id: ocaml-cache-test
-#      uses: actions/cache@v2
-#      with:
-#        path: ${{ env.GH_OCAML_CACHE }}
-#        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
-#    - name: Building ocaml ${{ env.OCAML_VERSION }} cache - test
-#      if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
-#      env:
-#        OCAML_VERSION: ${{ matrix.ocamlv }}
-#      run: bash -exu .github/scripts/ocaml-cache.sh ocaml
+    - name: ocaml ${{ matrix.ocamlv }} cache - test
+      id: ocaml-cache-test
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.GH_OCAML_CACHE }}
+        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
+    - name: Building ocaml ${{ env.OCAML_VERSION }} cache - test
+      if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
+      env:
+        OCAML_VERSION: ${{ matrix.ocamlv }}
+      run: bash -exu .github/scripts/ocaml-cache.sh ocaml
     - name: opam bootstrap cache
       id: opam-bootstrap
       uses: actions/cache@v2
