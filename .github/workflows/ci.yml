@@ -236,3 +236,48 @@ jobs:
 #        BASE_REF_SHA: ${{ github.event.pull_request.base.sha }}
 #        PR_REF_SHA: ${{ github.event.pull_request.head.sha }}
 #      run: bash -exu .github/scripts/hygiene.sh
+
+  z3:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        ocamlv: [ 4.11.2 ]
+      fail-fast: false
+    env:
+      OPAMBSROOT: ~/.cache/opam.z3.cached
+    steps:
+    - uses: actions/checkout@v2
+    - name: install deps
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt install bubblewrap
+#    - name: ocaml ${{ matrix.ocamlv }} cache - test
+#      id: ocaml-cache-test
+#      uses: actions/cache@v2
+#      with:
+#        path: ${{ env.GH_OCAML_CACHE }}
+#        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
+#    - name: Building ocaml ${{ env.OCAML_VERSION }} cache - test
+#      if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
+#      env:
+#        OCAML_VERSION: ${{ matrix.ocamlv }}
+#      run: bash -exu .github/scripts/ocaml-cache.sh ocaml
+    - name: opam bootstrap cache
+      id: opam-bootstrap
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/opam.z3.cached
+          ~/.cache/opam-local/bin/**
+        key: opam-z3-${{ runner.os }}-${{ env.OPAMBSVERSION }}-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/opam-bs-cache.sh', '.github/scripts/preamble.sh') }}
+    - name: opam root cache
+      env:
+        OPAMBSROOT: ~/.cache/opam.z3.cached
+      if: steps.opam-bootstrap.outputs.cache-hit != 'true'
+      run: bash -exu .github/scripts/opam-bs-cache.sh
+    - name: Compile
+      env:
+        SOLVER=z3
+        OCAML_VERSION: ${{ matrix.ocamlv }}
+      run: bash -exu .github/scripts/solvers.sh
+
