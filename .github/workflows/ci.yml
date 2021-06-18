@@ -238,15 +238,17 @@ jobs:
 #        PR_REF_SHA: ${{ github.event.pull_request.head.sha }}
 #      run: bash -exu .github/scripts/hygiene.sh
 
-  z3:
+  solvers:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
         ocamlv: [ 4.11.2 ]
+        solver: [ z3, 0install ]
       fail-fast: false
     env:
-      SOLVER: z3
+      SOLVER: ${{ matrix.solver }}
+      OPAM_REPO_SHA: 02ead5a557
       OPAMBSROOT: ~/.cache/opam.z3.cached
     steps:
     - uses: actions/checkout@v2
@@ -269,12 +271,12 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/.cache/opam.z3.cached
+          ~/.cache/opam.${{ matrix.solver }}.cached
           ~/.cache/opam-local/bin/**
-        key: opam-z3-${{ runner.os }}-${{ env.OPAMBSVERSION }}-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/opam-bs-cache.sh', '.github/scripts/preamble.sh') }}
+        key: opam-${{ matrix.solver }}-${{ runner.os }}-${{ env.OPAMBSVERSION }}-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/opam-bs-cache.sh', '.github/scripts/preamble.sh') }}
     - name: opam root cache
       env:
-        OPAMBSROOT: ~/.cache/opam.z3.cached
+        OPAMBSROOT: ~/.cache/opam.${{ matrix.solver }}.cached
       if: steps.opam-bootstrap.outputs.cache-hit != 'true'
       run: bash -exu .github/scripts/opam-bs-cache.sh
     - name: Compile

@@ -5,7 +5,8 @@
 export OPAMYES=1
 export OCAMLRUNPARAM=b
 
-export OPAMROOT=$CACHE/opam.$SOLVER.cached
+export OPAMROOT=$OPAMBSROOT
+echo $OPAMROOT
 
 which opam
 opam --version
