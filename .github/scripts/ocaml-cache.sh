@@ -9,7 +9,7 @@ cd "ocaml-$OCAML_VERSION"
 if [[ $OPAM_TEST -ne 1 ]] ; then
   if [[ -e configure.ac ]]; then
     CONFIGURE_SWITCHES="--disable-debugger --disable-debug-runtime"
-    if [ "x$SOLVER" = "x" ]; then
+    if [ "$SOLVER" != "z3" ]; then
       CONFIGURE_SWITCHES="$CONFIGURE_SWITCHES --disable-ocamldoc"
     fi
     if [[ ${OCAML_VERSION%.*} = '4.08' ]]; then
@@ -17,7 +17,7 @@ if [[ $OPAM_TEST -ne 1 ]] ; then
     fi
   else
     CONFIGURE_SWITCHES="-no-graph -no-debugger"
-    if [ "x$SOLVER" = "x" ]; then
+    if [ "$SOLVER" != "z3" ]; then
       CONFIGURE_SWITCHES="$CONFIGURE_SWITCHES -no-ocamldoc"
     fi
     if [[ ${OCAML_VERSION%.*} = '4.08' ]]; then
