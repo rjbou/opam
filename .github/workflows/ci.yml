@@ -260,7 +260,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ env.GH_OCAML_CACHE }}
-        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
+        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ matrix.solver }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}-test
     - name: Building ocaml ${{ env.OCAML_VERSION }} cache - test
       if: steps.ocaml-cache-test.outputs.cache-hit != 'true'
       env:
