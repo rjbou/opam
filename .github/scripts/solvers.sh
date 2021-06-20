@@ -24,7 +24,7 @@ case "$SOLVER" in
 esac
 
 opam switch create $SOLVER ocaml-system || true
-opam install $PKGS
+opam install $PKGS -vv
 opam install . --deps
 opam clean --logs --switch-cleanup
 eval $(opam env)
