@@ -13,7 +13,7 @@ echo $OPAMROOT
 opam switch create $SOLVER ocaml-system || true
 opam install $SOLVER
 opam install . --deps
-opam --logs --switch-cleanup
+opam clean --logs --switch-cleanup
 eval $(opam env)
 ./configure
 make
