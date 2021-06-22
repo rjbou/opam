@@ -102,6 +102,11 @@ Prefixes used to help generate release notes, changes, and blog posts:
 ## Github Actions
   * Add solver backends compile test [#4723 @rjbou] [2.1.0~rc2 #4720]
   * Fix ocaml link (http -> https) [#4729 @rjbou]
+## Refest
+  *
+
+## Github Actions
+  * Add solver backend test [#4723 @rjbou] [2.1.0~rc2 #4720]
 
 ## Shell
   * fish: fix deprecated redirection syntax `^` [#4736 @vzaliva]
