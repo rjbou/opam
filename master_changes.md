@@ -15,6 +15,11 @@ Prefixes used to help generate release notes, changes, and blog posts:
 ## Plugins
   *
 
+## Format upgrade
+ * Fix format upgrade when there is missing local switches in the config file [#XXX @rjbou - fix #4713]
+ * Fix not recorded local switch handling, with format upgrade [#XXX @rjbou]
+ * Set opam root version to 2.1 [#XXX @rjbou]
+
 ## Init
   *
 
