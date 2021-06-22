@@ -5,6 +5,7 @@ Prefixes used to help generate release notes, changes, and blog posts:
 * ◈ New option/command/subcommand
 * [BUG] for bug fixes
 * [NEW] for new features (not a command itself)
+* [NEW] for new features
 
 ## Version
   *
@@ -16,9 +17,9 @@ Prefixes used to help generate release notes, changes, and blog posts:
   *
 
 ## Format upgrade
- * Fix format upgrade when there is missing local switches in the config file [#XXX @rjbou - fix #4713]
- * Fix not recorded local switch handling, with format upgrade [#XXX @rjbou]
- * Set opam root version to 2.1 [#XXX @rjbou]
+  * [BUG] Fix format upgrade when there is missing local switches in the config file [#XXX @rjbou - fix #4713] [2.1.0~rc2 #4715]
+  * [BUG] Fix not recorded local switch handling, with format upgrade [#XXX @rjbou] [2.1.0~rc2 #4715]
+  * Set opam root version to 2.1 [#XXX @rjbou] [2.1.0~rc2 #4715]
 
 ## Init
   *
@@ -109,6 +110,10 @@ Prefixes used to help generate release notes, changes, and blog posts:
   * Fix ocaml link (http -> https) [#4729 @rjbou]
 ## Refest
   *
+## Reftest
+  * Update opam root version test with local switches handling [#XXX @rjbou] [2.1.0~rc2 #4715]
+  * Add mechanism to define our mutli platform tiny programs (like opam-cat) to use them in tests [#XXX @rjbou]
+  * Add `opam-cat` program to cat opam files in normalised form [#XXX @rjbou] [2.1.0~rc2 #4715]
 
 ## Github Actions
   * Add solver backend test [#4723 @rjbou] [2.1.0~rc2 #4720]
