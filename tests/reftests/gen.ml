@@ -30,6 +30,13 @@ let repo_directory ~archive_hash =
 let opamroot_directory ~archive_hash =
   Printf.sprintf "root-%s" archive_hash
 
+let external_programs =
+  match Sys.getenv_opt "OPAM_REFTESTS_EXTERNAL" with
+  | Some s ->
+    List.fold_left (Printf.sprintf "%s %%{dep:%s.exe}")
+      "" (OpamStd.String.split s ',')
+  | None -> ""
+
 let run_rule ~base_name ~archive_hash =
   Format.sprintf {|
 (rule
@@ -38,8 +45,9 @@ let run_rule ~base_name ~archive_hash =
  (action
   (with-stdout-to
    %%{targets}
-   (run ./run.exe %%{bin:opam} %%{dep:%s.test} %%{read-lines:testing-env}))))
+   (run ./run.exe %%{bin:opam} %%{dep:%s.test} %%{read-lines:testing-env}%s))))
 |} (base_name^".out") (opamroot_directory ~archive_hash) base_name
+    external_programs
 
 let archive_download_rule archive_hash =
    Format.sprintf {|

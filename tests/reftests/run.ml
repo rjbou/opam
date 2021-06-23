@@ -98,7 +98,14 @@ let load_test f =
 
 let base_env =
   let propagate v = try [v, Sys.getenv v] with Not_found -> [] in
-  propagate "PATH" @
+  let path =
+    let p = "PATH" in
+    let v = Sys.getenv p in
+    (*     let add_cwd = v in *)
+    let add_cwd = Sys.getcwd () ^":"^v in
+    [p, add_cwd]
+  in
+  path @
   propagate "HOME" @
   propagate "COMSPEC" @
   propagate "LIB" @
@@ -144,6 +151,14 @@ let str_replace_path ?(escape=false) whichway filters s =
         if Re.execp (Re.compile re) s then s else "\\c")
     s filters
 
+let external_programs =
+  match Sys.getenv_opt "OPAM_REFTESTS_EXTERNAL" with
+  | Some s ->
+    OpamStd.String.split s ','
+    |> List.map (fun s -> [s; s^".exe"])
+    |> List.flatten
+  | None -> []
+
 let command
     ?(allowed_codes = [0]) ?(vars=[]) ?(silent=false) ?(filter=[])
     cmd args =
@@ -158,12 +173,14 @@ let command
   set_binary_mode_in ic false;
   let cmd, orig_cmd =
     let maybe_resolved_cmd =
-      if Sys.win32 then
-        OpamStd.Option.default cmd @@ OpamSystem.resolve_command cmd
-      else
-        cmd
+      if Sys.win32 || List.mem cmd external_programs then
+        let open OpamStd.Option.Op in
+        OpamSystem.resolve_command ~env cmd
+        +! (OpamSystem.resolve_command ~env (cmd^".exe")
+            +! cmd)
+      else cmd
     in
-      maybe_resolved_cmd, cmd
+    maybe_resolved_cmd, cmd
   in
   let args =
     if orig_cmd = "tar" || orig_cmd = "tar.exe" then
@@ -516,9 +533,7 @@ let () =
   | _ :: opam :: input :: env ->
     let opam = OpamFilename.(to_string (of_string opam)) in
     let vars =
-      List.map (fun s -> match OpamStd.String.cut_at s '=' with
-          | Some (var, value) -> var, value
-          | None -> failwith "Bad 'var=value' argument")
+      OpamStd.List.filter_map (fun s -> OpamStd.String.cut_at s '=')
         env
     in
     load_test input |> run_test ~opam ~vars
