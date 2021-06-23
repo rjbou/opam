@@ -14,7 +14,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:cli-versioning.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:cli-versioning.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-conflict-4373)
@@ -31,7 +31,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:conflict-4373.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:conflict-4373.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-conflict-badversion)
@@ -48,7 +48,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:conflict-badversion.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:conflict-badversion.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-conflict-camlp4)
@@ -65,7 +65,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:conflict-camlp4.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:conflict-camlp4.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-conflict-core)
@@ -82,7 +82,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:conflict-core.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:conflict-core.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-conflict-solo5)
@@ -99,7 +99,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:conflict-solo5.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:conflict-solo5.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-cudf-preprocess)
@@ -116,7 +116,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:cudf-preprocess.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:cudf-preprocess.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-dot-install)
@@ -133,7 +133,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:dot-install.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:dot-install.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-init)
@@ -150,7 +150,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:init.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:init.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-install-pgocaml)
@@ -167,7 +167,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:install-pgocaml.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:install-pgocaml.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-legacy-git)
@@ -184,7 +184,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:legacy-git.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:legacy-git.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-legacy-local)
@@ -201,7 +201,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:legacy-local.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:legacy-local.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-opamroot-versions)
@@ -218,7 +218,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:opamroot-versions.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:opamroot-versions.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-pat-sub)
@@ -235,7 +235,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:pat-sub.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:pat-sub.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-show)
@@ -252,7 +252,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:show.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:show.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-switch-creation)
@@ -269,7 +269,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:switch-creation.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:switch-creation.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-upgrade-format)
@@ -286,7 +286,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:upgrade-format.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:upgrade-format.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (alias
  (name reftest-var-option)
@@ -303,7 +303,7 @@
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:var-option.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:var-option.test} %{read-lines:testing-env} %{dep:opamcat.exe}))))
 
 (rule
  (targets opam-repo-N0REP0)

@@ -38,7 +38,6 @@
      * `| unordered` compares lines without considering their ordering
      * variables from command outputs: `cmd args >$ VAR`
      * `### : comment`
-     * opam-cat: prints a nromalised opam file
    - if you need more shell power, create a script using <FILENAME> then run it.
      Or just use `sh -c`... but beware for compatibility.
 
@@ -99,7 +98,14 @@ let load_test f =
 
 let base_env =
   let propagate v = try [v, Sys.getenv v] with Not_found -> [] in
-  propagate "PATH" @
+  let path =
+    let p = "PATH" in
+    let v = Sys.getenv p in
+    (*     let add_cwd = v in *)
+    let add_cwd = Sys.getcwd () ^":"^v in
+    [p, add_cwd]
+  in
+  path @
   propagate "HOME" @
   propagate "COMSPEC" @
   propagate "LIB" @
@@ -145,6 +151,14 @@ let str_replace_path ?(escape=false) whichway filters s =
         if Re.execp (Re.compile re) s then s else "\\c")
     s filters
 
+let external_programs =
+  match Sys.getenv_opt "OPAM_REFTESTS_EXTERNAL" with
+  | Some s ->
+    OpamStd.String.split s ','
+    |> List.map (fun s -> [s; s^".exe"])
+    |> List.flatten
+  | None -> []
+
 let command
     ?(allowed_codes = [0]) ?(vars=[]) ?(silent=false) ?(filter=[])
     cmd args =
@@ -159,12 +173,14 @@ let command
   set_binary_mode_in ic false;
   let cmd, orig_cmd =
     let maybe_resolved_cmd =
-      if Sys.win32 then
-        OpamStd.Option.default cmd @@ OpamSystem.resolve_command cmd
-      else
-        cmd
+      if Sys.win32 || List.mem cmd external_programs then
+        let open OpamStd.Option.Op in
+        OpamSystem.resolve_command ~env cmd
+        +! (OpamSystem.resolve_command ~env (cmd^".exe")
+            +! cmd)
+      else cmd
     in
-      maybe_resolved_cmd, cmd
+    maybe_resolved_cmd, cmd
   in
   let args =
     if orig_cmd = "tar" || orig_cmd = "tar.exe" then
@@ -249,7 +265,6 @@ let rec with_temp_dir f =
 
 type command =
   | File_contents of string
-  | Cat of string list
   | Run of { env: (string * string) list;
              cmd: string;
              args: string list; (* still escaped *)
@@ -330,10 +345,6 @@ module Parse = struct
     else if str.[0] = ':' || str.[0] = '#' then
       Comment str
     else
-    match OpamStd.String.cut_at str ' ' with
-    | Some ("opam-cat", files) ->
-        Cat (OpamStd.String.split files ' ')
-    | _ ->
     let varbinds, pos =
       let gr = exec (compile @@ rep re_varbind) str in
       List.map (fun gr -> Group.get gr 1, get_str (Group.get gr 2))
@@ -392,8 +403,9 @@ end
 
 let parse_command = Parse.command
 
-let common_filters dir =
-   let tmpdir = Filename.get_temp_dir_name () in
+let run_cmd ~opam ~dir ?(vars=[]) ?(filter=[]) ?(silent=false) cmd args =
+  let filter =
+    let tmpdir = Filename.get_temp_dir_name () in
     Re.[
       alt [str dir; str (OpamSystem.back_to_forward dir)],
       Some "${BASEDIR}";
@@ -404,14 +416,11 @@ let common_filters dir =
            str "opam-";
            rep1 (alt [alnum; char '-'])],
       Some "${OPAMTMP}";
-    ]
-
-let run_cmd ~opam ~dir ?(vars=[]) ?(filter=[]) ?(silent=false) cmd args =
-  let filter = common_filters dir @ filter in
-  let opamroot = Filename.concat dir "OPAM" in
+    ] @ filter
+  in
   let env_vars = [
     "OPAM", opam;
-    "OPAMROOT", opamroot;
+    "OPAMROOT", Filename.concat dir "OPAM";
   ] @ vars
   in
   let var_filters =
@@ -484,65 +493,6 @@ let run_test ?(vars=[]) ~opam t =
           List.fold_left
             (fun vars (v, r) -> (v, r) :: List.filter (fun (w, _) -> v <> w) vars)
             vars bindings
-        | Cat files ->
-          let print_opamfile header file =
-            let content =
-              let open OpamParserTypes.FullPos in
-              let original = OpamParser.FullPos.file file in
-              let rec mangle item =
-                match item.pelem with
-                | Section s ->
-                  {item with pelem = Section {s with section_name = OpamStd.Option.map (fun v -> {v with pelem = mangle_string v.pelem}) s.section_name;
-                                                     section_items = {s.section_items with pelem = List.map mangle s.section_items.pelem}}}
-                | Variable(name, value) ->
-                  {item with pelem = Variable(name, mangle_value value)}
-              and mangle_value item =
-                match item.pelem with
-                | String s ->
-                  {item with pelem = String(mangle_string s)}
-                | Relop(op, l, r) ->
-                  {item with pelem = Relop(op, mangle_value l, mangle_value r)}
-                | Prefix_relop(relop, v) ->
-                  {item with pelem = Prefix_relop(relop, mangle_value v)}
-                | Logop(op, l, r) ->
-                  {item with pelem = Logop(op, mangle_value l, mangle_value r)}
-                | Pfxop(op, v) ->
-                  {item with pelem = Pfxop(op, mangle_value v)}
-                | List l ->
-                  {item with pelem = List{l with pelem = List.map mangle_value l.pelem}}
-                | Group l ->
-                  {item with pelem = Group{l with pelem = List.map mangle_value l.pelem}}
-                | Option(v, l) ->
-                  {item with pelem = Option(mangle_value v, {l with pelem = List.map mangle_value l.pelem})}
-                | Env_binding(name, op, v) ->
-                  {item with pelem = Env_binding(name, op, mangle_value v)}
-                | Bool _
-                | Int _
-                | Ident _ -> item
-              and mangle_string = String.map (function '\\' -> '/' | c -> c)
-              in
-              let mangled =
-                {original with file_contents = List.map mangle original.file_contents}
-              in
-              OpamPrinter.FullPos.Normalise.opamfile mangled
-            in
-            let str = if header then Printf.sprintf "=> %s <=\n" file else "" in
-            let str = Printf.sprintf "%s%s" str content in
-            let str =
-              str_replace_path OpamSystem.back_to_forward
-                (common_filters dir) str
-            in
-            print_string str
-          in
-          let files =
-            List.map (fun s -> Re.(replace_string (compile @@ str "$OPAMROOT")
-                                     ~by:opamroot s)) files
-          in
-          (match files with
-           | file::[] -> print_opamfile false file
-           | _::_  -> List.iter (print_opamfile true) files
-           | [] -> ());
-          vars
         | Run {env; cmd; args; filter; output; unordered} ->
           let silent = output <> None || unordered in
           let r, errcode =
@@ -583,9 +533,7 @@ let () =
   | _ :: opam :: input :: env ->
     let opam = OpamFilename.(to_string (of_string opam)) in
     let vars =
-      List.map (fun s -> match OpamStd.String.cut_at s '=' with
-          | Some (var, value) -> var, value
-          | None -> failwith "Bad 'var=value' argument")
+      OpamStd.List.filter_map (fun s -> OpamStd.String.cut_at s '=')
         env
     in
     load_test input |> run_test ~opam ~vars
