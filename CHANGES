@@ -30,6 +30,14 @@ are not marked).
 * The options `--root` and `--switch` are now reflected in environment
   variables when building packages so that calls to `opam` during build access
   the correct root and switch [#4668 @LasseBlaauwbroek]
+* If opam root is different from the binary, allow reading it and try to read
+  in best effort mode [#4638 @rjbou - fix #4636]
+* Differentiate bad format from bad (opam) version with `Bad_version`
+  exception, raised from `OpamFormat.check_opam_version` [#4638 @rjbou]
+* Add `BestEffort` modules with reading functions that don't show errors, given
+  the `opam_file_format` internal field [#4638 @rjbou - fix
+* Require opam-file-format 2.1.3+ in order to enforce opam-version: "2.1" as
+  first non-comment line [#4639 @dra27 - fix #4394]
 
 2.0.8:
 * Add colon for fish MANPATH fix. [#4084 @rjbou - fix #4078]
