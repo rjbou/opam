@@ -202,13 +202,13 @@ let depexts_status_of_packages_raw ~depexts global_config switch_config packages
         else
           avail, not_found
       in
+(*       OpamConsole.error "%s" (OpamPackage.Map.to_string OpamSysPkg.string_of_status map); *)
       let map =
       OpamPackage.Map.map (fun set ->
           { OpamSysPkg.s_available = set %% avail;
             OpamSysPkg.s_not_found = set %% not_found}
         ) syspkg_map
         in
-      OpamConsole.error "%s" (OpamPackage.Map.to_string OpamSysPkg.string_of_status map);
       map
     | exception (Failure msg) ->
       OpamConsole.note "%s\nYou can disable this check using 'opam \
@@ -221,8 +221,11 @@ let depexts_status_of_packages_raw ~depexts global_config switch_config packages
 
 let depexts_unavailable_raw sys_packages nv =
   match OpamPackage.Map.find_opt nv sys_packages with
-  | Some { OpamSysPkg.s_not_found; _}
+  | Some( { OpamSysPkg.s_not_found; _} as st)
     when not (OpamSysPkg.Set.is_empty s_not_found) ->
+    OpamConsole.error "not found %s for %s"
+    (OpamPackage.to_string nv)
+    (OpamSysPkg.string_of_status st);
     Some s_not_found
   | _ -> None
 
