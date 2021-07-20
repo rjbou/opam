@@ -279,9 +279,9 @@ let packages_status packages =
             else
             try
               let grs = Re.exec repo_name l in
-              let repo = Some (Re.Group.get grs 1) in
+              let repo = (Re.Group.get grs 1) in
             let _ = OpamConsole.note "4. got repo %s " repo in
-              current, fst_version, installed, repo, instavail
+              current, fst_version, installed, Some repo, instavail
             with Not_found ->
             let _ = OpamConsole.note "5. nothing" in
               current, fst_version, installed, repo, instavail)
