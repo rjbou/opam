@@ -259,25 +259,31 @@ let packages_status packages =
       (* fst_version is here to do not add package while their informations
          parsing it not yet finished, or at least a minimum complete *)
       |> List.fold_left (fun (current, fst_version, installed, repo, instavail) l ->
+      OpamConsole.note "line %S" l;
           try
             let new_pkg = Re.(Group.get (exec pkg_name l) 1) in
             let pkg = match repo with Some r -> current^"@"^r | None -> current in
             let instavail = add_pkg fst_version pkg installed instavail in
+            let _ = OpamConsole.note "1. added pkg %s installed %B" pkg installed in
             new_pkg, true, false, None, instavail
           with Not_found ->
             if l.[2] != ' ' then (* only version in after two spaces *)
               let pkg = match repo with Some r -> current^"@"^r | None -> current in
               let instavail = add_pkg fst_version pkg installed instavail in
+            let _ = OpamConsole.note "2. added pkg %s installed %B" pkg installed in
               current, false, false, None, instavail
             else
             if Re.execp is_installed l then
+            let _ = OpamConsole.note "3. flag installed " in
               current, fst_version, true, repo, instavail
             else
             try
               let grs = Re.exec repo_name l in
               let repo = Some (Re.Group.get grs 1) in
+            let _ = OpamConsole.note "4. got repo %s " repo in
               current, fst_version, installed, repo, instavail
             with Not_found ->
+            let _ = OpamConsole.note "5. nothing" in
               current, fst_version, installed, repo, instavail)
         ("", true, false, None, OpamSysPkg.Set.(empty, empty))
       |> (fun (_,_,_,_, instavail) -> instavail)
