@@ -149,6 +149,7 @@ let packages_status packages =
         available, OpamSysPkg.Set.empty
     in
     OpamConsole.warning "installed %s" (OpamSysPkg.Set.to_string sys_installed);
+    OpamConsole.warning "sys_available %s" (OpamStd.Option.to_string OpamSysPkg.Set.to_string sys_available);
     OpamConsole.warning "available %s" (OpamSysPkg.Set.to_string available);
     OpamConsole.warning "not_found %s" (OpamSysPkg.Set.to_string not_found);
     available, not_found
