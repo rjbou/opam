@@ -263,15 +263,30 @@ let packages_status packages =
       OpamConsole.note "line %S" l;
           try
             let new_pkg = Re.(Group.get (exec pkg_name l) 1) in
+            let instavail =
+            match repo with
+            | None ->  add_pkg fst_version current installed instavail
+            | Some r ->
+  add_pkg fst_version current installed instavail
+  |> add_pkg fst_version (current^"@"^r) installed
+            in
             let pkg = match repo with Some r -> current^"@"^r | None -> current in
+(*
             let instavail = add_pkg fst_version pkg installed instavail in
-            let _ = OpamConsole.note "1. added pkg %s installed %B" pkg installed in
+*)
+            let _ = OpamConsole.note "1. added %B pkg %s installed %B" fst_version pkg installed in
             new_pkg, true, false, None, instavail
           with Not_found ->
             if l.[2] != ' ' then (* only version in after two spaces *)
+ let instavail =
+            match repo with
+            | None ->  add_pkg fst_version current installed instavail
+            | Some r ->
+  add_pkg fst_version current installed instavail
+  |> add_pkg fst_version (current^"@"^r) installed
+            in
               let pkg = match repo with Some r -> current^"@"^r | None -> current in
-              let instavail = add_pkg fst_version pkg installed instavail in
-            let _ = OpamConsole.note "2. added pkg %s installed %B" pkg installed in
+            let _ = OpamConsole.note "2. added %B pkg %s installed %B" fst_version pkg installed in
               current, false, false, None, instavail
             else
             if Re.execp is_installed l then
