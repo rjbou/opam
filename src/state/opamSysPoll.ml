@@ -135,6 +135,8 @@ let os_version_lazy = lazy (
 let os_version () = Lazy.force os_version_lazy
 
 let os_family_lazy = lazy (
+Some "alpine"
+(*
   match os () with
   | Some "linux" ->
     (os_release_field "ID_LIKE" >>= fun s ->
@@ -143,6 +145,7 @@ let os_family_lazy = lazy (
   | Some ("freebsd" | "openbsd" | "netbsd" | "dragonfly") -> Some "bsd"
   | Some ("win32" | "cygwin") -> Some "windows"
   | _ -> os_distribution ()
+*)
 )
 let os_family () = Lazy.force os_family_lazy
 
