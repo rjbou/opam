@@ -8,15 +8,19 @@ defaults:
     shell: bash
 
 jobs:
-  depexts:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-        dist: [ alpine, debian ]
+  depexts-alpine:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: depexts actions alpine
-        uses: ./.github/actions/${{ matrix.dist }}
-        id: depexts
+        uses: ./.github/actions/alpine
+        id: depexts-alpine
+  depexts-debian:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: depexts actions debian
+        uses: ./.github/actions/debian
+        id: depexts-debian
