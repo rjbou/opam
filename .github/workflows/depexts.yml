@@ -1,0 +1,25 @@
+name: depexts
+on:
+  push:
+    paths:
+      - 'src/state/opamSysInteract.ml'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+####
+# Test some conf packages
+####
+  depexts:
+#    needs: [build]
+    runs-on: ubuntu-latest
+    name: external dependencies
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: depexts actions alpine 
+        uses: ./.github/actions # Uses an action in the root directory
+        id: depext-actions-alpine
