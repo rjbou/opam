@@ -12,7 +12,7 @@ case $GITHUB_EVENT_NAME in
   BRANCH=master
 esac
 
-opam pin -y git+https://github.com/ocaml/opam
+opam pin -y git+https://github.com/ocaml/opam#$BRANCH
 sudo cp /home/ocaml/.opam/default/lib/opam-devel/opam /usr/local/bin
 opam --version
 rm -rf $OPAMROOT
