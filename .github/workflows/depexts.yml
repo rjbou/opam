@@ -14,8 +14,9 @@ jobs:
 ####
   depexts:
     runs-on: ubuntu-latest
-    matrix:
-      - distributions: [ alpine, debian ]
+    strategy:
+      matrix:
+        distributions: [ alpine, debian ]
     name: external dependencies
     steps:
       - name: Checkout
