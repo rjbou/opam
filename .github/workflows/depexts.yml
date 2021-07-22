@@ -1,8 +1,8 @@
 name: depexts
-on:
-  push:
-    paths:
-      - 'src/state/opamSysInteract.ml'
+#on:
+#  push:
+#    paths:
+#      - 'src/state/opamSysInteract.ml'
 
 defaults:
   run:
@@ -20,5 +20,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: depexts actions alpine
-        uses: ./.github/actions # Uses an action in the root directory
-        id: depext-actions-alpine
+        uses: ./.github/actions
+        id: depext-actions
