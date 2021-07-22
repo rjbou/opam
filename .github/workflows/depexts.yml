@@ -14,10 +14,12 @@ jobs:
 ####
   depexts:
     runs-on: ubuntu-latest
+    matrix:
+      - distributions: [ alpine, debian ]
     name: external dependencies
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: depexts actions alpine
-        uses: ./.github/actions
-        id: depexts-alpine
+        uses: ./.github/actions/${{ matrix.distributions }}
+        id: depexts-${{ matrix-distributions }}

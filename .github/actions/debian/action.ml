@@ -2,4 +2,4 @@ name: 'depexts-debian'
 description: 'Test external dependencies handling for debian'
 runs:
   using: 'docker'
-  image: 'dockerfile-debian'
+  image: 'Dockerfile'
