@@ -12,9 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        distributions: [ alpine, debian ]
         os: [ ubuntu-latest ]
-    name: external dependencies
+        dist: [ alpine, debian ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
