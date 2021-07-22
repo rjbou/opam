@@ -1,6 +1,5 @@
 name: depexts
-#on:
-#  push:
+on: [ push]
 #    paths:
 #      - 'src/state/opamSysInteract.ml'
 
