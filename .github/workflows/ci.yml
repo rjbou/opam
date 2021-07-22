@@ -32,5 +32,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: depexts actions alpine 
-        uses: ./ # Uses an action in the root directory
+        uses: ./.github/actions # Uses an action in the root directory
         id: depext-actions-alpine
