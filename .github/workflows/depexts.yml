@@ -8,15 +8,12 @@ defaults:
     shell: bash
 
 jobs:
-
-####
-# Test some conf packages
-####
   depexts:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         distributions: [ alpine, debian ]
+        os: [ ubuntu-latest ]
     name: external dependencies
     steps:
       - name: Checkout
