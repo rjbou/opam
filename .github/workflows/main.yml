@@ -1,6 +1,28 @@
 name: Builds, tests & co
 
-on: [ push, pull_request ]
+on:
+  push:
+    path-ignore:
+    - 'release/**'
+    - 'shell/**'
+    - 'admin-scripts:**'
+    - 'doc/**'
+    - 'CHANGES'
+    - 'LICENSE'
+    - 'CONTRIBUTING.md'
+    - 'master_changes.md'
+    - 'README.md'
+  pull_request:
+    path-ignore:
+    - 'release/**'
+    - 'shell/**'
+    - 'admin-scripts:**'
+    - 'doc/**'
+    - 'CHANGES'
+    - 'LICENSE'
+    - 'CONTRIBUTING.md'
+    - 'master_changes.md'
+    - 'README.md'
 
 env:
   OPAMBSVERSION: 2.1.0
