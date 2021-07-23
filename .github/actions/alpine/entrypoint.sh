@@ -13,7 +13,7 @@ case $GITHUB_EVENT_NAME in
 esac
 
 opam pin -y git+https://github.com/ocaml/opam#$BRANCH
-cp `opam var prefix`/lib/opam-devel/opam /
+cp `opam var prefix`/lib/opam-devel/opam /opam/
 alias opam=/opam/opam
 rm -rf $OPAMROOT
 opam config report
