@@ -12,11 +12,11 @@ case $GITHUB_EVENT_NAME in
   BRANCH=master
 esac
 
-opam pin -y git+https://github.com/ocaml/opam#$BRANCH
+opam pin git+https://github.com/ocaml/opam#$BRANCH
 cp `opam var prefix`/lib/opam-devel/opam /opam/
 alias opam=/opam/opam
-rm -rf $OPAMROOT
 opam config report
+rm -rf $OPAMROOT
 opam init --reinit -ni --disable-sandboxing --bare
 opam switch create confs --empty
 opam install conf-gmp
