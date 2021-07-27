@@ -159,7 +159,7 @@ jobs:
 # Opam cold
 ####
   cold:
-    needs: [ build, archives-cache ]
+    needs: [ archives-cache ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
