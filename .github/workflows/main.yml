@@ -5,19 +5,19 @@ on:
     path-ignore:
     - 'release/**'
     - 'shell/**'
-    - 'admin-scripts:**'
+    - 'admin-scripts/**'
     - 'doc/**'
     - 'CHANGES'
     - 'LICENSE'
     - 'CONTRIBUTING.md'
     - 'master_changes.md'
     - 'README.md'
-    - '.github/**'
+    - '.github/**/**'
   pull_request:
     path-ignore:
     - 'release/**'
     - 'shell/**'
-    - 'admin-scripts:**'
+    - 'admin-scripts/**'
     - 'doc/**'
     - 'CHANGES'
     - 'LICENSE'
