@@ -2,6 +2,34 @@
 
 . .github/scripts/hygiene-preamble.sh
 
+CheckConfigure () {
+  GIT_INDEX_FILE=tmp-index git read-tree --reset -i "$1"
+  git diff-tree --diff-filter=d --no-commit-id --name-only -r "$1" \
+    | (while IFS= read -r path
+  do
+    case "$path" in
+      configure|configure.ac|m4/*)
+        touch CHECK_CONFIGURE;;
+    esac
+  done)
+  rm -f tmp-index
+  if [[ -e CHECK_CONFIGURE ]] ; then
+    echo "configure generation altered in $1"
+    echo 'Verifying that configure.ac generates configure'
+    git clean -dfx
+    git checkout -f "$1"
+    mv configure configure.ref
+    make configure
+    if ! diff -q configure configure.ref >/dev/null ; then
+      echo -e "[\e[31mERROR\e[0m] configure.ac in $1 doesn't generate configure, \
+please run make configure and fixup the commit"
+      ERROR=1
+    else
+      echo "configure ok for $1"
+    fi
+  fi
+}
+
 ###
 # Check configure
 ###

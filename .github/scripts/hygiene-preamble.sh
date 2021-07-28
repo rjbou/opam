@@ -25,6 +25,6 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   set -e
 fi
 
+set +x
+
 ERROR=0
-
-
