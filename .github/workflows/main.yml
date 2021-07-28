@@ -2,27 +2,37 @@ name: Builds, tests & co
 
 on:
   push:
-    paths-ignore:
-    - 'release/**'
-    - 'shell/**'
-    - 'admin-scripts/**'
-    - 'doc/**'
-    - 'CHANGES'
-    - 'LICENSE'
-    - 'CONTRIBUTING.md'
-    - 'master_changes.md'
-    - 'README.md'
+    path:
+    - 'src/**'
+    - 'dune'
+    - 'dune-project'
+    - '*.opam'
+    - 'src/**'
+    - '!src/tools/**'
+    - 'src_ext/**'
+    - 'Makefile*'
+    - 'configure*'
   pull_request:
-    paths-ignore:
-    - 'release/**'
-    - 'shell/**'
-    - 'admin-scripts/**'
-    - 'doc/**'
-    - 'CHANGES'
-    - 'LICENSE'
-    - 'CONTRIBUTING.md'
-    - 'master_changes.md'
-    - 'README.md'
+    path:
+    - 'src/**'
+    - 'dune'
+    - 'dune-project'
+    - '*.opam'
+    - 'src/**'
+    - '!src/tools/**'
+    - 'src_ext/**'
+    - 'Makefile*'
+    - 'configure*'
+#    paths-ignore:
+#    - 'release/**'
+#    - 'shell/**'
+#    - 'admin-scripts/**'
+#    - 'doc/**'
+#    - 'CHANGES'
+#    - 'LICENSE'
+#    - 'CONTRIBUTING.md'
+#    - 'master_changes.md'
+#    - 'README.md'
 
 env:
   OPAMBSVERSION: 2.1.0
