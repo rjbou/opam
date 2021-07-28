@@ -12,6 +12,7 @@ on:
     - 'CONTRIBUTING.md'
     - 'master_changes.md'
     - 'README.md'
+    - '.github/**'
   pull_request:
     path-ignore:
     - 'release/**'
@@ -23,6 +24,7 @@ on:
     - 'CONTRIBUTING.md'
     - 'master_changes.md'
     - 'README.md'
+    - '.github/**'
 
 env:
   OPAMBSVERSION: 2.1.0
