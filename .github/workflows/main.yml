@@ -2,7 +2,7 @@ name: Builds, tests & co
 
 on:
   push:
-    path-ignore:
+    paths-ignore:
     - 'release/**'
     - 'shell/**'
     - 'admin-scripts/**'
@@ -14,7 +14,7 @@ on:
     - 'README.md'
     - '.github/**/**'
   pull_request:
-    path-ignore:
+    paths-ignore:
     - 'release/**'
     - 'shell/**'
     - 'admin-scripts/**'
