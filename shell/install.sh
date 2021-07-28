@@ -408,3 +408,4 @@ if [ ! "$NOBACKUP" = 1 ]; then
 fi
 
 rm -f $TMP/$OPAM_BIN
+
