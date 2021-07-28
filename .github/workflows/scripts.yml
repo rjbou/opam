@@ -10,7 +10,7 @@ defaults:
     shell: bash
 
 jobs:
-  hygiene-scriptis:
+  hygiene-scripts:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
