@@ -41,8 +41,8 @@ ENV OPAMCONFIRMLEVEL=unsafe-yes
 RUN opam init -ni --disable-sandboxing --bare
 RUN opam switch create confs ocaml-system
 RUN opam install opam-repository opam-solver opam-state opam-client opam-core opam-devel --deps
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh entrypoint.sh
+ENTRYPOINT ["/opam/entrypoint.sh"]
 EOF
 
 cat >$dir/entrypoint.sh << EOF
