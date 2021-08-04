@@ -7,7 +7,7 @@ dir=.github/actions/$target
 
 mkdir -p $dir
 
-cat >$dir/action.ml << EOF
+cat >$dir/action.yml << EOF
 name: 'depexts-$target'
 description: 'Test external dependencies handling for $target'
 runs:
