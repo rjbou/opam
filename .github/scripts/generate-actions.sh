@@ -70,3 +70,5 @@ opam switch create confs --empty
 opam install conf-gmp
 opam install conf-automake
 EOF
+
+chmod +x $dir/entrypoint.sh
