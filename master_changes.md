@@ -124,7 +124,7 @@ users)
   * fish: fix deprecated redirection syntax `^` [#4736 @vzaliva]
 
 ## Doc
-  *
+  * Standardise `macOs` use [#4782 @kit-ty-kate]
 
 ## Security fixes
   *
