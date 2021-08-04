@@ -16,7 +16,7 @@ jobs:
       - name: generate action
         run: |
           bash .github/scripts/generate-actions.sh alpine
-          head .github/actions/*
+          head -n 20 .github/actions/*/*
       - name: depexts actions alpine
         uses: ./.github/actions/alpine
         id: depexts-alpine
@@ -28,7 +28,7 @@ jobs:
       - name: generate action
         run: |
           bash .github/scripts/generate-actions.sh alpine
-          head .github/actions/*
+          head -n 20 .github/actions/*/*
       - name: depexts actions debian
         uses: ./.github/actions/debian
         id: depexts-debian
