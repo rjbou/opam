@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v2
       - name: generate action
         run: |
-          bash .github/scripts/generate-actions.sh alpine
+          bash .github/scripts/generate-actions.sh debian
           head -n 20 .github/actions/*/*
       - name: depexts actions debian
         uses: ./.github/actions/debian
