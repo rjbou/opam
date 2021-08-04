@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: generate action
+        run: |
+          bash .github/scripts/generate-actions.sh alpine
+          head .github/actions/*
       - name: depexts actions alpine
         uses: ./.github/actions/alpine
         id: depexts-alpine
@@ -21,6 +25,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: generate action
+        run: |
+          bash .github/scripts/generate-actions.sh alpine
+          head .github/actions/*
       - name: depexts actions debian
         uses: ./.github/actions/debian
         id: depexts-debian
