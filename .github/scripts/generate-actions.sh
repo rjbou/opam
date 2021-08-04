@@ -32,7 +32,7 @@ RUN apt install -y ocaml m4 git rsync patch make wget opam ocaml-compiler-libs
 EOF
 esac
 
-cat >$dir/Dockerfile <<- EOF
+cat >>$dir/Dockerfile << EOF
 WORKDIR opam
 ENV OPAMROOTISOK=1
 ENV OPAMROOT=/opam/root
