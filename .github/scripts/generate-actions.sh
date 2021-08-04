@@ -61,7 +61,7 @@ case \$GITHUB_EVENT_NAME in
 esac
 
 opam pin git+https://github.com/rjbou/opam#\$BRANCH
-cp `opam var prefix`/lib/opam-devel/opam /opam/
+cp \$(opam var prefix)/lib/opam-devel/opam /opam/
 alias opam=/opam/opam
 opam config report
 rm -rf \$OPAMROOT
