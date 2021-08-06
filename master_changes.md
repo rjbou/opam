@@ -109,6 +109,7 @@ users)
 ## Internal
   * Add license and lowerbounds to opam files [#4714 @kit-ty-kate]
   * Bump version to 2.2.0~alpha~dev [#4725 @dra27]
+  * avoid calling Unix.environment at top level [#4731 @hannesm]
 
 ## Test
 
