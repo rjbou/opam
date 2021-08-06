@@ -124,6 +124,7 @@ users)
   * Specify whitelist of changed files to launch workflow [#473 @rjbou]
   * Update changelog checker list [#4773 @rjbou]
   * Launch main hygiene job on configure/src_ext changes [#4773 @rjbou]
+  * Add a depext checkup, launched only is `OpamSysInteract` is changed [#4788 @rjbou]
 
 ## Shell
   * fish: fix deprecated redirection syntax `^` [#4736 @vzaliva]
