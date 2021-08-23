@@ -63,7 +63,7 @@ set -eux
 
 cd /github/workspace
 opam install . --deps
-eval $(opam env)
+eval \$(opam env)
 ./configure
 make
 #opam pin /github/workspace #git+https://github.com/ocaml/opam#\$BRANCH
