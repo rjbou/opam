@@ -61,15 +61,18 @@ set -eux
 #  BRANCH=master
 #esac
 
-ls -al /github/workspace
-opam pin /github/workspace #git+https://github.com/ocaml/opam#\$BRANCH
-cp \$(opam var prefix)/lib/opam-devel/opam /opam/
-alias opam=/opam/opam
-opam config report
-opam switch create confs --empty
-opam install conf-autoconf
-opam install conf-gmp
-opam install conf-automake
+cd /github/workspace
+opam install . --deps
+./configure
+make
+#opam pin /github/workspace #git+https://github.com/ocaml/opam#\$BRANCH
+#cp \$(opam var prefix)/lib/opam-devel/opam /opam/
+#alias opam=/opam/opam
+./opam config report
+./opam switch create confs --empty
+./opam install conf-autoconf
+./opam install conf-gmp
+./opam install conf-automake
 EOF
 
 chmod +x $dir/entrypoint.sh
