@@ -79,7 +79,7 @@ EOF
  esac
 
 # Take 2.1 opam binary from cache
-cp binary/opam $dir/
+cp binary/opam $dir/opam
 
 cat >>$dir/Dockerfile << EOF
 RUN test -d /opam || mkdir /opam
@@ -88,7 +88,7 @@ ENV OPAMROOT /opam/root
 ENV OPAMYES 1
 ENV OPAMCONFIRMLEVEL unsafe-yes
 ENV OPAMPRECISETRACKING 1
-COPY opam-2.1.0-x86_64-linux /usr/bin/opam
+COPY opam /usr/bin/opam
 RUN echo 'default-invariant: [ "ocaml" {>= "4.09.0"} ]' > /opam/opamrc
 RUN test -f \$OPAMROOT/config || /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc
 RUN /usr/bin/opam switch this-opam || /usr/bin/opam switch create this-opam ocaml
