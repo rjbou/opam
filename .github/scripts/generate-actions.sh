@@ -89,11 +89,11 @@ ENV OPAMYES 1
 ENV OPAMCONFIRMLEVEL unsafe-yes
 ENV OPAMPRECISETRACKING 1
 COPY opam /usr/bin/opam
-RUN echo 'default-invariant: [ "ocaml" {>= "4.09.0"} ]' > /opam/opamrc
-RUN test -f \$OPAMROOT/config || /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc
-RUN /usr/bin/opam switch this-opam || /usr/bin/opam switch create this-opam ocaml
-RUN /usr/bin/opam install opam-repository opam-solver opam-state opam-client opam-core opam-devel --deps
-RUN opam clean --logs --switch-cleanup
+#RUN echo 'default-invariant: [ "ocaml" {>= "4.09.0"} ]' > /opam/opamrc
+#RUN test -f \$OPAMROOT/config || /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc
+#RUN /usr/bin/opam switch this-opam || /usr/bin/opam switch create this-opam ocaml
+#RUN /usr/bin/opam install opam-repository opam-solver opam-state opam-client opam-core opam-devel --deps
+#RUN opam clean --logs --switch-cleanup
 COPY entrypoint.sh /opam/entrypoint.sh
 ENTRYPOINT ["/opam/entrypoint.sh"]
 EOF
@@ -102,7 +102,11 @@ cat >$dir/entrypoint.sh << EOF
 #!/bin/sh
 set -eux
 
-cd /github/workspace
+echo 'default-invariant: [ "ocaml" {>= "4.09.0"} ]' > /opam/opamrc
+test -f \$OPAMROOT/config || /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc
+opam switch this-opam || /usr/bin/opam switch create this-opam ocaml
+
+#cd /github/workspace
 opam install . --deps
 eval \$(opam env)
 ./configure
