@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: opam binary cache
-        id: binary
-        uses: actions/cache@v2
-        with:
-          path: binary/opam
-        key: binary-${{ env.OPAMVERSION }}
+      id: binary
+      uses: actions/cache@v2
+      with:
+        path: binary/opam
+      key: binary-${{ env.OPAMVERSION }}
     - name: Retrieve opam binary
       if: steps.binary.outputs.cache-hit != 'true'
       run: |
