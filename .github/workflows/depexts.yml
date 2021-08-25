@@ -20,7 +20,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: binary/opam
-      key: binary-${{ env.OPAMVERSION }}
+        key: binary-${{ env.OPAMVERSION }}
     - name: Retrieve opam binary
       if: steps.binary.outputs.cache-hit != 'true'
       run: |
