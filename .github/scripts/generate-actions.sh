@@ -2,7 +2,7 @@
 
 set -eu
 
-#for target in alpine debian arch centos opensuse fedora oraclelinux ubuntu; do
+#for target in alpine debian arrchlinux centos opensuse fedora oraclelinux ubuntu; do
 target=$1
 dir=.github/actions/$target
 
@@ -26,7 +26,7 @@ FROM alpine
 RUN apk add $mainlibs $ocaml g++
 EOF
     ;;
-  arch)
+  arrchlinux)
 # no automake
     cat >$dir/Dockerfile << EOF
 FROM archlinux
