@@ -109,9 +109,9 @@ eval \$(opam env)
 make
 ./opam config report
 ./opam switch create confs --empty
-./opam install conf-autoconf
-./opam install conf-gmp
-./opam install conf-automake
+./opam install -vv conf-autoconf
+./opam install -vv conf-gmp
+./opam install -vv conf-automake
 EOF
 
 chmod +x $dir/entrypoint.sh
