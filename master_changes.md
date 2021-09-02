@@ -79,6 +79,7 @@ users)
   * Sync the behaviour of the macOS sandbox script with Linux's: /tmp is now ready-only [#4719 @kit-ty-kate]
   * Always mount every directories under / on Linux [#4795 @kit-ty-kate]
   * Get rid of OPAM_USER_PATH_RO (never used on macOS and no longer needed on Linux) [#4795 @kit-ty-kate]
+  * Make the macOS sandbox stricter to workaround a macOS bug [#4797 @kit-ty-kate #4389]
 
 ## Repository management
   * Pass --depth=1 to git-fetch in the Git repo backend [#4442 @dra27]
