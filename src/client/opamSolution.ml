@@ -474,6 +474,79 @@ let parallel_apply t
     else action_graph
   in
 
+  (* factorise fetches: creates [`Fetches] nodes that download once the archive
+     and copies its content in source directories. Handles only http and rsync
+     backend with at least a checksum. *)
+  let action_graph =
+    let cache_dir = OpamRepositoryPath.download_cache t.switch_global.root in
+    let packages =
+      let urls, hash_nvs =
+        OpamPackage.Set.fold (fun nv (urls, hashes as acc) ->
+            match OpamSwitchState.url t nv with
+            | Some url ->
+              let checksums = OpamFile.URL.checksum url in
+              let url = OpamFile.URL.url url in
+              (match url.OpamUrl.backend, checksums with
+               | (`http | `rsync ) , _::_
+                 when OpamFilename.is_archive
+                     (OpamFilename.of_string url.OpamUrl.path) ->
+                 OpamUrl.Map.update url
+                   (fun hset -> OpamHash.Set.(union hset (of_list checksums)))
+                   OpamHash.Set.empty urls,
+                 List.fold_left (fun hashes h ->
+                     OpamHash.Map.update h (OpamPackage.Set.add nv)
+                       OpamPackage.Set.empty hashes)
+                   hashes checksums;
+               | _ -> acc)
+            | None -> acc)
+          sources_needed (OpamUrl.Map.empty, OpamHash.Map.empty)
+      in
+      OpamUrl.Map.fold (fun _url hashes packages ->
+          (* should we check urls ? *)
+          let _, choosen =
+            (* should we keep other checksums or drop them ? *)
+            OpamHash.Set.fold (fun hash ((num_nv, _nvs) as acc) ->
+                match OpamHash.Map.find_opt hash hash_nvs with
+                | Some nvset ->
+                  let number = OpamPackage.Set.cardinal nvset in
+                  if number > num_nv &&
+                     OpamRepository.is_cached cache_dir [hash] = [] then
+                    number, Some (hash,  nvset)
+                  else acc
+                | None -> acc
+              ) hashes (1, None)
+            (* we begin with 1 to remove unique hash/package *)
+          in
+          match choosen with
+          | Some (_hash, nvs) -> nvs::packages
+          | _ -> packages)
+        urls []
+    in
+    let g = PackageActionGraph.copy action_graph in
+    let removed_vertexes =
+      PackageActionGraph.fold_edges (fun v1 v2 vertexes ->
+          match v1 with
+          | `Fetch p ->
+            (match List.find_opt (OpamPackage.Set.mem p) packages with
+             | Some set ->
+               let fetches =
+                 let n, nvs =
+                   match OpamPackage.Set.elements set with
+                   | n::(_::_ as nvs) -> n, nvs
+                   | _ -> assert false
+                 in
+                 `Fetches (n, nvs)
+               in
+               PackageActionGraph.remove_edge g v1 v2;
+               PackageActionGraph.add_edge g fetches v2;
+               v1 :: vertexes
+             | None -> vertexes)
+          | _ -> vertexes)
+        action_graph []
+    in
+    List.iter (PackageActionGraph.remove_vertex g) removed_vertexes;
+    g
+  in
   (match OpamSolverConfig.(!r.cudf_file) with
    | None -> ()
    | Some f ->
