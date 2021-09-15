@@ -751,6 +751,7 @@ let update_with_init_config ?(overwrite=false) config init_config =
     else if getter conf = getter C.empty then setter v conf
     else conf
   in
+  let c =
   config |>
   match I.jobs init_config with
       | Some j -> setifnew C.jobs C.with_jobs j
@@ -770,6 +771,24 @@ let update_with_init_config ?(overwrite=false) config init_config =
     (I.default_compiler init_config) |>
   setifnew C.default_invariant C.with_default_invariant
     (I.default_invariant init_config)
+ in
+ let num w =
+   OpamFile.Wrappers.(
+     w.pre_build @
+    w.wrap_build @
+    w.post_build @
+    w.pre_install @
+    w.wrap_install @
+    w.post_install @
+    w.pre_remove @
+    w.wrap_remove @
+    w.post_remove @
+    w.pre_session @
+    w.post_session
+    ) |> List.length in
+ OpamConsole.error "Init %d wrappers and config %d ones"
+ (num @@ I.wrappers init_config) (num @@ C.wrappers config);
+ c
 
 let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace
