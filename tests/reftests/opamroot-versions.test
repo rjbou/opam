@@ -935,7 +935,7 @@ opam-version: "2.0"
 roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### :V:1:e: reinit from 2.0
 ### ocaml generate.ml 2.0
-### opam init --reinit --bypass-checks --no-setup
+### opam init --reinit --bypass-checks --no-setup --debug-level 2
 No configuration file found, using built-in defaults.
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
