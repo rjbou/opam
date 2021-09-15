@@ -12,6 +12,7 @@ on:
     - 'Makefile*'
     - 'configure*'
     - '.github/**'
+    - 'tests/reftests/**'
   pull_request:
     paths:
     - 'src/**'
