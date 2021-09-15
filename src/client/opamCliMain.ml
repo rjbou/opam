@@ -344,10 +344,12 @@ let rec main_catch_all f =
     OpamConsole.header_msg "Rerunning init and update";
     (match reinit with
      | Some reinit ->
+     OpamConsole.error "I reinitialise with a reinit function";
        reinit conf;
        OpamConsole.msg "Update done.\n";
        exit (OpamStd.Sys.get_exit_code `Success)
      | None ->
+     OpamConsole.error "I reinitialise with default values";
        OpamClient.reinit ~interactive:true ~update_config:false
          ~bypass_checks:true conf (OpamStd.Sys.guess_shell_compat ());
        OpamConsole.msg
