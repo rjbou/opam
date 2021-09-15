@@ -788,6 +788,7 @@ let update_with_init_config ?(overwrite=false) config init_config =
     ) |> List.length in
  OpamConsole.error "Init %d wrappers and config %d ones"
  (num @@ I.wrappers init_config) (num @@ C.wrappers c);
+ OpamConsole.note "%s" (OpamFile.Config.write_to_string c);
  c
 
 let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
