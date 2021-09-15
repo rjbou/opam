@@ -514,8 +514,12 @@ let check_and_revert_sandboxing root config =
       OpamConsole.error "trying sadboxing";
       let b =
         (* Don't assume that we can mount the CWD *)
+        let l =
         OpamSystem.in_tmp_dir @@ fun () ->
           OpamSystem.read_command_output ~env ~allow_stdin:false (cmd @ test_cmd)
+          in
+          OpamConsole.error "result is %S" (OpamStd.List.to_string (fun x -> x) l);
+           l
         = ["SUCCESS"]
         in
         OpamConsole.error "is it working ? %B" b;
