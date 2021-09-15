@@ -786,9 +786,11 @@ let update_with_init_config ?(overwrite=false) config init_config =
     w.pre_session @
     w.post_session
     ) |> List.length in
+(*
  OpamConsole.error "Init %d wrappers and config %d ones"
  (num @@ I.wrappers init_config) (num @@ C.wrappers c);
  OpamConsole.note "%s" (OpamFile.Config.write_to_string c);
+*)
  c
 
 let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
@@ -819,6 +821,7 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
       OpamAuxCommands.check_and_revert_sandboxing root config
     else config
   in
+ OpamConsole.note " after sdbx check :%s" (OpamFile.Config.write_to_string config);
   OpamFile.Config.write (OpamPath.config root) config;
   OpamEnv.setup root ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace shell;
