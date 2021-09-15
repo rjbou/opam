@@ -816,6 +816,7 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
       (OpamFile.InitConfig.init_scripts init_config)
   in
   OpamEnv.write_custom_init_scripts root custom_init_scripts;
+  OpamConsole.error "check sandbox ? %B" check_sandbox;
   let config =
     if check_sandbox then
       OpamAuxCommands.check_and_revert_sandboxing root config

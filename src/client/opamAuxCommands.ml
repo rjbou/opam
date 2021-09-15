@@ -511,10 +511,15 @@ let check_and_revert_sandboxing root config =
         Array.append [| "OPAM_SWITCH_PREFIX=/dev/null" |] (Unix.environment ())
       in
       try
+      OpamConsole.error "trying sadboxing";
+      let b =
         (* Don't assume that we can mount the CWD *)
         OpamSystem.in_tmp_dir @@ fun () ->
           OpamSystem.read_command_output ~env ~allow_stdin:false (cmd @ test_cmd)
         = ["SUCCESS"]
+        in
+        OpamConsole.error "is it working ? %B" b;
+        b
       with e ->
         (OpamConsole.error "Sandboxing is not working on your platform%s:\n%s"
            (OpamStd.Option.to_string (fun os -> " "^os)
@@ -527,6 +532,7 @@ let check_and_revert_sandboxing root config =
                 within a container or virtual machine)."))
     in
     if working_or_noop then config else
+    let _ = OpamConsole.warning "removing wrappers" in
     let wrappers =
       let filter sdbx_cmd =
         List.filter (fun cmd_l -> not (List.mem cmd_l sdbx_cmd))
