@@ -102,49 +102,12 @@ jobs:
         make -C src_ext cache-archives
         ls src_ext/archives -al
 
-####
-# Build
-####
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-        ocamlv: [ 4.11.2 ]
-        include:
-          - os: macos-latest
-            ocamlv: 4.12.0
-      # Intentionally fail fast, no need to run all build if there is a
-      # problem in a given version; usually it is functions not defined in lower
-      # versions of OCaml
-      fail-fast: true
-    steps:
-    - name: install deps
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt install bubblewrap
-    - uses: actions/checkout@v2
-    - name: ocaml ${{ matrix.ocamlv }} cache
-      id: ocaml-cache
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.GH_OCAML_CACHE }}
-        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ hashFiles ('.github/scripts/ocaml-cache.sh', '.github/scripts/preamble.sh') }}
-    - name: Building ocaml ${{ matrix.ocamlv }} cache
-      if: steps.ocaml-cache.outputs.cache-hit != 'true'
-      env:
-        OCAML_VERSION: ${{ matrix.ocamlv }}
-      run: bash -exu .github/scripts/ocaml-cache.sh ocaml
-    - name: Build
-      env:
-        OCAML_VERSION: ${{ matrix.ocamlv }}
-      run: bash -exu .github/scripts/main.sh
-
 
 ####
 # Opam tests
 ####
   test:
-    needs: [ build, archives-cache ]
+    needs: [  archives-cache ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
