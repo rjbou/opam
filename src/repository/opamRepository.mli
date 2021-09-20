@@ -36,6 +36,14 @@ val pull_tree:
   ?subpath:string -> dirname -> OpamHash.t list -> url list ->
   string download OpamProcess.job
 
+val pulls_tree:
+  ?cache_dir:dirname ->
+  ?cache_urls:OpamUrl.t list ->
+  (string * OpamFilename.Dir.t) list ->
+  OpamHash.t list ->
+  OpamTypes.url list ->
+  string download OpamProcess.job
+
 (** Same as [pull_tree], but for fetching a single file. *)
 val pull_file:
   string -> ?cache_dir:dirname -> ?cache_urls:url list -> ?silent_hits:bool ->
