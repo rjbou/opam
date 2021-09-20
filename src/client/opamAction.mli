@@ -23,6 +23,10 @@ open OpamStateTypes
 val download_package:
   rw switch_state -> package -> (string option * string) option OpamProcess.job
 
+val download_same_source_packages:
+  rw switch_state -> OpamFile.URL.t option -> package list ->
+  (string option * string) option OpamProcess.job
+
 (** [prepare_package_source t pkg dir] updates the given source [dir] with the
     extra downloads, overlays and patches from the package's metadata
     applied. *)
