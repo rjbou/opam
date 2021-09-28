@@ -1595,6 +1595,7 @@ let compute_root_causes g requested reinstall =
       Unknown
     | `Build _, _, _ | _, _, `Build _ -> assert false
     | `Fetch _, _, _ | _, _, `Fetch _ -> assert false (* XXX CHECK *)
+    | `Fetches _, _, _ | _, _, `Fetches _ -> assert false (* XXX CHECK *)
   in
   let get_causes acc roots =
     let rec aux seen depth pkgname causes =

@@ -30,6 +30,7 @@ let name_of_action = function
   | `Reinstall _ -> "recompile"
   | `Build _ -> "build"
   | `Fetch _ -> "fetch"
+  | `Fetches _ -> "fetches"
 
 let symbol_of_action =
   let open OpamConsole in
@@ -52,10 +53,14 @@ let symbol_of_action =
   | `Build _ ->
       utf8_symbol Symbols.greek_small_letter_lambda
                   ~alternates:[Symbols.six_pointed_black_star] "B"
-  | `Fetch _ ->
+  | `Fetch _  ->
     utf8_symbol Symbols.downwards_black_arrow
       ~alternates:[Symbols.downwards_double_arrow;
                    Symbols.black_down_pointing_triangle] "F"
+  | `Fetches _ ->
+    (* add a proper symbol ? *)
+    utf8_symbol Symbols.downwards_double_arrow
+      ~alternates:[Symbols.downwards_arrow] "S"
 
 let action_strings ?utf8 a =
   if utf8 = None && (OpamConsole.utf8 ()) || utf8 = Some true
@@ -67,7 +72,7 @@ let action_color c =
       | `Install _ | `Change (`Up,_,_) -> `green
       | `Remove _ | `Change (`Down,_,_) -> `red
       | `Reinstall _ -> `yellow
-      | `Build _ | `Fetch _ -> `cyan)
+      | `Build _ | `Fetch _ | `Fetches _ -> `cyan)
 
 module MakeAction (P: GenericPackage) : ACTION with type package = P.t
 = struct
@@ -84,6 +89,10 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | `Build p, `Build q
     | `Fetch p, `Fetch q
       -> P.compare p q
+    | `Fetches (p, pl), `Fetches (q, ql) ->
+      List.fold_left2 (fun comp p q ->
+          if comp <> 0 then comp else P.compare p q)
+        0 (p::pl) (q::ql)
     | `Change (`Up,p0,p), `Change (`Up,q0,q)
     | `Change (`Down,p0,p), `Change (`Down,q0,q)
       ->
@@ -93,8 +102,8 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | _, `Install _ | `Remove _, _ -> -1
     | `Build _, _ | _, `Change (`Down,_,_) -> 1
     | _, `Build _ | `Change (`Down,_,_), _ -> -1
-    | `Fetch _, _ | _, `Reinstall _ -> 1
-    | _, `Fetch _ | `Reinstall _, _ -> -1
+    | (`Fetch _ | `Fetches _), _ | _, `Reinstall _ -> 1
+    | _, (`Fetch _ | ` Fetches _) | `Reinstall _, _ -> -1
 
   let hash a = Hashtbl.hash (OpamTypesBase.map_action P.hash a)
 
@@ -103,6 +112,9 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
   let to_string a = match a with
     | `Remove p | `Install p | `Reinstall p | `Build p | `Fetch p ->
       Printf.sprintf "%s %s" (action_strings a) (P.to_string p)
+    | `Fetches (p, pl) ->
+      Printf.sprintf "%s %s" (action_strings a)
+        (OpamStd.List.concat_map "+" P.to_string (p::pl))
     | `Change (_,p0,p) ->
       Printf.sprintf "%s.%s %s %s"
         (P.name_to_string p0)
@@ -122,6 +134,8 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
         :: match a with
         | `Remove p | `Install p | `Reinstall p | `Build p | `Fetch p ->
           (P.version_to_string p ^ append p) :: []
+        | `Fetches (p, pl) ->
+          List.map (fun p -> P.version_to_string p ^ append p)  (p::pl)
         | `Change (_,p0,p) ->
           Printf.sprintf "%s to %s"
             (P.version_to_string p0 ^ append p0)
@@ -140,6 +154,7 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | `Reinstall p -> `O ["recompile", P.to_json p]
     | `Build p -> `O ["build", P.to_json p]
     | `Fetch p -> `O ["fetch", P.to_json p]
+    | `Fetches (p, pl) -> `O ["fetches", `A (List.map P.to_json (p::pl))]
 
   let of_json =
     let open OpamStd.Option.Op in
@@ -158,6 +173,16 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | `O ["recompile", p] -> P.of_json p >>= (fun p -> Some (`Reinstall p))
     | `O ["build", p] -> P.of_json p >>= (fun p -> Some (`Build p))
     | `O ["fetch", p] -> P.of_json p >>= (fun p -> Some (`Fetch p))
+    | `O ["fetches", `A pl] ->
+      (match List.map P.of_json pl with
+       | (Some p)::pl ->
+         (try
+            let pl =
+              List.map (function Some p -> p | _ -> raise Not_found) pl
+            in
+            Some (`Fetches (p, pl))
+          with Not_found -> None)
+       | _ -> None)
     | _ -> None
 
   module O = struct
@@ -301,7 +326,7 @@ module Make (A: ACTION) : SIG with type package = A.package = struct
             g0 a;
           add_edge g b a
         | `Remove _ -> ()
-        | `Build _ | `Fetch _ -> assert false)
+        | `Build _ | `Fetch _ | `Fetches _ -> assert false)
       g0;
     (* For delaying removal a little bit, for each action "remove A" we add
        a constraint "build B -> remove A" for transitive predecessors
@@ -315,7 +340,8 @@ module Make (A: ACTION) : SIG with type package = A.package = struct
           List.iter
             (fun b -> add_edge g b a)
             (closed_predecessors p)
-        | `Install _ | `Reinstall _ | `Change _ | `Build _ | `Fetch _ -> ())
+        | `Install _ | `Reinstall _ | `Change _
+        | `Build _ | `Fetch _ | `Fetches _ -> ())
       g;
     (* Add a "fetch" action as a dependency for all "build" and "remove" actions
        that require it (via [sources_needed]). *)
@@ -329,7 +355,7 @@ module Make (A: ACTION) : SIG with type package = A.package = struct
         | `Build p | `Remove p ->
           if sources_needed p then acc_add_action acc p a else acc
         | `Install _ | `Reinstall _ | `Change _ -> acc
-        | `Fetch _ -> assert false
+        | `Fetch _ | `Fetches _ -> assert false
       ) g Map.empty in
     Map.iter (fun p acts ->
         let f = `Fetch p in

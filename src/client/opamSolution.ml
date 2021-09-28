@@ -24,7 +24,8 @@ exception Fetch_fail of string
 
 let post_message ?(failed=false) st action =
   match action, failed with
-  | `Remove _, _ | `Reinstall _, _ | `Build _, false | `Fetch _, _ -> ()
+  | `Remove _, _ | `Reinstall _, _ | `Build _, false
+  | `Fetch _, _ | `Fetches _, _ -> ()
   | `Build pkg, true | `Install pkg, _ | `Change (_,_,pkg), _ ->
     let opam = OpamSwitchState.opam st pkg in
     let messages = OpamFile.OPAM.post_messages opam in
@@ -210,9 +211,11 @@ let sanitize_atom_list ?(permissive=false) t atoms =
 
 (* Pretty-print errors *)
 let display_error (n, error) =
-  let f action nv =
+  let f action nvs =
     let disp =
-      OpamConsole.header_error "while %s %s" action (OpamPackage.to_string nv) in
+      OpamConsole.header_error "while %s %s" action
+        (OpamStd.Format.pretty_list (List.map OpamPackage.to_string nvs))
+    in
     match error with
     | Sys.Break | OpamParallel.Aborted -> ()
     | Failure s -> disp "%s" s
@@ -223,13 +226,14 @@ let display_error (n, error) =
         OpamConsole.errmsg "%s" (OpamStd.Exn.pretty_backtrace e)
   in
   match n with
-  | `Change (`Up, _, nv)   -> f "upgrading to" nv
-  | `Change (`Down, _, nv) -> f "downgrading to" nv
-  | `Install nv        -> f "installing" nv
-  | `Reinstall nv      -> f "recompiling" nv
-  | `Remove nv         -> f "removing" nv
-  | `Build nv          -> f "compiling" nv
-  | `Fetch nv          -> f "fetching sources for" nv
+  | `Change (`Up, _, nv)   -> f "upgrading to" [nv]
+  | `Change (`Down, _, nv) -> f "downgrading to" [nv]
+  | `Install nv        -> f "installing" [nv]
+  | `Reinstall nv      -> f "recompiling" [nv]
+  | `Remove nv         -> f "removing" [nv]
+  | `Build nv          -> f "compiling" [nv]
+  | `Fetch nv          -> f "fetching sources for" [nv]
+  | `Fetches (nv,nvs)    -> f "multi fetching sources for" (nv::nvs)
 
 module Json = struct
   let output_request request user_action =
@@ -465,7 +469,7 @@ let parallel_apply t
       let g = PackageActionGraph.copy action_graph in
       PackageActionGraph.iter_vertex (fun v ->
           match v with
-          | `Fetch _ -> ()
+          | `Fetch _ | `Fetches _ -> ()
           | `Install _ | `Reinstall _ | `Change _
           | `Remove _ | `Build _ ->
             PackageActionGraph.remove_vertex g v
@@ -618,7 +622,7 @@ let parallel_apply t
         | Some subpath -> OpamFilename.Op.(raw / subpath) in
     if OpamClientConfig.(!r.fake) then
       match action with
-      | `Build _ | `Fetch _ -> Done (`Successful (installed, removed))
+      | `Build _ | `Fetch _ | `Fetches _ -> Done (`Successful (installed, removed))
       | `Install nv ->
         OpamConsole.msg "Faking installation of %s\n"
           (OpamPackage.to_string nv);
@@ -627,7 +631,7 @@ let parallel_apply t
       | `Remove nv ->
         remove_from_install nv;
         Done (`Successful (installed, OpamPackage.Set.add nv removed))
-      | _ -> assert false
+      | `Change _ | `Reinstall _ -> assert false
     else
     match action with
     | `Fetch nv ->
@@ -703,7 +707,7 @@ let parallel_apply t
         nv;
       store_time ();
       `Successful (installed, OpamPackage.Set.add nv removed)
-    | _ -> assert false
+    | `Change _ | `Reinstall _ -> assert false
   in
 
   let action_results =
@@ -842,8 +846,8 @@ let parallel_apply t
             OpamPath.Switch.build t.switch_global.root t.switch nv in
           if not OpamClientConfig.(!r.keep_build_dir) then
             OpamFilename.rmdir build_dir
-        | `Remove _ | `Install _ | `Build _ | `Fetch _ -> ()
-        | _ -> assert false)
+        | `Remove _ | `Install _ | `Build _ | `Fetch _ | `Fetches _ -> ()
+        | `Change _ | `Reinstall _  -> assert false)
       graph
   in
   let t =
@@ -1013,7 +1017,7 @@ let parallel_apply t
         ~empty:"No changes have been performed"
         successful;
       t, err
-    | _ -> assert false
+    | Nothing_to_do | OK _  -> assert false
 
 let simulate_new_state state t =
   let installed =
@@ -1024,7 +1028,7 @@ let simulate_new_state state t =
           OpamPackage.Set.add p installed
         | `Remove p ->
           OpamPackage.Set.remove p installed
-        | `Build _ | `Fetch _ -> installed
+        | `Build _ | `Fetch _ | `Fetches _ -> installed
       )
       t state.installed in
   { state with installed }
