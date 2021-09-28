@@ -238,6 +238,7 @@ type 'a concrete_action = [
   | 'a atomic_action
   | `Build of 'a
   | `Fetch of 'a
+  | `Fetches of 'a * 'a list
 ]
 
 type 'a action = [
