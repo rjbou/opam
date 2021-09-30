@@ -1,0 +1,119 @@
+N0REP0
+### <shared.ml>
+print_endline "I am a shared code"
+### <non-shared.ml>
+print_endline "I am a non shared code"
+### tar czf shared.tgz shared.ml
+### tar czf non-shared.tgz non-shared.ml
+### <pkg:no-extra.3>
+opam-version: "2.0"
+build: [ "ocaml" "shared.ml" ]
+### <pkg:extra.3>
+opam-version: "2.0"
+build: [
+  [ "ocaml" "shared.ml" ]
+  [ "ocaml" "extra_uniq.ml" ]
+]
+#patches: ["shared.patch"]
+### <pkg:extra.3:extra_uniq.ml>
+print_endline "I am a non shared code"
+### <pkg:non-shared.4>
+opam-version: "2.0"
+build: [ "ocaml" "non-shared.ml" ]
+### <mkurl.sh>
+arch=$1
+shift
+for p in $@; do
+  file="REPO/packages/${p%.*}/$p/opam"
+  echo "url {" >> $file
+  echo "src: \"${BASEDIR}/$arch.tgz\"" >> $file
+  MD5=$(openssl md5 $arch.tgz | cut -d' ' -f2)
+  echo "checksum: \"md5=$MD5\"" >> $file
+  echo "}" >> $file
+done
+### sh mkurl.sh shared no-extra.3 extra.3
+### sh mkurl.sh non-shared non-shared.4
+### OPAMJOBS=1 OPAMDOWNLOADJOBS=1
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] synchronised from file://${BASEDIR}/REPO
+Now run 'opam upgrade' to apply any package updates.
+### opam switch create shared --empty
+### opam install no-extra extra non-shared | unordered
+The following actions will be performed:
+  - install extra      3
+  - install non-shared 4
+  - install no-extra   3
+===== 3 to install =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved extra.3  (file://${BASEDIR}/shared.tgz)
+-> retrieved no-extra.3  (cached)
+-> retrieved non-shared.4  (file://${BASEDIR}/non-shared.tgz)
+-> installed extra.3
+-> installed no-extra.3
+-> installed non-shared.4
+Done.
+### : From archive with top directory and extra sources :
+### <shared/shared.ml>
+print_endline "I am a shared code"
+### <non-shared/non-shared.ml>
+print_endline "I am a non shared code"
+### tar czf shared.tgz shared
+### tar czf non-shared.tgz non-shared
+### <pkg:no-extra.3>
+opam-version: "2.0"
+build: [
+  [ "ocaml" "shared.ml" ]
+  [ "ocaml" "extra_source.ml" ]
+]
+### <pkg:extra.3>
+opam-version: "2.0"
+build: [
+  [ "ocaml" "shared.ml" ]
+  [ "ocaml" "extra_uniq.ml" ]
+  [ "ocaml" "extra_source.ml" ]
+]
+### <extra/extra_source.ml>
+print_endline "I am an extra sourced code!"
+### <pkg:non-shared.4>
+opam-version: "2.0"
+build: [ "ocaml" "non-shared.ml" ]
+### sh mkurl.sh shared no-extra.3 extra.3
+### sh mkurl.sh non-shared non-shared.4
+### <mkextrasource.sh>
+src=$1
+shift
+for p in $@; do
+  file="REPO/packages/${p%.*}/$p/opam"
+  echo "extra-source \"$src\" {" >> $file
+  echo "src: \"${BASEDIR}/extra/$src\"" >> $file
+  MD5=$(openssl md5 extra/$src | cut -d' ' -f2)
+  echo "checksum: \"md5=$MD5\"" >> $file
+  echo "}" >> $file
+done
+### sh mkextrasource.sh extra_source.ml extra.3 no-extra.3
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] synchronised from file://${BASEDIR}/REPO
+Now run 'opam upgrade' to apply any package updates.
+### opam install no-extra extra non-shared | unordered
+The following actions will be performed:
+  - recompile no-extra   3
+  - recompile extra      3
+  - recompile non-shared 4
+===== 3 to recompile =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved extra.3  (file://${BASEDIR}/shared.tgz)
+-> retrieved no-extra.3  (cached)
+-> retrieved non-shared.4  (file://${BASEDIR}/non-shared.tgz)
+-> removed   extra.3
+-> installed extra.3
+-> removed   no-extra.3
+-> installed no-extra.3
+-> removed   non-shared.4
+-> installed non-shared.4
+Done.
