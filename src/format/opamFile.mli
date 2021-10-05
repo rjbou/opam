@@ -304,7 +304,8 @@ module URL: sig
   include IO_FILE
 
   val create:
-    ?mirrors:url list -> ?checksum:OpamHash.t list -> ?subpath:string ->
+    ?mirrors:url list -> ?checksum:OpamHash.t list ->
+    ?swhid:OpamHash.SWHID.t -> ?subpath:string ->
     url -> t
 
   (** URL address *)
@@ -314,10 +315,14 @@ module URL: sig
 
   (** Archive checksum *)
   val checksum: t -> OpamHash.t list
+  val swhid: t -> OpamHash.SWHID.t option
 
   (** Constructor *)
   val with_url: url -> t -> t
   val with_checksum: OpamHash.t list -> t -> t
+  val with_mirrors: OpamUrl.t list -> t -> t
+  val with_swhid: OpamHash.SWHID.t -> t -> t
+  val with_swhid_opt: OpamHash.SWHID.t option -> t -> t
   val with_subpath: string -> t -> t
   val with_subpath_opt: string option -> t -> t
 
