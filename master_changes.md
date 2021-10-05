@@ -78,6 +78,7 @@ users)
   * Add `depexts` to default printer [#4898 @rjbou]
   * Make `opam show --list-files <pkg>` fail with not found when `<pkg>` is not installed [#4956 @kit-ty-kate - fix #4930]
   * Improve performance of opam show by 300% when the package to show is given explicitly or unique [#4998 @kit-ty-kate - fix #4997 and partially #4172]
+  * Add printer for `url.swhid:` [#4859 @rjbou]
 
 ## Var/Option
   * Don't error when displaying if switch is not set [#5027 @rjbou - fix #5025]
@@ -116,6 +117,7 @@ users)
 
 ## Opamfile
   * Fix substring errors in preserved_format [#4941 @rjbou - fix #4936]
+  * Add swhid url handling in url field [#4859 @rjbou @zapashcanon]
 
 ## External dependencies
   * Set `DEBIAN_FRONTEND=noninteractive` for unsafe-yes confirmation level [#4735 @dra27 - partially fix #4731] [2.1.0~rc2 #4739]
@@ -268,6 +270,7 @@ users)
   * Add deprectaed flag test [#4523 @kit-ty-kate]
   * Escape for cmdliner.1.1.1 output chane [#5131 @rjbou]
   * Add deps-only, install formula [#4975 @AltGr]
+  * Add `swhid` print tests in show, and swh fallback test [#4859 @rjbou]
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -392,3 +395,10 @@ users)
   * `OpamCoreConfig.r`: remove openssl related config: `use_openssl` parameter & config field, and `OPAMUSEOPENSSL` environment variable [#5042 @kit-ty-kate]
   * `OpamFilename`: add a `SubPath` submodule to handle multi-platform subpath specifications. It has an effect on a lot of functions signatures [#4876 @rjbou]
   * `OpamJson`: use `Jsonm` and add an `of_string` function [#XXX @rjbou]
+
+  * `OpamFile.URL`: add `swhid` field in `t` record, and its access functions [#4859 @rjbou]
+  * `OpamFile.URL`: add `with_mirrors` [#4859 @rjbou]
+## opam-core
+  * `OpamSystem`: avoid calling Unix.environment at top level [#4789 @hannesm]
+  * `OpamHash`: add module `SWHID` that create and check Software Heritage IDs hashes format [#4859 @rjbou]
+  * `OpamURL`: add module `SWHID` that contains helpers from and to internal swhid url [#4859 @rjbou]
