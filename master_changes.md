@@ -50,6 +50,7 @@ users)
 ## Show
   * Add `depexts` to default printer [#4898 @rjbou]
   * Make `opam show --list-files <pkg>` fail with not found when `<pkg>` is not installed [#4956 @kit-ty-kate - fix #4930]
+  * Add printer for `url.swhid:` [#4859 @rjbou]
 
 ## Var
   *
@@ -71,7 +72,7 @@ users)
   *
 
 ## Opamfile
-  *
+  * Add swhid url handling in url field [#4859 @rjbou @zapashcanon]
 
 ## External dependencies
   * Set `DEBIAN_FRONTEND=noninteractive` for unsafe-yes confirmation level [#4735 @dra27 - partially fix #4731] [2.1.0~rc2 #4739]
@@ -176,6 +177,7 @@ users)
   * opam root version: add reinit test casess [#4763 @rjbou] [2.1.0~rc2 #4750]
   * Add & update env tests [#4861 #4841 @rjbou @dra27]
   * Port opam-rt tests: orphans, dep-cycles, reinstall, and big-upgrade [#4979 @AltGr]
+  * Add `swhid` print tests in show [#4859 @rjbou]
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -235,3 +237,9 @@ users)
   * `OpamStd.ABSTRACT`: add `compare` and `equal`, that added those functions to `OpamFilename`, `OpamHash`, `OpamStd`, `OpamStd`, `OpamUrl`, and `OpamVersion` [#4918 @rjbou]
   * `OpamHash`: add `sort` from strongest to weakest kind
 
+  * `OpamFile.URL`: add `swhid` field in `t` record, and its access functions [#4859 @rjbou]
+  * `OpamFile.URL`: add `with_mirrors` [#4859 @rjbou]
+## opam-core
+  * `OpamSystem`: avoid calling Unix.environment at top level [#4789 @hannesm]
+  * `OpamHash`: add module `SWHID` that create and check Software Heritage IDs hashes format [#4859 @rjbou]
+  * `OpamURL`: add module `SWHID` that contains helpers from and to internal swhid url [#4859 @rjbou]
