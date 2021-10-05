@@ -46,3 +46,10 @@ val compute: ?kind:kind -> string -> t
 
 (** Compute the hash of the given string *)
 val compute_from_string: ?kind:kind -> string -> t
+
+(* Software Heritage Identifiers *)
+module SWHID : sig
+  type t
+  include OpamStd.ABSTRACT with type t := t
+  val is_valid : string -> bool
+end

@@ -148,3 +148,50 @@ end
 module Set = OpamStd.Set.Make(O)
 
 module Map = OpamStd.Map.Make(O)
+
+module SWHID = struct
+  type t = string
+
+  let is_valid s =
+    String.length s = 50 &&
+    (* format from
+       https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
+       on rev & rel support: https://forge.softwareheritage.org/T1258
+    *)
+    match String.split_on_char ':' s with
+    | "swh"::"1"::("rev"|"rel")::s::[] -> is_hex_str 40 s
+    | _ -> false
+
+(*
+  let to_path s =
+    ["swhid"; String.sub s 10 2; String.sub s 10 40]
+*)
+
+  let to_string s = s
+  let of_string s =
+    if is_valid s then s else
+      invalid_arg "OpamHash.SWHID.of_string"
+  let of_string_opt s =
+    try Some (of_string s) with Invalid_argument _ -> None
+  let to_json s = `String (to_string s)
+  let of_json = function
+    | `String s -> of_string_opt s
+    | _ -> None
+
+  (** XXX Keep that? *)
+  let compare = String.compare
+  let equal = String.equal
+
+  module O = struct
+    type _t = t
+    type t = _t
+    let to_string = to_string
+    let to_json = to_json
+    let of_json = of_json
+    let compare = compare
+  end
+
+  module Set = OpamStd.Set.Make(O)
+  module Map = OpamStd.Map.Make(O)
+end
+

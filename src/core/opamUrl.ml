@@ -308,3 +308,21 @@ module Op = struct
     {url with path }
 
 end
+
+module SWHID = struct
+
+  let prefix = "swhid.opam.ocaml.org/"
+  let is_valid u =
+    u.backend = `http
+    && (String.equal u.transport "http" || String.equal u.transport "https")
+    && OpamStd.String.starts_with ~prefix u.path
+  let of_url u =
+    try
+      Some (OpamHash.SWHID.of_string (OpamStd.String.remove_prefix ~prefix u.path))
+    with Invalid_argument _ -> None
+  let to_url h =
+    { transport = "https"; backend = `http ; hash = None;
+      path = Printf.sprintf "%s%s" prefix (OpamHash.SWHID.to_string h)
+    }
+
+end
