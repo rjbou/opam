@@ -83,7 +83,7 @@ jobs:
 
   archives-cache:
     if: >-
-      !contains(github.event.pull_request.labels.*.name, 'b)
+      !contains(github.event.pull_request.labels.*.name, 'b')
       && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
