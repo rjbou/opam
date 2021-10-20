@@ -294,7 +294,14 @@ let pull_tree
         let tmp_archive = OpamFilename.(create tmpdir (basename archive)) in
         OpamFilename.move ~src:archive ~dst:tmp_archive;
         extract_archive tmp_archive (OpamUrl.to_string url)
-      | url, Result None -> Done (Result (OpamUrl.to_string url))
+      | url, Result None ->
+        let url =
+          OpamUrl.to_string url ^
+          match subpath with
+          | None -> ""
+          | Some sb -> "("^sb^")"
+        in
+        Done (Result url)
       | _, (Not_available _ as na) -> Done na
 
 let revision dirname url =
