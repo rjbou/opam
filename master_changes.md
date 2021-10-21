@@ -36,6 +36,8 @@ users)
 
 ## Actions
   *  Add a `'Fetch` action with several packages: one node to download once and prepare source once for packages that share same archive [#4893 @rjbou - fix #3741]
+## Actions list
+  * Add subpath on actions listing urls [#4876 @rjbou]
 
 ## Install
   * Make the status of pinned packages more explicit during installation [#4987 @kit-ty-kate - fix #4925]
@@ -60,6 +62,14 @@ users)
   * [BUG] Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#5079 @rjbou - fix #4313]
   * [BUG] Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#5080 @rjbou - fix #4936]
   * [BUG] Fix using `--working-dir` with non pinned packages: it was not downloading sources as they were remove from package that need sources [#5082 @rjbou - fix #5060]
+  * [BUG] Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#4963 @rjbou - fix #4936]
+  * [BUG] Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#4963 @rjbou - fix #4313]
+  * Scan lock files too [#4963 @rjbou]
+  * Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#4963 @rjbou - fix #4936]
+  * Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#4963 @rjbou - fix #4313]
+  * [NEW] Reactivate subpath and recursive pinning `--recursive` and `--subpath` [#4876 @rjbou]
+  * scan: show subpaths [#4876 @rjbou]
+  * Fix windows path for subpath, by introducing their own type in `OpamFilename` [#4876 @rjbou]
 
 ## List
   * Some optimisations to 'opam list --installable' queries combined with other filters [#4882 @altgr - fix #4311]
@@ -146,6 +156,7 @@ users)
   * Pass --depth=1 to git-fetch in the Git repo backend [#4442 @dra27]
   * Use 4.08's unnamed functor arguments to silence warning 67 [#4775 @dra27]
   * git: disable colored output [#4884 @rjbou]
+  * Check if a source is up to date with subpath [#4876 @rjbou]
 
 ## Build
   * Bump src_exts and fix build compat with Dune 2.9.0 [#4752 @dra27]
@@ -328,6 +339,8 @@ users)
   * `OpamClient.filter_unpinned_locally` now display a warning of skipped packages instead of debug log [#5083 @rjbou]
   * `OpamSolution.parallel_apply`: fix sources_needed package set, now integrate requested but not locally pinned packages [#5082 @rjbou]
 
+  * Add `?subpath` to `OpamRepository.fetch_dev_packages`, `OpamVCS.is_up_to_date` and vcs specific functions in `OpamDarcs`, `OpamHG`, and `OpamGit` [#4875 @rjbou]
+  * Add `?subpath` to `OpamRepository.fetch_dev_packages`, `OpamVCS.is_up_to_date` and vcs specific functions in `OpamDarcs`, `OpamHG`, and `OpamGit` [#4876 @rjbou]
 ## opam-state
   * `OpamSwitchState.universe`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
   * `OpamdPinned`: add `?locked` (and handle lock file then) argument to `orig_opam_file`, `files_in_source`, and `name_of_opam_filename` [#5079 @rjbou]
@@ -360,3 +373,5 @@ users)
   * `OpamSystem.real_path`: Remove the double chdir trick on OCaml >= 4.13.0 [#4961 @kit-ty-kate]
   * `OpamProcess.wait_one`: display command in verbose mode for finished found process [#5091 @rjbou]
   * `OpamStd.Config.E`: add a `REMOVED` variant to allow removing completely an environment variable handling [#5112 @rjbou]
+  * `OpamFilename`: add a `SubPath` submodule to handle multi-platform subpath specifications. It has an effect on a lot of functions signatures [#4875 @rjbou]
+  * `OpamFilename`: add a `SubPath` submodule to handle multi-platform subpath specifications. It has an effect on a lot of functions signatures [#4876 @rjbou]
