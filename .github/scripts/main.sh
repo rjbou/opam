@@ -28,6 +28,7 @@ export OCAMLRUNPARAM=b
   make all
 
   rm -f ~/local/bin/opam
+  dune build --help=plain 2>/dev/null | sed -ne 's/^[[:space:]]*\(--promote-install-files\)\(\[.*\|[[:space:]]\)*$/ \1/p'
   make install
   (set +x ; echo -en "::endgroup::build opam\r") 2>/dev/null
 
