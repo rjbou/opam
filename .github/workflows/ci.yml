@@ -83,7 +83,6 @@ jobs:
 # Opam tests
 ####
   test:
-    needs: [ build ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
