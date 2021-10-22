@@ -19,6 +19,8 @@ export OCAMLRUNPARAM=b
 
   ./configure --prefix ~/local --with-mccs
 
+  dune build --help=plain 2>/dev/null | sed -ne 's/^[[:space:]]*\(--promote-install-files\)\(\[.*\|[[:space:]]\)*$/ \1/p'
+  exit 3
   if [[ $OPAM_TEST$OPAM_COLD -eq 0 ]] ; then
     make lib-ext
   fi
@@ -28,7 +30,6 @@ export OCAMLRUNPARAM=b
   make all
 
   rm -f ~/local/bin/opam
-  dune build --help=plain 2>/dev/null | sed -ne 's/^[[:space:]]*\(--promote-install-files\)\(\[.*\|[[:space:]]\)*$/ \1/p'
   make install
   (set +x ; echo -en "::endgroup::build opam\r") 2>/dev/null
 
