@@ -111,6 +111,7 @@ opam-installer.install: $(DUNE_DEP)
 
 .PHONY: build-opam
 build-opam: $(DUNE_DEP)
+	echo "dun promote arg is $(DUNE_PROMOTE_ARG)"
 	$(DUNE) build --profile=$(DUNE_PROFILE) $(DUNE_ARGS) opam-installer.install opam.install$(DUNE_PROMOTE_ARG)
 opam.install: $(DUNE_DEP)
 	$(DUNE) build --profile=$(DUNE_PROFILE) $(DUNE_ARGS) opam-installer.install opam.install$(DUNE_PROMOTE_ARG)
