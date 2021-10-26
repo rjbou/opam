@@ -1,0 +1,128 @@
+N0REP0
+### OPAMYES=1
+### <ongoing/ongoing.opam>
+opam-version: "2.0"
+synopsis: "One-line description"
+description: """
+Longer description
+"""
+maintainer: "Name <email>"
+authors: "Name <email>"
+license: "MIT"
+homepage: " "
+bug-reports: " "
+build: [ "ocaml" "ongoing.ml" ]
+### <init.sh>
+set -ue
+cd ongoing
+git init -q
+dune init executable ongoing
+git add -A
+git commit -qm "init"
+### sh init.sh
+Success: initialized executable component named ongoing
+### opam switch create default --empty
+### opam pin ./ongoing
+Package ongoing does not exist, create as a NEW package? [Y/n] y
+ongoing is now pinned to git+file://${BASEDIR}/ongoing#master (version ~dev)
+
+The following actions will be performed:
+  - install ongoing ~dev*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved ongoing.~dev  (no changes)
+-> installed ongoing.~dev
+Done.
+### <ongoing/newfile.ml>
+print_string "new!"
+### <ongoing/ongoing.opam>
+opam-version: "2.0"
+synopsis: "One-line description"
+description: """
+Longer description
+"""
+maintainer: "Name <email>"
+authors: "Name <email>"
+license: "MIT"
+homepage: " "
+bug-reports: " "
+build: [ "ocaml" "newfile.ml" ]
+### opam reinstall ongoing -v
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1:
+[NOTE] Ignoring uncommitted changes in ${BASEDIR}/ongoing (`--working-dir' not active).
+Processing  1/1: [ongoing.~dev: git]
+[ongoing.~dev] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile ongoing ~dev*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [ongoing.~dev: git]
+-> retrieved ongoing.~dev  (no changes)
+Processing  2/4: [ongoing: ocaml ongoing.ml]
++ ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "ongoing.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+- Hello, World!
+-> compiled  ongoing.~dev
+-> removed   ongoing.~dev
+-> installed ongoing.~dev
+Done.
+### opam install ongoing --working-dir -v
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [ongoing.~dev: git]
+[ongoing.~dev] synchronised (git+file://${BASEDIR}/ongoing#master)
+[ongoing] Installing new package description from upstream git+file://${BASEDIR}/ongoing#master
+
+The following actions will be performed:
+  - recompile ongoing ~dev*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [ongoing: ocaml newfile.ml]
++ ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+- new!
+-> compiled  ongoing.~dev
+-> removed   ongoing.~dev
+-> installed ongoing.~dev
+Done.
+### git -C ./ongoing add ongoing.opam
+### git -C ./ongoing commit -qm "forgot a file"
+### opam reinstall ongoing -v | grep -v "^#"
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1:
+[NOTE] Ignoring uncommitted changes in ${BASEDIR}/ongoing (`--working-dir' not active).
+Processing  1/1: [ongoing.~dev: git]
+[ongoing.~dev] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile ongoing ~dev*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [ongoing.~dev: git]
+-> retrieved ongoing.~dev  (no changes)
+Processing  2/4: [ongoing: ocaml newfile.ml]
++ ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+- new!
+-> compiled  ongoing.~dev
+-> removed   ongoing.~dev
+-> installed ongoing.~dev
+Done.
+### opam reinstall ongoing --working-dir -v
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [ongoing.~dev: git]
+[ongoing.~dev] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile ongoing ~dev*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [ongoing: ocaml newfile.ml]
++ ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+- new!
+-> compiled  ongoing.~dev
+-> removed   ongoing.~dev
+-> installed ongoing.~dev
+Done.
