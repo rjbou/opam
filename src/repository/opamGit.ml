@@ -82,6 +82,8 @@ module VCS : OpamVCS.VCS = struct
        else Done (Some dir)
      | _ -> Done None)
     @@+ fun global_cache ->
+    git repo_root ["reset"; "--hard"; "HEAD"; "-q"]
+    @@> fun _ ->
     let repo_url = OpamUrl.map_file_url (Lazy.force cygpath) repo_url in
     let origin = OpamUrl.base_url repo_url in
     let branch = OpamStd.Option.default "HEAD" repo_url.OpamUrl.hash in
