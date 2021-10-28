@@ -94,7 +94,7 @@ Done.
 Processing  1/1:
 [NOTE] Ignoring uncommitted changes in ${BASEDIR}/ongoing (`--working-dir' not active).
 Processing  1/1: [ongoing.~dev: git]
-[ongoing.~dev] synchronised (no changes)
+[ongoing.~dev] synchronised (git+file://${BASEDIR}/ongoing#master)
 
 The following actions will be performed:
   - recompile ongoing ~dev*
@@ -104,16 +104,24 @@ Processing  1/4: [ongoing.~dev: git]
 -> retrieved ongoing.~dev  (no changes)
 Processing  2/4: [ongoing: ocaml newfile.ml]
 + ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
-- new!
--> compiled  ongoing.~dev
--> removed   ongoing.~dev
--> installed ongoing.~dev
-Done.
+- Cannot find file ./newfile.ml.
+[ERROR] The compilation of ongoing.~dev failed at "ocaml newfile.ml".
+
+
+
+
+<><> Error report <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
++- The following actions failed
+| - build ongoing ~dev
++- 
+- No changes have been performed
+'${OPAMBIN} reinstall ongoing -v' failed.
+# Return code 31 #
 ### opam reinstall ongoing --working-dir -v
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1: [ongoing.~dev: git]
-[ongoing.~dev] synchronised (no changes)
+[ongoing.~dev] synchronised (git+file://${BASEDIR}/ongoing#master)
 
 The following actions will be performed:
   - recompile ongoing ~dev*
