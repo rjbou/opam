@@ -634,6 +634,14 @@ let parallel_apply t
       | `Change _ | `Reinstall _ -> assert false
     else
     match action with
+    | `Fetches (nv, nvs) ->
+      log "Fetching sources for %s" (OpamPackage.to_string nv);
+      (OpamAction.download_same_source_packages t
+         (OpamSwitchState.url t nv) (nv::nvs) @@+ function
+       | None ->
+         store_time (); Done (`Successful (installed, removed))
+       | Some (_short_error, long_error) ->
+         Done (`Exception (Fetch_fail long_error)))
     | `Fetch nv ->
       log "Fetching sources for %s" (OpamPackage.to_string nv);
       (OpamAction.download_package t nv @@+ function
