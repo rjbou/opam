@@ -48,8 +48,7 @@ The following actions will be performed:
 ===== 3 to install =====
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> retrieved extra.3  (file://${BASEDIR}/shared.tgz)
--> retrieved no-extra.3  (cached)
+-> retrieved extra.3+no-extra.3  (file://${BASEDIR}/shared.tgz)
 -> retrieved non-shared.4  (file://${BASEDIR}/non-shared.tgz)
 -> installed extra.3
 -> installed no-extra.3
@@ -107,8 +106,7 @@ The following actions will be performed:
 ===== 3 to recompile =====
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> retrieved extra.3  (file://${BASEDIR}/shared.tgz)
--> retrieved no-extra.3  (cached)
+-> retrieved extra.3+no-extra.3  (file://${BASEDIR}/shared.tgz)
 -> retrieved non-shared.4  (file://${BASEDIR}/non-shared.tgz)
 -> removed   extra.3
 -> installed extra.3
