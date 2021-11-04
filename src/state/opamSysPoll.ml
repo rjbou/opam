@@ -22,6 +22,14 @@ let command_output c =
 
 let norm s = if s = "" then None else Some (String.lowercase_ascii s)
 
+let syspoll var laz ?(env=OpamVariable.Map.empty) () =
+  match OpamVariable.Full.read_from_env (OpamVariable.Full.of_string var) with
+  | Some (S c) -> Some c
+  | _ ->
+    match OpamVariable.Map.find_opt (OpamVariable.of_string var) env with
+    | Some (lazy (Some (OpamTypes.S c)), _) -> Some c
+    | _ -> Lazy.force laz
+
 let normalise_arch raw =
   match String.lowercase_ascii raw with
   | "x86" | "i386" | "i486" | "i586" | "i686" -> "x86_32"
@@ -47,7 +55,7 @@ let arch_lazy = lazy (
   | None | Some "" -> None
   | Some a -> Some (normalise_arch a)
 )
-let arch () = Lazy.force arch_lazy
+let arch = syspoll "arch" arch_lazy
 
 let normalise_os raw =
   match String.lowercase_ascii raw with
@@ -64,7 +72,7 @@ let os_lazy = lazy (
   | None | Some "" -> None
   | Some s -> Some (normalise_os s)
 )
-let os () = Lazy.force os_lazy
+let os = syspoll "os" os_lazy
 
 let os_release_field =
   let os_release_file = lazy (
@@ -108,7 +116,7 @@ let os_distribution_lazy = lazy (
      with Not_found -> linux)
   | os -> os
 )
-let os_distribution () = Lazy.force os_distribution_lazy
+let os_distribution = syspoll "os-distribution" os_distribution_lazy
 
 let os_version_lazy = lazy (
   match os () with
@@ -131,7 +139,7 @@ let os_version_lazy = lazy (
   | _ ->
     OpamStd.Sys.uname "-r" >>= norm
 )
-let os_version () = Lazy.force os_version_lazy
+let os_version = syspoll "os-version" os_version_lazy
 
 let os_family_lazy = lazy (
   match os () with
@@ -143,7 +151,7 @@ let os_family_lazy = lazy (
   | Some ("win32" | "cygwin") -> Some "windows"
   | _ -> os_distribution ()
 )
-let os_family () = Lazy.force os_family_lazy
+let os_family = syspoll "os-family" os_family_lazy
 
 let variables =
   List.map
@@ -161,10 +169,10 @@ let variables =
 let cores_lazy = lazy (OpamSystem.cpu_count ())
 let cores () = Lazy.force cores_lazy
 
-let to_string () =
+let to_string ?env () =
   let open OpamStd.Option.Op in
   Printf.sprintf "arch=%s os=%s os-distribution=%s os-version=%s"
-    (arch () +! "unknown")
-    (os () +! "unknown")
-    (os_distribution () +! "unknown")
-    (os_version () +! "unknown")
+    (arch ?env () +! "unknown")
+    (os ?env () +! "unknown")
+    (os_distribution ?env () +! "unknown")
+    (os_version ?env () +! "unknown")
