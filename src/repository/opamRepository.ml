@@ -44,6 +44,11 @@ let cache_file cache_dir checksum =
   in
   aux cache_dir (OpamHash.to_path checksum)
 
+let is_cached cache_dir checksums =
+  List.filter (fun chk ->
+      OpamFilename.exists (cache_file cache_dir chk))
+    checksums
+
 let fetch_from_cache =
   let currently_downloading = ref [] in
   let rec no_concurrent_dls key f x =

@@ -52,6 +52,10 @@ val pull_file_to_cache:
     dirname. *)
 val cache_file: dirname -> OpamHash.t -> filename
 
+(** [is_cached cache_dir checksums] Returns list of cached files with checksum
+    in [cache_dir]. *)
+val is_cached: dirname -> OpamHash.t list -> OpamHash.t list
+
 (** Get the optional revision associated to a backend (git hash, etc.). *)
 val revision: dirname -> url -> version option OpamProcess.job
 
