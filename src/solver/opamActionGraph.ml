@@ -90,9 +90,15 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | `Fetch p, `Fetch q
       -> P.compare p q
     | `Fetches (p, pl), `Fetches (q, ql) ->
-      List.fold_left2 (fun comp p q ->
-          if comp <> 0 then comp else P.compare p q)
-        0 (p::pl) (q::ql)
+      let rec aux comp pl ql =
+        if comp <> 0 then comp else
+        match pl, ql with
+        | [], [] -> 0
+        | [], _::_ -> -1
+        | _::_, [] -> 1
+        | p::pl, q::ql -> aux (P.compare p q) pl ql
+      in
+      aux 0 (p::pl) (q::ql)
     | `Change (`Up,p0,p), `Change (`Up,q0,q)
     | `Change (`Down,p0,p), `Change (`Down,q0,q)
       ->
