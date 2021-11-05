@@ -26,6 +26,9 @@ users)
 ## Config report
   *
 
+
+## Actions
+  *  Add a `'Fetches' action to share fetches: one node to download once and prepare source once for packages that share same archive [#XXX @rjbou - fix #XXX]
 ## Install
   *
 
@@ -194,6 +197,8 @@ users)
 ## opam-client
   * `OpamStd.ABSTRACT`: add `compare` and `equal`, that added those functions to `OpamCLIVersion` [#4918 @rjbou]
 ## opam-repository
+  * New download functions, old ones kept [#XXX rjbou]
+  * Add `OpamRepository.is_cached` [#XXX]
 ## opam-state
 ## opam-solver
 ## opam-format
