@@ -108,6 +108,8 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
     | _, `Install _ | `Remove _, _ -> -1
     | `Build _, _ | _, `Change (`Down,_,_) -> 1
     | _, `Build _ | `Change (`Down,_,_), _ -> -1
+    | `Fetches _ , `Fetch _ -> 1
+    | `Fetch _, `Fetches _ -> -1
     | (`Fetch _ | `Fetches _), _ | _, `Reinstall _ -> 1
     | _, (`Fetch _ | ` Fetches _) | `Reinstall _, _ -> -1
 
