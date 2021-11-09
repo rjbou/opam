@@ -16,7 +16,6 @@ environment:
     OPAM_REPO_SHA: 765662297a24d833c6a04752cd8b89c5bd72fe26
     OPAM_TEST_REPO_SHA: 765662297a24d833c6a04752cd8b89c5bd72fe26
   matrix:
-      DEP_MODE: lib-pkg
     - appveyor_build_worker_image: Visual Studio 2017
       OCAML_PORT: msvc
       DEP_MODE: lib-pkg
