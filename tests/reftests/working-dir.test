@@ -12,15 +12,11 @@ license: "MIT"
 homepage: " "
 bug-reports: " "
 build: [ "ocaml" "ongoing.ml" ]
-### <init.sh>
-set -ue
-cd ongoing
-git init -q
-dune init executable ongoing
-git add -A
-git commit -qm "init"
-### sh init.sh
-Success: initialized executable component named ongoing
+### <ongoing/ongoing.ml>
+print_string "versionned"
+### git -C ./ongoing init -q
+### git -C ./ongoing add -A
+### git -C ./ongoing commit -qm "init"
 ### opam switch create default --empty
 ### opam pin ./ongoing
 Package ongoing does not exist, create as a NEW package? [Y/n] y
@@ -63,7 +59,7 @@ Processing  1/4: [ongoing.~dev: git]
 -> retrieved ongoing.~dev  (no changes)
 Processing  2/4: [ongoing: ocaml ongoing.ml]
 + ${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh "build" "ocaml" "ongoing.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
-- Hello, World!
+- versionned
 -> compiled  ongoing.~dev
 -> removed   ongoing.~dev
 -> installed ongoing.~dev
