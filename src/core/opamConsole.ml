@@ -891,6 +891,26 @@ let print_table ?cut oc ~sep table =
   in
   List.iter (fun l -> print_line (cleanup_trailing l)) table
 
+let log_env label l =
+  let void = "∅" in
+  let map f = OpamStd.Option.map_default f void in
+  let msg =
+    List.map (fun (n,v) ->
+        n,
+        match v with
+        | `Bool b -> map string_of_bool b
+        | `String s -> map (fun s -> s) s
+        | `Int i -> map string_of_int i
+        | `Float f -> map string_of_float f
+        | `Custom (f,e) -> map f e
+      )
+      l
+    |> OpamStd.List.concat_map " " (fun (n,v) -> n^"="^v)
+  in
+  let label = Printf.sprintf "CONFIG(%s)" label in
+  log label ~level:3 "%s" msg
+
+
 (* This allows OpamStd.Config.env to display warning messages *)
 let () =
   OpamStd.Sys.(set_warning_printer {warning})

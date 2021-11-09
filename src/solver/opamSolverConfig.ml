@@ -46,6 +46,25 @@ module E = struct
   let upgradecriteria = value (function UPGRADECRITERIA s -> s | _ -> None)
   let versionlagpower = value (function VERSIONLAGPOWER i -> i | _ -> None)
 
+  let to_string () =
+    [
+      "besteffort", `Bool (besteffort ());
+      "besteffortprefixcriteria", `String (besteffortprefixcriteria ());
+      "criteria", `String (criteria ());
+      "cudffile", `String (cudffile ());
+      "cudftrim", `String (cudftrim ());
+      "digdepth", `Int (digdepth ());
+      "externalsolver", `String (externalsolver ());
+      "fixupcriteria", `String (fixupcriteria ());
+      "noaspcud", `Bool (noaspcud ());
+      "prepro", `Bool (prepro ());
+      "solverallowsuboptimal", `Bool (solverallowsuboptimal ());
+      "solvertimeout", `Float (solvertimeout ());
+      "useinternalsolver", `Bool (useinternalsolver ());
+      "upgradecriteria", `String (upgradecriteria ());
+      "versionlagpower", `Int (versionlagpower ());
+    ]
+
 end
 
 type t = {
@@ -251,3 +270,6 @@ let call_solver ~criteria cudf =
   OpamConsole.log "SOLVER" "Calling solver %s with criteria %s"
     (OpamCudfSolver.get_name (module S)) criteria;
   S.call ~criteria ?timeout:(!r.solver_timeout) cudf
+
+let log () =
+  OpamConsole.log "solver" (E.to_string ())

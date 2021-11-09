@@ -35,7 +35,15 @@ module E : sig
     val debug: unit -> int option
     val logs: unit -> string option
     val yes: unit -> bool option
-end
+
+    val to_string:
+      unit -> (string *
+               [< `Bool of bool option
+               | `Custom of ('a -> string) * 'a option
+               | `Float of float option
+               | `Int of int option
+               | `String of string option ]) list
+  end
 
 type t = private {
   debug_level : int;

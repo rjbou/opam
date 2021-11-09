@@ -47,6 +47,25 @@ module E = struct
   let withdoc = value (function WITHDOC b -> b | _ -> None)
   let withtest = value (function WITHTEST b -> b | _ -> None)
 
+  let to_string () =
+    [
+      "builddoc", `Bool (builddoc ());
+      "buildtest", `Bool (buildtest ());
+      "downloadjobs", `Int (downloadjobs ());
+      "dryrun", `Bool (dryrun ());
+      "ignoreconstraints", `String (ignoreconstraints ());
+      "jobs", `Int (jobs ());
+      "locked", `String (locked ());
+      "makecmd", `String (makecmd ());
+      "nodepexts", `Bool (nodepexts ());
+      "noenvnotice", `Bool (noenvnotice ());
+      "root", `String (root ());
+      "switch", `String (switch ());
+      "unlockbase", `Bool (unlockbase ());
+      "withdoc", `Bool (withdoc ());
+      "withtest", `Bool (withtest ());
+    ]
+
 end
 
 type t = {
@@ -384,3 +403,6 @@ let get_switch () =
     OpamConsole.error_and_exit `Configuration_error
       "No switch is currently set. Please use 'opam switch' to set or install \
        a switch"
+
+let log () =
+  OpamConsole.log "state" (E.to_string ())

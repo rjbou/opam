@@ -48,6 +48,28 @@ module E = struct
   let verbose = value (function VERBOSE l -> l | _ -> None)
   let yes = value (function YES b -> b | _ -> None)
 
+  let to_string () =
+    [
+      let color = value (function COLOR c -> c | _ -> None)
+  let confirmlevel = value (function CONFIRMLEVEL c -> c | _ -> None)
+      "debug", `Int (debug ());
+    "debugsections", `String (debugsections ());
+    "errloglen", `Int (errloglen ());
+    "keeplogs", `Bool (keeplogs ());
+    "logs", `String (logs ());
+    "mergeout", `Bool (mergeout ());
+    "no", `Bool (no ());
+    "precisetracking", `Bool (precisetracking ());
+    "safe", `Bool (safe ());
+    let statusline = value (function STATUSLINE c -> c | _ -> None)
+        "useopenssl", `Bool (useopenssl ());
+      let utf8 = value (function UTF8 c -> c | _ -> None)
+          "utf8msgs", `Bool (utf8msgs ());
+        let verbose = value (function VERBOSE l -> l | _ -> None)
+            "yes", `Bool (yes ());
+]
+
+
 end
 
 type t = {

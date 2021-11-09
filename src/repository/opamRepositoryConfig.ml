@@ -28,6 +28,16 @@ module E = struct
   let retries = value (function RETRIES i -> i | _ -> None)
   let validationhook = value (function VALIDATIONHOOK s -> s | _ -> None)
 
+  let to_string () =
+    [
+      "curl", `String (curl ());
+      "fetch", `String (fetch ());
+      "nochecksums", `Bool (nochecksums ());
+      "requirechecksums", `Bool (requirechecksums ());
+      "retries", `Int (retries ());
+      "validationhook", `String (validationhook ());
+    ]
+
 end
 
 type dl_tool_kind = [ `Curl | `Default ]
@@ -141,3 +151,6 @@ let initk k =
     ?force_checksums
 
 let init ?noop:_ = initk (fun () -> ())
+
+let log () =
+  OpamConsole.log "repository" (E.to_string ())

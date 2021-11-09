@@ -37,6 +37,13 @@ module E: sig
     val rootisok: unit -> bool option
     val noaggregate: unit -> bool option
     val noselfupgrade: unit -> string option
+    val to_string:
+    unit -> (string *
+             [< `Bool of bool option
+             | `Custom of ('a -> string) * 'a option
+             | `Float of float option
+             | `Int of int option
+             | `String of string option ]) list
 end
 
 type t = private {
@@ -88,6 +95,8 @@ type 'a options_fun =
 include OpamStd.Config.Sig
   with type t := t
    and type 'a options_fun := 'a options_fun
+
+val log: unit -> unit
 
 (** Extra files included in [opam search] *)
 val search_files: string list
