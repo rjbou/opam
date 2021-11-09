@@ -22,14 +22,6 @@ module E : sig
 
   val curl: unit -> string option
   val fetch: unit -> string option
-
-  val to_string:
-    unit -> (string *
-             [< `Bool of bool option
-             | `Custom of ('a -> string) * 'a option
-             | `Float of float option
-             | `Int of int option
-             | `String of string option ]) list
 end
 
 (** Toggles parsing of the tool's output to detect errors
@@ -53,5 +45,3 @@ type 'a options_fun =
 include OpamStd.Config.Sig
   with type t := t
    and type 'a options_fun := 'a options_fun
-
-val log: unit -> unit

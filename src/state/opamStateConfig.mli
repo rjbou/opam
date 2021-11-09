@@ -31,17 +31,8 @@ module E : sig
     | UNLOCKBASE of bool option
     | WITHDOC of bool option
     | WITHTEST of bool option
-
   val root: unit -> string option
   val switch: unit -> string option
-
-  val to_string:
-    unit -> (string *
-             [< `Bool of bool option
-             | `Custom of ('a -> string) * 'a option
-             | `Float of float option
-             | `Int of int option
-             | `String of string option ]) list
 end
 
 type t = private {
@@ -155,5 +146,3 @@ end
    versions, and at switch loading for that specific case. *)
 val downgrade_2_1_switch:
   OpamFile.Switch_config.t OpamFile.t -> OpamFile.Switch_config.t option
-
-val log: unit -> unit

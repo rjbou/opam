@@ -20,13 +20,6 @@ module E = struct
   let skipversionchecks = value (function SKIPVERSIONCHECKS b -> b | _ -> None)
   let strict = value (function STRICT b -> b | _ -> None)
 
-  let to_string () =
-    [
-      "allparens", `Bool (allparens ());
-      "skipversionchecks", `Bool (skipversionchecks ());
-      "strict", `Bool (strict ());
-    ]
-
 end
 
 type t = {
@@ -74,6 +67,3 @@ let initk k =
     ?all_parens:(E.allparens ())
 
 let init ?noop:_ = initk (fun () -> ())
-
-let log () =
-  OpamConsole.log "format" (E.to_string ())

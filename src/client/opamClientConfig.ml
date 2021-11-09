@@ -54,30 +54,6 @@ module E = struct
   let stats = value (function STATS b -> b | _ -> None)
   let workingdir = value (function WORKINGDIR b -> b | _ -> None)
 
-  let to_string () =
-    [
-      "assumedepexts", `Bool (assumedepexts ());
-      "autoremove", `Bool (autoremove ());
-      "cli", `String (cli ());
-      "dropworkingdir", `Bool (dropworkingdir ());
-      "editor", `String (editor ());
-      "fake", `Bool (fake ());
-      "ignorepindepends", `Bool (ignorepindepends ());
-      "inplacebuild", `Bool (inplacebuild ());
-      "json", `String (json ());
-      "keepbuilddir", `Bool (keepbuilddir ());
-      "noaggregate", `Bool (noaggregate ());
-      "noautoupgrade", `Bool (noautoupgrade ());
-      "noselfupgrade", `String (noselfupgrade ());
-      "pinkindauto", `Bool (pinkindauto ());
-      "reusebuilddir", `Bool (reusebuilddir ());
-      "rootisok", `Bool (rootisok ());
-      "show", `Bool (show ());
-      "skipupdate", `Bool (skipupdate ());
-      "stats", `Bool (stats ());
-      "workingdir", `Bool (workingdir ());
-    ]
-
 end
 
 type t = {
@@ -287,6 +263,3 @@ let opam_init ?root_dir ?strict ?solver =
   OpamSolverConfig.initk ?solver |>
   OpamStateConfig.initk ~root_dir:root |>
   initk
-
-let log () =
- OpamConsole.log "client" (E.to_string ())

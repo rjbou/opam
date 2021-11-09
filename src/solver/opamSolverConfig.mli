@@ -28,16 +28,7 @@ module E : sig
     | UPGRADECRITERIA of string option
     | USEINTERNALSOLVER of bool option
     | VERSIONLAGPOWER of int option
-
-  val externalsolver: unit -> string option
-
-  val to_string:
-    unit -> (string *
-             [< `Bool of bool option
-             | `Custom of ('a -> string) * 'a option
-             | `Float of float option
-             | `Int of int option
-             | `String of string option ]) list
+    val externalsolver: unit -> string option
 end
 
 type t = private {
@@ -82,5 +73,3 @@ val call_solver: criteria:string -> Cudf.cudf -> Cudf.preamble option * Cudf.uni
 val best_effort: unit -> bool
 
 val criteria: OpamTypes.solver_criteria -> string
-
-val log: unit -> unit
