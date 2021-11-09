@@ -26,7 +26,7 @@ shift
 for p in $@; do
   file="REPO/packages/${p%.*}/$p/opam"
   echo "url {" >> $file
-  echo "src: \"${BASEDIR}/$arch.tgz\"" >> $file
+  echo "src: \"$BASEDIR/$arch.tgz\"" >> $file
   MD5=$(openssl md5 $arch.tgz | cut -d' ' -f2)
   echo "checksum: \"md5=$MD5\"" >> $file
   echo "}" >> $file
@@ -34,6 +34,8 @@ done
 ### sh mkurl.sh shared no-extra.3 extra.3
 ### sh mkurl.sh non-shared non-shared.4
 ### OPAMJOBS=1 OPAMDOWNLOADJOBS=1
+### find REPO
+### cat REPO/packages/extra/extra.3/opam
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
