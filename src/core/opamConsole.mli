@@ -132,3 +132,6 @@ val read: ('a, unit, string, string option) format4 -> 'a
 val print_table:
   ?cut:[`Wrap of string | `Truncate | `None] -> out_channel -> sep:string ->
   string list list -> unit
+
+val log_env:
+  string ->  (string * OpamStd.Log.log_env) list -> unit

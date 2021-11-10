@@ -77,6 +77,23 @@ let default = {
   force_checksums = None;
 }
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+      match old with
+      | Some o when try get o = get r with Invalid_argument _ -> false -> None
+      | _ -> Some (label, le (get r))
+    in
+    OpamStd.List.filter_map (fun x -> x) @@
+    OpamStd.Log.[
+      add "download_tool" (fun r -> r.download_tool) (fun x -> Lazy ((fun (_args, tool) -> match tool with | `Curl -> "curl" | `Default -> "default"), x));
+      add "validation_hook" (fun r -> r.validation_hook) (fun x -> OS (OpamStd.Option.map (fun _ -> "todo") x));
+      add "retries" (fun r -> r.retries) (fun x -> I x);
+      add "force_checksums" (fun r -> r.force_checksums) (fun x -> OB x);
+    ]
+
 let setk k t
     ?download_tool
     ?validation_hook
@@ -84,12 +101,14 @@ let setk k t
     ?force_checksums
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     download_tool = t.download_tool + download_tool;
     validation_hook = t.validation_hook + validation_hook;
     retries = t.retries + retries;
     force_checksums = t.force_checksums + force_checksums;
-  }
+  } in
+  OpamConsole.log_env "repository" (log ~old:t r);
+  k r
 
 let set t = setk (fun x () -> x) t
 

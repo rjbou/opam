@@ -40,17 +40,35 @@ let default = {
   all_parens = false;
 }
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+      match old with
+      | Some o when try get o = get r with Invalid_argument _ -> false -> None
+      | _ -> Some (label, le (get r))
+    in
+    OpamStd.List.filter_map (fun x -> x) @@
+    OpamStd.Log.[
+      add "strict" (fun r -> r.strict) (fun x -> B x);
+      add "skip_version_checks" (fun r -> r.skip_version_checks) (fun x -> B x);
+      add "all_parens" (fun r -> r.all_parens) (fun x -> B x);
+    ]
+
 let setk k t
     ?strict
     ?skip_version_checks
     ?all_parens
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     strict = t.strict + strict;
     skip_version_checks = t.skip_version_checks + skip_version_checks;
     all_parens = t.all_parens + all_parens;
-  }
+  } in
+  if r <> t then OpamConsole.log_env "format" (log ~old:t r);
+  k r
 
 let set t = setk (fun x () -> x) t
 

@@ -102,6 +102,32 @@ let default =
     version_lag_power = 1;
   }
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+      match old with
+      | Some o when try get o = get r with Invalid_argument _ -> false -> None
+      | _ -> Some (label, le (get r))
+    in
+    OpamStd.List.filter_map (fun x -> x) @@
+    OpamStd.Log.[
+      add "cudf_file" (fun r -> r.cudf_file) (fun x -> OS x);
+      add "solver" (fun r -> r.solver) (fun x -> Lazy ((fun (module M: OpamCudfSolver.S) -> M.name), x));
+      add "best_effort" (fun r -> r.best_effort) (fun x -> B x);
+      add "solver_preferences_default" (fun r -> r.solver_preferences_default) (fun x -> OLazy ((fun z -> z), x));
+      add "solver_preferences_upgrade" (fun r -> r.solver_preferences_upgrade) (fun x -> OLazy ((fun z -> z), x));
+      add "solver_preferences_fixup" (fun r -> r.solver_preferences_fixup) (fun x -> OLazy ((fun z -> z), x));
+      add "solver_preferences_best_effort_prefix" (fun r -> r.solver_preferences_best_effort_prefix) (fun x -> OLazy ((fun z -> z), x));
+      add "solver_timeout" (fun r -> r.solver_timeout) (fun x -> OF x);
+      add "solver_allow_suboptimal" (fun r -> r.solver_allow_suboptimal) (fun x -> B x);
+      add "cudf_trim" (fun r -> r.cudf_trim) (fun x -> OS x);
+      add "dig_depth" (fun r -> r.dig_depth) (fun x -> I x);
+      add "preprocess" (fun r -> r.preprocess) (fun x -> B x);
+      add "version_lag_power" (fun r -> r.version_lag_power) (fun x -> I x);
+    ]
+
 let setk k t
     ?cudf_file
     ?solver
@@ -118,7 +144,7 @@ let setk k t
     ?version_lag_power
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     cudf_file = t.cudf_file + cudf_file;
     solver = t.solver + solver;
     best_effort = t.best_effort + best_effort;
@@ -139,7 +165,9 @@ let setk k t
     dig_depth = t.dig_depth + dig_depth;
     preprocess = t.preprocess + preprocess;
     version_lag_power = t.version_lag_power + version_lag_power;
-  }
+  } in
+  OpamConsole.log_env "solver" (log ~old:t r);
+  k r
 
 let set t = setk (fun x () -> x) t
 

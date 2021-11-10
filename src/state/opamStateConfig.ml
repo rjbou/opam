@@ -106,6 +106,33 @@ type 'a options_fun =
   ?no_depexts: bool ->
   'a
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+      match old with
+      | Some o when try get o = get r with Invalid_argument _ -> false -> None
+      | _ -> Some (label, le (get r))
+    in
+    OpamStd.List.filter_map (fun x -> x) @@
+    OpamStd.Log.[
+      add "root_dir" (fun r -> r.root_dir) (fun x -> Custom (OpamFilename.Dir.to_string, x));
+      add "current_switch" (fun r -> r.current_switch) (fun x -> OCustom (OpamSwitch.to_string, x));
+      add "switch_from" (fun r -> r.switch_from) (fun x -> Custom ((function `Env -> "env" | `Command_line -> "cli" | `Default -> "default"), x));
+      add "jobs" (fun r -> r.jobs) (fun x -> Lazy (string_of_int, x));
+      add "dl_jobs" (fun r -> r.dl_jobs) (fun x -> I x);
+      add "build_test" (fun r -> r.build_test) (fun x -> OpamStd.Log.B x);
+      add "build_doc" (fun r -> r.build_doc) (fun x -> OpamStd.Log.B x);
+      add "dryrun" (fun r -> r.dryrun) (fun x -> OpamStd.Log.B x);
+      add "makecmd" (fun r -> r.makecmd) (fun x -> Lazy ((fun x -> x), x));
+      add "ignore_constraints_on" (fun r -> r.ignore_constraints_on) (fun x -> Custom (OpamPackage.Name.Set.to_string, x));
+      add "unlock_base" (fun r -> r.unlock_base) (fun x -> OpamStd.Log.B x);
+      add "no_env_notice" (fun r -> r.no_env_notice) (fun x -> OpamStd.Log.B x);
+      add "locked" (fun r -> r.locked) (fun x -> OS x);
+      add "no_depexts" (fun r -> r.no_depexts) (fun x ->  OpamStd.Log.B x);
+    ]
+
 let setk k t
     ?root_dir
     ?current_switch
@@ -123,7 +150,7 @@ let setk k t
     ?no_depexts
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     root_dir = t.root_dir + root_dir;
     current_switch =
       (match current_switch with None -> t.current_switch | s -> s);
@@ -139,7 +166,9 @@ let setk k t
     no_env_notice = t.no_env_notice + no_env_notice;
     locked = t.locked + locked;
     no_depexts = t.no_depexts + no_depexts;
-  }
+  } in
+  OpamConsole.log_env "state" (log ~old:t r);
+  k r
 
 let set t = setk (fun x () -> x) t
 

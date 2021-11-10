@@ -579,6 +579,15 @@ module Config : sig
 
   val env_answer: env_var -> answer option
 
+val answer: string -> answer
+val when_: string -> when_
+val when_ext: string -> when_ext
+val sections: string -> sections
+
+val string_of_answer: answer -> string option
+val string_of_when: when_ -> string option
+val string_of_when_ext: when_ext -> string option
+
   module type Sig = sig
 
     (** Read-only record type containing the lib's configuration options *)
@@ -626,4 +635,28 @@ module Config : sig
     val updates: t list -> unit
   end
 
+end
+
+module Log : sig
+
+type log_env =
+  | B : bool -> log_env
+  | S : string -> log_env
+  | I : int -> log_env
+  | OS : string option -> log_env
+  | OB : bool option -> log_env
+  | OF : float option -> log_env
+  | LS : string list -> log_env
+  | Custom : ('a -> string) * 'a -> log_env
+  | OCustom : ('b -> string) * 'b option -> log_env
+  | CustomO : ('c -> string option) * 'c -> log_env
+  | Lazy : ('d -> string) * 'd Lazy.t -> log_env
+  | OLazy : ('e -> string) * 'e option Lazy.t -> log_env
+
+val log_env_t:
+  string -> (string * log_env) list -> string * int * string
+val log_env:
+  string -> (string * log_env) list -> unit 
+val log: string -> ?level:int -> ('a, unit, string, unit) format4 -> 'a
+val get_pending: unit -> (string * int * float * string) list
 end

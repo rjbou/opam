@@ -1416,6 +1416,26 @@ module Config = struct
   type when_ext = [ `Extended | when_ ]
   type answer = [ `unsafe_yes | `all_yes | `all_no | `ask ]
 
+  let _answer = [
+    "ask", `ask;
+    "no", `all_no;
+    "yes", `all_yes;
+    "unsafe-yes", `unsafe_yes;
+  ]
+
+  let _when = [
+    "always", `Always;
+    "never", `Never;
+    "auto", `Auto
+  ]
+
+  let _when_ext = ("extended", `Extended) :: _when
+
+  let from_name e l =
+    Option.map snd @@
+    List.find_opt Op.(fst @> String.lowercase_ascii @> String.equal e) l
+  let from_constr l e = Option.map fst @@ List.find_opt Op.(snd @> (=) e) l
+
   let env conv var =
     try Option.map conv (Env.getopt ("OPAM"^var))
     with Failure _ ->
@@ -1450,21 +1470,23 @@ module Config = struct
       var
 
   type sections = int option OpamString.Map.t
-  let env_sections var =
-    env (fun s ->
-      let f map elt =
-        let parse_value (section, value) =
-          try
-            (section, Some (int_of_string value))
-          with Failure _ ->
-            (section, None)
-        in
-        let (section, level) =
-          Option.map_default parse_value (elt, None) (OpamString.cut_at elt ':')
-        in
-        OpamString.Map.add section level map
+  let sections s =
+    let f map elt =
+      let parse_value (section, value) =
+        try
+          (section, Some (int_of_string value))
+        with Failure _ ->
+          (section, None)
       in
-      List.fold_left f OpamString.Map.empty (OpamString.split s ' ')) var
+      let (section, level) =
+        Option.map_default parse_value (elt, None) (OpamString.cut_at elt ':')
+      in
+      OpamString.Map.add section level map
+    in
+    List.fold_left f OpamString.Map.empty (OpamString.split s ' ')
+
+  let env_sections var =
+    env sections var
 
   let env_string var =
     env (fun s -> s) var
@@ -1473,20 +1495,19 @@ module Config = struct
     env float_of_string var
 
   let when_ext s =
-    match String.lowercase_ascii s with
-    | "extended" -> `Extended
-    | "always" -> `Always
-    | "never" -> `Never
-    | "auto" -> `Auto
-    | _ -> failwith "env_when"
+    match from_name s _when_ext with
+    | Some w -> w
+    | None -> failwith "env_when"
 
   let env_when_ext var = env when_ext var
 
+  let when_ s =
+    match from_name s _when with
+    | Some w -> w
+    | None -> failwith "env_when"
+
   let env_when var =
-    env (fun v -> match when_ext v with
-        | (`Always | `Never | `Auto) as w -> w
-        | `Extended -> failwith "env_when")
-      var
+    env when_ var
 
   let resolve_when ~auto = function
     | `Always -> true
@@ -1494,18 +1515,18 @@ module Config = struct
     | `Auto -> Lazy.force auto
 
   let answer s =
-    match String.lowercase_ascii s with
-    | "ask" -> `ask
-    | "yes" -> `all_yes
-    | "no" -> `all_no
-    | "unsafe-yes" -> `unsafe_yes
-    | _ -> failwith "env_answer"
+    match from_name s _answer with
+    | Some w -> w
+    | None -> failwith "env_answer"
 
   let env_answer =
     env (fun s ->
         try if bool s then `all_yes else `all_no
         with Failure _ -> answer s)
 
+let string_of_when = from_constr _when
+let string_of_answer = from_constr _answer
+let string_of_when_ext = from_constr _when_ext
 
   module E = struct
     type t = ..
@@ -1519,6 +1540,67 @@ module Config = struct
       let l = lazy (try Some (find var); with Not_found -> None) in
       fun () -> Lazy.force l
   end
+
+end
+
+module Log = struct
+
+  type log_env =
+    | B : bool -> log_env
+    | S : string -> log_env
+    | I : int -> log_env
+    | OS : string option -> log_env
+    | OB : bool option -> log_env
+    | OF : float option -> log_env
+    | LS : string list -> log_env
+    | Custom : ('a -> string) * 'a -> log_env
+    | OCustom : ('b -> string) * 'b option -> log_env
+    | CustomO : ('c -> string option) * 'c -> log_env
+    | Lazy : ('d -> string) * 'd Lazy.t -> log_env
+    | OLazy : ('e -> string) * 'e option Lazy.t -> log_env
+
+  let pending = ref []
+
+  let log section ?(level=1) fmt =
+    let timestamp = Unix.gettimeofday () in
+    let k s =
+      pending := (section, level, timestamp, s)::!pending
+    in
+    Format.ksprintf k fmt
+
+  let get_pending () =
+    let r = !pending in
+    pending := [];
+    r
+
+  let log_env_t label l =
+    let label = Printf.sprintf "CONFIG(%s)" label in
+    if l = [] then (label, 4, "no changes") else
+    let void = "∅" in
+    let map f = Option.map_default f void in
+    let str = function
+      | B b -> string_of_bool b
+      | I i -> string_of_int i
+      | S s -> s
+      | OS s -> map (fun x -> x) s
+      | OB b -> map string_of_bool b
+      | OF b -> map string_of_float b
+      | LS l -> OpamList.to_string (fun x -> x) l
+      | OCustom (f,e) -> map f e
+      | CustomO (f,e) -> map (fun x -> x) (f e)
+      | Custom (f,e) -> f e
+      | Lazy (f,e) -> if Lazy.is_val e then f (Lazy.force e) else void
+      | OLazy (f,e) -> if Lazy.is_val e then map f (Lazy.force e) else void
+    in
+    let msg =
+      List.map (fun (n,v) -> n, str v) l
+      |> OpamList.concat_map " " (fun (n,v) -> n^"="^v)
+    in
+    (label, 3, msg)
+
+  let log_env label l =
+    let (label, level, msg) = log_env_t label l in
+    log label ~level "%s" msg
 
 end
 

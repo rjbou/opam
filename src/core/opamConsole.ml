@@ -504,8 +504,8 @@ let print_message =
       in
       Printf.ksprintf output_string fmt
 
-let timestamp () =
-  let time = Unix.gettimeofday () -. global_start_time in
+let timestamp ?tms () =
+  let time = OpamStd.Option.default (Unix.gettimeofday ()) tms -. global_start_time in
   let tm = Unix.gmtime time in
   let msec = time -. (floor time) in
   Printf.ksprintf (colorise `blue) "%.2d:%.2d.%.3d"
@@ -550,20 +550,38 @@ let log section ?(level=1) fmt =
       | None -> debug_level
       | exception Not_found -> 0
   in
+  (* factorise rjbou *)
   if not OpamCoreConfig.(!r.set) then
-    let b = Buffer.create 128 in
-    let timestamp = timestamp () ^ "  " in
-    let k _ = Queue.push (level, timestamp, Buffer.contents b) pending in
-    Format.kfprintf k (Format.formatter_of_buffer b) ("%a  " ^^ fmt ^^ "\n%!")
-      (acolor_w 30 `yellow) section
-  else if level <= abs debug_level then
-    let () = clear_status () in
-    let () = clear_pending debug_level in
-    let timestamp = if debug_level < 0 then "" else timestamp () ^ "  " in
-    Format.kfprintf finalise_output log_formatter ("%s%a  " ^^ fmt ^^ "\n%!")
-      timestamp (acolor_w 30 `yellow) section
+    let print ?tms section level fmt =
+      let b = Buffer.create 128 in
+      let timestamp = timestamp ?tms () ^ "  " in
+      let k _ = Queue.push (level, timestamp, Buffer.contents b) pending in
+      Format.kfprintf k (Format.formatter_of_buffer b) ("%a  " ^^ fmt ^^ "\n%!")
+        (acolor_w 30 `yellow) section
+    in
+    (match OpamStd.Log.get_pending () with
+     | [] -> ()
+     | l ->
+       List.iter (fun (section, level, tms, msg) ->
+           print section level ~tms "%s" msg) l);
+    print section level fmt
   else
-    Format.ifprintf Format.err_formatter fmt
+  let print ?tms section level fmt =
+    if level <= abs debug_level then
+      let () = clear_status () in
+      let () = clear_pending debug_level in
+      let timestamp = if debug_level < 0 then "" else timestamp ?tms () ^ "  " in
+      Format.kfprintf finalise_output log_formatter ("%s%a  " ^^ fmt ^^ "\n%!")
+        timestamp (acolor_w 30 `yellow) section
+    else
+      Format.ifprintf Format.err_formatter fmt
+  in
+  (match OpamStd.Log.get_pending () with
+   | [] -> ()
+   | l ->
+     List.iter (fun (section, level, tms, msg) ->
+         print section level ~tms "%s" msg) l);
+  print section level fmt
 
 (* Helper to pass stringifiers to log (use [log "%a" (slog to_string) x]
    rather than [log "%s" (to_string x)] to avoid costly unneeded
@@ -890,6 +908,22 @@ let print_table ?cut oc ~sep table =
       output_string str;
   in
   List.iter (fun l -> print_line (cleanup_trailing l)) table
+
+(*
+type ('a, 'b) log_env =
+  | B of bool
+  | Custom of ('a -> string) * 'a
+  | I of int
+  | LS of string list
+  | OCustom of ('b -> string) * 'b option
+  | OS of string option
+  | S of string
+*)
+
+let log_env label l =
+  let (label, level, msg) = OpamStd.Log.log_env_t label l in
+  log label ~level "%s" msg
+
 
 (* This allows OpamStd.Config.env to display warning messages *)
 let () =

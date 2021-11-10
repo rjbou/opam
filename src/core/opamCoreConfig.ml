@@ -30,8 +30,8 @@ module E = struct
     | YES of bool option
 
   open OpamStd.Config.E
-  let color = value (function COLOR c -> c | _ -> None)
-  let confirmlevel = value (function CONFIRMLEVEL c -> c | _ -> None)
+  let color = value (function COLOR w -> w | _ -> None)
+  let confirmlevel = value (function CONFIRMLEVEL a -> a | _ -> None)
   let debug = value (function DEBUG i -> i | _ -> None)
   let debugsections = value (function DEBUGSECTIONS s -> s | _ -> None)
   let errloglen = value (function ERRLOGLEN i -> i | _ -> None)
@@ -41,7 +41,7 @@ module E = struct
   let no = value (function NO b -> b | _ -> None)
   let precisetracking = value (function PRECISETRACKING b -> b | _ -> None)
   let safe = value (function SAFE b -> b | _ -> None)
-  let statusline = value (function STATUSLINE c -> c | _ -> None)
+  let statusline = value (function STATUSLINE w -> w | _ -> None)
   let useopenssl = value (function USEOPENSSL b -> b | _ -> None)
   let utf8 = value (function UTF8 c -> c | _ -> None)
   let utf8msgs = value (function UTF8MSGS b -> b | _ -> None)
@@ -51,7 +51,7 @@ module E = struct
 end
 
 type t = {
-  debug_level: int;
+  debug_level: OpamStd.Config.level;
   debug_sections: OpamStd.Config.sections;
   verbose_level: OpamStd.Config.level;
   color: OpamStd.Config.when_;
@@ -70,7 +70,7 @@ type t = {
 }
 
 type 'a options_fun =
-  ?debug_level:int ->
+  ?debug_level:OpamStd.Config.level ->
   ?debug_sections:OpamStd.Config.sections ->
   ?verbose_level:OpamStd.Config.level ->
   ?color:OpamStd.Config.when_ ->
@@ -109,6 +109,34 @@ let default = {
   set = false;
 }
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+      match old with
+      | Some o when try get o = get r with Invalid_argument _ -> false -> None
+      | _ -> Some (label, le (get r))
+    in
+    OpamStd.List.filter_map (fun x -> x) @@
+    OpamStd.Log.[
+      add "debug_level" (fun r -> r.debug_level) (fun x -> I x);
+      add "debug_sections" (fun r -> r.debug_sections) (fun x -> Custom (OpamStd.String.Map.to_string (OpamStd.Option.to_string string_of_int), x));
+      add "verbose_level" (fun r -> r.verbose_level) (fun x -> I x);
+      add "color" (fun r -> r.color) (fun x -> CustomO (OpamStd.Config.string_of_when, x));
+      add "utf8" (fun r -> r.utf8) (fun x -> CustomO (OpamStd.Config.string_of_when_ext, x));
+      add "disp_status_line" (fun r -> r.disp_status_line) (fun x -> CustomO (OpamStd.Config.string_of_when, x));
+      add "confirm_level" (fun r -> r.confirm_level) (fun x -> CustomO ((function | `undefined -> Some "undefined" | #OpamStd.Config.answer as z -> OpamStd.Config.string_of_answer z) , x));
+      add "yes" (fun r -> r.yes) (fun x -> OB x);
+      add "safe_mode" (fun r -> r.safe_mode) (fun x -> B x);
+      add "log_dir" (fun r -> r.log_dir) (fun x -> S x);
+      add "keep_log_dir" (fun r -> r.keep_log_dir) (fun x -> B x);
+      add "errlog_length" (fun r -> r.errlog_length) (fun x -> I x);
+      add "merged_output" (fun r -> r.merged_output) (fun x -> B x);
+      add "use_openssl" (fun r -> r.use_openssl) (fun x -> B x);
+      add "precise_tracking" (fun r -> r.precise_tracking) (fun x -> B x);
+    ]
+
 let setk k t
     ?debug_level
     ?debug_sections
@@ -127,7 +155,7 @@ let setk k t
     ?precise_tracking
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     debug_level = t.debug_level + debug_level;
     debug_sections = t.debug_sections + debug_sections;
     verbose_level = t.verbose_level + verbose_level;
@@ -147,7 +175,10 @@ let setk k t
     use_openssl = t.use_openssl + use_openssl;
     precise_tracking = t.precise_tracking + precise_tracking;
     set = true;
-  }
+  } in
+  if r <> t then OpamStd.Log.log_env "core" (log ~old:t r);
+  k r
+
 
 let set t = setk (fun x () -> x) t
 

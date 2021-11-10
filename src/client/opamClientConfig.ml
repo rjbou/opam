@@ -122,6 +122,38 @@ type 'a options_fun =
   ?scrubbed_environment_variables:string list ->
   'a
 
+let log =
+  let fst = ref true in
+  fun ?old r ->
+    let old = if !fst then (fst:= false; None) else old in
+    let add label get le =
+    match old with
+    | Some o when try get o = get r with Invalid_argument _ -> false -> None
+    | _ -> Some (label, le (get r))
+  in
+  OpamStd.List.filter_map (fun x -> x) @@
+  OpamStd.Log.[
+    add "print_stats" (fun r -> r.print_stats) (fun x -> B x);
+    add "pin_kind_auto" (fun r -> r.pin_kind_auto) (fun x -> B x);
+    add "autoremove" (fun r -> r.autoremove) (fun x -> B x);
+    add "editor" (fun r -> r.editor) (fun x -> S x);
+    add "keep_build_dir" (fun r -> r.keep_build_dir) (fun x -> B x);
+    add "reuse_build_dir" (fun r -> r.reuse_build_dir) (fun x -> B x);
+    add "inplace_build" (fun r -> r.inplace_build) (fun x -> B x);
+    add "working_dir" (fun r -> r.working_dir) (fun x -> B x);
+    add "drop_working_dir" (fun r -> r.drop_working_dir) (fun x -> B x);
+    add "ignore_pin_depends" (fun r -> r.ignore_pin_depends) (fun x -> B x);
+    add "show" (fun r -> r.show) (fun x -> B x);
+    add "fake" (fun r -> r.fake) (fun x -> B x);
+    add "skip_dev_update" (fun r -> r.skip_dev_update) (fun x -> B x);
+    add "json_out" (fun r -> r.json_out) (fun x -> OS x);
+    add "root_is_ok" (fun r -> r.root_is_ok) (fun x -> B x);
+    add "no_auto_upgrade" (fun r -> r.no_auto_upgrade) (fun x -> B x);
+    add "assume_depexts" (fun r -> r.assume_depexts) (fun x -> B x);
+    add "cli" (fun r -> r.cli) (fun x -> Custom (OpamCLIVersion.to_string, x));
+    add "scrubbed_environment_variables" (fun r -> r.scrubbed_environment_variables) (fun x -> LS x);
+  ]
+
 let setk k t
     ?print_stats
     ?pin_kind_auto
@@ -144,7 +176,7 @@ let setk k t
     ?scrubbed_environment_variables
   =
   let (+) x opt = match opt with Some x -> x | None -> x in
-  k {
+  let r = {
     print_stats = t.print_stats + print_stats;
     pin_kind_auto = t.pin_kind_auto + pin_kind_auto;
     autoremove = t.autoremove + autoremove;
@@ -164,7 +196,9 @@ let setk k t
     assume_depexts = t.assume_depexts + assume_depexts;
     cli = t.cli + cli;
     scrubbed_environment_variables = t.scrubbed_environment_variables + scrubbed_environment_variables
-  }
+  } in
+  OpamConsole.log_env "client" (log ~old:t r);
+  k r
 
 let set t = setk (fun x () -> x) t
 
