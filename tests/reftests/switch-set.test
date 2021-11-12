@@ -1,4 +1,5 @@
 N0REP0
+### # Test the "go to previous switch" feature
 ### opam switch create foo --empty
 ### opam switch create bar --empty
 ### opam switch show
@@ -13,3 +14,13 @@ bar
 ### opam switch -
 ### opam switch show
 bar
+### # check that switches with name "-" do not interfere with the "go to previous switch" feature
+### opam switch bar
+### opam switch create - --empty
+### opam switch set -
+### opam switch show
+-
+### opam switch bar
+### opam switch --cli=2.1 -
+### opam switch show
+-
