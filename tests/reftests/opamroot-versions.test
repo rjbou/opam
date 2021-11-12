@@ -710,6 +710,7 @@ eval-variables: [sys-comp-version ["sh" "-c" "echo $OPAMSYSCOMP"] "comp version"
 installed-switches: ["sw-sys-comp" "sw-comp" "default"]
 opam-root-version: "2.1"
 opam-version: "2.0"
+previous-switch: "sw-sys-comp"
 repositories: "default"
 switch: "sw-comp"
 ### opam-cat $OPAMROOT/sw-comp/.opam-switch/switch-config
@@ -1048,6 +1049,7 @@ eval-variables: [sys-comp-version ["sh" "-c" "echo $OPAMSYSCOMP"] "comp version"
 installed-switches: ["sw-sys-comp" "sw-comp" "default"]
 opam-root-version: "2.1"
 opam-version: "2.0"
+previous-switch: "sw-sys-comp"
 repositories: "default"
 switch: "sw-comp"
 wrap-build-commands: ["%{hooks}%/sandbox.sh" "build"] {os = "linux" | os = "macos"}
@@ -1387,6 +1389,7 @@ eval-variables: [sys-comp-version ["sh" "-c" "echo $OPAMSYSCOMP"] "comp version"
 installed-switches: ["sw-sys-comp" "sw-comp" "default"]
 opam-root-version: "2.1"
 opam-version: "2.0"
+previous-switch: "sw-sys-comp"
 repositories: "default"
 switch: "sw-comp"
 wrap-build-commands: ["%{hooks}%/sandbox.sh" "build"] {os = "linux" | os = "macos"}

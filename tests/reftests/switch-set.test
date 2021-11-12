@@ -1,0 +1,15 @@
+N0REP0
+### opam switch create foo --empty
+### opam switch create bar --empty
+### opam switch show
+bar
+### opam switch -
+### opam switch show
+foo
+### opam switch -
+### opam switch show
+bar
+### opam switch bar
+### opam switch -
+### opam switch show
+bar
