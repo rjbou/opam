@@ -38,6 +38,7 @@ users)
     [#4853 @rjbou - fix #4843]
   * Ensure setenv can use package variables defined during the build [#4841 @dra27]
   * [BUG] Fix `set-invariant: default repos were loaded instead of switch repos [#4866 @rjbou]
+  * Add support for `opam switch -` (go to previous switch) [#4910 @kit-ty-kate]
 
 ## Pin
   *
