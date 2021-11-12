@@ -2783,6 +2783,10 @@ let switch cli =
     | Some `current, [] ->
       OpamSwitchCommand.show ();
       `Ok ()
+    | Some `default "-", [] when OpamCLIVersion.Op.(cli @>= cli2_2) ->
+      OpamGlobalState.with_ `Lock_write @@ fun gt ->
+      OpamSwitchCommand.switch_previous `Lock_none gt;
+      `Ok ()
     | Some `set, [switch]
     | Some `default switch, [] ->
       OpamGlobalState.with_ `Lock_write @@ fun gt ->

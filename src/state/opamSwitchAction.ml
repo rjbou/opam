@@ -133,7 +133,11 @@ let set_current_switch gt st =
        shell use:\n %s"
       (OpamSwitch.to_string st.switch)
       (OpamEnv.eval_string gt ~set_opamswitch:true (Some st.switch));
-  let config = OpamFile.Config.with_switch st.switch gt.config in
+  let config =
+    gt.config |>
+    OpamFile.Config.with_previous_switch_opt (OpamFile.Config.switch gt.config) |>
+    OpamFile.Config.with_switch st.switch
+  in
   let gt = { gt with config } in
   OpamGlobalState.write gt;
   let rt = { st.switch_repos with repos_global = gt } in

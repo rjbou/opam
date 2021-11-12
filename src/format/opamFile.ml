@@ -1226,7 +1226,7 @@ end
 module ConfigSyntax = struct
 
   let internal = "config"
-  let format_version = OpamVersion.of_string "2.1"
+  let format_version = OpamVersion.of_string "2.2"
   let file_format_version = OpamVersion.of_string "2.0"
   let root_version = OpamVersion.of_string "2.1"
 
@@ -1238,6 +1238,7 @@ module ConfigSyntax = struct
     repositories : repository_name list;
     installed_switches : switch list;
     switch : switch option;
+    previous_switch : switch option;
     jobs : int option;
     dl_tool : arg list option;
     dl_jobs : int;
@@ -1265,6 +1266,7 @@ module ConfigSyntax = struct
   let repositories t = t.repositories
   let installed_switches t = t.installed_switches
   let switch t = t.switch
+  let previous_switch t = t.previous_switch
   let jobs t = t.jobs
   let dl_tool t = t.dl_tool
   let dl_jobs t = t.dl_jobs
@@ -1297,6 +1299,8 @@ module ConfigSyntax = struct
     { t with installed_switches }
   let with_switch_opt switch t = { t with switch }
   let with_switch switch t = { t with switch = Some switch }
+  let with_previous_switch_opt previous_switch t = { t with previous_switch }
+  let with_previous_switch previous_switch t = { t with previous_switch = Some previous_switch }
   let with_jobs jobs t = { t with jobs = Some jobs}
   let with_jobs_opt jobs t = { t with jobs }
   let with_dl_tool dl_tool t = { t with dl_tool = Some dl_tool }
@@ -1332,6 +1336,7 @@ module ConfigSyntax = struct
     repositories = [];
     installed_switches = [];
     switch = None;
+    previous_switch = None;
     jobs = None;
     dl_tool = None;
     dl_jobs = 1;
@@ -1381,6 +1386,9 @@ module ConfigSyntax = struct
       "switch", Pp.ppacc_opt
         with_switch switch
         (Pp.V.string -| Pp.of_module "switch" (module OpamSwitch));
+      "previous-switch", Pp.ppacc_opt
+        with_previous_switch previous_switch
+        (Pp.V.string -| Pp.of_module "previous-switch" (module OpamSwitch));
       "jobs", Pp.ppacc_opt
         with_jobs jobs
         Pp.V.pos_int;

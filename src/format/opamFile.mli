@@ -130,6 +130,8 @@ module Config: sig
   val with_switch: switch -> t -> t
   val with_switch_opt: switch option -> t -> t
 
+  val with_previous_switch_opt: switch option -> t -> t
+
   val with_installed_switches: switch list -> t -> t
 
   (** Repository updates *)
@@ -184,6 +186,8 @@ module Config: sig
 
   (** Return the OCaml switch *)
   val switch: t -> switch option
+
+  val previous_switch : t -> switch option
 
   val installed_switches: t -> switch list
 
