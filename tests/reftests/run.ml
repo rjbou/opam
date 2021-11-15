@@ -139,14 +139,15 @@ let str_replace_path ?(escape=false) whichway filters s =
     else fun s -> s
   in
   List.fold_left (fun s (re, by) ->
+(*
       let re_path = Re.(
           seq [re; group (rep (diff any space))]
         ) in
+*)
       match by with
       | Sed by ->
-        Re.replace (Re.compile re_path) s
-          ~f:(fun g ->
-              escape (by ^ whichway (Re.Group.(get g (nb_groups g - 1)))))
+        Re.replace (Re.compile re) s ~f:(fun g -> escape by)
+      (* ^ whichway (Re.Group.(get g (nb_groups g - 1))))) *)
       | Grep | GrepV ->
         let way = if by = Grep then fun x -> x else not in
         if way @@ Re.execp (Re.compile re) s then s else "\\c")
