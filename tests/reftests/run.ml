@@ -133,7 +133,7 @@ type filt_sort =
   | Grep
   | GrepV
 
-let str_replace_path ?(escape=false) whichway filters s =
+let str_replace_path ?(escape=false) _whichway filters s =
   let escape =
     if escape then Re.(replace_string (compile @@ char '\\') ~by:"\\\\")
     else fun s -> s
@@ -146,7 +146,7 @@ let str_replace_path ?(escape=false) whichway filters s =
 *)
       match by with
       | Sed by ->
-        Re.replace (Re.compile re) s ~f:(fun g -> escape by)
+        Re.replace (Re.compile re) s ~f:(fun _ -> escape by)
       (* ^ whichway (Re.Group.(get g (nb_groups g - 1))))) *)
       | Grep | GrepV ->
         let way = if by = Grep then fun x -> x else not in
