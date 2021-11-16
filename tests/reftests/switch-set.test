@@ -1,26 +1,47 @@
 N0REP0
 ### # Test the "go to previous switch" feature
 ### opam switch create foo --empty
+### opam option previous-switch --global
 ### opam switch create bar --empty
+### opam option previous-switch --global
+"foo"
 ### opam switch show
 bar
 ### opam switch -
+### opam option previous-switch --global
+"bar"
 ### opam switch show
 foo
 ### opam switch -
+### opam option previous-switch --global
+"foo"
 ### opam switch show
 bar
 ### opam switch bar
+### opam option previous-switch --global
+"bar"
 ### opam switch -
+### opam option previous-switch --global
+"bar"
 ### opam switch show
 bar
 ### # check that switches with name "-" do not interfere with the "go to previous switch" feature
 ### opam switch bar
+### opam option previous-switch --global
+"bar"
 ### opam switch create - --empty
+### opam option previous-switch --global
+"bar"
 ### opam switch set -
+### opam option previous-switch --global
+"-"
 ### opam switch show
 -
 ### opam switch bar
+### opam option previous-switch --global
+"-"
 ### opam switch --cli=2.1 -
+### opam option previous-switch --global
+"bar"
 ### opam switch show
 -
