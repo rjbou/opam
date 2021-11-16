@@ -38,7 +38,7 @@ users)
     [#4853 @rjbou - fix #4843]
   * Ensure setenv can use package variables defined during the build [#4841 @dra27]
   * [BUG] Fix `set-invariant: default repos were loaded instead of switch repos [#4866 @rjbou]
-  * Add support for `opam switch -` (go to previous switch) [#4910 @kit-ty-kate]
+  * Add support for `opam switch -` (go to previous switch) [#4910 @kit-ty-kate - fix 4866]
 
 ## Pin
   *
@@ -178,9 +178,12 @@ users)
 
 # API updates
 ## opam-client
+  * Add an optional argument to `OpamArg.mk_subdoc` for extra default elements: `?extra_defaults:(validity * string * string) list` [#4910 @kit-ty-kate]
+  * Add `OpamSwitchCommand.previsou_switch` [#4910 @kit-ty-kate]
 ## opam-repository
 ## opam-state
 ## opam-solver
 ## opam-format
+  * Add field `previous-switch` on `OpamFile.Config.t`, and its functions [#4910 @kit-ty-kate]
 ## opam-core
   * OpamSystem: avoid calling Unix.environment at top level [#4789 @hannesm]
