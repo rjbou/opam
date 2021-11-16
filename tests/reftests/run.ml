@@ -133,7 +133,7 @@ type filt_sort =
   | Grep
   | GrepV
 
-let str_replace_path ?(escape=false) _whichway filters s =
+let str_replace ?(escape=false) whichway filters s =
   let escape =
     if escape then Re.(replace_string (compile @@ char '\\') ~by:"\\\\")
     else fun s -> s
@@ -152,6 +152,7 @@ let str_replace_path ?(escape=false) _whichway filters s =
         let way = if by = Grep then fun x -> x else not in
         if way @@ Re.execp (Re.compile re) s then s else "\\c")
     s filters
+        |> whichway
 
 let command
     ?(allowed_codes = [0]) ?(vars=[]) ?(silent=false) ?(filter=[])
@@ -188,7 +189,7 @@ let command
   let rec filter_output ?(first=true) ic =
     match input_line ic with
     | s ->
-      let s = str_replace_path OpamSystem.back_to_forward filter s in
+      let s = str_replace OpamSystem.back_to_forward filter s in
       if s = "\\c" then filter_output ~first ic
       else
         (if not first then Buffer.add_char out_buf '\n';
@@ -442,7 +443,7 @@ let run_cmd ~opam ~dir ?(vars=[]) ?(filter=[]) ?(silent=false) cmd args =
         let expanded =
           if a <> "" && a.[0] = '\'' then a
           else
-            str_replace_path ~escape:true OpamSystem.forward_to_back
+            str_replace ~escape:true OpamSystem.forward_to_back
               var_filters a
         in
         Parse.get_str expanded)
@@ -544,7 +545,7 @@ let run_test ?(vars=[]) ~opam t =
             let str = if header then Printf.sprintf "=> %s <=\n" file else "" in
             let str = Printf.sprintf "%s%s" str content in
             let str =
-              str_replace_path OpamSystem.back_to_forward
+              str_replace OpamSystem.back_to_forward
                 (common_filters dir) str
             in
             print_string str
