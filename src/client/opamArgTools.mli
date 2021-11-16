@@ -86,7 +86,7 @@ val bad_subcommand:
 
 val mk_subdoc :
   cli:OpamCLIVersion.Sourced.t -> ?defaults:(string * string) list ->
-  ?extra:Manpage.block list ->
+  ?extra_defaults:(validity * string * string) list ->
   'a subcommands -> Manpage.block list
 
 type command = unit Term.t * Term.info
