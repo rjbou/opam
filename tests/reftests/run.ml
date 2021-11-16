@@ -147,12 +147,12 @@ let str_replace ?(escape=false) whichway filters s =
       match by with
       | Sed by ->
         Re.replace (Re.compile re) s ~f:(fun _ -> escape by)
+        |> whichway
       (* ^ whichway (Re.Group.(get g (nb_groups g - 1))))) *)
       | Grep | GrepV ->
         let way = if by = Grep then fun x -> x else not in
         if way @@ Re.execp (Re.compile re) s then s else "\\c")
     s filters
-        |> whichway
 
 let command
     ?(allowed_codes = [0]) ?(vars=[]) ?(silent=false) ?(filter=[])
