@@ -2438,7 +2438,14 @@ let switch cli =
           shell_eval_invocation shell
             (opam_env_invocation ~switch:"SWITCH" ~set_opamswitch:true ())
             |> Manpage.escape));
-  ] @ mk_subdoc ~cli ~defaults:["","list";"SWITCH","set"] commands
+  ] @
+    mk_subdoc ~cli ~defaults:["","list";"SWITCH","set"]
+      ~extra:[`I ("$(i,-)", "Switches back to the previous switch (similar to \
+                             $(b,git switch -)). This behaviour is new to opam \
+                             2.2 and above. To set the current switch to a switch \
+                             named $(i,-) use OPAMCLI=2.1 or lower, or use \
+                             $(i,opam switch set -)")
+             ] commands
     @ [
       `S Manpage.s_examples;
       `Pre "    opam switch create 4.08.0";
