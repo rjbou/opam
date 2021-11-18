@@ -53,7 +53,7 @@ MD5_0install-solver = 50daf035b04b29399a3c6e6f965ac447
 
 $(call PKG_SAME,0install-solver)
 
-URL_opam-file-format = https://github.com/Keryan-dev/opam-file-format/archive/refs/heads/semver.zip
+URL_opam-file-format = https://github.com/Keryan-dev/opam-file-format/archive/semver.tar.gz
 MD5_opam-file-format = bf530ae337f792fcb452b2f472cba459
 
 $(call PKG_SAME,opam-file-format)
