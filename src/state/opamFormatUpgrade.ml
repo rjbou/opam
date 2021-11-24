@@ -764,7 +764,7 @@ let from_1_3_dev7_to_2_0_alpha root ~on_the_fly:_ conf =
   in
   OpamFile.Repos_config.write (OpamPath.repos_config root)
     (OpamRepositoryName.Map.of_list
-       (List.map (fun (_, r, u) -> r, Some (u,None)) prio_repositories));
+       (List.map (fun (_, r, u) -> r, Some (u,true,None)) prio_repositories));
   let prio_repositories =
     List.stable_sort (fun (prio1, _, _) (prio2, _, _) -> prio2 - prio1)
       prio_repositories
@@ -1098,7 +1098,14 @@ let from_2_0_to_2_1 _ ~on_the_fly conf =
 
 let v2_2_alpha = OpamVersion.of_string "2.2~alpha"
 
-let from_2_1_to_2_2_alpha _ ~on_the_fly:_ conf = conf, None
+let from_2_1_to_2_2_alpha_repo root _conf =
+  let f = OpamPath.repos_config root in
+  OpamStd.Option.iter (OpamFile.Repos_config.write f)
+    (OpamFile.Repos_config.read_opt f)
+
+let from_2_1_to_2_2_alpha root ~on_the_fly conf =
+  if not on_the_fly then from_2_1_to_2_2_alpha_repo root conf;
+  conf, Some `Repo
 
 (* To add an upgrade layer
    * [from_x_to_y] updates only global config file. If repo or switch file need
@@ -1303,6 +1310,7 @@ let repo_switch_hard_upgrade old_root_version global_lock root config =
   let is_dev = OpamVersion.is_dev_version () in
   let upgrades =
     [
+      v2_2_alpha, from_2_1_to_2_2_alpha_repo
     ]
     |> List.filter (fun (v,_) ->
         OpamVersion.compare old_root_version v < 0)

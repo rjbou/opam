@@ -404,7 +404,7 @@ let init cli =
     let repo =
       OpamStd.Option.map (fun url ->
           let repo_url = OpamUrl.parse ?backend:repo_kind ~from_file:false url in
-          { repo_name; repo_url; repo_trust = None })
+          { repo_name; repo_url; repo_initialised = false; repo_trust = None })
         repo_url
     in
     let gt, rt, default_compiler =
@@ -2215,7 +2215,13 @@ let repository cli =
       otherwise be used to explicitly set the repository list at once."
       Arg.(int) 1
   in
-  let repository global_options command kind short scope rank params () =
+  let no_action =
+    mk_flag ~cli (cli_from cli2_2) ["n"; "no-action"]
+      "Do not automatically update when adding or changin repository url. \
+       You must update afterwards"
+  in
+  let repository global_options command kind short scope rank params
+      no_action () =
     apply_global_options cli global_options;
     let global = List.mem `Default scope in
     let command, params, rank = match command, params, rank with
@@ -2288,15 +2294,17 @@ let repository cli =
       in
       OpamRepositoryState.with_ `Lock_write gt (fun rt ->
           let rt = OpamRepositoryCommand.add rt name url trust_anchors in
-          let failed, rt =
-            OpamRepositoryCommand.update_with_auto_upgrade rt [name]
-          in
-          if failed <> [] then
-            (OpamRepositoryState.drop @@ OpamRepositoryCommand.remove rt name;
-             OpamConsole.error_and_exit `Sync_error
-               "Initial repository fetch failed"));
-      OpamGlobalState.drop @@ OpamRepositoryCommand.update_selection gt ~global
-        ~switches (update_repos name);
+          if not no_action then
+            let failed, rt =
+              OpamRepositoryCommand.update_with_auto_upgrade rt [name]
+            in
+            if failed <> [] then
+              (OpamRepositoryState.drop @@ OpamRepositoryCommand.remove rt name;
+               OpamConsole.error_and_exit `Sync_error
+                 "Initial repository fetch failed"));
+      if not no_action then
+        OpamGlobalState.drop @@ OpamRepositoryCommand.update_selection gt ~global
+          ~switches (update_repos name);
       if scope = [`Current_switch] then
         OpamConsole.note
           "Repository %s has been added to the selections of switch %s \
@@ -2380,23 +2388,24 @@ let repository cli =
            fun () -> OpamFilename.copy_dir ~src:target ~dst:dir)
       in
       let rt = OpamRepositoryCommand.set_url rt name url trust_anchors in
-      let failed, rt =
-        OpamRepositoryCommand.update_with_auto_upgrade rt [name]
-      in
-      OpamRepositoryState.drop rt;
-      if failed <> [] then
-        (let repo = OpamRepositoryState.get_repo rt0 name in
-         OpamConsole.error
-           "Fetching repository %s with %s fails, reverting to %s"
-           (OpamRepositoryName.to_string name)
-           (OpamUrl.to_string url)
-           (OpamUrl.to_string repo.repo_url);
-         let rt =
-           OpamRepositoryCommand.set_url rt0 name repo.repo_url repo.repo_trust
+      if not no_action then
+        (let failed, rt =
+           OpamRepositoryCommand.update_with_auto_upgrade rt [name]
          in
-         backup ();
          OpamRepositoryState.drop rt;
-         OpamStd.Sys.exit_because `Sync_error);
+         if failed <> [] then
+           (let repo = OpamRepositoryState.get_repo rt0 name in
+            OpamConsole.error
+              "Fetching repository %s with %s fails, reverting to %s"
+              (OpamRepositoryName.to_string name)
+              (OpamUrl.to_string url)
+              (OpamUrl.to_string repo.repo_url);
+            let rt =
+              OpamRepositoryCommand.set_url rt0 name repo.repo_url repo.repo_trust
+            in
+            backup ();
+            OpamRepositoryState.drop rt;
+            OpamStd.Sys.exit_because `Sync_error));
       `Ok ()
     | Some `set_repos, names ->
       let names = List.map OpamRepositoryName.of_string names in
@@ -2441,7 +2450,7 @@ let repository cli =
   mk_command_ret  ~cli cli_original "repository" ~doc ~man
     Term.(const repository $global_options cli $command
           $repo_kind_flag cli cli_original $print_short_flag cli cli_original
-          $scope $rank $params)
+          $scope $rank $params $no_action)
 
 
 (* SWITCH *)
