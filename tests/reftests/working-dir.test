@@ -11,9 +11,9 @@ authors: "Name <email>"
 license: "MIT"
 homepage: " "
 bug-reports: " "
-build: [ "ocaml" "ongoing.ml" ]
+build: [ "cat" "ongoing.ml" ]
 ### <ongoing/ongoing.ml>
-print_string "versionned"
+versionned
 ### git -C ./ongoing init -q
 ### git -C ./ongoing add -A
 ### git -C ./ongoing commit -qm "init"
@@ -30,7 +30,7 @@ The following actions will be performed:
 -> installed ongoing.~dev
 Done.
 ### <ongoing/newfile.ml>
-print_string "new!"
+new!
 ### <ongoing/ongoing.opam>
 opam-version: "2.0"
 synopsis: "One-line description"
@@ -42,8 +42,8 @@ authors: "Name <email>"
 license: "MIT"
 homepage: " "
 bug-reports: " "
-build: [ "ocaml" "newfile.ml" ]
-### opam reinstall ongoing -v | '.*ocaml(.exe)?"? "' -> 'ocaml "'
+build: [ "cat" "newfile.ml" ]
+### opam reinstall ongoing -v | '.*cat(.exe)?"? "' -> 'cat "'
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1:
@@ -57,14 +57,14 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/4: [ongoing.~dev: git]
 -> retrieved ongoing.~dev  (no changes)
-Processing  2/4: [ongoing: ocaml ongoing.ml]
-ocaml "ongoing.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+Processing  2/4: [ongoing: cat ongoing.ml]
+cat "ongoing.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
 - versionned
 -> compiled  ongoing.~dev
 -> removed   ongoing.~dev
 -> installed ongoing.~dev
 Done.
-### opam install ongoing --working-dir -v | '.*ocaml(.exe)?"? "' -> 'ocaml "'
+### opam install ongoing --working-dir -v | '.*cat(.exe)?"? "' -> 'cat "'
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1: [ongoing.~dev: git]
@@ -75,8 +75,8 @@ The following actions will be performed:
   - recompile ongoing ~dev*
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/3: [ongoing: ocaml newfile.ml]
-ocaml "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+Processing  1/3: [ongoing: cat newfile.ml]
+cat "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
 - new!
 -> compiled  ongoing.~dev
 -> removed   ongoing.~dev
@@ -84,7 +84,7 @@ ocaml "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
 Done.
 ### git -C ./ongoing add ongoing.opam
 ### git -C ./ongoing commit -qm "forgot a file"
-### opam reinstall ongoing -v | grep -v "^#" | '.*ocaml(.exe)?"? "' -> 'ocaml "'
+### opam reinstall ongoing -v | grep -v "^#" | '.*cat(.exe)?"? "' -> 'cat "'
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1:
@@ -98,10 +98,10 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/4: [ongoing.~dev: git]
 -> retrieved ongoing.~dev  (no changes)
-Processing  2/4: [ongoing: ocaml newfile.ml]
-ocaml "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
-- Cannot find file ./newfile.ml.
-[ERROR] The compilation of ongoing.~dev failed at "ocaml newfile.ml".
+Processing  2/4: [ongoing: cat newfile.ml]
+cat "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+- cat: newfile.ml: No such file or directory
+[ERROR] The compilation of ongoing.~dev failed at "cat newfile.ml".
 
 
 
@@ -113,7 +113,7 @@ ocaml "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
 - No changes have been performed
 '${OPAMBIN} reinstall ongoing -v' failed.
 # Return code 31 #
-### opam reinstall ongoing --working-dir -v | '.*ocaml(.exe)?"? "' -> 'ocaml "'
+### opam reinstall ongoing --working-dir -v | '.*cat(.exe)?"? "' -> 'cat "'
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1: [ongoing.~dev: git]
@@ -123,8 +123,8 @@ The following actions will be performed:
   - recompile ongoing ~dev*
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/3: [ongoing: ocaml newfile.ml]
-ocaml "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
+Processing  1/3: [ongoing: cat newfile.ml]
+cat "newfile.ml" (CWD=${BASEDIR}/OPAM/default/.opam-switch/build/ongoing.~dev)
 - new!
 -> compiled  ongoing.~dev
 -> removed   ongoing.~dev
