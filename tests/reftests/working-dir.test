@@ -15,7 +15,7 @@ build: [ "sh" "-c" "test -f ongoing.ml && cat ongoing.ml" ]
 ### <ongoing/ongoing.ml>
 versionned
 ### git -C ./ongoing init -q
-### git -C ./ongoing config core.autocrlf true
+### git -C ./ongoing config core.autocrlf false
 ### git -C ./ongoing add -A
 ### git -C ./ongoing commit -qm "init"
 ### opam switch create default --empty
