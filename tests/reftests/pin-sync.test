@@ -1,0 +1,609 @@
+N0REP0
+### :: setup ::
+### : package with archive
+### <pkg:foo.1>
+opam-version: "2.0"
+build: [ "test" "-f" "lorem" ]
+### <pkg:foo.2>
+opam-version: "2.0"
+build: [ "test" "-f" "dolor" ]
+### <mkurl.sh>
+arch=$1
+shift
+for p in $@; do
+  file="REPO/packages/${p%.*}/$p/opam"
+  echo "url {" >> $file
+  echo "src: \"$BASEDIR/$arch.tgz\"" >> $file
+  MD5=$(openssl md5 $arch.tgz | cut -d' ' -f2)
+echo $MD5
+  echo "checksum: \"md5=$MD5\"" >> $file
+  echo "}" >> $file
+done
+### <lorem>
+ipsum
+### <dolor>
+sit
+### tar czf archive1.tgz lorem
+### tar czf archive2.tgz dolor
+### sh mkurl.sh archive1 foo.1
+### sh mkurl.sh archive2 foo.2
+### : package with rsync url
+### <pkg:bar.1>
+opam-version: "2.0"
+build: [ "test" "-f" "lorem" ]
+### <pkg:bar.2>
+opam-version: "2.0"
+build: [ "test" "-f" "dolor" ]
+### <bar.1/lorem>
+ipsum
+### <bar.2/dolor>
+sit
+### <mkurl.sh>
+for p in $@; do
+  file="REPO/packages/${p%.*}/$p/opam"
+  echo "url {" >> $file
+  echo "local: \"$BASEDIR/$p\"" >> $file
+  echo "}" >> $file
+done
+### sh mkurl.sh bar.1 bar.2
+### : package with git url
+### <pkg:baz.1>
+opam-version: "2.0"
+build: [ "test" "-f" "lorem" ]
+### <pkg:baz.2>
+opam-version: "2.0"
+build: [ "test" "-f" "dolor" ]
+### <baz.1/lorem>
+ipsum
+### <baz.2/dolor>
+sit
+### <mkurl.sh>
+for p in $@; do
+  file="REPO/packages/${p%.*}/$p/opam"
+  echo "url {" >> $file
+  echo "git: \"$BASEDIR/$p\"" >> $file
+  echo "}" >> $file
+done
+### sh mkurl.sh baz.1 baz.2
+### <git-populate>
+for d in $@; do
+  git -C $d init -q
+  git -C $d add -A
+  git -C $d commit -qm "init"
+done
+### sh git-populate baz.1 baz.2
+### : local package with git url
+### <qux/opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [ "Z" "A" "R" ]
+license: "ISC"
+homepage: "x"
+bug-reports: "x"
+version: "test"
+build: [ "test" "-f" "lorem" ]
+### <qux/lorem>
+ipsum
+### sh git-populate qux
+### : local package with rsync url
+### <corge/opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [ "Z" "A" "R" ]
+license: "ISC"
+homepage: "x"
+bug-reports: "x"
+version: "test"
+build: [ "test" "-f" "lorem" ]
+### <corge/lorem>
+ipsum
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] synchronised from file://${BASEDIR}/REPO
+Now run 'opam upgrade' to apply any package updates.
+### OPAMYES=1
+### opam switch create sync --empty
+### OPAMVERBOSE=2
+### #OPAMDEBUGSECTIONS="SOLUTION ACTION PARALLEL" OPAMDEBUG=-1
+### : version pin with local
+### opam pin foo 1 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+foo is now pinned to version 1
+
+The following actions will be performed:
+  - install foo 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [foo.1: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive1.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/foo"
+Processing  1/3:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive1.tgz" "-C" "${OPAMTMP}"
+-> retrieved foo.1  (file://${BASEDIR}/archive1.tgz)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/3: [foo: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/foo.1)
+-> compiled  foo.1
+-> installed foo.1
+Done.
+### opam install foo | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+[NOTE] Package foo is already installed (current version is 1).
+### opam reinstall foo | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+The following actions will be performed:
+  - recompile foo 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4:
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/2d/2d1226cdbff68729f39bf0bd661df76c" "-C" "${OPAMTMP}"
+-> retrieved foo.1  (cached)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [foo: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/foo.1)
+-> compiled  foo.1
+-> removed   foo.1
+-> installed foo.1
+Done.
+### opam pin foo 2 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+[NOTE] Package foo used to be pinned to version 1
+foo is now pinned to version 2
+
+The following actions will be performed:
+  - upgrade foo 1 to 2*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [foo.2: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive2.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/foo"
+Processing  1/4:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive2.tgz" "-C" "${OPAMTMP}"
+-> retrieved foo.2  (file://${BASEDIR}/archive2.tgz)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [foo: test dolor]
+test "-f" "dolor" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/foo.2)
+-> compiled  foo.2
+-> removed   foo.1
+-> installed foo.2
+Done.
+### : version pin with git
+### opam pin bar 1 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+bar is now pinned to version 1
+
+The following actions will be performed:
+  - install bar 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [bar.1: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/bar.1/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/bar"
+-> retrieved bar.1  (file://${BASEDIR}/bar.1)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/3: [bar: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/bar.1)
+-> compiled  bar.1
+-> installed bar.1
+Done.
+### opam install bar | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [bar.1: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/bar.1/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/bar"
+[bar.1] synchronised (no changes)
+
+[NOTE] Package bar is already installed (current version is 1).
+### opam reinstall bar | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [bar.1: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/bar.1/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/bar"
+[bar.1] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile bar 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [bar.1: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/bar.1/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/bar"
+-> retrieved bar.1  (no changes)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [bar: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/bar.1)
+-> compiled  bar.1
+-> removed   bar.1
+-> installed bar.1
+Done.
+### opam pin bar 2 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+[NOTE] Package bar used to be pinned to version 1
+bar is now pinned to version 2
+
+The following actions will be performed:
+  - upgrade bar 1 to 2*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [bar.2: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/bar.2/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/bar"
+-> retrieved bar.2  (file://${BASEDIR}/bar.2)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [bar: test dolor]
+test "-f" "dolor" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/bar.2)
+-> compiled  bar.2
+-> removed   bar.1
+-> installed bar.2
+Done.
+### : version pin with local path
+### opam pin baz 1 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+baz is now pinned to version 1
+
+The following actions will be performed:
+  - install baz 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [baz.1: git]
++ /usr/bin/git "init" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "config" "--local" "fetch.prune" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "config" "--local" "diff.noprefix" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "config" "--local" "core.autocrlf" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "config" "--local" "core.eol" "lf" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "config" "--local" "color.ui" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "remote" "add" "origin" "file://${BASEDIR}/baz.1" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/baz.1" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/baz.1" "--update-shallow" "--depth=1" "+HEAD:refs/remotes/opam-ref" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "reset" "--hard" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "clean" "-fdx" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
+-> retrieved baz.1  (git+file://${BASEDIR}/baz.1)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/3: [baz: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/baz.1)
+-> compiled  baz.1
+-> installed baz.1
+Done.
+### opam install baz | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [baz.1: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/baz.1" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/baz.1" "--update-shallow" "--depth=1" "+HEAD:refs/remotes/opam-ref" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
+[baz.1] synchronised (no changes)
+
+[NOTE] Package baz is already installed (current version is 1).
+### opam reinstall baz | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [baz.1: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/baz.1" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/baz.1" "--update-shallow" "--depth=1" "+HEAD:refs/remotes/opam-ref" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
+[baz.1] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile baz 1*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [baz.1: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/baz.1" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/baz.1" "--update-shallow" "--depth=1" "+HEAD:refs/remotes/opam-ref" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
+-> retrieved baz.1  (no changes)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [baz: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/baz.1)
+-> compiled  baz.1
+-> removed   baz.1
+-> installed baz.1
+Done.
+### opam pin baz 2 | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+[NOTE] Package baz used to be pinned to version 1
+baz is now pinned to version 2
+
+The following actions will be performed:
+  - upgrade baz 1 to 2*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [baz.2: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/baz.2" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/baz.2" "--update-shallow" "--depth=1" "+HEAD:refs/remotes/opam-ref" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "reset" "--hard" "refs/remotes/opam-ref" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
++ /usr/bin/git "clean" "-fdx" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/baz)
+-> retrieved baz.2  (git+file://${BASEDIR}/baz.2)
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
+Processing  2/4: [baz: test dolor]
+test "-f" "dolor" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/baz.2)
+-> compiled  baz.2
+-> removed   baz.1
+-> installed baz.2
+Done.
+### : git pin
+### opam pin qux | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
++ /usr/bin/git "symbolic-ref" "--quiet" "--short" "HEAD" (CWD=${BASEDIR}/qux)
+Processing  1/1: [qux: git]
++ /usr/bin/git "init" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "config" "--local" "fetch.prune" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "config" "--local" "diff.noprefix" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "config" "--local" "core.autocrlf" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "config" "--local" "core.eol" "lf" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "config" "--local" "color.ui" "false" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "remote" "add" "origin" "file://${BASEDIR}/qux" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/qux" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/qux" "--update-shallow" "--depth=1" "+master:refs/remotes/opam-ref-master" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "reset" "--hard" "refs/remotes/opam-ref-master" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "clean" "-fdx" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
+Package qux does not exist, create as a NEW package? [Y/n] y
+qux is now pinned to git+file://${BASEDIR}/qux#master (version test)
+
+The following actions will be performed:
+  - install qux test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/3: [qux: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/qux.test)
+-> compiled  qux.test
+-> installed qux.test
+Done.
+### opam install qux | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1:
++ /usr/bin/git "symbolic-ref" "--quiet" "--short" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "ls-files" "--others" "--exclude-standard" (CWD=${BASEDIR}/qux)
+Processing  1/1: [qux.test: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/qux" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/qux" "--update-shallow" "--depth=1" "+master:refs/remotes/opam-ref-master" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref-master" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
+[qux.test] synchronised (no changes)
+
+[NOTE] Package qux is already installed (current version is test).
+### opam reinstall qux | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1:
++ /usr/bin/git "symbolic-ref" "--quiet" "--short" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "ls-files" "--others" "--exclude-standard" (CWD=${BASEDIR}/qux)
+Processing  1/1: [qux.test: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/qux" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/qux" "--update-shallow" "--depth=1" "+master:refs/remotes/opam-ref-master" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref-master" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
+[qux.test] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile qux test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/4: [qux: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/qux.test)
+-> compiled  qux.test
+-> removed   qux.test
+-> installed qux.test
+Done.
+### <qux/opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [ "Z" "A" "R" ]
+license: "ISC"
+homepage: "x"
+bug-reports: "x"
+version: "test"
+build: [ "test" "-f" "dolor" ]
+### <qux/dolor>
+ipsum
+### git -C qux add dolor
+### git -C qux commit -qam "update"
+### opam install qux | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1:
++ /usr/bin/git "symbolic-ref" "--quiet" "--short" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "HEAD" (CWD=${BASEDIR}/qux)
++ /usr/bin/git "ls-files" "--others" "--exclude-standard" (CWD=${BASEDIR}/qux)
+Processing  1/1: [qux.test: git]
++ /usr/bin/git "remote" "set-url" "origin" "file://${BASEDIR}/qux" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "fetch" "-q" "file://${BASEDIR}/qux" "--update-shallow" "--depth=1" "+master:refs/remotes/opam-ref-master" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "diff" "--no-ext-diff" "--quiet" "refs/remotes/opam-ref-master" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "reset" "--hard" "refs/remotes/opam-ref-master" "--" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
++ /usr/bin/git "clean" "-fdx" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/sources/qux)
+[qux.test] synchronised (git+file://${BASEDIR}/qux#master)
+[qux] Installing new package description from upstream git+file://${BASEDIR}/qux#master
+
+The following actions will be performed:
+  - recompile qux test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/4: [qux: test dolor]
+test "-f" "dolor" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/qux.test)
+-> compiled  qux.test
+-> removed   qux.test
+-> installed qux.test
+Done.
+### : path pin
+### opam pin corge | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+Processing  1/1: [corge: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/corge/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/corge"
+Package corge does not exist, create as a NEW package? [Y/n] y
+corge is now pinned to file://${BASEDIR}/corge (version test)
+
+The following actions will be performed:
+  - install corge test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/3: [corge: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/corge.test)
+-> compiled  corge.test
+-> installed corge.test
+Done.
+### opam install corge | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [corge.test: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/corge/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/corge"
+[corge.test] synchronised (no changes)
+
+[NOTE] Package corge is already installed (current version is test).
+### opam reinstall corge | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [corge.test: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/corge/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/corge"
+[corge.test] synchronised (no changes)
+
+The following actions will be performed:
+  - recompile corge test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/4: [corge: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/corge.test)
+-> compiled  corge.test
+-> removed   corge.test
+-> installed corge.test
+Done.
+### <corge/opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [ "Z" "A" "R" ]
+license: "ISC"
+homepage: "x"
+bug-reports: "x"
+version: "test"
+build: [ "test" "-f" "dolor" ]
+### <corge/dolor>
+ipsum
+### opam install corge | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [corge.test: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/corge/" "${BASEDIR}/OPAM/sync/.opam-switch/sources/corge"
+[corge.test] synchronised (file://${BASEDIR}/corge)
+[corge] Installing new package description from upstream file://${BASEDIR}/corge
+
+The following actions will be performed:
+  - recompile corge test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/4: [corge: test dolor]
+test "-f" "dolor" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/corge.test)
+-> compiled  corge.test
+-> removed   corge.test
+-> installed corge.test
+Done.
+### : pin with url
+### <opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [ "Z" "A" "R" ]
+license: "ISC"
+homepage: "x"
+bug-reports: "x"
+version: "test"
+build: [ "test" "-f" "lorem" ]
+### tar czf archive3.tgz lorem opam
+### opam pin grault ./archive3.tgz | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+Package grault does not exist, create as a NEW package? [Y/n] y
+[grault.~dev: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/grault"
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[grault.~dev] synchronised (file://${BASEDIR}/archive3.tgz)
+grault is now pinned to file://${BASEDIR}/archive3.tgz (version test)
+
+The following actions will be performed:
+  - install grault test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/3: [grault: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/grault.test)
+-> compiled  grault.test
+-> installed grault.test
+Done.
+### opam install grault | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [grault.test: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/grault"
+Processing  1/1:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[grault.test] synchronised (file://${BASEDIR}/archive3.tgz)
+
+[NOTE] Package grault is already installed (current version is test).
+### opam reinstall grault | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [grault.test: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/grault"
+Processing  1/1:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[grault.test] synchronised (file://${BASEDIR}/archive3.tgz)
+
+The following actions will be performed:
+  - recompile grault test*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/4: [grault: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/grault.test)
+-> compiled  grault.test
+-> removed   grault.test
+-> installed grault.test
+Done.
+### : pin with version and url
+### opam pin garply.xtest ./archive3.tgz | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+Package garply does not exist, create as a NEW package? [Y/n] y
+[garply.xtest: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[garply.xtest] synchronised (file://${BASEDIR}/archive3.tgz)
+garply is now pinned to file://${BASEDIR}/archive3.tgz (version xtest)
+
+The following actions will be performed:
+  - install garply xtest*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/3: [garply.xtest: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
+Processing  1/3:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+-> retrieved garply.xtest  (file://${BASEDIR}/archive3.tgz)
+Processing  2/3: [garply: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/garply.xtest)
+-> compiled  garply.xtest
+-> installed garply.xtest
+Done.
+### opam install garply | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [garply.xtest: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
+Processing  1/1:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[garply.xtest] synchronised (file://${BASEDIR}/archive3.tgz)
+
+[NOTE] Package garply is already installed (current version is xtest).
+### opam reinstall garply | grep -v '^- ' | '.*test(.exe)?"? "' -> 'test "'
+
+<><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [garply.xtest: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
+Processing  1/1:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+[garply.xtest] synchronised (file://${BASEDIR}/archive3.tgz)
+
+The following actions will be performed:
+  - recompile garply xtest*
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/4: [garply.xtest: rsync]
++ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
+Processing  1/4:
++ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
+-> retrieved garply.xtest  (file://${BASEDIR}/archive3.tgz)
+Processing  2/4: [garply: test lorem]
+test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/garply.xtest)
+-> compiled  garply.xtest
+-> removed   garply.xtest
+-> installed garply.xtest
+Done.
