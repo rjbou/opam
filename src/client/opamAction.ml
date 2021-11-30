@@ -243,13 +243,19 @@ let download_package st nv =
   then Done None
   else
   let dir = OpamSwitchState.source_dir st nv in
-  if OpamPackage.Set.mem nv st.pinned &&
-     OpamFilename.exists_dir dir &&
+  if
+    (not @@ OpamSwitchState.is_version_pinned st (OpamPackage.name nv))  &&
+    OpamPackage.Set.mem nv st.pinned &&
+    OpamFilename.exists_dir dir
+(*
+     &&
+     (OpamSwitchState.is_version_pinned st (OpamPackage.name nv) ||
      OpamStd.Option.Op.(
        OpamPinned.find_opam_file_in_source nv.name dir >>|
        OpamFile.OPAM.safe_read >>=
        OpamFile.OPAM.version_opt)
-     = Some nv.version
+     = Some nv.version)
+*)
   then Done None
   else
   let print_action msg =
