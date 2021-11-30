@@ -52,6 +52,8 @@ val resolve_switch_raw:
   'a global_state -> switch -> OpamFile.Switch_config.t -> full_variable ->
   variable_contents option
 
+(* Returns true if the package opam file contains an url field with http
+   backend and package no t registered pinned, or no checksum associated. *)
 val is_dev_package: 'a switch_state -> OpamFile.OPAM.t -> bool
 
 (** The defaults are [true] for [build], false for [dev] and [post], and
