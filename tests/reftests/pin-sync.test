@@ -15,7 +15,6 @@ for p in $@; do
   echo "url {" >> $file
   echo "src: \"$BASEDIR/$arch.tgz\"" >> $file
   MD5=$(openssl md5 $arch.tgz | cut -d' ' -f2)
-echo $MD5
   echo "checksum: \"md5=$MD5\"" >> $file
   echo "}" >> $file
 done
@@ -137,7 +136,7 @@ The following actions will be performed:
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/4:
-+ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/2d/2d1226cdbff68729f39bf0bd661df76c" "-C" "${OPAMTMP}"
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/49/49349299cb3658d80aa344822da83945" "-C" "${OPAMTMP}"
 -> retrieved foo.1  (cached)
 + /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
 Processing  2/4: [foo: test lorem]
@@ -563,11 +562,6 @@ The following actions will be performed:
   - install garply xtest*
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/3: [garply.xtest: rsync]
-+ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
-Processing  1/3:
-+ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
--> retrieved garply.xtest  (file://${BASEDIR}/archive3.tgz)
 Processing  2/3: [garply: test lorem]
 test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/garply.xtest)
 -> compiled  garply.xtest
@@ -596,11 +590,6 @@ The following actions will be performed:
   - recompile garply xtest*
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/4: [garply.xtest: rsync]
-+ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive3.tgz" "${BASEDIR}/OPAM/sync/.opam-switch/sources/garply"
-Processing  1/4:
-+ /usr/bin/tar "xfz" "${OPAMTMP}/archive3.tgz" "-C" "${OPAMTMP}"
--> retrieved garply.xtest  (file://${BASEDIR}/archive3.tgz)
 Processing  2/4: [garply: test lorem]
 test "-f" "lorem" (CWD=${BASEDIR}/OPAM/sync/.opam-switch/build/garply.xtest)
 -> compiled  garply.xtest
