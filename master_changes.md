@@ -58,6 +58,7 @@ users)
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
   * ◈ New option `opam pin --current` to fix a package in its current state (avoiding pending reinstallations or removals from the repository) [#4973 @AltGr - fix #4970]
   * [BUG] Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#5079 @rjbou - fix #4313]
+  * [BUG] Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#5080 @rjbou - fix #4936]
 
 ## List
   * Some optimisations to 'opam list --installable' queries combined with other filters [#4882 @altgr - fix #4311]
@@ -107,6 +108,10 @@ users)
 
 ## Update
   *
+  * Handle lock files when upgrading pinned packages [#5080 @rjbou]
+
+## Update
+  * Handle lock files when environment variable is given [#5080 @rjbou]
 
 ## Opamfile
   * Fix substring errors in preserved_format [#4941 @rjbou - fix #4936]
@@ -313,6 +318,8 @@ users)
   * Add `OpamSwitchCommand.previous_switch` [#4910 @kit-ty-kate]
   * `OpamClient`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
   * `OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `name_and_dir_of_opam_file`, `opams_of_dir`, `opams_of_dir_w_target`, `resolve_locals`, and `autopin` [#5079 @rjbou]
+  * `OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `upgrade` and `upgrade_t` [#5080 @rjbou]
+  * `OpamClient.compute_upgrade_t`: checks for lock files upgrade, in case overlay file (from update) wasn't updated with lock file [#5080 @rjbou]
 
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
@@ -323,6 +330,8 @@ users)
   * `OpamSwitchState.universe`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
   * `OpamdPinned`: add `?locked` (and handle lock file then) argument to `orig_opam_file`, `files_in_source`, and `name_of_opam_filename` [#5079 @rjbou]
 
+  * `OpamPinned`: add `save_overlay` [#5080 @rjbou]
+  * `OpamPinned`: add `find_lock_file_in_source`, mirror of `find_opam_file_in_source` [#5080 @rjbou]
 ## opam-solver
   * `OpamCudf`: Change type of `conflict_case.Conflict_cycle` (`string list list` to `Cudf.package action list list`) and `cycle_conflict`, `string_of_explanations`, `conflict_explanations_raw` types accordingly [#4039 @gasche]
   * `OpamCudf`: add `conflict_cycles` [#4039 @gasche]
