@@ -43,6 +43,9 @@ users)
 ## Pin
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
   * ◈ New option `opam pin --current` to fix a package in its current state (avoiding pending reinstallations or removals from the repository) [#4973 @AltGr - fix #4970]
+  * [BUG] Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#4963 @rjbou - fix #4936]
+  * [BUG] Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#4963 @rjbou - fix #4313]
+  * Scan lock files too [#4963 @rjbou]
 
 ## List
   * Some optimisations to 'opam list --installable' queries combined with other filters [#4882 @altgr - fix #4311]
@@ -73,8 +76,14 @@ users)
 ## Lock
   *
 
+## Upgrade
+  * Handle lock files when upgrading pinned packages [#4963 @rjbou]
+
+## Update
+  * Handle lock files when environment variable is given [#4963 @rjbou]
+
 ## Opamfile
-  *
+  * Fix substring errors in preserved_format [#4941 @rjbou - fix #4936]
 
 ## External dependencies
   * Set `DEBIAN_FRONTEND=noninteractive` for unsafe-yes confirmation level [#4735 @dra27 - partially fix #4731] [2.1.0~rc2 #4739]
@@ -186,6 +195,7 @@ users)
   * Add & update env tests [#4861 #4841 @rjbou @dra27]
   * Port opam-rt tests: orphans, dep-cycles, reinstall, and big-upgrade [#4979 @AltGr]
   * Add & update env tests [#4861 #4841 #4974 @rjbou @dra27 @AltGr]
+  * Add lock test [#4963 @rjbou]
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -235,8 +245,13 @@ users)
 ## opam-client
   * `OpamStd.ABSTRACT`: add `compare` and `equal`, that added those functions to `OpamCLIVersion` [#4918 @rjbou]
   * `OpamConfigCommand`: add a labelled argument `no_switch` to `exec` [#4957 @kit-ty-kate]
+  * `OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `name_and_dir_of_opam_file`, `opams_of_dir`, `opams_of_dir_w_target`, and `autopin` [#4963 @rjbou]
+  * `OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `upgrade` and `upgrade_t` [#4963 @rjbou]
 ## opam-repository
 ## opam-state
+  * `OpamdPinned`: add `?locked` (and handle lock file then) argument to `orig_opam_file`, `files_in_source`, and name_of_opam_filename` [#4963 @rjbou]
+  * `OpamPinned`: add `save_overlay` [#4963 @rjbou]
+  * `OpamPinned`: add `find_lock_file_in_source`, mirror of `find_opam_file_in_source` [#4963 @rjbou]
 ## opam-solver
   * `OpamCudf`: Change type of `conflict_case.Conflict_cycle` (`string list list` to `Cudf.package action list list`) and `cycle_conflict`, `string_of_explanations`, `conflict_explanations_raw` types accordingly [#4039 @gasche]
   * `OpamCudf`: add `conflict_cycles` [#4039 @gasche]
