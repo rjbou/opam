@@ -43,6 +43,8 @@ users)
 ## Pin
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
   * ◈ New option `opam pin --current` to fix a package in its current state (avoiding pending reinstallations or removals from the repository) [#4973 @AltGr - fix #4970]
+  * Fix opam file overlay writing when a locked file is found: it is written with preserved format, and it was the opam file that was taken, not the locked one [#4963 @rjbou - fix #4936]
+  * Fix some pinning process with lock file (e.g. `opam install . --locked` after normal pin) [#4963 @rjbou - fix #4313]
 
 ## List
   * Some optimisations to 'opam list --installable' queries combined with other filters [#4882 @altgr - fix #4311]
@@ -74,7 +76,7 @@ users)
   *
 
 ## Opamfile
-  *
+  * Fix substring errors in preserved_format [#4941 @rjbou - fix #4936]
 
 ## External dependencies
   * Set `DEBIAN_FRONTEND=noninteractive` for unsafe-yes confirmation level [#4735 @dra27 - partially fix #4731] [2.1.0~rc2 #4739]
@@ -234,8 +236,10 @@ users)
 ## opam-client
   * `OpamStd.ABSTRACT`: add `compare` and `equal`, that added those functions to `OpamCLIVersion` [#4918 @rjbou]
   * `OpamConfigCommand`: add a labelled argument `no_switch` to `exec` [#4957 @kit-ty-kate]
+  * `OpamAuxCommand`: add `?locked` (and handle locke file then) argument to `name_and_dir_of_opam_file`, `opams_of_dir`, `opams_of_dir_w_target`, and `autopin` [#4963 @rjbou]
 ## opam-repository
 ## opam-state
+  * `OpamdPinned`: add `?locked` (and handle locke file then) argument to `orig_opam_file`, `files_in_source`, and name_of_opam_filename` [#4963 @rjbou]
 ## opam-solver
 ## opam-format
   * `OpamStd.ABSTRACT`: add `compare` and `equal`, that added those functions to `OpamSysPkg` and `OpamVariable` [#4918 @rjbou]
