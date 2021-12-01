@@ -587,7 +587,7 @@ and source_pin
     if need_edit then
       (if not (OpamFile.exists temp_file) then
          OpamFile.OPAM.write_with_preserved_format
-           ?format_from:(OpamPinned.orig_opam_file st name opam_base)
+           ?format_from:(OpamPinned.orig_opam_file st name ?locked opam_base)
            temp_file opam_base;
        edit_raw name temp_file >>|
        (* Preserve metadata_dir so that copy_files below works *)
@@ -623,7 +623,7 @@ and source_pin
     let opam = copy_files st opam in
 
     OpamFile.OPAM.write_with_preserved_format
-      ?format_from:(OpamPinned.orig_opam_file st name opam)
+      ?format_from:(OpamPinned.orig_opam_file st name ?locked opam)
       (OpamPath.Switch.Overlay.opam st.switch_global.root st.switch nv.name)
       opam;
 

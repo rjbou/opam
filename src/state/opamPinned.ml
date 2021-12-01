@@ -32,12 +32,12 @@ let possible_definition_filenames dir name = [
   dir // "opam"
 ]
 
+let lock_filename file =
+  OpamStd.Option.map (OpamFilename.add_extension file)
+    OpamStateConfig.(!r.locked)
+
 let check_locked default =
-  OpamConsole.error "check_locked for %S" (OpamFilename.to_string default);
-  match
-    OpamStd.Option.map (OpamFilename.add_extension default)
-      OpamStateConfig.(!r.locked)
-  with
+  match lock_filename default with
   | None -> default
   | Some locked ->
     if not (OpamFilename.exists locked) then default else
@@ -230,13 +230,19 @@ let files_in_source ?(recurse=false) ?subpath d =
            (OpamFilename.to_string f);
          None)
 
-let orig_opam_file st name opam =
+let orig_opam_file st name ?(locked=false) opam =
   let open OpamStd.Option.Op in
   OpamFile.OPAM.get_metadata_dir
     ~repos_roots:(OpamRepositoryState.get_root st.switch_repos)
     opam >>= fun dir ->
-  OpamStd.List.find_opt OpamFilename.exists [
+  (* why not possible_definition_filenames ? *)
+  let opam_files = [
     dir // (OpamPackage.Name.to_string name ^ ".opam");
     dir // "opam"
-  ] >>|
-  OpamFile.make
+  ] in
+  let locked_files =
+    if locked then OpamStd.List.filter_map lock_filename opam_files else []
+  in
+  OpamStd.List.find_opt OpamFilename.exists locked_files
+  ++ OpamStd.List.find_opt OpamFilename.exists opam_files
+  >>| OpamFile.make
