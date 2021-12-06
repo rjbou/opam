@@ -146,6 +146,7 @@ let str_replace_path ?(escape=false) whichway filters s =
       match by with
       | Sed by ->
         (* workaround to have several replacement, and handle paths *)
+        let r =
         let rec loop prev =
           let replaced =
             Re.replace (Re.compile re_path) prev
@@ -155,6 +156,9 @@ let str_replace_path ?(escape=false) whichway filters s =
           if prev = replaced then  prev else loop replaced
         in
         loop s
+        in
+        if r <> s then Printf.printf "-->%s\n++>%s\n%!" s r;
+        r
       | Grep | GrepV ->
         let way = if by = Grep then fun x -> x else not in
         if way @@ Re.execp (Re.compile re) s then s else "\\c")
@@ -610,7 +614,9 @@ let run_test ?(vars=[]) ~opam t =
           in
           Printf.sprintf "\n  checksum:\"md5=%s\"" md5
           in
-          let url = str_replace_path ~escape:true OpamSystem.back_to_forward [] (dir^"/"^url) in
+          let url = str_replace_path ~escape:true OpamSystem.back_to_forward (
+    filters_of_var ["BASEDIR", dir]@
+          common_filters dir) (url) in
           let section =
             Printf.sprintf {|
 url {

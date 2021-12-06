@@ -643,6 +643,7 @@ let parallel_apply t
        | Some (_short_error, long_error) ->
          Done (`Exception (Fetch_fail long_error)))
     | `Fetch nv ->
+  OpamConsole.error "installing:\n%s" (OpamFile.OPAM.write_to_string (OpamSwitchState.opam t nv ));
       log "Fetching sources for %s" (OpamPackage.to_string nv);
       (OpamAction.download_package t nv @@+ function
         | None ->

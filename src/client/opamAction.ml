@@ -942,6 +942,7 @@ let build_package t ?(test=false) ?(doc=false) build_dir nv =
    Does not register the installation in the metadata! *)
 let install_package t ?(test=false) ?(doc=false) ?build_dir nv =
   let opam = OpamSwitchState.opam t nv in
+  OpamConsole.error "installing:\n%s" (OpamFile.OPAM.write_to_string opam);
   let commands =
     OpamFile.OPAM.install opam |>
     OpamFilter.commands
