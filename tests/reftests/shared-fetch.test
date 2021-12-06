@@ -26,7 +26,7 @@ shift
 for p in $@; do
   file="REPO/packages/${p%.*}/$p/opam"
   echo "url {" >> $file
-  echo "src: \"$BASEDIR/$arch.tgz\"" >> $file
+  echo "src: \"$arch.tgz\"" >> $file
   MD5=$(openssl md5 $arch.tgz | cut -d' ' -f2)
   echo "checksum: \"md5=$MD5\"" >> $file
   echo "}" >> $file
@@ -89,7 +89,7 @@ shift
 for p in $@; do
   file="REPO/packages/${p%.*}/$p/opam"
   echo "extra-source \"$src\" {" >> $file
-  echo "src: \"${BASEDIR}/extra/$src\"" >> $file
+  echo "src: \"extra/$src\"" >> $file
   MD5=$(openssl md5 extra/$src | cut -d' ' -f2)
   echo "checksum: \"md5=$MD5\"" >> $file
   echo "}" >> $file
