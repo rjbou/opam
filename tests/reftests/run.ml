@@ -133,11 +133,10 @@ type filt_sort =
   | Grep
   | GrepV
 
-let escape_backslash = Re.(replace_string (compile @@ char '\\') ~by:"\\\\")
-
 let str_replace_path ?(escape=false) whichway filters s =
   let escape =
-    if escape then escape_backslash else fun s -> s
+    if escape then Re.(replace_string (compile @@ char '\\') ~by:"\\\\")
+    else fun s -> s
   in
   List.fold_left (fun s (re, by) ->
       let re_path = Re.(
@@ -272,10 +271,6 @@ type command =
   | File_contents of string
   | Cat of { files: string list;
              filter: (Re.t * filt_sort) list; }
-  | Add_url of { file: string;
-                 kind: string;
-                 checksum: bool;
-                 url: string; }
   | Run of { env: (string * string) list;
              cmd: string;
              args: string list; (* still escaped *)
@@ -413,18 +408,6 @@ module Parse = struct
     match cmd with
     | Some "opam-cat" ->
       Cat { files = args; filter = rewr; }
-    | Some "fill-url" ->
-      (match args with
-       | file :: url :: kind :: checksum ->
-         let kinds = [ "local"; "https"; "archive"; "src"; "git"; ] in
-         if List.for_all ((<>) kind) kinds then
-           raise (Invalid_argument
-                    (Printf.sprintf "fill-url: unknown kind %s" kind));
-         let checksum = checksum = ["true"] || checksum = ["checksum"] in
-         Add_url { file; url; kind; checksum; }
-       | _ ->
-         raise (Invalid_argument
-                  "fill-url: 'fill-url opam-file archive-url kind checksum?"))
     | Some cmd ->
       Run {
         env = varbinds;
@@ -597,28 +580,6 @@ let run_test ?(vars=[]) ~opam t =
            | file::[] -> print_opamfile false file
            | _::_  -> List.iter (print_opamfile true) files
            | [] -> ());
-          vars
-        | Add_url { file; url; kind; checksum; } ->
-          if not (Sys.file_exists file) then vars else
-          let oc =  open_out_gen [Open_wronly; Open_append; ] 0o666 file in
-          let checksum =
-          if not checksum then "" else
-          let md5 =
-            match run_cmd ~opam ~dir ~silent:true "openssl" ["md5"; url] |> fst |> String.split_on_char ' ' with
-            | _::hash::_ -> hash
-            | _ -> assert false
-          in
-          Printf.sprintf "\n  checksum:\"md5=%s\"" md5
-          in
-          let url = str_replace_path ~escape:true OpamSystem.back_to_forward [] (dir^"/"^url) in
-          let section =
-            Printf.sprintf {|
-url {
-  %s: "%s"%s
-}|} kind url checksum
-          in
-          output_string oc section;
-          close_out oc;
           vars
         | Run {env; cmd; args; filter; output; unordered} ->
           let silent = output <> None || unordered in

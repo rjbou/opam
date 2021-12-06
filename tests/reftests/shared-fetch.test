@@ -31,14 +31,11 @@ for p in $@; do
   echo "checksum: \"md5=$MD5\"" >> $file
   echo "}" >> $file
 done
-### fill-url REPO/packages/extra/extra.3/opam shared.tgz src checksum
-### fill-url REPO/packages/no-extra/no-extra.3/opam shared.tgz src checksum
-### fill-url REPO/packages/non-shared/non-shared.4/opam non-shared.tgz src checksum
+### sh mkurl.sh shared no-extra.3 extra.3
+### sh mkurl.sh non-shared non-shared.4
 ### OPAMJOBS=1 OPAMDOWNLOADJOBS=1
 ### find REPO
 ### cat REPO/packages/extra/extra.3/opam
-### cat REPO/packages/no-extra/no-extra.3/opam
-### cat REPO/packages/non-shared/non-shared.4/opam
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
@@ -84,9 +81,8 @@ print_endline "I am an extra sourced code!"
 ### <pkg:non-shared.4>
 opam-version: "2.0"
 build: [ "ocaml" "non-shared.ml" ]
-### fill-url REPO/packages/extra/extra.3/opam shared.tgz src checksum
-### fill-url REPO/packages/no-extra/no-extra.3/opam shared.tgz src checksum
-### fill-url REPO/packages/non-shared/non-shared.4/opam non-shared.tgz src checksum
+### sh mkurl.sh shared no-extra.3 extra.3
+### sh mkurl.sh non-shared non-shared.4
 ### <mkextrasource.sh>
 src=$1
 shift
