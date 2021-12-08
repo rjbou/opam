@@ -1,0 +1,73 @@
+N0REP0
+### <pkg:foo.1>
+opam-version: "2.0"
+### <pkg:bar.1>
+opam-version: "2.0"
+### <pkg:baz.1>
+opam-version: "2.0"
+### <pkg:top.1>
+opam-version: "2.0"
+depends: [
+  "foo"
+  ("bar" | "baz")
+]
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
+### opam switch create inst --empty
+### : test check installed :
+### opam install --check top
+Missing dependencies:
+bar baz foo
+# Return code 1 #
+### opam install foo
+The following actions will be performed:
+=== install 1 package
+  - install foo 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed foo.1
+Done.
+### opam install --check top
+Missing dependencies:
+bar baz
+# Return code 1 #
+### opam install bar
+The following actions will be performed:
+=== install 1 package
+  - install bar 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed bar.1
+Done.
+### opam install --check top
+All dependencies installed
+### opam remove bar
+The following actions will be performed:
+=== remove 1 package
+  - remove bar 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   bar.1
+Done.
+### opam install baz
+The following actions will be performed:
+=== install 1 package
+  - install baz 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed baz.1
+Done.
+### opam install --check top
+All dependencies installed
+### opam install bar
+The following actions will be performed:
+=== install 1 package
+  - install bar 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed bar.1
+Done.
+### opam install --check top
+All dependencies installed

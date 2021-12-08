@@ -1008,6 +1008,27 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:install-pgocaml.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-install)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (action
+  (diff install.test install.out)))
+
+(alias
+ (name reftest)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (deps (alias reftest-install)))
+
+(rule
+ (targets install.out)
+ (deps root-N0REP0)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:install.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-json.unix)
  (enabled_if (and (= %{os_type} "Unix") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action
