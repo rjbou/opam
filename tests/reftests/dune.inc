@@ -187,6 +187,23 @@
    (run ./run.exe %{bin:opam} %{dep:install-pgocaml.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-install)
+ (action
+  (diff install.test install.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-install)))
+
+(rule
+ (targets install.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:install.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-legacy-git)
  (action
   (diff legacy-git.test legacy-git.out)))
