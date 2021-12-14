@@ -38,15 +38,14 @@ val find_opam_file_in_source:
     [pkgname.opam/opam], etc. This is affected by
     [OpamStateConfig.(!r.locked)] *)
 val files_in_source:
-  ?recurse:bool ->
-  ?subpath:string ->
+  ?recurse:bool -> ?subpath:string -> ?locked:bool ->
   dirname -> (name option * OpamFile.OPAM.t OpamFile.t * string option) list
 
 (** From an opam file location, sitting below the given project directory, find
     the corresponding package name if specified ([<name>.opam] or
     [<name>.opam/opam]). This function doesn't check the project directory name
     itself, or the package name that might be specified within the file. *)
-val name_of_opam_filename: dirname -> filename -> name option
+val name_of_opam_filename: ?locked:bool -> dirname -> filename -> name option
 
 (** Finds back the location of the opam file this package definition was loaded
     from *)

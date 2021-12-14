@@ -31,12 +31,12 @@ val url_with_local_branch: url -> url
 
 (** From an in-source opam file, return the corresponding package name if it can
     be found, and the corresponding source directory *)
-val name_and_dir_of_opam_file: filename -> name option * dirname
+val name_and_dir_of_opam_file: ?locked:bool -> filename -> name option * dirname
 
 (** From a directory, retrieve its opam files and returns packages name, opam
     file and subpath option *)
 val opams_of_dir:
-  ?recurse:bool -> ?subpath:string ->
+  ?recurse:bool -> ?subpath:string -> ?locked:bool ->
   OpamFilename.Dir.t -> (name * OpamFile.OPAM.t OpamFile.t * string option) list
 
 (** Like [opam_of_dirs], but changes the pinning_url if needed. If given [url]
@@ -45,7 +45,7 @@ val opams_of_dir:
     package information (name, opam file, new_url, subpath) are added to the
     returned list, otherwise it is discarded. *)
 val opams_of_dir_w_target:
-  ?recurse:bool -> ?subpath:string ->
+  ?recurse:bool -> ?subpath:string -> ?locked:bool ->
   ?same_kind:(OpamUrl.t -> bool) -> OpamUrl.t -> OpamFilename.Dir.t ->
   (name * OpamFile.OPAM.t OpamFile.t * OpamUrl.t * string option) list
 
@@ -55,7 +55,7 @@ val opams_of_dir_w_target:
     the same package name appears multiple times.
 *)
 val resolve_locals:
-  ?quiet:bool -> ?recurse:bool -> ?subpath:string ->
+  ?quiet:bool -> ?recurse:bool -> ?subpath:string -> ?locked:bool ->
   [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
   (name * OpamUrl.t * string option * OpamFile.OPAM.t OpamFile.t) list * atom list
 
@@ -81,11 +81,8 @@ val resolve_locals_pinned:
     even if [simulate] is [true].
 *)
 val autopin:
-  rw switch_state ->
-  ?simulate:bool ->
-  ?quiet:bool ->
-  ?recurse:bool ->
-  ?subpath:string ->
+  rw switch_state -> ?simulate:bool -> ?quiet:bool -> ?recurse:bool ->
+  ?subpath:string -> ?locked:bool ->
   [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
   rw switch_state * atom list
 
@@ -96,11 +93,8 @@ val autopin:
     that option, the state can safely be worked with and will just contain the
     proper package definitions *)
 val simulate_autopin:
-  'a switch_state ->
-  ?quiet:bool ->
-  ?for_view:bool ->
-  ?recurse:bool ->
-  ?subpath:string ->
+  'a switch_state -> ?quiet:bool -> ?for_view:bool -> ?recurse:bool ->
+  ?subpath:string -> ?locked:bool ->
   [ `Atom of atom | `Filename of filename | `Dirname of dirname ] list ->
   'a switch_state * atom list
 
