@@ -159,16 +159,16 @@ conflicts:
 Ok, tolock is no longer pinned to file://${BASEDIR}/tolock (version 1)
 ### opam install ./tolock --show
 The following actions would be performed:
-  - install bar    3   [required by tolock]
-  - install foo    2   [required by tolock]
-  - install tolock dev
+  - install bar    3            [required by tolock]
+  - install foo    2            [required by tolock]
+  - install tolock dev (pinned)
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install foo    1 [required by tolock]
-  - install bar    1 [required by tolock]
-  - install baz    1 [required by tolock]
-  - install tolock 1
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
 ===== 4 to install =====
 ### : git pin with lock file :
 ### git -C tolock init -q
@@ -187,16 +187,16 @@ conflicts:
 Ok, tolock is no longer pinned to git+file://${BASEDIR}/tolock#master (version 1)
 ### opam install ./tolock --show
 The following actions would be performed:
-  - install bar    3   [required by tolock]
-  - install foo    2   [required by tolock]
-  - install tolock dev
+  - install bar    3            [required by tolock]
+  - install foo    2            [required by tolock]
+  - install tolock dev (pinned)
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install foo    1 [required by tolock]
-  - install bar    1 [required by tolock]
-  - install baz    1 [required by tolock]
-  - install tolock 1
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
 ===== 4 to install =====
 ### opam pin ./tolock -n
 Package tolock does not exist, create as a NEW package? [Y/n] y
@@ -209,24 +209,28 @@ The following actions would be performed:
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 ### opam install ./tolock --locked
+tolock is now pinned to git+file://${BASEDIR}/tolock#master (version 1)
 [NOTE] Ignoring uncommitted changes in ${BASEDIR}/tolock (`--working-dir' not active).
-[tolock.dev] synchronised (no changes)
+[tolock.1] synchronised (no changes)
 The following actions will be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed bar.3
--> installed foo.2
--> retrieved tolock.dev  (no changes)
--> installed tolock.dev
+-> installed bar.1
+-> installed baz.1
+-> installed foo.1
+-> retrieved tolock.1  (no changes)
+-> installed tolock.1
 Done.
 ### : git pin woth opam file committed :
 ### git -C tolock add tolock.opam
@@ -243,16 +247,16 @@ conflicts:
 Ok, tolock is no longer pinned to git+file://${BASEDIR}/tolock#master (version 1)
 ### opam install ./tolock --show
 The following actions would be performed:
-  - install bar    3   [required by tolock]
-  - install foo    2   [required by tolock]
-  - install tolock dev
+  - install bar    3            [required by tolock]
+  - install foo    2            [required by tolock]
+  - install tolock dev (pinned)
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install foo    1 [required by tolock]
-  - install bar    1 [required by tolock]
-  - install baz    1 [required by tolock]
-  - install tolock 1
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
 ===== 4 to install =====
 ### opam pin ./tolock -n
 Package tolock does not exist, create as a NEW package? [Y/n] y
@@ -265,24 +269,28 @@ The following actions would be performed:
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 ### opam install ./tolock --locked
+tolock is now pinned to git+file://${BASEDIR}/tolock#master (version 1)
 [NOTE] Ignoring uncommitted changes in ${BASEDIR}/tolock (`--working-dir' not active).
-[tolock.dev] synchronised (no changes)
+[tolock.1] synchronised (no changes)
 The following actions will be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed bar.3
--> installed foo.2
--> retrieved tolock.dev  (no changes)
--> installed tolock.dev
+-> installed bar.1
+-> installed baz.1
+-> installed foo.1
+-> retrieved tolock.1  (no changes)
+-> installed tolock.1
 Done.
 ### : git pin with lock file committed :
 ### git -C tolock add tolock.opam.locked
@@ -299,16 +307,16 @@ conflicts:
 Ok, tolock is no longer pinned to git+file://${BASEDIR}/tolock#master (version 1)
 ### opam install ./tolock --show
 The following actions would be performed:
-  - install bar    3   [required by tolock]
-  - install foo    2   [required by tolock]
-  - install tolock dev
+  - install bar    3            [required by tolock]
+  - install foo    2            [required by tolock]
+  - install tolock dev (pinned)
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install foo    1 [required by tolock]
-  - install bar    1 [required by tolock]
-  - install baz    1 [required by tolock]
-  - install tolock 1
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
 ===== 4 to install =====
 ### opam pin ./tolock -n
 Package tolock does not exist, create as a NEW package? [Y/n] y
@@ -321,21 +329,25 @@ The following actions would be performed:
 ===== 3 to install =====
 ### opam install ./tolock --locked --show
 The following actions would be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 ### opam install ./tolock --locked
-[tolock.dev] synchronised (no changes)
+tolock is now pinned to git+file://${BASEDIR}/tolock#master (version 1)
+[tolock.1] synchronised (no changes)
 The following actions will be performed:
-  - install bar    3            [required by tolock]
-  - install foo    2            [required by tolock]
-  - install tolock dev (pinned)
-===== 3 to install =====
+  - install foo    1          [required by tolock]
+  - install bar    1          [required by tolock]
+  - install baz    1          [required by tolock]
+  - install tolock 1 (pinned)
+===== 4 to install =====
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed bar.3
--> installed foo.2
--> retrieved tolock.dev  (no changes)
--> installed tolock.dev
+-> installed bar.1
+-> installed baz.1
+-> installed foo.1
+-> retrieved tolock.1  (no changes)
+-> installed tolock.1
 Done.

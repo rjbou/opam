@@ -88,8 +88,8 @@ let url_with_local_branch = function
      | None -> url)
   | url -> url
 
-let opams_of_dir ?recurse ?subpath d =
-  let files = OpamPinned.files_in_source ?recurse ?subpath d in
+let opams_of_dir ?recurse ?subpath ?locked d =
+  let files = OpamPinned.files_in_source ?recurse ?subpath ?locked d in
   List.fold_left (fun acc (n, f, subp) ->
       let name =
         let open OpamStd.Option.Op in
@@ -109,7 +109,7 @@ let opams_of_dir ?recurse ?subpath d =
         acc)
     [] files
 
-let opams_of_dir_w_target ?(recurse=false) ?subpath
+let opams_of_dir_w_target ?(recurse=false) ?subpath ?locked
     ?(same_kind=fun _ -> OpamClientConfig.(!r.pin_kind_auto)) url dir =
   OpamStd.List.filter_map (fun (name, file, subp) ->
       let url =
@@ -143,9 +143,9 @@ let opams_of_dir_w_target ?(recurse=false) ?subpath
       if same_kind url then
         Some (name, file, url, subp)
       else None)
-    (opams_of_dir ~recurse ?subpath dir)
+    (opams_of_dir ~recurse ?subpath ?locked dir)
 
-let name_and_dir_of_opam_file f =
+let name_and_dir_of_opam_file ?locked f =
   let srcdir = OpamFilename.dirname f in
   let srcdir =
     if OpamFilename.dir_ends_with ".opam" srcdir &&
@@ -156,7 +156,7 @@ let name_and_dir_of_opam_file f =
   in
   let name =
     let open OpamStd.Option.Op in
-    OpamPinned.name_of_opam_filename srcdir f >>+ fun () ->
+    OpamPinned.name_of_opam_filename ?locked srcdir f >>+ fun () ->
     OpamFile.OPAM.(name_opt (safe_read (OpamFile.make f))) >>+ fun () ->
     name_from_project_dirname srcdir
   in
@@ -204,7 +204,7 @@ let resolve_locals_pinned st ?(recurse=false) ?subpath atom_or_local_list =
   in
   List.rev atoms
 
-let resolve_locals ?(quiet=false) ?recurse ?subpath atom_or_local_list =
+let resolve_locals ?(quiet=false) ?recurse ?subpath ?locked atom_or_local_list =
   let target_dir dir =
     let d = OpamFilename.Dir.to_string dir in
     let backend = OpamUrl.guess_version_control d in
@@ -216,7 +216,9 @@ let resolve_locals ?(quiet=false) ?recurse ?subpath atom_or_local_list =
         | `Atom a -> to_pin, a :: atoms
         | `Dirname d ->
           let target = target_dir d in
-          let names_files = opams_of_dir_w_target ?recurse ?subpath target d in
+          let names_files =
+            opams_of_dir_w_target ?recurse ?subpath ?locked target d
+          in
           if names_files = [] && not quiet then
             OpamConsole.warning "No package definitions found at %s"
               (OpamFilename.Dir.to_string d);
@@ -228,7 +230,7 @@ let resolve_locals ?(quiet=false) ?recurse ?subpath atom_or_local_list =
           in
           to_pin, atoms
         | `Filename f ->
-          match name_and_dir_of_opam_file f with
+          match name_and_dir_of_opam_file ?locked f with
           | Some n, srcdir ->
             (n, target_dir srcdir, None, OpamFile.make f) :: to_pin,
             (n, None) :: atoms
@@ -250,15 +252,18 @@ let resolve_locals ?(quiet=false) ?recurse ?subpath atom_or_local_list =
     OpamConsole.error_and_exit `Bad_arguments
       "Multiple files for the same package name were specified:\n%s"
       (OpamStd.Format.itemize (fun (n, t, _, f) ->
-         Printf.sprintf "Package %s with definition %s %s %s"
-           (OpamConsole.colorise `bold @@ OpamPackage.Name.to_string n)
-           (OpamFile.to_string f)
-           (OpamConsole.colorise `blue "=>")
-           (OpamUrl.to_string t))
+           Printf.sprintf "Package %s with definition %s %s %s"
+             (OpamConsole.colorise `bold @@ OpamPackage.Name.to_string n)
+             (OpamFile.to_string f)
+             (OpamConsole.colorise `blue "=>")
+             (OpamUrl.to_string t))
           duplicates)
 
-let autopin_aux st ?quiet ?(for_view=false) ?recurse ?subpath atom_or_local_list =
-  let to_pin, atoms = resolve_locals ?quiet ?recurse ?subpath atom_or_local_list in
+let autopin_aux st ?quiet ?(for_view=false) ?recurse ?subpath ?(locked=false)
+    atom_or_local_list =
+  let to_pin, atoms =
+    resolve_locals ?quiet ?recurse ?subpath ~locked atom_or_local_list
+  in
   if to_pin = [] then
     atoms, to_pin, OpamPackage.Set.empty, OpamPackage.Set.empty
   else
@@ -304,11 +309,13 @@ let autopin_aux st ?quiet ?(for_view=false) ?recurse ?subpath atom_or_local_list
           &&
           (* For `opam show`, we need to check does the opam file changed to
              perform a simulated pin if so *)
-          (not for_view ||
+          ((not for_view && not locked) ||
            match
              OpamSwitchState.opam_opt st pinned_pkg, OpamFile.OPAM.read_opt opam
            with
-           | Some opam0, Some opam -> OpamFile.OPAM.equal opam0 opam
+           | Some opam0, Some opam ->
+             OpamFile.OPAM.(if for_view then equal else effectively_equal)
+               opam0 opam
            | _, _ -> false)
         with Not_found -> false)
       to_pin
@@ -351,16 +358,11 @@ let simulate_local_pinnings ?quiet ?(for_view=false) st to_pin =
   in
   let local_packages = OpamPackage.keys local_opams in
   let pinned =
-    if for_view then
-      (* For `opam show`, to display local files instead of the stored on, we
-         need to have on the pinned set only the new simulated pinned ones instead
-         of really pinned ones. *)
-      let open OpamPackage.Set.Op in
-      st.pinned
-      -- OpamPackage.packages_of_names st.pinned
-        (OpamPackage.names_of_packages local_packages)
-      ++ local_packages
-    else st.pinned
+    let open OpamPackage.Set.Op in
+    st.pinned
+    -- OpamPackage.packages_of_names st.pinned
+      (OpamPackage.names_of_packages local_packages)
+    ++ local_packages
   in
   let st = {
     st with
@@ -374,16 +376,16 @@ let simulate_local_pinnings ?quiet ?(for_view=false) st to_pin =
            (fun nv -> not (OpamPackage.Name.Set.mem nv.name local_names))
            (Lazy.force st.available_packages))
         (OpamSwitchState.compute_available_packages
-           st.switch_global st.switch st.switch_config ~pinned:st.pinned
-           ~opams:local_opams)
+           st.switch_global st.switch st.switch_config ~pinned ~opams:local_opams)
     );
     pinned;
   } in
   st, local_packages
 
-let simulate_autopin st ?quiet ?(for_view=false) ?recurse ?subpath atom_or_local_list =
+let simulate_autopin st ?quiet ?(for_view=false) ?recurse ?subpath ?locked
+    atom_or_local_list =
   let atoms, to_pin, obsolete_pins, already_pinned_set =
-    autopin_aux st ?quiet ~for_view ?recurse ?subpath atom_or_local_list
+    autopin_aux st ?quiet ~for_view ?recurse ?subpath ?locked atom_or_local_list
   in
   if to_pin = [] then st, atoms else
   let st =
@@ -413,12 +415,12 @@ let simulate_autopin st ?quiet ?(for_view=false) ?recurse ?subpath atom_or_local
         OpamConsole.msg "\n"));
   st, atoms
 
-let autopin st ?(simulate=false) ?quiet ?recurse ?subpath atom_or_local_list =
+let autopin st ?(simulate=false) ?quiet ?recurse ?subpath ?locked atom_or_local_list =
   if OpamStateConfig.(!r.dryrun) || OpamClientConfig.(!r.show) then
-    simulate_autopin st ?quiet atom_or_local_list
+    simulate_autopin st ?quiet ?locked atom_or_local_list
   else
   let atoms, to_pin, obsolete_pins, already_pinned_set =
-    autopin_aux st ?quiet ?recurse ?subpath atom_or_local_list
+    autopin_aux st ?quiet ?recurse ?subpath ?locked atom_or_local_list
   in
   if to_pin = [] && OpamPackage.Set.is_empty obsolete_pins &&
      OpamPackage.Set.is_empty already_pinned_set
