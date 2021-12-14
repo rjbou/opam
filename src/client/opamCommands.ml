@@ -1658,7 +1658,7 @@ let install cli =
     let st, atoms =
       OpamAuxCommands.autopin
         st ~recurse ?subpath ~quiet:check ~simulate:(deps_only||check||depext_only)
-        atoms_or_locals
+        ~locked:(OpamStateConfig.(!r.locked) <> None) atoms_or_locals
     in
     if atoms = [] then
       (OpamConsole.msg "Nothing to do\n";
@@ -2684,6 +2684,7 @@ let switch cli =
              if use_local then
                let st, atoms =
                  OpamAuxCommands.autopin st ~simulate:deps_only ~quiet:true
+                   ~locked:(OpamStateConfig.(!r.locked) <> None)
                    [`Dirname (OpamFilename.Dir.of_string switch_arg)]
                in
                let st =
@@ -3051,7 +3052,8 @@ let pin ?(unpin_only=false) cli =
           | _ -> false
         in
         let pkgs =
-          OpamAuxCommands.opams_of_dir_w_target ~recurse ?subpath ~same_kind url d
+          OpamAuxCommands.opams_of_dir_w_target ~recurse ?subpath ~same_kind
+            ~locked:(OpamStateConfig.(!r.locked) <> None) url d
           |> List.map (fun (n,o,u,b) -> (n, OpamFile.OPAM.read_opt o, b, u))
         in
         pkgs, None
@@ -3080,7 +3082,8 @@ let pin ?(unpin_only=false) cli =
               "Could not retrieve %s" u
           | Result _ | Up_to_date _ ->
             let pkgs =
-              OpamAuxCommands.opams_of_dir ~recurse ?subpath pin_cache_dir
+              OpamAuxCommands.opams_of_dir ~recurse ?subpath
+                ~locked:(OpamStateConfig.(!r.locked) <> None) pin_cache_dir
               |> List.map (fun (n,o,b) -> (n, OpamFile.OPAM.read_opt o, b, url))
             in
             pkgs, Some cleanup

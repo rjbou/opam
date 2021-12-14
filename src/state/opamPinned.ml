@@ -146,9 +146,14 @@ let find_opam_file_in_source ?(locked=false) name dir =
    | _ -> opt)
   |> OpamStd.Option.map OpamFile.make
 
-let name_of_opam_filename dir file =
-  let open OpamStd.Option.Op in
-  let suffix = ".opam" in
+let name_of_opam_filename ?(locked=false) dir file =
+  let suffix =
+    let suff = ".opam" in
+    if locked then
+      (OpamStateConfig.(!r.locked) >>| Printf.sprintf "%s.%s" suff)
+      +! suff
+    else suff
+  in
   let get_name s =
     if Filename.check_suffix s suffix
     then Some Filename.(chop_suffix (basename s) suffix)
@@ -169,7 +174,7 @@ let name_of_opam_filename dir file =
   try Some (OpamPackage.Name.of_string name)
   with Failure _ -> None
 
-let files_in_source ?(recurse=false) ?subpath d =
+let files_in_source ?(recurse=false) ?subpath ?(locked=false) d =
   let baseopam = OpamFilename.Base.of_string "opam" in
   let files =
     let rec files_aux acc base d =
@@ -219,7 +224,7 @@ let files_in_source ?(recurse=false) ?subpath d =
     (OpamStd.Option.map_default (fun sp -> OpamFilename.Op.(d / sp)) d subpath)
   in
   files d @ files (d / "opam") |>
-  List.map (fun (f,s) -> check_locked f, s) |>
+  List.map (fun (f,s) -> (if locked then check_locked f else f), s) |>
   OpamStd.List.filter_map
     (fun (f, subpath) ->
        try
