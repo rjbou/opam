@@ -166,7 +166,7 @@ module OpamList = struct
 
   let pick_assoc x l =
   let kv, l = pick (fun (k, _) -> k = x) l in
-  Option.map snd kv, l
+  (match kv with | Some (_,v) -> Some v | None -> None), l
 
   let update_assoc k v l =
     let rec aux acc = function
