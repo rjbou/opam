@@ -155,14 +155,18 @@ module OpamList = struct
       [] -> None
     | (a,b)::l -> if compare a x = 0 then Some b else assoc_opt x l
 
-  let pick_assoc x l =
+  let pick f l =
     let rec aux acc = function
       | [] -> None, l
-      | (k,v) as b::r ->
-        if k = x then Some v, List.rev_append acc r
-        else aux (b::acc) r
+      | x::l ->
+        if f x then Some x, List.rev_append acc l
+        else aux (x::acc) l
     in
     aux [] l
+
+  let pick_assoc x l =
+  let kv, l = pick (fun (k, _) -> k = x) l in
+  Option.map snd kv, l
 
   let update_assoc k v l =
     let rec aux acc = function
