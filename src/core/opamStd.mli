@@ -231,6 +231,9 @@ module List : sig
       bound. *)
   val update_assoc: 'a -> 'b -> ('a * 'b) list -> ('a * 'b) list
 
+  (** Like [pick_assoc], but with a test function that takes a list element *)
+  val pick: ('a -> bool) -> 'a list -> 'a option * 'a list
+
 end
 
 module String : sig
