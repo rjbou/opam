@@ -492,3 +492,503 @@ pin1sub1sub1.3      (uninstalled)  git  git+file://${BASEDIR}/pinnes#master (a/i
 pin1sub1sub1sub1.3  (uninstalled)  git  git+file://${BASEDIR}/pinnes#master (a/i/j)
 pin1sub1sub2.3      (uninstalled)  git  git+file://${BASEDIR}/pinnes#master (a/k)
 pin1sub2.3          (uninstalled)  git  git+file://${BASEDIR}/pinnes#master (b)
+### ############################
+### #     same with lock files #
+### ############################
+### # structure
+### : $ find pinnes
+### : .pin1.opam
+### : ./a
+### : ./a/pin1sub1.opam
+### : ./a/pin1sub1.opam.locked
+### : ./a/i
+### : ./a/i/pin1sub1sub1.opam
+### : ./a/i/pin1sub1sub1.opam.locked
+### : ./a/i/j
+### : ./a/i/j/pin1sub1sub1sub1.opam
+### : ./a/i/j/pin1sub1sub1sub1.opam.locked
+### : ./pin1.opam
+### : ./pin1.opam.locked
+### : ./a/k
+### : ./a/k/pin1sub1sub2.opam
+### : ./a/k/pin1sub1sub2.opam.locked
+### : ./b
+### : ./b/pin1sub2.opam
+### : ./b/pin1sub2.opam.locked
+### rm -rf pinnes
+### opam switch remove devnull
+Switch devnull and all its packages will be wiped. Are you sure? [Y/n] y
+### OPAMLOCKED=locked
+### <pin:pinnes/pin1.opam>
+build: [ "false" ]
+### <pin:pinnes/pin1.opam.locked>
+version: "l1"
+### <pin:pinnes/a/pin1sub1.opam>
+build: [ "false" ]
+### <pin:pinnes/a/pin1sub1.opam.locked>
+version: "l1"
+### <pin:pinnes/a/i/pin1sub1sub1.opam>
+build: [ "false" ]
+### <pin:pinnes/a/i/pin1sub1sub1.opam.locked>
+version: "l1"
+### <pin:pinnes/a/i/j/pin1sub1sub1sub1.opam>
+build: [ "false" ]
+### <pin:pinnes/a/i/j/pin1sub1sub1sub1.opam.locked>
+version: "l1"
+### <pin:pinnes/a/k/pin1sub1sub2.opam>
+build: [ "false" ]
+### <pin:pinnes/a/k/pin1sub1sub2.opam.locked>
+version: "l1"
+### <pin:pinnes/b/pin1sub2.opam>
+build: [ "false" ]
+### <pin:pinnes/b/pin1sub2.opam.locked>
+version: "l1"
+### git -C ./pinnes init -q
+### git -C ./pinnes config core.autocrlf false
+### git -C ./pinnes add a/i b
+### git -C ./pinnes commit -qm "fst"
+### opam switch create devnull --empty
+### opam pin -n --recursive pinnes
+This will pin the following packages: pin1, pin1sub1, pin1sub1sub1, pin1sub1sub1sub1, pin1sub1sub2, pin1sub2. Continue? [Y/n] y
+Package pin1 does not exist, create as a NEW package? [Y/n] y
+pin1 is now pinned to git+file://${BASEDIR}/pinnes#master (version l1)
+Package pin1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1 is now pinned to file://${BASEDIR}/pinnes (a) (version l1)
+Package pin1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l1)
+Package pin1sub1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l1)
+Package pin1sub1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub2 is now pinned to file://${BASEDIR}/pinnes (a/k) (version l1)
+Package pin1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub2 is now pinned to git+file://${BASEDIR}/pinnes#master (b) (version l1)
+### opam list -s
+### opam pin
+pin1.l1              (uninstalled)  git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1          (uninstalled)  rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l1      (uninstalled)  git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub1sub1sub1.l1  (uninstalled)  git    git+file://${BASEDIR}/pinnes#master (a/i/j)
+pin1sub1sub2.l1      (uninstalled)  rsync  file://${BASEDIR}/pinnes (a/k)
+pin1sub2.l1          (uninstalled)  git    git+file://${BASEDIR}/pinnes#master (b)
+### opam unpin -n --recursive pinnes
+Ok, pin1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (version l1)
+Ok, pin1sub1 is no longer pinned to file://${BASEDIR}/pinnes (a) (version l1)
+Ok, pin1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l1)
+Ok, pin1sub1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l1)
+Ok, pin1sub1sub2 is no longer pinned to file://${BASEDIR}/pinnes (a/k) (version l1)
+Ok, pin1sub2 is no longer pinned to git+file://${BASEDIR}/pinnes#master (b) (version l1)
+### opam list -s
+### opam pin
+### opam pin  --recursive pinnes | unordered
+This will pin the following packages: pin1, pin1sub1, pin1sub1sub1, pin1sub1sub1sub1, pin1sub1sub2, pin1sub2. Continue? [Y/n] y
+Package pin1 does not exist, create as a NEW package? [Y/n] y
+pin1 is now pinned to git+file://${BASEDIR}/pinnes#master (version l1)
+Package pin1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1 is now pinned to file://${BASEDIR}/pinnes (a) (version l1)
+Package pin1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l1)
+Package pin1sub1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l1)
+Package pin1sub1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub2 is now pinned to file://${BASEDIR}/pinnes (a/k) (version l1)
+Package pin1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub2 is now pinned to git+file://${BASEDIR}/pinnes#master (b) (version l1)
+
+The following actions will be performed:
+  - install pin1sub1sub1     l1 (pinned)
+  - install pin1             l1 (pinned)
+  - install pin1sub1sub1sub1 l1 (pinned)
+  - install pin1sub1         l1 (pinned)
+  - install pin1sub2         l1 (pinned)
+  - install pin1sub1sub2     l1 (pinned)
+===== 6 to install =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1.l1  (no changes)
+-> installed pin1.l1
+-> retrieved pin1sub1.l1  (file://${BASEDIR}/pinnes(a))
+-> installed pin1sub1.l1
+-> retrieved pin1sub1sub1.l1  (no changes)
+-> installed pin1sub1sub1.l1
+-> retrieved pin1sub1sub1sub1.l1  (no changes)
+-> installed pin1sub1sub1sub1.l1
+-> retrieved pin1sub1sub2.l1  (file://${BASEDIR}/pinnes(a/k))
+-> installed pin1sub1sub2.l1
+-> retrieved pin1sub2.l1  (no changes)
+-> installed pin1sub2.l1
+Done.
+### opam remove --recursive ./pinnes | unordered
+Ok, pin1sub2 is no longer pinned to git+file://${BASEDIR}/pinnes#master (b) (version l1)
+Ok, pin1sub1sub2 is no longer pinned to file://${BASEDIR}/pinnes (a/k) (version l1)
+Ok, pin1sub1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l1)
+Ok, pin1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l1)
+Ok, pin1sub1 is no longer pinned to file://${BASEDIR}/pinnes (a) (version l1)
+Ok, pin1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (version l1)
+The following actions will be performed:
+  - remove pin1sub1sub1sub1 l1
+  - remove pin1sub2         l1
+  - remove pin1sub1sub2     l1
+  - remove pin1sub1sub1     l1
+  - remove pin1             l1
+  - remove pin1sub1         l1
+===== 6 to remove =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   pin1.l1
+-> removed   pin1sub1.l1
+-> removed   pin1sub1sub1.l1
+-> removed   pin1sub1sub1sub1.l1
+-> removed   pin1sub1sub2.l1
+-> removed   pin1sub2.l1
+Done.
+### opam list -s
+### opam pin
+### opam install ./pinnes | unordered
+Package pin1 does not exist, create as a NEW package? [Y/n] y
+pin1 is now pinned to git+file://${BASEDIR}/pinnes#master (version l1)
+The following actions will be performed:
+  - install pin1 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1.l1  (git+file://${BASEDIR}/pinnes#master)
+-> installed pin1.l1
+Done.
+### opam list -s
+pin1
+### opam pin
+pin1.l1    git  git+file://${BASEDIR}/pinnes#master
+### opam install ./pinnes --subpath a | unordered
+Package pin1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1 is now pinned to file://${BASEDIR}/pinnes (a) (version l1)
+The following actions will be performed:
+  - install pin1sub1 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub1.l1  (file://${BASEDIR}/pinnes(a))
+-> installed pin1sub1.l1
+Done.
+### opam list -s
+pin1
+pin1sub1
+### opam pin
+pin1.l1        git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1    rsync  file://${BASEDIR}/pinnes (a)
+### opam install ./pinnes --subpath b | unordered
+Package pin1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub2 is now pinned to git+file://${BASEDIR}/pinnes#master (b) (version l1)
+The following actions will be performed:
+  - install pin1sub2 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub2.l1  (git+file://${BASEDIR}/pinnes#master(b))
+-> installed pin1sub2.l1
+Done.
+### opam list -s
+pin1
+pin1sub1
+pin1sub2
+### opam pin
+pin1.l1        git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1    rsync  file://${BASEDIR}/pinnes (a)
+pin1sub2.l1    git    git+file://${BASEDIR}/pinnes#master (b)
+### opam install ./pinnes --subpath a/i | unordered
+Package pin1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l1)
+The following actions will be performed:
+  - install pin1sub1sub1 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub1sub1.l1  (git+file://${BASEDIR}/pinnes#master(a/i))
+-> installed pin1sub1sub1.l1
+Done.
+### opam list -s
+pin1
+pin1sub1
+pin1sub1sub1
+pin1sub2
+### opam pin
+pin1.l1            git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1        rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l1    git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub2.l1        git    git+file://${BASEDIR}/pinnes#master (b)
+### opam install ./pinnes --subpath a/i/j | unordered
+Package pin1sub1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l1)
+The following actions will be performed:
+  - install pin1sub1sub1sub1 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub1sub1sub1.l1  (git+file://${BASEDIR}/pinnes#master(a/i/j))
+-> installed pin1sub1sub1sub1.l1
+Done.
+### opam list -s
+pin1
+pin1sub1
+pin1sub1sub1
+pin1sub1sub1sub1
+pin1sub2
+### opam pin
+pin1.l1                git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1            rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l1        git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub1sub1sub1.l1    git    git+file://${BASEDIR}/pinnes#master (a/i/j)
+pin1sub2.l1            git    git+file://${BASEDIR}/pinnes#master (b)
+### opam install ./pinnes --subpath a/k | unordered
+Package pin1sub1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub2 is now pinned to file://${BASEDIR}/pinnes (a/k) (version l1)
+The following actions will be performed:
+  - install pin1sub1sub2 l1 (pinned)
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub1sub2.l1  (file://${BASEDIR}/pinnes(a/k))
+-> installed pin1sub1sub2.l1
+Done.
+### opam list -s
+pin1
+pin1sub1
+pin1sub1sub1
+pin1sub1sub1sub1
+pin1sub1sub2
+pin1sub2
+### opam pin
+pin1.l1                git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l1            rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l1        git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub1sub1sub1.l1    git    git+file://${BASEDIR}/pinnes#master (a/i/j)
+pin1sub1sub2.l1        rsync  file://${BASEDIR}/pinnes (a/k)
+pin1sub2.l1            git    git+file://${BASEDIR}/pinnes#master (b)
+### <pin:pinnes/pin1.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/pin1.opam.locked>
+version: "l2"
+### <pin:pinnes/a/pin1sub1.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/a/pin1sub1.opam.locked>
+version: "l2"
+### <pin:pinnes/a/i/pin1sub1sub1.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/a/i/pin1sub1sub1.opam.locked>
+version: "l2"
+### <pin:pinnes/a/i/j/pin1sub1sub1sub1.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/a/i/j/pin1sub1sub1sub1.opam.locked>
+version: "l2"
+### <pin:pinnes/a/k/pin1sub1sub2.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/a/k/pin1sub1sub2.opam.locked>
+version: "l2"
+### <pin:pinnes/b/pin1sub2.opam>
+version: "2"
+build: [ "false" ]
+### <pin:pinnes/b/pin1sub2.opam.locked>
+version: "l2"
+### git -C pinnes add pin1.opam pin1.opam.locked a/i b
+### git -C pinnes commit -qm "snd"
+### opam update | grep synchronised
+[pin1.l1] synchronised (git+file://${BASEDIR}/pinnes#master)
+[pin1sub1.l1] synchronised (file://${BASEDIR}/pinnes(a))
+[pin1sub1sub1.l1] synchronised (git+file://${BASEDIR}/pinnes#master(a/i))
+[pin1sub1sub1sub1.l1] synchronised (git+file://${BASEDIR}/pinnes#master(a/i/j))
+[pin1sub1sub2.l1] synchronised (file://${BASEDIR}/pinnes(a/k))
+[pin1sub2.l1] synchronised (git+file://${BASEDIR}/pinnes#master(b))
+### opam upgrade | unordered
+The following actions will be performed:
+  - upgrade pin1             l1 to l2 (pinned)
+  - upgrade pin1sub1         l1 to l2 (pinned)
+  - upgrade pin1sub2         l1 to l2 (pinned)
+  - upgrade pin1sub1sub1     l1 to l2 (pinned)
+  - upgrade pin1sub1sub2     l1 to l2 (pinned)
+  - upgrade pin1sub1sub1sub1 l1 to l2 (pinned)
+===== 6 to upgrade =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   pin1.l1
+-> installed pin1.l2
+-> retrieved pin1sub1.l2  (file://${BASEDIR}/pinnes(a))
+-> removed   pin1sub1.l1
+-> installed pin1sub1.l2
+-> retrieved pin1sub1sub1.l2  (no changes)
+-> removed   pin1sub1sub1.l1
+-> installed pin1sub1sub1.l2
+-> retrieved pin1sub1sub1sub1.l2  (no changes)
+-> removed   pin1sub1sub1sub1.l1
+-> installed pin1sub1sub1sub1.l2
+-> retrieved pin1sub1sub2.l2  (file://${BASEDIR}/pinnes(a/k))
+-> removed   pin1sub1sub2.l1
+-> installed pin1sub1sub2.l2
+-> retrieved pin1sub2.l2  (no changes)
+-> removed   pin1sub2.l1
+-> installed pin1sub2.l2
+Done.
+### <pinnes/a/i/new>
+hej
+### <pinnes/a/k/new>
+hoj
+### git -C pinnes add a/i/new
+### git -C pinnes commit -qm "thd"
+### opam update | grep synchronised
+[pin1.l2] synchronised (git+file://${BASEDIR}/pinnes#master)
+[pin1sub1.l2] synchronised (file://${BASEDIR}/pinnes(a))
+[pin1sub1sub1.l2] synchronised (git+file://${BASEDIR}/pinnes#master(a/i))
+[pin1sub1sub1sub1.l2] synchronised (no changes)
+[pin1sub1sub2.l2] synchronised (file://${BASEDIR}/pinnes(a/k))
+[pin1sub2.l2] synchronised (no changes)
+### opam upgrade | unordered
+The following actions will be performed:
+  - recompile pin1sub1sub2 l2 (pinned) [upstream or system changes]
+  - recompile pin1sub1sub1 l2 (pinned) [upstream or system changes]
+  - recompile pin1sub1     l2 (pinned) [upstream or system changes]
+===== 3 to recompile =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved pin1sub1.l2  (no changes)
+-> removed   pin1sub1.l2
+-> installed pin1sub1.l2
+-> retrieved pin1sub1sub1.l2  (no changes)
+-> removed   pin1sub1sub1.l2
+-> installed pin1sub1sub1.l2
+-> retrieved pin1sub1sub2.l2  (no changes)
+-> removed   pin1sub1sub2.l2
+-> installed pin1sub1sub2.l2
+Done.
+### opam list -s
+pin1
+pin1sub1
+pin1sub1sub1
+pin1sub1sub1sub1
+pin1sub1sub2
+pin1sub2
+### opam pin
+pin1.l2                git    git+file://${BASEDIR}/pinnes#master
+pin1sub1.l2            rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l2        git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub1sub1sub1.l2    git    git+file://${BASEDIR}/pinnes#master (a/i/j)
+pin1sub1sub2.l2        rsync  file://${BASEDIR}/pinnes (a/k)
+pin1sub2.l2            git    git+file://${BASEDIR}/pinnes#master (b)
+### opam remove ./pinnes --recursive
+Ok, pin1sub2 is no longer pinned to git+file://${BASEDIR}/pinnes#master (b) (version l2)
+Ok, pin1sub1sub2 is no longer pinned to file://${BASEDIR}/pinnes (a/k) (version l2)
+Ok, pin1sub1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l2)
+Ok, pin1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l2)
+Ok, pin1sub1 is no longer pinned to file://${BASEDIR}/pinnes (a) (version l2)
+Ok, pin1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (version l2)
+The following actions will be performed:
+  - remove pin1sub1sub1     l2
+  - remove pin1sub1sub2     l2
+  - remove pin1             l2
+  - remove pin1sub1sub1sub1 l2
+  - remove pin1sub1         l2
+  - remove pin1sub2         l2
+===== 6 to remove =====
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   pin1.l2
+-> removed   pin1sub1.l2
+-> removed   pin1sub1sub1.l2
+-> removed   pin1sub1sub1sub1.l2
+-> removed   pin1sub1sub2.l2
+-> removed   pin1sub2.l2
+Done.
+### opam pin ./pinnes --subpath a --recursive -n
+This will pin the following packages: pin1sub1, pin1sub1sub1, pin1sub1sub1sub1, pin1sub1sub2. Continue? [Y/n] y
+Package pin1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1 is now pinned to file://${BASEDIR}/pinnes (a) (version l2)
+Package pin1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l2)
+Package pin1sub1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l2)
+Package pin1sub1sub2 does not exist, create as a NEW package? [Y/n] y
+pin1sub1sub2 is now pinned to file://${BASEDIR}/pinnes (a/k) (version l2)
+### opam pin
+pin1sub1.l2          (uninstalled)  rsync  file://${BASEDIR}/pinnes (a)
+pin1sub1sub1.l2      (uninstalled)  git    git+file://${BASEDIR}/pinnes#master (a/i)
+pin1sub1sub1sub1.l2  (uninstalled)  git    git+file://${BASEDIR}/pinnes#master (a/i/j)
+pin1sub1sub2.l2      (uninstalled)  rsync  file://${BASEDIR}/pinnes (a/k)
+### opam-cat $OPAMROOT/devnull/.opam-switch/overlay/pin1sub1/opam
+authors: "the testing team"
+available: opam-version >= "2.1"
+bug-reports: "https://nobug"
+description: "Two words."
+dev-repo: "hg+htpps://to@lo.ck"
+homepage: "egapemoh"
+license: "ISC"
+maintainer: "maint@tain.er"
+name: "pin1sub1"
+opam-version: "2.0"
+synopsis: "A word"
+version: "l2"
+x-subpath: "a"
+url {
+src: "file://${BASEDIR}/pinnes"
+}
+### opam-cat OPAM/devnull/.opam-switch/overlay/pin1sub1sub1/opam
+authors: "the testing team"
+available: opam-version >= "2.1"
+bug-reports: "https://nobug"
+description: "Two words."
+dev-repo: "hg+htpps://to@lo.ck"
+homepage: "egapemoh"
+license: "ISC"
+maintainer: "maint@tain.er"
+name: "pin1sub1sub1"
+opam-version: "2.0"
+synopsis: "A word"
+version: "l2"
+x-subpath: "a/i"
+url {
+src: "git+file://${BASEDIR}/pinnes#master"
+}
+### opam unpin ./pinnes --recursive
+Ok, pin1sub1 is no longer pinned to file://${BASEDIR}/pinnes (a) (version l2)
+Ok, pin1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version l2)
+Ok, pin1sub1sub1sub1 is no longer pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version l2)
+Ok, pin1sub1sub2 is no longer pinned to file://${BASEDIR}/pinnes (a/k) (version l2)
+### opam pin
+### opam pin scan ./pinnes | grep -v '# Name.*'
+pin1    l2         git+file://${BASEDIR}/pinnes#master  -
+### opam pin scan ./pinnes --recursive | '# Name.*' -> '\c'
+pin1sub2          l2         git+file://${BASEDIR}/pinnes#master  b
+pin1sub1sub2      l2         git+file://${BASEDIR}/pinnes#master  a/k
+pin1sub1sub1sub1  l2         git+file://${BASEDIR}/pinnes#master  a/i/j
+pin1sub1sub1      l2         git+file://${BASEDIR}/pinnes#master  a/i
+pin1sub1          l2         git+file://${BASEDIR}/pinnes#master  a
+pin1              l2         git+file://${BASEDIR}/pinnes#master  -
+### opam pin scan ./pinnes --subpath a | grep -v '# Name.*'
+pin1sub1  l2         git+file://${BASEDIR}/pinnes#master  a
+### opam pin scan ./pinnes --subpath a --recursive | '# Name.*' -> '\c'
+pin1sub1sub2      l2         git+file://${BASEDIR}/pinnes#master  a/k
+pin1sub1sub1sub1  l2         git+file://${BASEDIR}/pinnes#master  a/i/j
+pin1sub1sub1      l2         git+file://${BASEDIR}/pinnes#master  a/i
+pin1sub1          l2         git+file://${BASEDIR}/pinnes#master  a
+### opam pin scan ./pinnes --recursive --normalise
+pin1sub2.l2^git+file://${BASEDIR}/pinnes#master^b
+pin1sub1sub2.l2^git+file://${BASEDIR}/pinnes#master^a/k
+pin1sub1sub1sub1.l2^git+file://${BASEDIR}/pinnes#master^a/i/j
+pin1sub1sub1.l2^git+file://${BASEDIR}/pinnes#master^a/i
+pin1sub1.l2^git+file://${BASEDIR}/pinnes#master^a
+pin1.l2^git+file://${BASEDIR}/pinnes#master
+### opam pin --with-version 3 pin1sub2^git+file://${BASEDIR}/pinnes#master^b pin1sub1sub1sub1^git+file://${BASEDIR}/pinnes#master^a/i/j pin1sub1sub1^git+file://${BASEDIR}/pinnes#master^a/i pin1sub1^git+file://${BASEDIR}/pinnes#master^a pin1^git+file://${BASEDIR}/pinnes#master pin1sub1sub2^git+file://${BASEDIR}/pinnes#master^a/k -n
+This will pin the following packages: pin1sub2, pin1sub1sub1sub1, pin1sub1sub1, pin1sub1, pin1, pin1sub1sub2. Continue? [Y/n] y
+Package pin1sub2 does not exist, create as a NEW package? [Y/n] y
+[pin1sub2.3] synchronised (no changes)
+pin1sub2 is now pinned to git+file://${BASEDIR}/pinnes#master (b) (version 3)
+Package pin1sub1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+[pin1sub1sub1sub1.3] synchronised (no changes)
+pin1sub1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i/j) (version 3)
+Package pin1sub1sub1 does not exist, create as a NEW package? [Y/n] y
+[pin1sub1sub1.3] synchronised (file://${BASEDIR}/pinnes(a/i))
+pin1sub1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a/i) (version 3)
+Package pin1sub1 does not exist, create as a NEW package? [Y/n] y
+[pin1sub1.3] synchronised (file://${BASEDIR}/pinnes(a))
+pin1sub1 is now pinned to git+file://${BASEDIR}/pinnes#master (a) (version 3)
+Package pin1 does not exist, create as a NEW package? [Y/n] y
+[pin1.3] synchronised (file://${BASEDIR}/pinnes)
+pin1 is now pinned to git+file://${BASEDIR}/pinnes#master (version 3)
+Package pin1sub1sub2 does not exist, create as a NEW package? [Y/n] y
+[pin1sub1sub2.3] synchronised (file://${BASEDIR}/pinnes(a/k))
+pin1sub1sub2 is now pinned to git+file://${BASEDIR}/pinnes#master (a/k) (version 3)
