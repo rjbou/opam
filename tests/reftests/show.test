@@ -355,7 +355,7 @@ url {
   src:"https://an.arch/i/ve.tgz"
   mirrors:
     [ "https://a.mi/rror"
-     "http://swhid.opam.ocaml.org/swh:1:rev:309cf2674ee7a0749978cf8265ab91a60aea0f7d" ]
+      "http://swhid.opam.ocaml.org/swh:1:rev:309cf2674ee7a0749978cf8265ab91a60aea0f7d" ]
 }
 ### opam show ./swhid.opam
 
@@ -399,5 +399,3 @@ url {
 url.src:     "https://an.arch/i/ve.tgz"
 url.swhid:   "swh:1:rev:309cf2674ee7a0749978cf8265ab91a60aea0f7d"
 url.mirrors: "https://a.mi/rror"
-### opam show ./swhid.opam -f url:
-
