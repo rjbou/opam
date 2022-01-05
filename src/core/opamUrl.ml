@@ -311,18 +311,29 @@ end
 
 module SWHID = struct
 
-  let prefix = "swhid.opam.ocaml.org/"
-  let is_valid u =
+  let http_prefix = "swhid.opam.ocaml.org/"
+  let ssh_prefix = "swh/"
+  let is_http u =
     u.backend = `http
     && (String.equal u.transport "http" || String.equal u.transport "https")
-    && OpamStd.String.starts_with ~prefix u.path
+    && OpamStd.String.starts_with ~prefix:http_prefix u.path
+  let is_ssh u =
+    u.backend = `rsync && String.equal u.transport "ssh"
+    && OpamStd.String.starts_with ~prefix:ssh_prefix u.path
+  let is_valid u = is_http u || is_ssh u
   let of_url u =
     try
-      Some (OpamHash.SWHID.of_string (OpamStd.String.remove_prefix ~prefix u.path))
+      let swhid =
+        if is_http u then
+          OpamStd.String.remove_prefix ~prefix:http_prefix u.path
+        else
+          "swh:" ^ OpamStd.String.remove_prefix ~prefix:ssh_prefix u.path
+      in
+      Some (OpamHash.SWHID.of_string swhid)
     with Invalid_argument _ -> None
   let to_url h =
     { transport = "https"; backend = `http ; hash = None;
-      path = Printf.sprintf "%s%s" prefix (OpamHash.SWHID.to_string h)
+      path = Printf.sprintf "%s%s" http_prefix (OpamHash.SWHID.to_string h)
     }
 
 end
