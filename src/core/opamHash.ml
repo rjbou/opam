@@ -158,7 +158,7 @@ module SWHID = struct
        https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
        on rev & rel support: https://forge.softwareheritage.org/T1258
     *)
-    match String.split_on_char ':' s with
+    match OpamStd.String.split s ':' with
     | "swh"::"1"::("rev"|"rel")::s::[] -> is_hex_str 40 s
     | _ -> false
 
