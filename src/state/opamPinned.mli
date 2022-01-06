@@ -34,6 +34,9 @@ val packages: 'a switch_state -> package_set
 val find_opam_file_in_source:
   ?locked:bool -> name -> dirname -> OpamFile.OPAM.t OpamFile.t option
 
+val find_lock_file_in_source:
+  name -> dirname -> OpamFile.OPAM.t OpamFile.t option
+
 (** Finds all package definition files in a given source dir [opam],
     [pkgname.opam/opam], etc. This is affected by
     [OpamStateConfig.(!r.locked)] *)
