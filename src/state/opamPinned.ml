@@ -146,6 +146,15 @@ let find_opam_file_in_source ?(locked=false) name dir =
    | _ -> opt)
   |> OpamStd.Option.map OpamFile.make
 
+let find_lock_file_in_source name dir =
+  OpamStateConfig.(!r.locked) >>= (fun ext ->
+      let definitions =
+        List.map (fun f -> OpamFilename.add_extension f ext)
+          (possible_definition_filenames dir name)
+      in
+      OpamStd.List.find_opt OpamFilename.exists definitions)
+  >>| OpamFile.make
+
 let name_of_opam_filename ?(locked=false) dir file =
   let suffix =
     let suff = ".opam" in
