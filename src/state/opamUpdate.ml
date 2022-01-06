@@ -255,7 +255,8 @@ let pinned_package st ?version ?(working_dir=false) name =
     (* Do the update *)
     fetch_dev_package urlf srcdir ~working_dir ?subpath nv @@+ fun result ->
     let new_source_opam =
-      OpamPinned.find_opam_file_in_source name srcdir_find >>= fun f ->
+      let locked = OpamStateConfig.(!r.locked) <> None in
+      OpamPinned.find_opam_file_in_source ~locked name srcdir_find >>= fun f ->
       let warns, opam_opt = OpamFileTools.lint_file f in
       let warns, opam_opt = match opam_opt with
         | Some opam0 ->

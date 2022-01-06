@@ -65,7 +65,7 @@ let update_dev_packages_t ?(only_installed=false) atoms t =
 
 let compute_upgrade_t
     ?(strict_upgrade=true) ?(auto_install=false) ?(only_installed=false)
-    ~all atoms t =
+    ?(locked=false) ~all atoms t =
   let names = OpamPackage.Name.Set.of_list (List.rev_map fst atoms) in
   let atoms =
     if strict_upgrade then
@@ -113,7 +113,7 @@ let compute_upgrade_t
       atoms
   in
   let t, to_upgrade =
-    if OpamStateConfig.(!r.locked) = None then t, to_upgrade else
+    if not locked then t, to_upgrade else
       OpamPackage.Set.fold (fun nv (t, to_upgrade) ->
           let name = OpamPackage.name nv in
           let srcdir = OpamPath.Switch.pinned_package t.switch_global.root t.switch name in
@@ -166,12 +166,13 @@ in
 
 let upgrade_t
     ?strict_upgrade ?auto_install ?ask ?(check=false) ?(terse=false)
-    ?only_installed ~all atoms t
+    ?locked ?only_installed ~all atoms t
   =
   log "UPGRADE %a"
     (slog @@ function [] -> "<all>" | a -> OpamFormula.string_of_atoms a)
     atoms;
-  match compute_upgrade_t ?strict_upgrade ?auto_install ?only_installed ~all atoms t with
+  match compute_upgrade_t ?strict_upgrade ?auto_install ?only_installed ?locked
+          ~all atoms t with
   | t, requested, Conflicts cs ->
     log "conflict!";
     if not (OpamPackage.Name.Set.is_empty requested) then
@@ -354,10 +355,10 @@ let upgrade_t
     OpamSolution.check_solution t (Success result);
     t
 
-let upgrade t ?check ?only_installed ~all names =
+let upgrade t ?locked ?check ?only_installed ~all names =
   let atoms = OpamSolution.sanitize_atom_list t names in
   let t = update_dev_packages_t ?only_installed atoms t in
-  upgrade_t ?check ~strict_upgrade:(not all) ?only_installed ~all atoms t
+  upgrade_t ?locked ?check ~strict_upgrade:(not all) ?only_installed ~all atoms t
 
 let fixup t =
   (* @LG reimplement as an alias for 'opam upgrade --criteria=fixup --best-effort --update-invariant *)
