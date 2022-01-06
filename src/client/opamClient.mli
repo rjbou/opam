@@ -96,7 +96,7 @@ val update:
     confirmation). The upgrade concerns them only unless [all] is specified. *)
 val upgrade:
   rw switch_state ->
-  ?check:bool -> ?only_installed:bool ->
+  ?locked:bool -> ?check:bool -> ?only_installed:bool ->
   all:bool -> atom list -> rw switch_state
 
 (** Low-level version of [upgrade], bypassing the package name sanitization and
@@ -104,7 +104,7 @@ val upgrade:
    message when we are at a local maximum, but there are possible upgrades *)
 val upgrade_t:
   ?strict_upgrade:bool -> ?auto_install:bool -> ?ask:bool -> ?check:bool ->
-  ?terse:bool ->
+  ?terse:bool -> ?locked:bool ->
   ?only_installed:bool ->
   all:bool -> atom list -> rw switch_state -> rw switch_state
 

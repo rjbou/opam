@@ -194,6 +194,7 @@ let pinned_package st ?version ?(working_dir=false) name =
     (slog @@ function true -> " (working dir)" | false -> "") working_dir;
   let open OpamStd.Option.Op in
   let root = st.switch_global.root in
+  let locked = OpamStateConfig.(!r.locked) <> None in
   let overlay_dir = OpamPath.Switch.Overlay.package root st.switch name in
   let overlay_opam = OpamFileTools.read_opam overlay_dir in
   match overlay_opam >>| fun opam -> opam, OpamFile.OPAM.url opam with
@@ -222,7 +223,7 @@ let pinned_package st ?version ?(working_dir=false) name =
         (fun x -> OpamFilename.Op.(srcdir / x)) srcdir subpath
     in
     let old_source_opam_hash, old_source_opam =
-      match OpamPinned.find_opam_file_in_source name srcdir_find with
+      match OpamPinned.find_opam_file_in_source ~locked name srcdir_find with
       | None -> None, None
       | Some f ->
         Some (OpamHash.compute (OpamFile.to_string f)),
@@ -260,7 +261,7 @@ let pinned_package st ?version ?(working_dir=false) name =
     (* Do the update *)
     fetch_dev_package urlf srcdir ~working_dir ?subpath nv @@+ fun result ->
     let new_source_opam =
-      OpamPinned.find_opam_file_in_source name srcdir_find >>= fun f ->
+      OpamPinned.find_opam_file_in_source ~locked name srcdir_find >>= fun f ->
       let warns, opam_opt = OpamFileTools.lint_file f in
       let warns, opam_opt = match opam_opt with
         | Some opam0 ->

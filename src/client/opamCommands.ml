@@ -1934,7 +1934,8 @@ let update cli =
     if upgrade then
       OpamSwitchState.with_ `Lock_write gt ~rt @@ fun st ->
       OpamConsole.msg "\n";
-      OpamSwitchState.drop @@ OpamClient.upgrade st ~check ~all:true []
+      let locked = OpamStateConfig.(!r.locked) <> None in
+      OpamSwitchState.drop @@ OpamClient.upgrade st ~locked ~check ~all:true []
     else if check then
       OpamStd.Sys.exit_because (if changed then `Success else `False)
     else if changed then
@@ -1996,7 +1997,9 @@ let upgrade cli =
     else
       OpamSwitchState.with_ `Lock_write gt @@ fun st ->
       let atoms = OpamAuxCommands.resolve_locals_pinned st ~recurse ?subpath atom_locs in
-      OpamSwitchState.drop @@ OpamClient.upgrade st ~check ~only_installed ~all atoms;
+      let locked = OpamStateConfig.(!r.locked) <> None in
+      OpamSwitchState.drop @@ OpamClient.upgrade st ~locked ~check
+        ~only_installed ~all atoms;
       `Ok ()
   in
   mk_command_ret  ~cli cli_original "upgrade" ~doc ~man
