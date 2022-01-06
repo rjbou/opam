@@ -361,6 +361,9 @@ build: [ "false" ]
 version: "1"
 ### <pin:tolock/tolock.opam.locked>
 version: "l1"
+### opam pin scan ./tolock --locked
+# Name  # Version  # Url
+tolock  1          file://${BASEDIR}/tolock
 ### opam pin ./tolock --locked
 Package tolock does not exist, create as a NEW package? [Y/n] y
 tolock is now pinned to file://${BASEDIR}/tolock (version l1)
