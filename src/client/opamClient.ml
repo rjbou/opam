@@ -112,8 +112,41 @@ let compute_upgrade_t
         | Some nv -> not (OpamPackage.Set.mem nv (Lazy.force t.available_packages)))
       atoms
   in
+  let t, to_upgrade =
+    if OpamStateConfig.(!r.locked) = None then t, to_upgrade else
+      OpamPackage.Set.fold (fun nv (t, to_upgrade) ->
+          let name = OpamPackage.name nv in
+          let srcdir = OpamPath.Switch.pinned_package t.switch_global.root t.switch name in
+          (* XXX handle subpath *)
+          let lock = OpamPinned.find_lock_file_in_source name srcdir in
+(*           OpamConsole.error "lock is located in %s" (OpamStd.Option.to_string (fun f -> OpamFilename.to_string (OpamFile.filename f))lock); *)
+          match OpamStd.Option.replace OpamFile.OPAM.read_opt lock with
+          | None -> t, to_upgrade
+          | Some lock ->
+            (*             let overlay_dir = OpamPath.Switch.Overlay.package t.switch_global.root t.switch name in *)
+            let overlay_file = OpamPath.Switch.Overlay.opam t.switch_global.root t.switch name in
+            let overlay = OpamFile.OPAM.read overlay_file in
+(*             OpamConsole.error "lock is %s" (OpamFile.OPAM.write_to_string lock); *)
+            if OpamFile.OPAM.effectively_equal lock overlay then
+              t, to_upgrade
+            else
+              (* XXX hack! *)
+              (OpamFile.OPAM.with_name name lock
+               |> OpamFile.OPAM.with_url_opt (OpamFile.OPAM.url overlay)
+(*
+               |> (fun lock ->
+                   OpamConsole.error "lock is %s"
+                   (OpamFile.OPAM.write_to_string lock); lock)
+*)
+               |> OpamFile.OPAM.write overlay_file;
+               let version = OpamPackage.Version.of_string "dev" in
+               OpamSwitchState.update_pin (OpamPackage.create name version) lock t,
+               (name, None)::to_upgrade))
+        t.pinned (t, to_upgrade)
+
+in
   if all then
-    names,
+    t, names,
     OpamSolution.resolve t Upgrade
       ~requested:names
       ~reinstall:(Lazy.force t.reinstall)
@@ -123,7 +156,7 @@ let compute_upgrade_t
          ~all:[]
          ~criteria:`Upgrade ())
   else
-  names,
+  t, names,
   OpamSolution.resolve t Upgrade
     ~requested:names
     (OpamSolver.request
@@ -139,7 +172,7 @@ let upgrade_t
     (slog @@ function [] -> "<all>" | a -> OpamFormula.string_of_atoms a)
     atoms;
   match compute_upgrade_t ?strict_upgrade ?auto_install ?only_installed ~all atoms t with
-  | requested, Conflicts cs ->
+  | t, requested, Conflicts cs ->
     log "conflict!";
     if not (OpamPackage.Name.Set.is_empty requested) then
       (OpamConsole.error "Package conflict!";
@@ -170,7 +203,7 @@ let upgrade_t
          current state.\n"
     end;
     OpamStd.Sys.exit_because `No_solution
-  | requested, Success solution ->
+  | t, requested, Success solution ->
     if check then
       OpamStd.Sys.exit_because
         (if OpamSolver.solution_is_empty solution
