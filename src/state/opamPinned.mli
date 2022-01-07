@@ -41,8 +41,8 @@ val find_lock_file_in_source:
     [pkgname.opam/opam], etc. This is affected by
     [OpamStateConfig.(!r.locked)] *)
 val files_in_source:
-  ?recurse:bool -> ?subpath:string -> ?locked:bool ->
-  dirname -> (name option * OpamFile.OPAM.t OpamFile.t * string option) list
+  ?recurse:bool -> ?subpath:subpath -> ?locked:bool ->
+  dirname -> (name option * OpamFile.OPAM.t OpamFile.t * subpath option) list
 
 (** From an opam file location, sitting below the given project directory, find
     the corresponding package name if specified ([<name>.opam] or

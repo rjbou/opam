@@ -296,10 +296,10 @@ let pull_tree
         extract_archive tmp_archive (OpamUrl.to_string url)
       | url, Result None ->
         let url =
-          OpamUrl.to_string url ^
-          match subpath with
-          | None -> ""
-          | Some sb -> "("^sb^")"
+          Printf.sprintf "%s%s"
+            (OpamUrl.to_string url)
+            (OpamStd.Option.to_string
+               OpamFilename.SubPath.to_pretty_string subpath)
         in
         Done (Result url)
       | _, (Not_available _ as na) -> Done na

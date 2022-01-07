@@ -322,5 +322,15 @@ module Attribute: sig
 
 end
 
+module SubPath: sig
+
+  include OpamStd.ABSTRACT
+  val (/): Dir.t -> t -> Dir.t
+  val (/?): Dir.t -> t option -> Dir.t
+  val to_pretty_string: t -> string
+  val to_normalised_string: t -> string
+
+end
+
 (** Convert a filename to an attribute, relatively to a root *)
 val to_attribute: Dir.t -> t -> Attribute.t
