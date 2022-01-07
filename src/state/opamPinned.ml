@@ -193,8 +193,10 @@ let files_in_source ?(recurse=false) ?subpath ?(locked=false) d =
                OpamFilename.check_suffix f ".opam" then
               let base =
                 match base, subpath with
-                | Some b, Some sp -> Some (Filename.concat sp b)
-                | Some b, _ | _, Some b -> Some b
+                | Some b, Some sp ->
+                  Some (Filename.concat (OpamFilename.SubPath.to_string sp) b)
+                | Some b, _ -> Some b
+                | _, Some sp -> Some (OpamFilename.SubPath.to_string sp)
                 | None, None -> None
               in
               Some (f, base)
@@ -229,9 +231,7 @@ let files_in_source ?(recurse=false) ?subpath ?(locked=false) d =
     in
     files_aux [] None
   in
-  let d =
-    (OpamStd.Option.map_default (fun sp -> OpamFilename.Op.(d / sp)) d subpath)
-  in
+  let d = OpamFilename.SubPath.(d /? subpath) in
   files d @ files (d / "opam") |>
   List.map (fun (f,s) -> (if locked then check_locked f else f), s) |>
   OpamStd.List.filter_map
@@ -239,7 +239,9 @@ let files_in_source ?(recurse=false) ?subpath ?(locked=false) d =
        try
          (* Ignore empty files *)
          if (Unix.stat (OpamFilename.to_string f)).Unix.st_size = 0 then None
-         else Some (name_of_opam_filename d f, OpamFile.make f, subpath)
+         else
+           Some (name_of_opam_filename d f, OpamFile.make f,
+                 OpamStd.Option.map OpamFilename.SubPath.of_string subpath)
        with Unix.Unix_error _ ->
          OpamConsole.error "Can not read %s, ignored."
            (OpamFilename.to_string f);
