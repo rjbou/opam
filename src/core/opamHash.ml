@@ -151,11 +151,11 @@ module Map = OpamStd.Map.Make(O)
 
 module SWHID = struct
   type t = {
-  swh_sch_version: int;
-  swh_object_type: [`rev | `rel];
-  swh_hash: string
+    swh_sch_version: int;
+    swh_object_type: [`rev | `rel];
+    swh_hash: string
   }
-  
+
   let of_string s =
 (*
     if String.length s = 50 then 
