@@ -543,11 +543,23 @@ let download_package_source_t st url nv_dirs =
       let dirnames =
         List.map (fun (nv, dir) -> OpamPackage.to_string nv, dir) nv_dirs
       in
+      let checksums = OpamFile.URL.checksum url in
       (OpamRepository.pull_shared_tree ~cache_dir ~cache_urls
-         dirnames
-         (OpamFile.URL.checksum url)
+         dirnames checksums
          (OpamFile.URL.url url :: OpamFile.URL.mirrors url))
-      @@| fun r -> Some r
+      @@+ function
+      | Not_available (_s,_l) as source_result ->
+        (OpamDownload.SWHID.fallback url @@+ function
+          | Right msg ->
+          (* TODO integrate in fetch error *)
+            if msg <> "" then
+              OpamConsole.warning "SWH fallback error: %s" msg;
+            Done (Some (source_result))
+          | Left swhid_url ->
+            (OpamRepository.pull_shared_tree ~cache_dir ~cache_urls
+               dirnames checksums [swhid_url])
+            @@| fun r -> Some r)
+      | source_result -> Done (Some source_result)
   in
   let fetch_extra_source_job (nv, name, u) = function
     | (_, _, Not_available _) :: _ as err -> Done err
