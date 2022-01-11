@@ -544,7 +544,7 @@ let detail_printer ?prettify ?normalise ?(sort=false) st nv =
        let value =
          if String.equal f "url.swhid" then
            match OpamFile.(OPAM.url opam >>= URL.swhid) with
-           | Some f -> OpamTypesBase.nullify_pos (String (OpamHash.SWHID.to_string f))
+           | Some f -> OpamTypesBase.nullify_pos (String (OpamSWHID.to_string f))
            | None -> raise Not_found
          else
          let opam =

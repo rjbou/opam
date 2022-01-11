@@ -89,13 +89,13 @@ module Op: sig
 
 end
 
-module SWHID: sig
+module OpamSWHID: sig
 
   (** Check url validity regarding its form:
       http backend and swhid path prefix [swhid.opam.ocaml.org] *)
   val is_valid: t -> bool
 
-  val of_url: t -> OpamHash.SWHID.t option
-  val to_url: OpamHash.SWHID.t -> t
+  val of_url: t -> OpamSWHID.t option
+  val to_url: OpamSWHID.t -> t
 
 end

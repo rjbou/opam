@@ -309,7 +309,7 @@ module Op = struct
 
 end
 
-module SWHID = struct
+module OpamSWHID = struct
 
   let http_prefix = "swhid.opam.ocaml.org/"
   let ssh_prefix = "swh/"
@@ -329,11 +329,11 @@ module SWHID = struct
         else
           "swh:" ^ OpamStd.String.remove_prefix ~prefix:ssh_prefix u.path
       in
-      Some (OpamHash.SWHID.of_string swhid)
+      Some (OpamSWHID.of_string swhid)
     with Invalid_argument _ -> None
   let to_url h =
     { transport = "https"; backend = `http ; hash = None;
-      path = Printf.sprintf "%s%s" http_prefix (OpamHash.SWHID.to_string h)
+      path = Printf.sprintf "%s%s" http_prefix (OpamSWHID.to_string h)
     }
 
 end

@@ -2210,7 +2210,7 @@ module URLSyntax = struct
     url     : url;
     mirrors : url list;
     checksum: OpamHash.t list;
-    swhid: OpamHash.SWHID.t option;
+    swhid: OpamSWHID.t option;
     errors  : (string * Pp.bad_format) list;
     subpath : string option;
   }
@@ -2284,13 +2284,13 @@ module URLSyntax = struct
       (fun x -> x) -|
     Pp.pp ~name
       (fun ~pos:_ t ->
-         let swhid, mirrors = OpamStd.List.pick OpamUrl.SWHID.is_valid t.mirrors in
+         let swhid, mirrors = OpamStd.List.pick OpamUrl.OpamSWHID.is_valid t.mirrors in
          match swhid with
          | None -> t
          | Some swhid_url ->
-           (match OpamUrl.SWHID.of_url swhid_url with
+           (match OpamUrl.OpamSWHID.of_url swhid_url with
             | None ->
-              Pp.warn "Bad format of SWHID url: %s" (OpamUrl.to_string swhid_url);
+              Pp.warn "Bad format of OpamSWHID url: %s" (OpamUrl.to_string swhid_url);
               t
             | swhid ->
               { t with swhid ; mirrors }))
@@ -2300,7 +2300,7 @@ module URLSyntax = struct
          | Some swhid ->
            { t with
              swhid = None;
-             mirrors = OpamUrl.SWHID.to_url swhid :: t.mirrors })
+             mirrors = OpamUrl.OpamSWHID.to_url swhid :: t.mirrors })
 
   let pp = Pp.I.map_file pp_contents
 
