@@ -520,6 +520,27 @@ let cleanup_source st old_opam_opt new_opam =
     OpamFilename.rmdir
       (OpamSwitchState.source_dir st (OpamFile.OPAM.package new_opam))
 
+let rec swhid_fallback opam ?(timeout=6) =
+  if timeout <= 0 then Done None
+  else
+  let swhid = OpamStd.Option.Op.(
+      OpamFile.OPAM.url opam >>= OpamFile.URL.swhid
+    ) in
+  match swhid with
+  | None -> Done None
+  | Some swhid ->
+    let hash = swhid.OpamSWHID.swh_hash in
+    let get_url = match swhid.OpamSWHID.swh_object_type with
+      | `rev -> OpamSWHID.url_from_rev
+      | `rel -> OpamSWHID.url_from_rel
+    in
+    get_url hash @@+ function
+    | Some ("done", fetch_url) -> Done (Some fetch_url)
+    | Some ("pending", _fetch_url) | Some ("new", _fetch_url) ->
+      Unix.sleep 10;
+      swhid_fallback opam ~timeout:(timeout - 1)
+    | None | Some ("failed", _) | Some (_, _) -> Done None
+
 let download_package_source st nv dirname =
   let opam = OpamSwitchState.opam st nv in
   let cache_dir = OpamRepositoryPath.download_cache st.switch_global.root in
