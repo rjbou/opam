@@ -51,5 +51,5 @@ val compute_from_string: ?kind:kind -> string -> t
 module SWHID : sig
   type t
   include OpamStd.ABSTRACT with type t := t
-  val is_valid : string -> bool
+(*   val is_valid : string -> bool *)
 end
