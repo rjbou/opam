@@ -520,6 +520,17 @@ let cleanup_source st old_opam_opt new_opam =
     OpamFilename.rmdir
       (OpamSwitchState.source_dir st (OpamFile.OPAM.package new_opam))
 
+let swhid_fallback opam =
+  let swhid = OpamStd.Option.Op.(
+      OpamFile.OPAM.url opam >>= OpamFile.URL.swhid
+    ) in
+  match swhid with
+  | None -> ()
+  | Some swhid ->
+    OpamConsole.error "swhid fallback!";
+    ()
+
+
 let download_package_source st nv dirname =
   let opam = OpamSwitchState.opam st nv in
   let cache_dir = OpamRepositoryPath.download_cache st.switch_global.root in
