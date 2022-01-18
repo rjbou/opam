@@ -77,6 +77,10 @@ users)
 ## Exec
   * [NEW] Add `opam exec --no-switch` [#4957 @kit-ty-kate - fix #4951]
 
+## Source
+  * Download source even if no switch is set [#4850 @rjbou @zapashcanon - fix #4809]
+  * [NEW] Add `--no-switch` option [#4850 @rjbou - fix #4858]
+
 ## Lint
   * W68: add warning for missing license field [#4766 @kit-ty-kate - partial fix #4598]
   * W62: use the spdx_licenses library to check for valid licenses. This allows to use compound expressions such as "MIT AND (GPL-2.0-only OR LGPL-2.0-only)", as well as user defined licenses e.g. "LicenseRef-my-custom-license" [#4768 @kit-ty-kate - fixes #4598]
@@ -225,6 +229,7 @@ users)
   * Add lock test [#4963 @rjbou]
   * Add working dir/inplace/assume-built test [#5081 @rjbou]
   * Fix github url: `git://` form no more handled [#5097 @rjbou]
+  * Add source test [#4850 @rjbou]
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -286,6 +291,7 @@ users)
   * `OpamClient`: fix `update_with_init_config`, when ``jobs` was set in `init_config`, it dropped rest of `config` update [#5056 @rjbou]
   * Add an optional argument to `OpamArg.mk_subdoc` for extra default elements: `?extra_defaults:(validity * string * string) list` [#4910 @kit-ty-kate]
   * Add `OpamSwitchCommand.previous_switch` [#4910 @kit-ty-kate]
+  * OpamAction: `prepare_package_source` can now take any switch state (previously required `rw`) [#4850 @rjbou]
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
   * New download functions for shared source, old ones kept [#4893 @rjbou]
