@@ -9,6 +9,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open OpamTypes
+
 (** Configuration init and handling of downloading commands *)
 
 exception Download_fail of string option * string
@@ -29,3 +31,10 @@ val download_as:
   ?checksum:OpamHash.t ->
   OpamUrl.t -> OpamFilename.t ->
   unit OpamProcess.job
+
+module SWHID: sig
+  val archive_fallback:
+    ?timeout:int -> OpamFile.URL.t ->
+    (string * OpamFilename.Dir.t * subpath option) list ->
+    string option download OpamProcess.job
+end
