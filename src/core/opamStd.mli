@@ -291,6 +291,8 @@ module String : sig
 
   val fold_left: ('a -> char -> 'a) -> 'a -> string -> 'a
 
+  val is_hex: string -> bool
+
 end
 
 module Format : sig
