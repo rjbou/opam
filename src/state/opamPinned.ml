@@ -252,3 +252,42 @@ let orig_opam_file st name ?(locked=false) opam =
   OpamStd.List.find_opt OpamFilename.exists locked_files
   ++ OpamStd.List.find_opt OpamFilename.exists opam_files
   >>| OpamFile.make
+
+let save_overlay st name ?version urlf opam =
+  log "saving overlay for %s" (OpamPackage.Name.to_string name);
+  let version =
+      version
+      ++ OpamFile.OPAM.version_opt opam
+      +! OpamPackage.Version.default
+  in
+  let root = st.switch_global.root in
+  let overlay_dir = OpamPath.Switch.Overlay.package root st.switch name in
+  OpamFilename.mkdir overlay_dir;
+  let opam_file = OpamPath.Switch.Overlay.opam root st.switch name in
+  List.iter OpamFilename.remove
+    OpamPath.Switch.Overlay.([
+        OpamFile.filename opam_file;
+        OpamFile.filename (url root st.switch name);
+        OpamFile.filename (descr root st.switch name);
+      ]);
+  let files_dir = OpamPath.Switch.Overlay.files root st.switch name in
+  OpamFilename.rmdir files_dir;
+  let opam =
+    OpamFile.OPAM.with_name name opam
+    |> OpamFile.OPAM.with_version version
+    |> OpamFile.OPAM.with_url urlf
+  in
+  List.iter (fun (file, rel_file, hash) ->
+      if OpamFilename.exists file &&
+         OpamHash.check_file (OpamFilename.to_string file) hash then
+        OpamFilename.copy ~src:file
+          ~dst:(OpamFilename.create files_dir rel_file)
+      else
+        OpamConsole.warning "Ignoring file %s with invalid hash"
+          (OpamFilename.to_string file))
+    (OpamFile.OPAM.get_extra_files
+       ~repos_roots:(OpamRepositoryState.get_root st.switch_repos)
+       opam);
+  OpamFile.OPAM.write opam_file
+    (OpamFile.OPAM.with_extra_files_opt None opam);
+  opam

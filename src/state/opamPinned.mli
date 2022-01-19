@@ -52,3 +52,8 @@ val name_of_opam_filename: ?locked:bool -> dirname -> filename -> name option
 val orig_opam_file:
   'a switch_state -> OpamPackage.Name.t -> ?locked:bool -> OpamFile.OPAM.t ->
   OpamFile.OPAM.t OpamFile.t option
+
+(** Save the opam file in overlay directory, retrieves extra files too *)
+val save_overlay:
+  rw switch_state -> name -> ?version:version -> OpamFile.URL.t ->
+  OpamFile.OPAM.t -> OpamFile.OPAM.t

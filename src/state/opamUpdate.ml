@@ -305,39 +305,8 @@ let pinned_package st ?version ?(working_dir=false) name =
       | Some a, Some b -> not (equal_opam a b)
     in
     let save_overlay opam =
-      OpamFilename.mkdir overlay_dir;
-      let opam_file = OpamPath.Switch.Overlay.opam root st.switch name in
-      List.iter OpamFilename.remove
-        OpamPath.Switch.Overlay.([
-            OpamFile.filename opam_file;
-            OpamFile.filename (url root st.switch name);
-            OpamFile.filename (descr root st.switch name);
-          ]);
-      let files_dir = OpamPath.Switch.Overlay.files root st.switch name in
-      OpamFilename.rmdir files_dir;
-      let opam =
-        OpamFile.OPAM.with_url urlf @@
-        OpamFile.OPAM.with_name name opam
-      in
-      let opam =
-        if OpamFile.OPAM.version_opt opam = None
-        then OpamFile.OPAM.with_version version opam
-        else opam
-      in
-      List.iter (fun (file, rel_file, hash) ->
-          if OpamFilename.exists file &&
-             OpamHash.check_file (OpamFilename.to_string file) hash then
-            OpamFilename.copy ~src:file
-              ~dst:(OpamFilename.create files_dir rel_file)
-          else
-            OpamConsole.warning "Ignoring file %s with invalid hash"
-              (OpamFilename.to_string file))
-        (OpamFile.OPAM.get_extra_files
-           ~repos_roots:(OpamRepositoryState.get_root st.switch_repos)
-           opam);
-      OpamFile.OPAM.write opam_file
-        (OpamFile.OPAM.with_extra_files_opt None opam);
-      opam
+      let version = OpamFile.OPAM.version_opt opam +! version in
+      OpamPinned.save_overlay st name ~version urlf opam
     in
     match result, new_source_opam with
     | Result _, Some new_opam
