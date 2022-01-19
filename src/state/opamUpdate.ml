@@ -199,7 +199,7 @@ let pinned_package st ?version ?(working_dir=false) name =
     let version =
       OpamFile.OPAM.version_opt opam ++
       version +!
-      OpamPackage.Version.of_string "dev"
+      OpamPackage.Version.default
     in
     let nv = OpamPackage.create name version in
     let srcdir = OpamPath.Switch.pinned_package root st.switch name in
