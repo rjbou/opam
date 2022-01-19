@@ -120,11 +120,19 @@ let compute_upgrade_t
       OpamPackage.Set.fold (fun nv0 (t, to_upgrade) ->
           let name = OpamPackage.name nv0 in
           let srcdir =
-            OpamPath.Switch.pinned_package t.switch_global.root t.switch name
+            let srcdir =
+              OpamPath.Switch.pinned_package t.switch_global.root t.switch name
+            in
+            let subpath =
+              let open OpamStd.Option.Op in
+              OpamSwitchState.opam t nv0
+              |> OpamFile.OPAM.url
+              >>= OpamFile.URL.subpath
+            in
+            OpamFilename.SubPath.(srcdir /? subpath)
           in
           let lock =
             OpamStd.Option.replace OpamFile.OPAM.read_opt
-              (* XXX handle subpath *)
               (OpamPinned.find_lock_file_in_source name srcdir)
           in
           let overlay =
