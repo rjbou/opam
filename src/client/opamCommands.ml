@@ -2345,13 +2345,18 @@ let repository cli =
       OpamStd.List.insert_at rank new_repo
         (List.filter (( <> ) new_repo ) repos)
     in
-    let check_for_repos rt names err =
+    let check_for_repos' repos names err =
       match
         List.filter (fun n ->
-            not (OpamRepositoryName.Map.mem n rt.repositories))
+            not (List.exists (OpamRepositoryName.equal n) repos))
           names
-      with [] -> () | l ->
-        err (OpamStd.List.concat_map " " OpamRepositoryName.to_string l)
+      with [] -> true | l ->
+        err (OpamStd.List.concat_map " " OpamRepositoryName.to_string l);
+        List.compare_lengths l names <> 0
+    in
+    let check_for_repos rt names err =
+      let _has_known_repos : bool = check_for_repos' rt names err in
+      ()
     in
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
     let all_switches = OpamFile.Config.installed_switches gt.config in
@@ -2424,27 +2429,49 @@ let repository cli =
       let rm = List.filter (fun n -> not (List.mem n names)) in
       let full_wipe = List.mem `All scope in
       let global = global || full_wipe in
-      let gt =
+      let update_gt () =
         OpamRepositoryCommand.update_selection gt
           ~global ~switches:switches rm
       in
       if full_wipe then
+        let gt = update_gt () in
         OpamRepositoryState.with_ `Lock_write gt @@ fun rt ->
-        check_for_repos rt names
+        let repos =
+          OpamRepositoryName.Map.keys rt.OpamStateTypes.repositories
+        in
+        check_for_repos repos names
           (OpamConsole.warning
              "No configured repositories by these names found: %s");
         OpamRepositoryState.drop @@
         List.fold_left OpamRepositoryCommand.remove rt names
-      else if scope = [`Current_switch] then
-        OpamConsole.msg
-          "Repositories removed from the selections of switch %s. \
-           Use '--all' to forget about them altogether.\n"
-          (OpamSwitch.to_string (OpamStateConfig.get_switch ()));
+      else begin
+        let has_known_repos =
+          OpamRepositoryState.with_ `Lock_none gt @@ fun rt ->
+          List.fold_left (fun has_known_repos switch ->
+              let repos = OpamRepositoryCommand.switch_repos rt switch in
+              check_for_repos' repos names
+                (OpamConsole.warning
+                   "No configured repositories by these names found in \
+                    the selection of switch '%s': %s"
+                   (OpamSwitch.to_string switch))
+              || has_known_repos)
+            false switches
+        in
+        if scope = [`Current_switch] && has_known_repos then
+          OpamConsole.msg
+            "Repositories removed from the selections of switch %s. \
+             Use '--all' to forget about them altogether.\n"
+            (OpamSwitch.to_string (OpamStateConfig.get_switch ()));
+        OpamGlobalState.drop (update_gt ())
+      end;
       `Ok ()
     | Some `add, [name] ->
       let name = OpamRepositoryName.of_string name in
       OpamRepositoryState.with_ `Lock_none gt (fun rt ->
-          check_for_repos rt [name]
+          let repos =
+            OpamRepositoryName.Map.keys rt.OpamStateTypes.repositories
+          in
+          check_for_repos repos [name]
             (OpamConsole.error_and_exit `Not_found
                "No configured repository '%s' found, you must specify an URL"));
       OpamGlobalState.drop @@
