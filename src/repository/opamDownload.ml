@@ -193,3 +193,15 @@ let download ?quiet ?validate ~overwrite ?compress ?checksum url dstdir =
   in
   download_as ?quiet ?validate ~overwrite ?compress ?checksum url dst @@|
   fun () -> dst
+
+let get_output url =
+  let cmd, _ = Lazy.force OpamRepositoryConfig.(!r.download_tool) in
+  let cmd =
+    match cmd with
+    | [(CIdent ("wget"|"fetch"|"curl" as cmd)), _] -> cmd
+    | _ -> "curl"
+  in
+  (* XXX use read command output ? *)
+  OpamSystem.make_command cmd [OpamUrl.to_string url] @@> function
+    { OpamProcess.r_code; OpamProcess.r_stdout; _ } ->
+    if r_code <> 0 then Done None else Done (Some r_stdout)

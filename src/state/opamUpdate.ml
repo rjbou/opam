@@ -535,11 +535,11 @@ let rec swhid_fallback opam ?(timeout=6) =
       | `rel -> OpamSWHID.url_from_rel
     in
     get_url hash @@+ function
-    | Some ("done", fetch_url) -> Done (Some fetch_url)
-    | Some ("pending", _fetch_url) | Some ("new", _fetch_url) ->
+    | Some (`Done fetch_url) -> Done (Some fetch_url)
+    | Some (`Pending | `New) ->
       Unix.sleep 10;
       swhid_fallback opam ~timeout:(timeout - 1)
-    | None | Some ("failed", _) | Some (_, _) -> Done None
+    | None | Some (`Failed | `Unknown) -> Done None
 
 let download_package_source st nv dirname =
   let opam = OpamSwitchState.opam st nv in

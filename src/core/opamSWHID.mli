@@ -27,5 +27,6 @@ val of_url: OpamUrl.t -> t option
 val to_url: t -> OpamUrl.t
 
 (** retrieval things *)
-val url_from_rev : string -> (string * string) option OpamProcess.Job.Op.job
-val url_from_rel : string -> (string * string) option OpamProcess.Job.Op.job
+type status = [ `Done of OpamUrl.t | `Pending | `New | `Failed  | `Unknown ]
+val url_from_rev : string -> status option OpamProcess.Job.Op.job
+val url_from_rel : string -> status option OpamProcess.Job.Op.job

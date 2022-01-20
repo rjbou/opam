@@ -29,3 +29,5 @@ val download_as:
   ?checksum:OpamHash.t ->
   OpamUrl.t -> OpamFilename.t ->
   unit OpamProcess.job
+
+val get_output: OpamUrl.t -> string list list option OpamProcess.job

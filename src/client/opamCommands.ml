@@ -2202,6 +2202,9 @@ let repository cli =
     | Some `remove, names ->
       let names = List.map OpamRepositoryName.of_string names in
       let rm = List.filter (fun n -> not (List.mem n names)) in
+      OpamConsole.error "names %s rm %s " 
+      (OpamStd.List.to_string OpamRepositoryName.to_string names)
+      (OpamStd.List.to_string OpamRepositoryName.to_string (rm names));
       let full_wipe = List.mem `All scope in
       let global = global || full_wipe in
       let gt =

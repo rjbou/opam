@@ -89,12 +89,21 @@ let to_url swh =
 
 open OpamProcess.Job.Op
 
-let instance = "https://archive.softwareheritage.org"
-let full_url endpoint = Printf.sprintf "%s/api/1%s" instance endpoint
+let instance = OpamUrl.of_string "https://archive.softwareheritage.org"
+let full_url middle hash = OpamUrl.Op.(instance / middle / hash)
 
-let json_of_string _s = assert false
+let json_of_string _s = _s
 
-let find_string _key _v =
+let find_string key s =
+  let re =
+    Re.(compile @@ seq
+          [ Re.str ("\""^key^"\":\"") ;
+            group @@ rep1 @@ diff any (char '"');
+            char '"' ])
+  in
+  try Some Re.(Group.get (exec re s) 1)
+  with Not_found -> None
+
 
   (*
    * $ curl https://archive.softwareheritage.org/api/1/vault/directory/4453cfbdab1a996658cd1a815711664ee7742380/
@@ -111,39 +120,48 @@ let find_string _key _v =
    *
    * *)
 
-  assert false
+type status = [ `Done of OpamUrl.t | `Pending | `New | `Failed | `Unknown ]
 
 let get_output url =
-  let args = [ url ] in
-  OpamSystem.make_command "curl" args @@> function
-   { OpamProcess.r_code; OpamProcess.r_stdout; _ } ->
-  if r_code <> 0 then Done None else
-  let json = String.concat "" r_stdout in
-  Done (Some (json_of_string json))
+ OpamDownload.get_output url @@> fun out ->
+    let json = String.concat "" out in
+    Done (Some (json_of_string json))
 
 let get_dir hash =
-  let url = full_url (Format.sprintf "/vault/directory/%s" hash) in
-  get_output url @@+ fun json ->
+  let url = full_url "vault/directory" hash in
+  get_output url @@| OpamStd.Option.replace @@ fun json ->
   let status = find_string "status" json in
   let fetch_url = find_string "fetch_url" json in
-  Done (Some (status, fetch_url))
+  match status, fetch_url with
+  | None, _ | _, None -> None
+  | Some status, Some fetch_url ->
+    Some (match status with
+        | "done" -> `Done (OpamUrl.of_string fetch_url)
+        | "pending" -> `Pending
+        | "new" -> `New
+        | "failed" -> `Failed
+        | _ -> `Unknown)
 
 let url_from_rev hash =
-  let url = full_url (Format.sprintf "/revision/%s/" hash) in
-  get_output url @@+ fun json ->
-  match find_string "directory" json with
+  let url = full_url "revision" hash in
+  get_output url @@+ function
   | None -> Done None
-  | Some d -> get_dir d
+  | Some json ->
+    match find_string "directory" json with
+    | None -> Done None
+    | Some d -> get_dir d
 
 let rec url_from_rel hash =
-  let url = full_url (Format.sprintf "/release/%s/" hash) in
-  get_output url @@+ fun json ->
-    match find_string "target" json with
+  let url = full_url "release" hash in
+  get_output url @@+ function
     | None -> Done None
-    | Some target ->
-      match find_string "target_type" json with
+    | Some json ->
+      match find_string "target" json with
       | None -> Done None
-      | Some "release" -> url_from_rel target
-      | Some "revision" -> url_from_rev target
-      | Some "directory" -> get_dir target
-      | _target_type -> Done None
+      | Some target ->
+        match find_string "target_type" json with
+        | None -> Done None
+        | Some "release" -> url_from_rel target
+        | Some "revision" -> url_from_rev target
+        | Some "directory" -> get_dir target
+        | _target_type -> Done None
