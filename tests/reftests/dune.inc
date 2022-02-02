@@ -1095,6 +1095,23 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:resolve-variables.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-scripts)
+ (action
+  (diff scripts.test scripts.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-scripts)))
+
+(rule
+ (targets scripts.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:scripts.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-shared-fetch)
  (action
   (diff shared-fetch.test shared-fetch.out)))
