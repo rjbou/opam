@@ -199,6 +199,7 @@ users)
   * [BUG] Remove windows double printing on commands and their output [#4940 @rjbou]
   * OpamParallel, MakeGraph(_).to_json: fix incorrect use of List.assoc [#5038 @Armael]
   * [BUG] Fix display of command when parallelised [#5091 @rjbou]
+  * Make SHA computation faster by using ocaml-sha [#5042 @kit-ty-kate]
 
 ## Internal: Windows
   * Support MSYS2: treat MSYS2 and Cygwin as equivalent [#4813 @jonahbeckford]
