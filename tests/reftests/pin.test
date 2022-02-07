@@ -1,5 +1,6 @@
 N0REP0
 ### opam switch create pinning --empty
+### : --current option :
 ### opam pin --current foo
 [ERROR] foo is not installed, invalid flag `--current'
 # Return code 2 #
