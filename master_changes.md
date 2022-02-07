@@ -58,6 +58,7 @@ users)
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
   * ◈ New option `opam pin --current` to fix a package in its current state (avoiding pending reinstallations or removals from the repository) [#4973 @AltGr - fix #4970]
   * [BUG] Fix using `--working-dir` with non pinned packages: it was not downloading sources as they were remove from package that need sources [#5082 @rjbou - fix #5060]
+  * [BUG] Handle external dependencies when updating switch state pin status (all pins), instead as a post pin action (only when called with `opam pin` [#5047 @rjbou - fix #5046]
 
 ## List
   * Some optimisations to 'opam list --installable' queries combined with other filters [#4882 @altgr - fix #4311]
@@ -306,6 +307,7 @@ users)
   * Add an optional argument to `OpamArg.mk_subdoc` for extra default elements: `?extra_defaults:(validity * string * string) list` [#4910 @kit-ty-kate]
   * Add `OpamSwitchCommand.previous_switch` [#4910 @kit-ty-kate]
   * `OpamClient`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
+  * `OpamClient.Pin.post_pin_action`: no more updates depexts information, moved to `OpamSwitchState.update_pin` [#5047 @rjbou]
 
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
@@ -315,6 +317,7 @@ users)
 
 ## opam-state
   * `OpamSwitchState.universe`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
+  * `OpamSwitchState.update_pin`: updates depexts state informations (`sys_packages`, `avalaible_packages`) [#5047 @rjbou]
 
 ## opam-solver
   * `OpamCudf`: Change type of `conflict_case.Conflict_cycle` (`string list list` to `Cudf.package action list list`) and `cycle_conflict`, `string_of_explanations`, `conflict_explanations_raw` types accordingly [#4039 @gasche]
