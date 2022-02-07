@@ -27,7 +27,7 @@ bar is now pinned to file://${BASEDIR}/bar (version dev)
 The following actions will be performed:
 === install 2 packages
   - install bar dev (pinned)
-  - install qux dev (pinned) [required by bar]
+  - install qux dev (pinned)
 
 The following system packages will first need to be installed:
     another-inexistant inexistant
@@ -77,6 +77,23 @@ The following actions will be performed:
 === install 2 packages
   - install bar dev (pinned)
   - install qux dev (pinned) [required by bar]
+
+The following system packages will first need to be installed:
+    another-inexistant inexistant
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+This command should get the requirements installed:
+
+    syspkgmanager install another-inexistant inexistant
+
+Would you like opam to:
+> 1. Check again, as the package is now installed
+  2. Attempt installation anyway, and permanently register that this external dependency is present, but not detectable
+  3. Abort the installation
+
+[1/2/3] 1[D[K[1/2/3] 1
+
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> retrieved bar.dev  (file://${BASEDIR}/bar)
