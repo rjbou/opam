@@ -115,8 +115,7 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
         let a = (a :> package action) in
         (if OpamConsole.utf8 ()
          then action_color a (symbol_of_action a)
-         else "-")
-        :: name_of_action a
+         else action_color a "- " ^ name_of_action a)
         :: OpamConsole.colorise `bold
           (P.name_to_string (OpamTypesBase.action_contents a))
         :: match a with
