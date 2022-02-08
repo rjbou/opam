@@ -17,7 +17,8 @@ module type ACTION = sig
   include OpamParallel.VERTEX with type t = package action
   val to_string: [< t ] -> string
   val to_aligned_strings:
-    ?append:(package -> string) -> [< t ] list -> string list list
+    ?explicit:bool -> ?append:(package -> string) -> [< t ] list ->
+    string list list
   module Set: OpamStd.SET with type elt = package action
   module Map: OpamStd.MAP with type key = package action
 end
@@ -119,11 +120,12 @@ module MakeAction (P: GenericPackage) : ACTION with type package = P.t
         (action_strings a)
         (P.version_to_string p)
 
-  let to_aligned_strings ?(append=(fun _ -> "")) l =
+  let to_aligned_strings ?(explicit=false) ?(append=(fun _ -> "")) l =
     List.map (fun a ->
         let a = (a :> package action) in
         (if OpamConsole.utf8 ()
-         then action_color a (symbol_of_action a)
+         then action_color a (symbol_of_action a) ^
+              if explicit then  " " ^ name_of_action a else ""
          else action_color a "- " ^ name_of_action a)
         :: OpamConsole.colorise `bold
           (P.name_to_string (OpamTypesBase.action_contents a))
