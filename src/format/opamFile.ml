@@ -2744,7 +2744,7 @@ module OPAMSyntax = struct
     if known_flags <> flags then
       Pp.warn ~pos
         "Unknown package flags %s ignored"
-        (OpamStd.Format.pretty_list (OpamStd.List.filter_map (function
+        (OpamStd.Format.pretty_list (List.filter_map (function
              | Pkgflag_Unknown s -> Some s
              | _ -> None)
              flags));

@@ -214,7 +214,7 @@ let preprocess_dot_install st nv build_dir =
       OpamFilename.in_dir build_dir @@ fun () ->
       log "Installing %s.\n" (OpamPackage.to_string nv);
       let warnings =
-        OpamStd.List.filter_map (fun install -> install warning) installs
+        List.filter_map (fun install -> install warning) installs
       in
       if warnings <> [] then
         (let install_f = OpamPath.Switch.install root st.switch nv.name in
