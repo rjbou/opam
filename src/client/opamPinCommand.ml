@@ -458,6 +458,7 @@ and source_pin
     with Not_found -> None
   in *)
 
+  OpamConsole.error "shouldn't be here";
   let open OpamStd.Option.Op in
 
   let cur_version, cur_urlf =
