@@ -616,7 +616,7 @@ let update_with_init_config ?(overwrite=false) config init_config =
     else if getter conf = getter C.empty then setter v conf
     else conf
   in
-  config |>
+  config 
   match I.jobs init_config with
       | Some j -> setifnew C.jobs C.with_jobs j
       | None -> fun c -> c |>
