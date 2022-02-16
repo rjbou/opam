@@ -74,6 +74,11 @@ AC_ARG_WITH([private_runtime],
                  [For a mingw-w64 build, manifest the runtime DLLs locally in Opam.Runtime.arch]),,[with_private_runtime=no]
 )
 
+AC_ARG_ENABLE([frozen_check],
+  AC_HELP_STRING([--enable-frozen-check],
+                 [Fail on some check necessary for make frozen]),[FROZEN_CHECK=yes],[]
+)
+
 AC_ARG_ENABLE([cold_check],
   AC_HELP_STRING([--enable-cold-check],
                  [Fail on some check necessary for make cold]),[COLD_CHECK=yes],[]
