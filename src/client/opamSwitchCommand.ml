@@ -307,6 +307,7 @@ let install_compiler
 
 let create
     gt ~rt ?synopsis ?repos ~update_config ~invariant switch post =
+    (match OpamStd.Sys.os () with | Linux | Unix -> OpamConsole.error "It's a linux!" | _ -> ());
   let update_config = update_config && not (OpamSwitch.is_external switch) in
   let comp_dir = OpamPath.Switch.root gt.root switch in
   let simulate = OpamStateConfig.(!r.dryrun) || OpamClientConfig.(!r.show) in
