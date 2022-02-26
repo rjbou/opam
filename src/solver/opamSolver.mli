@@ -106,11 +106,15 @@ val installable_subset: universe -> package_set -> package_set
     [post]: include post dependencies (depends: foo {post})
     [installed]: only consider already-installed packages
     [unavaiable]: also consider unavailable packages
+
+    @param including_init if [true] will include [set] in the return value.
+    Default is [true].
 *)
 val dependencies :
   depopts:bool -> build:bool -> post:bool ->
   installed:bool ->
   ?unavailable:bool ->
+  ?including_init:bool ->
   universe ->
   package_set ->
   package_set
@@ -120,6 +124,7 @@ val reverse_dependencies :
   depopts:bool -> build:bool -> post:bool ->
   installed:bool ->
   ?unavailable:bool ->
+  ?including_init:bool ->
   universe ->
   package_set ->
   package_set

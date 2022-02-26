@@ -230,7 +230,7 @@ let apply_selector ~base st = function
       | _ -> assert false
     in
     deps_fun ~depopts:tog.depopts ~build:tog.build ~post:tog.post
-      ~installed:false ~unavailable:true
+      ~installed:false ~unavailable:true ~including_init:false
       (get_universe st tog)
       (packages_of_atoms st atoms)
   | Required_by (tog, atoms) ->
