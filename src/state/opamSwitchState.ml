@@ -974,8 +974,9 @@ let universe st
       |> OpamFormula.packages st.packages
     in
     let requested_deps =
+      requested_allpkgs ++
       if false (*OpamStateConfig.(!r.skip_reinstalls)*)
-      then requested_allpkgs
+      then OpamPackage.Set.empty
       else OpamPackage.Set.fixpoint resolve_deps requested_allpkgs
     in
     requested_deps %% Lazy.force st.reinstall ++

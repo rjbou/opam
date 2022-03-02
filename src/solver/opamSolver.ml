@@ -587,7 +587,7 @@ let dependency_graph
 
 let filter_dependencies
     f_direction ~depopts ~build ~post ~installed
-    ?(unavailable=false) ?including_init universe packages =
+    ?(unavailable=false) universe packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Set.empty else
   let u_packages =
     packages ++
@@ -601,7 +601,7 @@ let filter_dependencies
       ~depopts ~build ~post universe u_packages packages
   in
   log ~level:3 "filter_dependencies: dependency";
-  let clos_packages = f_direction ?including_init cudf_universe cudf_packages in
+  let clos_packages = f_direction cudf_universe cudf_packages in
   let result =
     OpamCudf.Set.fold (fun cp -> OpamPackage.Set.add (OpamCudf.cudf2opam cp))
       clos_packages OpamPackage.Set.empty

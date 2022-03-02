@@ -38,11 +38,9 @@ module type SET = sig
   (** Raises Failure in case the element is already present *)
   val safe_add: elt -> t -> t
 
-  (** [fixpoint f set] Accumulates the resulting sets of a function of elements
-      until a fixpoint is reached.
-      @param including_init is [false], [set] won’t be included in the returned
-      set (unless returned by [f]). Default is [true]. *)
-  val fixpoint: ?including_init:bool -> (elt -> t) -> t -> t
+  (** Accumulates the resulting sets of a function of elements until a fixpoint
+      is reached *)
+  val fixpoint: (elt -> t) -> t -> t
 
   (** [map_reduce f op t] applies [f] to every element of [t] and combines the
       results using associative operator [op]. Raises [Invalid_argument] on an

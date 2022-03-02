@@ -1381,10 +1381,14 @@ let config cli =
               match OpamSwitchState.opam_opt state p with
               | Some o -> OpamFile.OPAM.has_flag Pkgflag_Compiler o
               | None -> false)
-          |> OpamSolver.dependencies ~depopts:true ~post:true ~build:true
-            ~installed:true
-            (OpamSwitchState.universe ~test:true ~doc:true ~tools:true
-               ~requested:OpamPackage.Set.empty state Query)
+          |> (fun set ->
+                let open OpamPackage.Set.Op in
+                OpamSolver.dependencies ~depopts:true ~post:true ~build:true
+                  ~installed:true
+                  (OpamSwitchState.universe ~test:true ~doc:true ~tools:true
+                     ~requested:OpamPackage.Set.empty state Query)
+                  set ++
+                set)
           |> OpamPackage.Set.iter process;
           if List.mem "." (OpamStd.Sys.split_path_variable (Sys.getenv "PATH"))
           then OpamConsole.warning

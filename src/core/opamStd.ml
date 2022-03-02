@@ -22,7 +22,7 @@ module type SET = sig
   val find: (elt -> bool) -> t -> elt
   val find_opt: (elt -> bool) -> t -> elt option
   val safe_add: elt -> t -> t
-  val fixpoint: ?including_init:bool -> (elt -> t) -> t -> t
+  val fixpoint: (elt -> t) -> t -> t
   val map_reduce: ?default:'a -> (elt -> 'a) -> ('a -> 'a -> 'a) -> t -> 'a
 
   module Op : sig
@@ -255,8 +255,7 @@ module Set = struct
       then failwith (Printf.sprintf "duplicate entry %s" (O.to_string elt))
       else add elt t
 
-    (* TODO: Make ~including_init:false the default *)
-    let fixpoint ?(including_init=true) f curset =
+    let fixpoint f curset =
       let open Op in
       let make_newset set = fold (fun nv set -> set ++ f nv) set empty in
       let rec aux fullset curset =
@@ -265,10 +264,7 @@ module Set = struct
         let fullset = fullset ++ curset in
         aux fullset (newset -- fullset)
       in
-      if including_init then
-        aux empty curset
-      else
-        aux empty (make_newset curset)
+      aux empty (make_newset curset)
 
     let map_reduce ?default f op t =
       match choose_opt t with
