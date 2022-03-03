@@ -465,13 +465,13 @@ version l1
 build
 ### opam upgrade --locked
 The following actions will be performed:
-=== recompile 1 package
-  - recompile tolock l1 (pinned) [upstream or system changes]
+=== upgrade 1 package
+  - upgrade tolock l1 to l2 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> retrieved tolock.l1  (no changes)
+-> retrieved tolock.l2  (file://${BASEDIR}/tolock)
 -> removed   tolock.l1
--> installed tolock.l1
+-> installed tolock.l2
 Done.
 ### <pin:tolock/tolock.opam>
 build: [ "false" ]
@@ -482,7 +482,7 @@ build: [ "echo" "locked" ]
 ### opam update tolock
 
 <><> Synchronising development packages <><><><><><><><><><><><><><><><><><><><>
-[tolock.l1] synchronised (file://${BASEDIR}/tolock)
+[tolock.l2] synchronised (file://${BASEDIR}/tolock)
 [tolock] Conflicting update of the metadata from file://${BASEDIR}/tolock.
 Override files in ${BASEDIR}/OPAM/locking/.opam-switch/overlay/tolock (there will be a backup)? [Y/n] y
 User metadata backed up in ${BASEDIR}/OPAM/backup/tolock.bak
@@ -492,21 +492,14 @@ version 3
 build   "false"
 ### opam upgrade --locked
 The following actions will be performed:
-=== downgrade 1 package
-  - downgrade tolock l1 to 3 (pinned) [no longer available]
+=== upgrade 1 package
+  - upgrade tolock l2 to l3 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-[ERROR] The compilation of tolock.3 failed at "false".
-
-
-
-
-<><> Error report <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-+- The following actions failed
-| - build tolock 3
-+- 
-- No changes have been performed
-# Return code 31 #
+-> retrieved tolock.l3  (file://${BASEDIR}/tolock)
+-> removed   tolock.l2
+-> installed tolock.l3
+Done.
 ### <pin:tolock/tolock.opam>
 build: [ "false" ]
 version: "4"
@@ -515,29 +508,22 @@ version: "l4"
 ### OPAMLOCKED=locked opam update tolock
 
 <><> Synchronising development packages <><><><><><><><><><><><><><><><><><><><>
-[tolock.3] synchronised (file://${BASEDIR}/tolock)
+[tolock.l3] synchronised (file://${BASEDIR}/tolock)
 [tolock] Installing new package description from upstream file://${BASEDIR}/tolock
 Now run 'opam upgrade' to apply any package updates.
 ### opam show tolock --field=version,build --normalise
-version 4
-build   "false"
+version l4
+build
 ### opam upgrade
 The following actions will be performed:
-=== downgrade 1 package
-  - downgrade tolock l1 to 4 (pinned) [no longer available]
+=== upgrade 1 package
+  - upgrade tolock l3 to l4 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-[ERROR] The compilation of tolock.4 failed at "false".
-
-
-
-
-<><> Error report <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-+- The following actions failed
-| - build tolock 4
-+- 
-- No changes have been performed
-# Return code 31 #
+-> retrieved tolock.l4  (file://${BASEDIR}/tolock)
+-> removed   tolock.l3
+-> installed tolock.l4
+Done.
 ### <pin:tolock/tolock.opam>
 version: "5"
 ### <pin:tolock/tolock.opam.locked>
@@ -546,8 +532,10 @@ version: "l5"
 ### opam update tolock
 
 <><> Synchronising development packages <><><><><><><><><><><><><><><><><><><><>
-[tolock.4] synchronised (file://${BASEDIR}/tolock)
-[tolock] Installing new package description from upstream file://${BASEDIR}/tolock
+[tolock.l4] synchronised (file://${BASEDIR}/tolock)
+[tolock] Conflicting update of the metadata from file://${BASEDIR}/tolock.
+Override files in ${BASEDIR}/OPAM/locking/.opam-switch/overlay/tolock (there will be a backup)? [Y/n] y
+User metadata backed up in ${BASEDIR}/OPAM/backup/tolock.bak
 Now run 'opam upgrade' to apply any package updates.
 ### opam show tolock --field=version,build --normalise
 version 5
@@ -555,10 +543,10 @@ build
 ### opam upgrade
 The following actions will be performed:
 === downgrade 1 package
-  - downgrade tolock l1 to 5 (pinned) [no longer available]
+  - downgrade tolock l4 to 5 (pinned) [no longer available]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   tolock.l1
+-> removed   tolock.l4
 -> installed tolock.5
 Done.
 ### <pin:tolock/tolock.opam.locked>
@@ -575,14 +563,18 @@ echo "]" >> tolock.install
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 [tolock.5] synchronised (file://${BASEDIR}/tolock)
+[tolock] Conflicting update of the metadata from file://${BASEDIR}/tolock.
+Override files in ${BASEDIR}/OPAM/locking/.opam-switch/overlay/tolock (there will be a backup)? [Y/n] y
+User metadata backed up in ${BASEDIR}/OPAM/backup/tolock.bak
 
 The following actions will be performed:
-=== recompile 1 package
-  - recompile tolock 5 (pinned)
+=== upgrade 1 package
+  - upgrade tolock 5 to l6 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved tolock.l6  (file://${BASEDIR}/tolock)
 -> removed   tolock.5
--> installed tolock.5
+-> installed tolock.l6
 Done.
 ### opam list --all --installed --columns=name,installed-files --normalise
 # Packages matching: any & installed
@@ -596,42 +588,44 @@ content
 [default] no changes from file://${BASEDIR}/REPO
 
 <><> Synchronising development packages <><><><><><><><><><><><><><><><><><><><>
-[tolock.5] synchronised (file://${BASEDIR}/tolock)
+[tolock.l6] synchronised (file://${BASEDIR}/tolock)
 Now run 'opam upgrade' to apply any package updates.
 ### opam upgrade
 The following actions will be performed:
 === recompile 1 package
-  - recompile tolock 5 (pinned) [upstream or system changes]
+  - recompile tolock l6 (pinned) [upstream or system changes]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   tolock.5
--> installed tolock.5
+-> retrieved tolock.l6  (no changes)
+-> removed   tolock.l6
+-> installed tolock.l6
 Done.
 ### opam list --all --installed --columns=name,installed-files --normalise
 # Packages matching: any & installed
 # Name # Installed files
-tolock
+tolock ${BASEDIR}/OPAM/locking/lib/tolock ${BASEDIR}/OPAM/locking/lib/tolock/fichier
 ### <tolock/files/warka>
 content
 ### opam update --dev
 
 <><> Synchronising development packages <><><><><><><><><><><><><><><><><><><><>
-[tolock.5] synchronised (file://${BASEDIR}/tolock)
+[tolock.l6] synchronised (file://${BASEDIR}/tolock)
 Now run 'opam upgrade' to apply any package updates.
 ### opam upgrade tolock
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
-[tolock.5] synchronised (no changes)
+[tolock.l6] synchronised (no changes)
 
 The following actions will be performed:
 === recompile 1 package
-  - recompile tolock 5 (pinned)
+  - recompile tolock l6 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   tolock.5
--> installed tolock.5
+-> retrieved tolock.l6  (no changes)
+-> removed   tolock.l6
+-> installed tolock.l6
 Done.
 ### opam list --all --installed --columns=name,installed-files --normalise
 # Packages matching: any & installed
 # Name # Installed files
-tolock
+tolock ${BASEDIR}/OPAM/locking/lib/tolock ${BASEDIR}/OPAM/locking/lib/tolock/fichier ${BASEDIR}/OPAM/locking/lib/tolock/warka
