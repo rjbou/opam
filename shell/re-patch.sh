@@ -65,12 +65,12 @@ for package in $(cd patches ; find . -maxdepth 1 -mindepth 1 -type d | sed -e 's
       patch -p1 --set-time --no-backup-if-mismatch < ../$patch
       cd ..
       (TZ=UTC+0 diff -Naur a b || true) > $patch.new
-      if ! diff -q $patch $patch.new &>/dev/null ; then
+#      if ! diff -q $patch $patch.new &>/dev/null ; then
         mv $patch $patch.old
         mv $patch.new $patch
-      else
-        rm $patch.new
-      fi
+#      else
+#        rm $patch.new
+#      fi
       rm -rf a
       mv b a
     done
