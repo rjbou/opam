@@ -7,7 +7,6 @@
 (*  exception on linking described in the file LICENSE.                   *)
 (*                                                                        *)
 (**************************************************************************)
-
 type t =
   [ `Null | `Bool of bool | `Float of float| `String of string
   | `A of t list | `O of (string * t) list ]
@@ -18,6 +17,11 @@ type 'a decoder = t -> 'a option
 let addc b c = Buffer.add_char b c
 let adds b s = Buffer.add_string b s
 let adds_esc b s =
+  let _ignored =
+  let open Jsonm in
+  let t : encoding = `UTF_8 in
+  ignore t
+  in
   let len = String.length s in
   let max_idx = len - 1 in
   let flush b start i =
