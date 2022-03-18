@@ -377,6 +377,23 @@
    (run ./run.exe %{bin:opam} %{dep:lock.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-minimal)
+ (action
+  (diff minimal.test minimal.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-minimal)))
+
+(rule
+ (targets minimal.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:minimal.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-opamroot-versions)
  (action
   (diff opamroot-versions.test opamroot-versions.out)))
@@ -596,6 +613,23 @@
   (with-stdout-to
    %{targets}
    (run ./run.exe %{bin:opam} %{dep:source.test} %{read-lines:testing-env}))))
+
+(rule
+ (alias reftest-swhid)
+ (action
+  (diff swhid.test swhid.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-swhid)))
+
+(rule
+ (targets swhid.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:swhid.test} %{read-lines:testing-env}))))
 
 (rule
  (alias reftest-switch-creation)
