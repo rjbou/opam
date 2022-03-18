@@ -683,6 +683,23 @@
    (run ./run.exe %{bin:opam} %{dep:source.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-swhid)
+ (action
+  (diff swhid.test swhid.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-swhid)))
+
+(rule
+ (targets swhid.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:swhid.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-switch-creation)
  (action
   (diff switch-creation.test switch-creation.out)))
