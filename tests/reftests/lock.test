@@ -249,7 +249,7 @@ version: "default-version"
 ### <pin:tolock-scan/tolock-scan.opam.locked>
 version: "locked-version"
 ### opam pin scan ./tolock-scan --locked | grep -v '# Name'
-tolock-scan  locked-version  file://${BASEDIR}/tolock-scan
+tolock-scan  locked-version  file://${BASEDIR}/tolock-scan  -
 ### : git pin with lock file :
 ### git -C tolock init -q
 ### git -C tolock config core.autocrlf false
