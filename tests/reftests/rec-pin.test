@@ -874,23 +874,24 @@ The following actions will be performed:
   - upgrade root-a-i-j_g l1 to l2 (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   root_g.l1
--> installed root_g.l2
--> retrieved root-a_p.l2  (file://${BASEDIR}/pinnes(a))
--> retrieved root-a-k_p.l2  (file://${BASEDIR}/pinnes(a/k))
--> removed   root-a_p.l1
--> installed root-a_p.l2
--> retrieved root-a-i_g.l2  (no changes)
--> removed   root-a-i_g.l1
--> installed root-a-i_g.l2
 -> retrieved root-a-i-j_g.l2  (no changes)
 -> removed   root-a-i-j_g.l1
--> installed root-a-i-j_g.l2
+-> retrieved root-a-i_g.l2  (no changes)
+-> removed   root-a-i_g.l1
+-> retrieved root-a-k_p.l2  (file://${BASEDIR}/pinnes(a/k))
 -> removed   root-a-k_p.l1
--> installed root-a-k_p.l2
+-> retrieved root-a_p.l2  (file://${BASEDIR}/pinnes(a))
+-> removed   root-a_p.l1
 -> retrieved root-b_g.l2  (no changes)
 -> removed   root-b_g.l1
+-> retrieved root_g.l2  (no changes)
+-> removed   root_g.l1
+-> installed root-a-i-j_g.l2
+-> installed root-a-i_g.l2
+-> installed root-a-k_p.l2
+-> installed root-a_p.l2
 -> installed root-b_g.l2
+-> installed root_g.l2
 Done.
 ### <pinnes/a/i/new>
 hej
@@ -907,21 +908,13 @@ hoj
 [root_g.l2] synchronised (git+file://${BASEDIR}/pinnes#master)
 ### opam upgrade | unordered
 The following actions will be performed:
-=== recompile 3 packages
-  - recompile root-a-i_g l2 (pinned) [upstream or system changes]
-  - recompile root-a-k_p l2 (pinned) [upstream or system changes]
-  - recompile root-a_p   l2 (pinned) [upstream or system changes]
--> retrieved root-a-k_p.l2  (no changes)
+=== recompile 1 package
+  - recompile root_g l2 (pinned) [upstream or system changes]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> retrieved root-a_p.l2  (no changes)
--> removed   root-a_p.l2
--> installed root-a_p.l2
--> retrieved root-a-i_g.l2  (no changes)
--> removed   root-a-i_g.l2
--> installed root-a-i_g.l2
--> removed   root-a-k_p.l2
--> installed root-a-k_p.l2
+-> retrieved root_g.l2  (no changes)
+-> removed   root_g.l2
+-> installed root_g.l2
 Done.
 ### opam list -s
 root-a-i-j_g
