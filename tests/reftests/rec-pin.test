@@ -353,28 +353,20 @@ hoj
 ### git -C pinnes add a/i/new
 ### git -C pinnes commit -qm "thd"
 ### opam update | grep synchronised
-[root-a-i-j_g.2] synchronised (git+file://${BASEDIR}/pinnes#master(a/i/j))
+[root-a-i-j_g.2] synchronised (no changes)
 [root-a-i_g.2] synchronised (git+file://${BASEDIR}/pinnes#master(a/i))
 [root-a-k_p.2] synchronised (file://${BASEDIR}/pinnes(a/k))
 [root-a_p.2] synchronised (file://${BASEDIR}/pinnes(a))
-[root-b_g.2] synchronised (git+file://${BASEDIR}/pinnes#master(b))
+[root-b_g.2] synchronised (no changes)
 [root_g.2] synchronised (git+file://${BASEDIR}/pinnes#master)
 ### opam upgrade | unordered
 The following actions will be performed:
-=== recompile 6 packages
-  - recompile root-a-i_g   2 (pinned) [upstream or system changes]
-  - recompile root-a-k_p   2 (pinned) [upstream or system changes]
-  - recompile root-a_p     2 (pinned) [upstream or system changes]
-  - recompile root-b_g     2 (pinned) [upstream or system changes]
-  - recompile root_g       2 (pinned) [upstream or system changes]
-  - recompile root-a-i-j_g 2 (pinned) [upstream or system changes]
--> retrieved root-a-i-j_g.2  (no changes)
--> removed   root-a-i-j_g.2
--> installed root-a-i-j_g.2
+=== recompile 4 packages
+  - recompile root-a-i_g 2 (pinned) [upstream or system changes]
+  - recompile root-a-k_p 2 (pinned) [upstream or system changes]
+  - recompile root-a_p   2 (pinned) [upstream or system changes]
+  - recompile root_g     2 (pinned) [upstream or system changes]
 -> retrieved root-a-k_p.2  (no changes)
--> retrieved root-b_g.2  (no changes)
--> removed   root-b_g.2
--> installed root-b_g.2
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> removed   root_g.2
@@ -516,24 +508,24 @@ Ok, root-a_p is no longer pinned to file://${BASEDIR}/pinnes (a) (version 2)
 root_g  2          git+file://${BASEDIR}/pinnes#master  -
 ### opam pin scan ./pinnes --recursive | '# Name.*' -> '\c'
 root-b_g      2          git+file://${BASEDIR}/pinnes#master  b
-root-a-k_p    2          git+file://${BASEDIR}/pinnes#master  a/k
+root-a-k_p    2          file://${BASEDIR}/pinnes             a/k
 root-a-i-j_g  2          git+file://${BASEDIR}/pinnes#master  a/i/j
 root-a-i_g    2          git+file://${BASEDIR}/pinnes#master  a/i
-root-a_p      2          git+file://${BASEDIR}/pinnes#master  a
+root-a_p      2          file://${BASEDIR}/pinnes             a
 root_g        2          git+file://${BASEDIR}/pinnes#master  -
 ### opam pin scan ./pinnes --subpath a | '# Name.*' -> '\c'
-root-a_p  2          git+file://${BASEDIR}/pinnes#master  a
+root-a_p  2          file://${BASEDIR}/pinnes  a
 ### opam pin scan ./pinnes --subpath a --recursive | '# Name.*' -> '\c'
-root-a-k_p    2          git+file://${BASEDIR}/pinnes#master  a/k
+root-a-k_p    2          file://${BASEDIR}/pinnes             a/k
 root-a-i-j_g  2          git+file://${BASEDIR}/pinnes#master  a/i/j
 root-a-i_g    2          git+file://${BASEDIR}/pinnes#master  a/i
-root-a_p      2          git+file://${BASEDIR}/pinnes#master  a
+root-a_p      2          file://${BASEDIR}/pinnes             a
 ### opam pin scan ./pinnes --recursive --normalise
 root-b_g.2^git+file://${BASEDIR}/pinnes#master^b
-root-a-k_p.2^git+file://${BASEDIR}/pinnes#master^a/k
+root-a-k_p.2^file://${BASEDIR}/pinnes^a/k
 root-a-i-j_g.2^git+file://${BASEDIR}/pinnes#master^a/i/j
 root-a-i_g.2^git+file://${BASEDIR}/pinnes#master^a/i
-root-a_p.2^git+file://${BASEDIR}/pinnes#master^a
+root-a_p.2^file://${BASEDIR}/pinnes^a
 root_g.2^git+file://${BASEDIR}/pinnes#master
 ### opam pin -n --with-version 3 root-b_g.2^git+file://${BASEDIR}/pinnes#master^b root-a-i-j_g.2^git+file://${BASEDIR}/pinnes#master^a/i/j root-a-i_g.2^git+file://${BASEDIR}/pinnes#master^a/i root-a_p.2^file://${BASEDIR}/pinnes^a root_g^git+file://${BASEDIR}/pinnes#master root-a-k_p.2^file://${BASEDIR}/pinnes^a/k
 This will pin the following packages: root-b_g, root-a-i-j_g, root-a-i_g, root-a_p, root_g, root-a-k_p. Continue? [Y/n] y
@@ -907,27 +899,19 @@ hoj
 ### git -C pinnes add a/i/new
 ### git -C pinnes commit -qm "thd"
 ### opam update | grep synchronised
-[root-a-i-j_g.l2] synchronised (git+file://${BASEDIR}/pinnes#master(a/i/j))
+[root-a-i-j_g.l2] synchronised (no changes)
 [root-a-i_g.l2] synchronised (git+file://${BASEDIR}/pinnes#master(a/i))
 [root-a-k_p.l2] synchronised (file://${BASEDIR}/pinnes(a/k))
 [root-a_p.l2] synchronised (file://${BASEDIR}/pinnes(a))
-[root-b_g.l2] synchronised (git+file://${BASEDIR}/pinnes#master(b))
+[root-b_g.l2] synchronised (no changes)
 [root_g.l2] synchronised (git+file://${BASEDIR}/pinnes#master)
 ### opam upgrade | unordered
 The following actions will be performed:
-=== recompile 5 packages
-  - recompile root-a-i_g   l2 (pinned) [upstream or system changes]
-  - recompile root-a-k_p   l2 (pinned) [upstream or system changes]
-  - recompile root-a_p     l2 (pinned) [upstream or system changes]
-  - recompile root-b_g     l2 (pinned) [upstream or system changes]
-  - recompile root-a-i-j_g l2 (pinned) [upstream or system changes]
--> retrieved root-a-i-j_g.l2  (no changes)
--> removed   root-a-i-j_g.l2
--> installed root-a-i-j_g.l2
+=== recompile 3 packages
+  - recompile root-a-i_g l2 (pinned) [upstream or system changes]
+  - recompile root-a-k_p l2 (pinned) [upstream or system changes]
+  - recompile root-a_p   l2 (pinned) [upstream or system changes]
 -> retrieved root-a-k_p.l2  (no changes)
--> retrieved root-b_g.l2  (no changes)
--> removed   root-b_g.l2
--> installed root-b_g.l2
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> retrieved root-a_p.l2  (no changes)
@@ -1036,24 +1020,24 @@ Ok, root-a_p is no longer pinned to file://${BASEDIR}/pinnes (a) (version l2)
 root_g  l2         git+file://${BASEDIR}/pinnes#master  -
 ### opam pin scan ./pinnes --recursive | '# Name.*' -> '\c'
 root-b_g      l2         git+file://${BASEDIR}/pinnes#master  b
-root-a-k_p    l2         git+file://${BASEDIR}/pinnes#master  a/k
+root-a-k_p    l2         file://${BASEDIR}/pinnes             a/k
 root-a-i-j_g  l2         git+file://${BASEDIR}/pinnes#master  a/i/j
 root-a-i_g    l2         git+file://${BASEDIR}/pinnes#master  a/i
-root-a_p      l2         git+file://${BASEDIR}/pinnes#master  a
+root-a_p      l2         file://${BASEDIR}/pinnes             a
 root_g        l2         git+file://${BASEDIR}/pinnes#master  -
 ### opam pin scan ./pinnes --subpath a | grep -v '# Name.*'
-root-a_p  l2         git+file://${BASEDIR}/pinnes#master  a
+root-a_p  l2         file://${BASEDIR}/pinnes  a
 ### opam pin scan ./pinnes --subpath a --recursive | '# Name.*' -> '\c'
-root-a-k_p    l2         git+file://${BASEDIR}/pinnes#master  a/k
+root-a-k_p    l2         file://${BASEDIR}/pinnes             a/k
 root-a-i-j_g  l2         git+file://${BASEDIR}/pinnes#master  a/i/j
 root-a-i_g    l2         git+file://${BASEDIR}/pinnes#master  a/i
-root-a_p      l2         git+file://${BASEDIR}/pinnes#master  a
+root-a_p      l2         file://${BASEDIR}/pinnes             a
 ### opam pin scan ./pinnes --recursive --normalise
 root-b_g.l2^git+file://${BASEDIR}/pinnes#master^b
-root-a-k_p.l2^git+file://${BASEDIR}/pinnes#master^a/k
+root-a-k_p.l2^file://${BASEDIR}/pinnes^a/k
 root-a-i-j_g.l2^git+file://${BASEDIR}/pinnes#master^a/i/j
 root-a-i_g.l2^git+file://${BASEDIR}/pinnes#master^a/i
-root-a_p.l2^git+file://${BASEDIR}/pinnes#master^a
+root-a_p.l2^file://${BASEDIR}/pinnes^a
 root_g.l2^git+file://${BASEDIR}/pinnes#master
 ### opam pin --with-version 3 root-b_g^git+file://${BASEDIR}/pinnes#master^b root-a-i-j_g^git+file://${BASEDIR}/pinnes#master^a/i/j root-a-i_g^git+file://${BASEDIR}/pinnes#master^a/i root-a_p^file://${BASEDIR}/pinnes^a root_g^git+file://${BASEDIR}/pinnes#master root-a-k_p^file://${BASEDIR}/pinnes^a/k -n
 This will pin the following packages: root-b_g, root-a-i-j_g, root-a-i_g, root-a_p, root_g, root-a-k_p. Continue? [Y/n] y
