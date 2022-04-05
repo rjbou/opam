@@ -35,5 +35,6 @@ depends: [
   "cppo" {build & >= "1.1.0"}
   "sha" {>= "1.13"}
   "jsonm"
+  "swhid_compute"
 ]
 conflicts: "extlib-compat"
