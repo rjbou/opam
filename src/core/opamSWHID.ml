@@ -98,28 +98,53 @@ let to_url swh =
 
 
 module SHA1 = struct
-let digest_string_to_hex = OpamSHA.sha256
+  let digest_string_to_hex = OpamSHA.sha256_string
 end
 module OS = struct
 
-open OpamFilename
+  open OpamFilename
 
-let contents directory =
-  let dir = OpamFilename.Dir.of_string directory in
-  Some ((files dir |> List.map to_string)
-        @ (dirs dir |> List.map Dir.to_string))
+  let contents dir =
+    try Some (OpamSystem.ls dir)
+    with _ -> None
+(*
+    let dir = OpamFilename.Dir.of_string directory in
+    Some ((files dir |> List.map to_string)
+          @ (dirs dir |> List.map Dir.to_string))
+*)
 
-let typ name =  None
-let read_file name =
-  try
-    Some OpamFilename.(read (of_string name))
-  with
-    _ -> None
-let permissions name = None
-let base name = OpamFilename.(Base.to_string (basename (of_string name)))
+  let typ name =
+    try if Sys.is_directory name then Some "dir" else Some "file"
+    with _ -> None
+
+  let read_file name =
+    try Some (OpamSystem.read name)
+    with OpamSystem.File_not_found _ -> None
+
+    (*
+      - [0o120000] if [f] is a symlink
+      - [0o040000] if [f] is a directory
+      - [0o100755] if [f] is an executable file
+      - [0o100644] if [f] is a regular file *)
+  let permissions name =
+    if not (Sys.file_exists name) then raise Not_found else
+    let Unix.{ st_kind; _ } = Unix.lstat name in
+    match st_kind with
+    | Unix.S_DIR -> Some 0o040000
+    | Unix.S_LNK -> Some 0o120000
+    | Unix.S_REG ->
+      Some (
+        if OpamSystem.is_executable name then 0o100755 else 0o100644
+      )
+    | _ -> None
+
+  let base name = OpamFilename.(Base.to_string (basename (of_string name)))
 
 end
+
 module Compute = Swhid_compute.Make(SHA1)(OS)
 
-let check archive =
-
+let compute dir =
+  match Compute.directory_identifier_deep (OpamFilename.Dir.to_string dir) with
+  | Some ((_,_,id), _) -> Some id
+  | _ -> None

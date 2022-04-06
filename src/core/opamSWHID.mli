@@ -25,3 +25,5 @@ val is_valid: OpamUrl.t -> bool
 
 val of_url: OpamUrl.t -> t option
 val to_url: t -> OpamUrl.t
+
+val compute: OpamFilename.Dir.t -> string option

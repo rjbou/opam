@@ -301,7 +301,7 @@ module SWHID = struct
 
 
   (* for the moment only used in sources, not extra sources or files *)
-  let fallback ?(timeout=6) urlf =
+  let url ?(timeout=6) urlf =
     match OpamFile.URL.swhid urlf with
     | None -> Done (Right "No SWHID defined")
     | Some swhid ->
@@ -321,7 +321,7 @@ module SWHID = struct
         let rec aux timeout =
           if timeout <= 0 then Done (Right "swh fallback failed") else
             get_url hash @@+ function
-            | Some (`Done fetch_url) -> Done (Left fetch_url)
+            | Some (`Done fetch_url) -> Done (Left (swhid, fetch_url))
             | Some (`Pending | `New) ->
               Unix.sleep 10;
               aux (timeout - 1)
@@ -329,5 +329,26 @@ module SWHID = struct
         in
         aux timeout
       else Done (Right "")
+
+	let retrieve swhid url =
+		OpamFilename.with_tmp_dir_job @@ fun dir ->
+		let archive =  OpamFilename.Op.(dir // "fallback") in
+		download_as ~overwrite:true url archive @@+ fun () ->
+		let source = OpamFilename.Op.(dir / "source") in
+		OpamFilename.extract_in_job archive source @@| function
+		| Some _e -> Not_available (None, "unable to extract archive, abort!")
+		| None ->
+			(match OpamSWHID.compute source with
+			 | None ->  Not_available (None, "unable to compute swhid id, invalid!")
+			 | Some id ->
+				 if String.equal id swhid.OpamSWHID.swh_hash then
+					 Result "swhid fallback"
+					 (* XXX add file to cache *)
+				 else
+					 Not_available ((Some "Bad checksum (swhid"),
+													Printf.sprintf "Invalid swhid hashes: given %s, computed %s"
+														swhid.OpamSWHID.swh_hash id)
+			)
+
 
 end
