@@ -95,3 +95,31 @@ let of_url url =
 let to_url swh =
   let path = Printf.sprintf "%s%s" prefix (to_string swh) in
   OpamUrl.{ transport = "https"; backend = `http ; hash = None; path }
+
+
+module SHA1 = struct
+let digest_string_to_hex = OpamSHA.sha256
+end
+module OS = struct
+
+open OpamFilename
+
+let contents directory =
+  let dir = OpamFilename.Dir.of_string directory in
+  Some ((files dir |> List.map to_string)
+        @ (dirs dir |> List.map Dir.to_string))
+
+let typ name =  None
+let read_file name =
+  try
+    Some OpamFilename.(read (of_string name))
+  with
+    _ -> None
+let permissions name = None
+let base name = OpamFilename.(Base.to_string (basename (of_string name)))
+
+end
+module Compute = Swhid_compute.Make(SHA1)(OS)
+
+let check archive =
+
