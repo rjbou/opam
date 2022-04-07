@@ -551,12 +551,12 @@ let download_package_source_t st url nv_dirs =
       | Not_available (_s,_l) as source_result ->
         (OpamDownload.SWHID.url url @@+ function
           | Right msg ->
-          (* TODO integrate in fetch error *)
+            (* TODO integrate in fetch error *)
             if msg <> "" then
               OpamConsole.warning "SWH fallback error: %s" msg;
             Done (Some (source_result))
           | Left (swhid, swhid_url) ->
-            (OpamDownload.SWHID.retrieve swhid swhid_url)
+            (OpamDownload.SWHID.retrieve swhid swhid_url dirnames)
             @@| fun r -> Some r)
       | source_result -> Done (Some source_result)
   in

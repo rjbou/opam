@@ -330,25 +330,28 @@ module SWHID = struct
         aux timeout
       else Done (Right "")
 
-	let retrieve swhid url =
-		OpamFilename.with_tmp_dir_job @@ fun dir ->
-		let archive =  OpamFilename.Op.(dir // "fallback") in
-		download_as ~overwrite:true url archive @@+ fun () ->
-		let source = OpamFilename.Op.(dir / "source") in
-		OpamFilename.extract_in_job archive source @@| function
-		| Some _e -> Not_available (None, "unable to extract archive, abort!")
-		| None ->
-			(match OpamSWHID.compute source with
-			 | None ->  Not_available (None, "unable to compute swhid id, invalid!")
-			 | Some id ->
-				 if String.equal id swhid.OpamSWHID.swh_hash then
-					 Result "swhid fallback"
-					 (* XXX add file to cache *)
-				 else
-					 Not_available ((Some "Bad checksum (swhid"),
-													Printf.sprintf "Invalid swhid hashes: given %s, computed %s"
-														swhid.OpamSWHID.swh_hash id)
-			)
+  let retrieve swhid url dirnames =
+    let id = swhid.OpamSWHID.swh_hash in
+    OpamFilename.with_tmp_dir_job @@ fun dir ->
+    let archive =  OpamFilename.Op.(dir // id) in
+    download_as ~overwrite:true url archive @@+ fun () ->
+    let sources = OpamFilename.Op.(dir / "src") in
+    OpamFilename.extract_job archive sources @@| function
+    | Some _e -> Not_available (None, "unable to extract archive, abort!")
+    | None ->
+      (match OpamSWHID.compute sources with
+       | None ->  Not_available (None, "unable to compute swhid id, invalid!")
+       | Some c_id ->
+         if String.equal c_id id then
+           (List.iter (fun (_,dst) ->
+                OpamFilename.copy_dir ~src:sources ~dst)
+               dirnames;
+            Result "iswhid fallback")
+         else
+           Not_available ((Some "Bad checksum (swhid"),
+                          Printf.sprintf "Invalid swhid hashes: given %s, computed %s"
+                            id c_id)
+      )
 
-
+ let fallback ?timeout urlf dirnames = Done (Result "")
 end

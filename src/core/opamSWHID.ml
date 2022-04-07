@@ -26,7 +26,7 @@ let equal a b = compare a b = 0
 let of_string s =
   let invalid () = invalid_arg "OpamSWHID.of_string"  in
   match OpamStd.String.split s ':' with
-  | "swh"::sv::("rev"|"rel"|"dir" as ot)::swh_hash::[] ->
+  | "swh"::sv::("dir" as ot)::swh_hash::[] ->
     (* Only api version 1 is handled for the moment *)
     let swh_sch_version =
       try
@@ -98,11 +98,9 @@ let to_url swh =
 
 
 module SHA1 = struct
-  let digest_string_to_hex = OpamSHA.sha256_string
+  let digest_string_to_hex = OpamSHA.sha1_string
 end
 module OS = struct
-
-  open OpamFilename
 
   let contents dir =
     try Some (OpamSystem.ls dir)
@@ -146,5 +144,6 @@ module Compute = Swhid_compute.Make(SHA1)(OS)
 
 let compute dir =
   match Compute.directory_identifier_deep (OpamFilename.Dir.to_string dir) with
-  | Some ((_,_,id), _) -> Some id
-  | _ -> None
+  | None ->  None
+  | Some identifier ->
+    Some (Swhid_types.get_object_id identifier)

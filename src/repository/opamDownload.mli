@@ -33,6 +33,9 @@ val download_as:
   unit OpamProcess.job
 
 module SWHID: sig
+(*
   val url: ?timeout:int -> OpamFile.URL.t -> (OpamSWHID.t * OpamUrl.t, string) either OpamProcess.job
-  val retrieve: OpamSWHID.t -> OpamUrl.t -> string download OpamProcess.job
+  val retrieve: OpamSWHID.t -> OpamUrl.t -> (string * OpamFilename.Dir.t) list -> string download OpamProcess.job
+*)
+  val fallback: ?timeout:int -> OpamFile.URL.t -> (string * OpamFilename.Dir.t) list -> string download OpamProcess.job
 end
