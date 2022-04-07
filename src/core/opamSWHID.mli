@@ -9,14 +9,10 @@
 (**************************************************************************)
 
 (* Software Heritage Identifiers *)
-type t = {
-  swh_sch_version: int;
-  swh_object_type: [ `rev | `rel | `dir ];
-  swh_hash: string
-}
+type t
 
 include OpamStd.ABSTRACT with type t := t
-
+val hash : t -> string
 (** url things *)
 
 (** Check url validity regarding its form:

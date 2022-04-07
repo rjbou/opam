@@ -224,7 +224,9 @@ module SWHID = struct
   (** SWHID retrieval functions *)
 
   open OpamProcess.Job.Op
-  open OpamStd.Option.Op
+(*   open OpamStd.Option.Op *)
+
+  let log fmt = OpamConsole.log "CURL(SWHID)" fmt
 
   let instance = OpamUrl.of_string "https://archive.softwareheritage.org"
   (* we keep api 1 hardcoded for the moment *)
@@ -277,6 +279,7 @@ module SWHID = struct
           | "failed" -> `Failed
           | _ -> `Unknown)
 
+(*
   let url_from_rev hash =
     let url = full_url "revision" hash in
     get_output url @@+ fun json ->
@@ -298,12 +301,33 @@ module SWHID = struct
         | Some "revision" -> url_from_rev target
         | Some "directory" -> get_dir target
         | _target_type -> Done None
+*)
 
+  let fallback_err fmt = Printf.sprintf ("SWH fallback: "^^fmt)
+
+  let get_url ?(timeout=6) swhid =
+    let attempts = timeout in
+    let hash = OpamSWHID.hash swhid in
+    let rec aux timeout =
+      if timeout <= 0 then
+        Done (Not_available
+                (Some (fallback_err "timeout"),
+                 fallback_err "%d attempts tried, aborting" attempts))
+      else
+        get_dir hash @@+ function
+        | Some (`Done fetch_url) -> Done (Result fetch_url)
+        | Some (`Pending | `New) ->
+          Unix.sleep 10;
+          aux (timeout - 1)
+        | None | Some (`Failed | `Unknown) ->
+          Done (Not_available (None, fallback_err "Unknown swhid"))
+    in
+    aux timeout
 
   (* for the moment only used in sources, not extra sources or files *)
-  let url ?(timeout=6) urlf =
+  let archive_fallback ?timeout urlf dirnames =
     match OpamFile.URL.swhid urlf with
-    | None -> Done (Right "No SWHID defined")
+    | None -> Done (Result None)
     | Some swhid ->
       (* Add a global modifier and/or command for default answering *)
       if OpamConsole.confirm ~default:false
@@ -311,47 +335,49 @@ module SWHID = struct
            from Software Heritage cache? It may take few minutes."
           (OpamConsole.colorise `underline
              (OpamUrl.to_string (OpamFile.URL.url urlf))) then
-        let get_url =
-          match swhid.OpamSWHID.swh_object_type with
-          | `rev -> url_from_rev
-          | `rel -> url_from_rel
-          | `dir -> get_dir
-        in
-        let hash = swhid.OpamSWHID.swh_hash in
-        let rec aux timeout =
-          if timeout <= 0 then Done (Right "swh fallback failed") else
-            get_url hash @@+ function
-            | Some (`Done fetch_url) -> Done (Left (swhid, fetch_url))
-            | Some (`Pending | `New) ->
-              Unix.sleep 10;
-              aux (timeout - 1)
-            | None | Some (`Failed | `Unknown) -> Done (Right "swh fallback failed")
-        in
-        aux timeout
-      else Done (Right "")
+        (log "SWH fallback for %s" (OpamUrl.to_string (OpamFile.URL.url urlf));
+         get_url ?timeout swhid @@+ function
+         | Not_available _ as error -> Done error
+         | Up_to_date _ -> assert false
+         | Result url ->
+           let hash = OpamSWHID.hash swhid in
+           OpamFilename.with_tmp_dir_job @@ fun dir ->
+           let archive =  OpamFilename.Op.(dir // hash) in
+           download_as ~overwrite:true url archive @@+ fun () ->
+           let sources = OpamFilename.Op.(dir / "src") in
+           OpamFilename.extract_job archive sources @@| function
+           | Some e ->
+             Not_available (
+               Some (fallback_err "archive extraction failure"),
+               fallback_err "archive extraction failure %s"
+                 (match e with
+                  | Failure s -> s
+                  | OpamSystem.Process_error pe ->
+                    OpamProcess.string_of_result pe
+                  | e -> Printexc.to_string e))
+           | None ->
+             (match OpamSWHID.compute sources with
+              | None ->
+                Not_available (
+                  Some (fallback_err "can't check archive validity"),
+                  fallback_err
+                    "error on swhid computation, can't check its validity")
+              | Some computed ->
+                if String.equal computed hash then
+                  (List.iter (fun (_nv,dst) ->
+                       (* add a text *)
+                       OpamFilename.copy_dir ~src:sources ~dst)
+                      dirnames;
+                   Result (Some "SWH fallback"))
+                else
+                  Not_available (
+                    Some (fallback_err "archive not valid"),
+                    fallback_err
+                      "archive corrupted, opam file swhid %S vs computed %S"
+                      hash computed)))
+      else
+        Done (Not_available
+                (Some (fallback_err "no retrieval"),
+                 fallback_err "retrieval refused by user"))
 
-  let retrieve swhid url dirnames =
-    let id = swhid.OpamSWHID.swh_hash in
-    OpamFilename.with_tmp_dir_job @@ fun dir ->
-    let archive =  OpamFilename.Op.(dir // id) in
-    download_as ~overwrite:true url archive @@+ fun () ->
-    let sources = OpamFilename.Op.(dir / "src") in
-    OpamFilename.extract_job archive sources @@| function
-    | Some _e -> Not_available (None, "unable to extract archive, abort!")
-    | None ->
-      (match OpamSWHID.compute sources with
-       | None ->  Not_available (None, "unable to compute swhid id, invalid!")
-       | Some c_id ->
-         if String.equal c_id id then
-           (List.iter (fun (_,dst) ->
-                OpamFilename.copy_dir ~src:sources ~dst)
-               dirnames;
-            Result "iswhid fallback")
-         else
-           Not_available ((Some "Bad checksum (swhid"),
-                          Printf.sprintf "Invalid swhid hashes: given %s, computed %s"
-                            id c_id)
-      )
-
- let fallback ?timeout urlf dirnames = Done (Result "")
 end

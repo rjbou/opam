@@ -34,7 +34,6 @@ The following actions will be performed:
   - install snappy-ko 2
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-[WARNING] SWH fallback error: No SWHID defined
 [ERROR] Failed to get sources of snappy-ko.2: Curl failed
 
 OpamSolution.Fetch_fail("https://fa.ke/url.tar.gz (Curl failed: \"/usr/bin/curl --write-out %{http_code}\\n --retry 3 --retry-delay 2 --user-agent opam/2.2.0~alpha~dev -L -o ${BASEDIR}/OPAM/fallback/.opam-switch/sources/snappy-ko.2/url.tar.gz.part -- https://fa.ke/url.tar.gz\" exited with code 6)")
@@ -64,7 +63,7 @@ The following actions will be performed:
 Processing  1/3: [snappy-swhid-dir.2: http]
 Source https://fa.ke/url.tar.gz is not available. Do you want to try to retrieve it from Software Heritage cache? It may take few minutes. [y/N] y
 Processing  1/3:
--> retrieved snappy-swhid-dir.2  (iswhid fallback)
+-> retrieved snappy-swhid-dir.2  (SWH fallback)
 -> installed snappy-swhid-dir.2
 Done.
 ### opam clean -c
@@ -83,10 +82,9 @@ The following actions will be performed:
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Source https://fa.ke/url.tar.gz is not available. Do you want to try to retrieve it from Software Heritage cache? It may take few minutes. [y/N] y
-[WARNING] SWH fallback error: swh fallback failed
-[ERROR] Failed to get sources of snappy-swhid-ko.2: Curl failed
+[ERROR] Failed to get sources of snappy-swhid-ko.2: SWH fallback: Unknown swhid
 
-OpamSolution.Fetch_fail("https://fa.ke/url.tar.gz (Curl failed: \"/usr/bin/curl --write-out %{http_code}\\n --retry 3 --retry-delay 2 --user-agent opam/2.2.0~alpha~dev -L -o ${BASEDIR}/OPAM/fallback/.opam-switch/sources/snappy-swhid-ko.2/url.tar.gz.part -- https://fa.ke/url.tar.gz\" exited with code 6)")
+OpamSolution.Fetch_fail("SWH fallback: Unknown swhid")
 
 
 <><> Error report <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
