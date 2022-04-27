@@ -231,7 +231,7 @@ reftest-runner: $(DUNE_DEP) src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) $(DUNE_PROFILE_ARG) --root . tests/reftests/run.exe
 
 reftests: $(DUNE_DEP) src/client/no-git-version
-	$(DUNE) build $(DUNE_ARGS) $(DUNE_PROFILE_ARG) --root . @reftest
+	$(DUNE) build --verbose $(DUNE_ARGS) $(DUNE_PROFILE_ARG) --root . @reftest
 
 reftest-%: $(DUNE_DEP) src/client/no-git-version
 	$(DUNE) build $(DUNE_ARGS) $(DUNE_PROFILE_ARG) --root . @reftest-$* --force
