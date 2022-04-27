@@ -188,7 +188,7 @@ uninstall: opam.install
 
 .PHONY: tests
 tests: $(DUNE_DEP) src/client/no-git-version
-	@$(DUNE) runtest $(DUNE_PROFILE_ARG) --root . $(DUNE_ARGS) src/ tests/ --no-buffer; \
+	@$(DUNE) runtest --verbose $(DUNE_PROFILE_ARG) --root . $(DUNE_ARGS) src/ tests/ --no-buffer; \
 	ret=$$?; \
 	echo "###     TESTS RESULT SUMMARY     ###"; \
 	for t in _build/default/tests/reftests/*.test; do \
