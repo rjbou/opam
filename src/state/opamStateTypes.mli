@@ -170,6 +170,7 @@ type provenance = [ `Env          (** Environment variable *)
 (** Pinned opam files informations *)
 type 'url _pinned_opamfile = {
   pin_file: OpamFile.OPAM.t OpamFile.t;
+  pin_locked: string option;
   pin_subpath: subpath option;
   pin_url: 'url;
 }
