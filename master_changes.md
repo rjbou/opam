@@ -84,6 +84,9 @@ users)
   * Try to set a variable with option `--switch <sw>` fails instead of writing a wrong `switch-config` file [#5027 @rjbou]
   * When a field is defined in switch and global scope, try to determine the scope also by checking switch selection [#5027 @rjbou]
 
+## Update / Upgrade
+  * [BUG] if a package is pinned from a locked file, it is automatically updated/upgraded accordingly a lock file (same extension) [#XXX @rjbou]
+
 ## Exec
   * [NEW] Add `opam exec --no-switch` [#4957 @kit-ty-kate - fix #4951]
 
@@ -114,6 +117,7 @@ users)
 
 ## Opamfile
   * Fix substring errors in preserved_format [#4941 @rjbou - fix #4936]
+  * Add `x-locked` extension fields for overlay internal use, it stores if the files originate from a locked file, if os its extension [#XXX @rjbou]
 
 ## External dependencies
   * Set `DEBIAN_FRONTEND=noninteractive` for unsafe-yes confirmation level [#4735 @dra27 - partially fix #4731] [2.1.0~rc2 #4739]
@@ -338,6 +342,8 @@ users)
   * `OpamClient`: handle formula on several functions, adding a `formula` labelled or optional argument  (`upgrade_t`, `compute_upgrade_t`, `upgrade`, `fixup`, `install_t`, `install`, `remove_t`, and `remove`) [#4975 @AltGr]
   * `OpamSolution`: add `print_requested` to print actions reasons [#4975 @AltGr]
   * `OpamSolution.apply`: take an optional argument `skip`, to avoid filtering solution beforehand [#4975 @AltGr]
+  * OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `name_and_dir_of_opam_file`, `opams_of_dir`, `opams_of_dir_w_target`, `resolve_locals`, `autopin`, and `simulate_autopin` [#XXX @rjbou]
+  * `OpamClient.PIN` change `?locked:bool` argument into `string`, to have lock extension name [#XXX @rjbou]
 
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
@@ -349,6 +355,9 @@ users)
 ## opam-state
   * `OpamSwitchState.universe`: `requested` argument moved from `name_package_set` to `package_set`, to precise installed packages with `--best-effort` [#4796 @LasseBlaauwbroek]
   * `OpamSwitchState.universe`: add a chrono for universe loading [#4975 @AltGr]
+  * `OpamdPinned`: add `?locked:string` (and handle lock file then) argument to `files_in_source`, and `name_of_opam_filename` [#XXX @rjbou]
+  * `OpamPinned`: when looking at opam files, keep (and return) information about its locked origin [#XXX @rjbou]
+  * `OpamUpdate.pinned_package`: use locked information to automatically update from locked file if present, if `?autolock` is given to true [#XXX @rjbou]
 
 ## opam-solver
   * `OpamCudf`: Change type of `conflict_case.Conflict_cycle` (`string list list` to `Cudf.package action list list`) and `cycle_conflict`, `string_of_explanations`, `conflict_explanations_raw` types accordingly [#4039 @gasche]
@@ -375,6 +384,7 @@ users)
   * `OpamFile.OPAM.to_string_with_preserved_format`: handle substring errors [#4941 @rjbou - fix #4936]
   * `OpamFile.OPAM.effective_part` and `OpamFile.OPAM.effectively_equal` now take an optional `?modulo_state:bool` parameter, that if `true`, eliminates the fields relying on the state of the switch (depends, available, …). This is `false` by default. [#5118 @kit-ty-kate]
   * `OpamTypes`: `request.wish_install` now takes a formula instead of  a conjunction [#4975 @AltGr]
+  * `OpamFile.OPAM`: Add `clocked` in the record with its modifiers/getter [#XXX @rjbou]
 
 ## opam-core
   * OpamSystem: avoid calling Unix.environment at top level [#4789 @hannesm]
