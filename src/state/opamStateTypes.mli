@@ -166,3 +166,26 @@ type provenance = [ `Env          (** Environment variable *)
                   | `Command_line (** Command line *)
                   | `Default      (** Default value *)
                   ]
+
+(** Pinned opam files informations *)
+type 'url _pinned_opamfile = {
+  pin_file: OpamFile.OPAM.t OpamFile.t;
+  pin_subpath: subpath option;
+  pin_url: 'url;
+}
+type ('name, 'url) _pinned_name_and_opamfile = {
+  pin_name: 'name;
+  pin: 'url _pinned_opamfile;
+}
+type name_and_file = (name, unit) _pinned_name_and_opamfile
+type name_and_file_w_url = (name, url) _pinned_name_and_opamfile
+type nameopt_and_file = (name option, unit) _pinned_name_and_opamfile
+type nameopt_and_file_w_url = (name option, url) _pinned_name_and_opamfile
+
+type pinned_opam = {
+  pinned_name : name;
+  pinned_version : version option;
+  pinned_opam : OpamFile.OPAM.t option;
+  pinned_subpath: subpath option;
+  pinned_url: url;
+}
