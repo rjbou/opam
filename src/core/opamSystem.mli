@@ -163,6 +163,8 @@ val dir_is_empty: string -> bool
     Links pointing to directory are also returned. *)
 val directories_with_links: string -> string list
 
+val is_executable: string -> bool
+
 (** Make a comman suitable for OpamProcess.Job. if [verbose], is set,
     command and output will be displayed (at command end for the
     latter, if concurrent commands are running). [name] is used for
