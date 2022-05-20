@@ -13,12 +13,13 @@ type t
 
 include OpamStd.ABSTRACT with type t := t
 val hash : t -> string
-(** url things *)
 
 (** Check url validity regarding its form:
     http backend and swhid path prefix [swhid.opam.ocaml.org] *)
 val is_valid: OpamUrl.t -> bool
 
+
+(** url things *)
 val of_url: OpamUrl.t -> t option
 val to_url: t -> OpamUrl.t
 

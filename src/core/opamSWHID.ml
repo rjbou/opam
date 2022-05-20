@@ -8,51 +8,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Swhid_types
-type t = identifier_core
+open Swhid_core
+open Object
 
-let compare (sch_version, object_type, hash) (sch_version', object_type', hash') =
-  let scheme_version = sch_version - sch_version' in
-  if scheme_version <> 0 then scheme_version else
-  let object_type = compare object_type object_type' in
-  if object_type <> 0 then object_type else
-    String.compare hash hash'
+type t = Core_identifier.t
 
+let compare = Core_identifier.compare
 let equal a b = compare a b = 0
 
-let of_string s =
-  let invalid () = invalid_arg "OpamSWHID.of_string"  in
-  match OpamStd.String.split s ':' with
-  | "swh"::sv::"dir"::hash::[] ->
-    (* Only api version 1 is handled for the moment *)
-    let scheme =
-      try
-        let scheme = int_of_string sv in
-        if scheme <> 1 then invalid () else scheme
-      with Failure _ -> invalid ()
-    in
-    (* format defined in
-       https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html *)
-    if String.length hash <> 40 || not (OpamStd.String.is_hex hash) then
-      invalid ();
-    (scheme, Directory, hash)
-  | _ -> invalid ()
-
-let to_string (sch, ot, h) =
-  Printf.sprintf "swh:%d:%s:%s"
-    sch
-    (match ot with | Directory -> "dir" | _ -> assert false)
-    h
-
 let of_string_opt s =
-  try Some (of_string s) with Invalid_argument _ -> None
+  match Core_identifier.of_string s with
+  | Ok i -> Some i
+  | Error _ -> None
+let of_string s =
+  match of_string_opt s with
+  | None -> invalid_arg "OpamSWHID.of_string"
+  | Some i -> i
+let to_string = Core_identifier.to_string
 
 let to_json s = `String (to_string s)
 let of_json = function
   | `String s -> of_string_opt s
   | _ -> None
 
-let hash (_,_,h) = h
+let hash s = Hash.to_string (Core_identifier.get_hash s)
 
 module O = struct
   type _t = t
@@ -60,7 +39,7 @@ module O = struct
   let to_string = to_string
   let to_json = to_json
   let of_json = of_json
-  let compare = compare
+  let compare = Core_identifier.compare
 end
 
 module Set = OpamStd.Set.Make(O)
@@ -97,7 +76,8 @@ module OS = struct
     with _ -> None
 
   let typ name =
-    try if Sys.is_directory name then Some "dir" else Some "file"
+    try
+      Some (if Sys.is_directory name then Compute.Dir else Compute.File)
     with _ -> None
 
   let read_file name =
@@ -116,19 +96,17 @@ module OS = struct
     | Unix.S_DIR -> Some 0o040000
     | Unix.S_LNK -> Some 0o120000
     | Unix.S_REG ->
-      Some (
-        if OpamSystem.is_executable name then 0o100755 else 0o100644
-      )
+      Some (if OpamSystem.is_executable name then 0o100755 else 0o100644)
     | _ -> None
 
   let base name = OpamFilename.(Base.to_string (basename (of_string name)))
 
 end
 
-module Compute = Swhid_compute.Make(SHA1)(OS)
+module Compute = Compute.Make(SHA1)(OS)
 
 let compute dir =
-  match Compute.directory_identifier_deep (OpamFilename.Dir.to_string dir) with
-  | None ->  None
-  | Some identifier ->
-    Some (Swhid_types.get_object_id identifier)
+  match Compute.directory_identifier_deep
+          (OpamFilename.Dir.to_string dir) with
+  | Error _ ->  None
+  | Ok identifier -> Some (Hash.to_string (get_hash identifier))
