@@ -153,13 +153,13 @@ OpamConsole.error "packages %s" (OpamSysPkg.Set.to_string packages);
       | Some sys_available ->
         let available = (packages -- installed) %% sys_available in
         let not_found = packages -- installed -- available in
-    OpamConsole.error "available %s" (OpamSysPkg.Set.to_string available);
-    OpamConsole.error "not_found %s" (OpamSysPkg.Set.to_string not_found);
         available, not_found
       | None ->
         let available = packages -- installed in
         available, OpamSysPkg.Set.empty
     in
+    OpamConsole.error "available %s" (OpamSysPkg.Set.to_string available);
+    OpamConsole.error "not_found %s" (OpamSysPkg.Set.to_string not_found);
     available, not_found
   in
   let to_string_list pkgs =
