@@ -960,7 +960,10 @@ let str0a : answerr -> string = function
 | `Quit -> "QUIT"
 | `Continue -> "CONTINUE"
 
+let count = ref 0
 let menu_answer ?default ?unsafe_yes ?yes ~no ~options fmt =
+if !count > 3 then assert false;
+incr count;
   assert (List.length options < 10);
   let _ =
    error "TTY %B || answer %s unsafe yes %s yes %s default %s no %s"
