@@ -140,17 +140,21 @@ let yum_cmd = lazy begin
 end
 
 let packages_status packages =
+OpamConsole.error "packages %s" (OpamSysPkg.Set.to_string packages);
   let (+++) pkg set = OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) set in
   (* Some package managers don't permit to request on available packages. In
      this case, we consider all non installed packages as [available]. *)
   let open OpamSysPkg.Set.Op in
   let compute_sets ?sys_available sys_installed =
     let installed = packages %% sys_installed in
+    OpamConsole.error "installed %s" (OpamSysPkg.Set.to_string installed);
     let available, not_found =
       match sys_available with
       | Some sys_available ->
         let available = (packages -- installed) %% sys_available in
         let not_found = packages -- installed -- available in
+    OpamConsole.error "available %s" (OpamSysPkg.Set.to_string available);
+    OpamConsole.error "not_found %s" (OpamSysPkg.Set.to_string not_found);
         available, not_found
       | None ->
         let available = packages -- installed in

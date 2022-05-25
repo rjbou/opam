@@ -964,7 +964,7 @@ let str0a : answerr -> string = function
 
 let count = ref 0
 let menu_answer ?default ?unsafe_yes ?yes ~no ~options fmt =
-if !count > 3 then assert false;
+if !count > 1 then assert false;
 incr count;
   assert (List.length options < 10);
   let _ =
