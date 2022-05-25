@@ -1217,11 +1217,16 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
       OpamConsole.error "%s" msg;
       check_again t sys_packages
   and check_again t sys_packages =
+  OpamConsole.error "checkign again";
+    OpamConsole.error "sys_packages %s" (OpamSysPkg.Set.to_string sys_packages);
     let needed, _notfound = OpamSysInteract.packages_status sys_packages in
+    OpamConsole.warning "needed %s" (OpamSysPkg.Set.to_string needed);
     let installed = OpamSysPkg.Set.diff sys_packages needed in
+    OpamConsole.warning "installed %s" (OpamSysPkg.Set.to_string installed);
     let t, sys_packages =
       map_sysmap (fun sysp -> OpamSysPkg.Set.diff sysp installed) t, needed
     in
+    OpamConsole.error "sys_packages %s" (OpamSysPkg.Set.to_string sys_packages);
     if OpamSysPkg.Set.is_empty sys_packages then t else
       (OpamConsole.error "These packages are still missing: %s\n"
          (syspkgs_to_string sys_packages);

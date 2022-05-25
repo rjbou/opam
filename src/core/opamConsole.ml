@@ -726,6 +726,7 @@ let short_user_input ~prompt ?default f =
   in
   try
     if OpamStd.Sys.(not tty_out || os () = Win32 || os () = Cygwin) then
+    let _ = warning "not tty_out" in
       let rec loop () =
         prompt ();
         let input = match String.lowercase_ascii (read_line ()) with
@@ -739,6 +740,7 @@ let short_user_input ~prompt ?default f =
       loop ()
     else
     let open Unix in
+    let _ = warning " tty_out" in
     prompt ();
     let buf = Bytes.create 3 in
     let rec loop () =
@@ -1042,13 +1044,20 @@ incr count;
           change_selection (prev_option default options)
         | "\027[B" (* down *) | "\027[C" (* right *) ->
           change_selection (prev_option default (List.rev options))
-        | i -> OpamStd.List.assoc_opt i nums_options
+        | i ->
+        let x = OpamStd.List.assoc_opt i nums_options in
+        error "associated to %s" (OpamStd.Option.to_string ~none:"XXX" str0a x);
+        x
       with Exit -> menu !default_ref
   in
   Printf.ksprintf (fun prompt_msg ->
       formatted_msg "%s\n" prompt_msg;
       let default = OpamStd.Option.default (fst (List.hd options)) default in
+      let y =
       menu default
+      in
+      error "final result! %s" (str0a y);
+      y
     ) fmt
 
 let menu ?default ?unsafe_yes ?yes ~no ~options fmt =
