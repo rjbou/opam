@@ -952,6 +952,102 @@ let print_table ?cut oc ~sep table =
   in
   List.iter (fun l -> print_line (cleanup_trailing l)) table
 
+type answerr =  [ `Continue | `Yes | `No | `Ignore | `Quit ]
+let str0a : answerr -> string = function
+| `Yes -> "YES"
+| `No -> "NO"
+| `Ignore -> "IGNORE"
+| `Quit -> "QUIT"
+| `Continue -> "CONTINUE"
+
+let menu_answer ?default ?unsafe_yes ?yes ~no ~options fmt =
+  assert (List.length options < 10);
+  let _ =
+   error "TTY %B || answer %s unsafe yes %s yes %s default %s no %s"
+      OpamStd.Sys.tty_out
+      (match OpamCoreConfig.answer () with
+       | `unsafe_yes -> "unsafe_yes"
+       | `all_yes -> "all_yes"
+       | `all_no -> "all_no"
+       | `ask -> "ask"
+      )
+      (OpamStd.Option.to_string ~none:"XXX" str0a unsafe_yes)
+      (OpamStd.Option.to_string ~none:"XXX" str0a yes)
+      (OpamStd.Option.to_string ~none:"XXX" str0a default)
+      (str0a no)
+  in
+  let options_nums =
+    List.mapi (fun n (ans, _) -> ans, string_of_int (n+1)) options
+  in
+  let nums_options = List.map (fun (a, n) -> n, a) options_nums in
+  let rec prev_option a0 = function
+    | (a,_)::[] -> a
+    | (a,_)::((a1,_)::_ as r) -> if a1 = a0 then a else prev_option a0 r
+    | [] -> assert false
+  in
+  let rec menu default =
+    let text =
+      OpamStd.List.concat_map "" ~right:"\n" (fun (ans, n) ->
+          Printf.ksprintf (OpamStd.Format.reformat ~indent:5) "%s %s. %s\n"
+            (if ans = default then ">" else " ")
+            (colorise `blue n)
+            (List.assoc ans options))
+        options_nums
+    in
+    let prompt =
+      Printf.sprintf "[%s] "
+        (OpamStd.List.concat_map "/" (fun (n, a) ->
+             colorise'
+               (`blue :: if a = default then [`underline] else [])
+               n)
+            nums_options)
+    in
+    let nlines = List.length Re.(all (compile (char '\n')) text) in
+    msg "%s" text;
+    let select a =
+    error "selected %s" (str0a a);
+      msg "%s" (List.assoc a options_nums); a
+    in
+    let default_s = List.assoc default options_nums in
+    if OpamCoreConfig.(!r.safe_mode) then let _ = error "safemode" in no else
+    match OpamCoreConfig.answer(), unsafe_yes, yes with
+    | `unsafe_yes, Some a, _ ->
+    warning "unsafe yes";
+    print_string prompt; select a
+    | #OpamStd.Config.yes_answer, _, Some a ->
+    warning "yes";
+    print_string prompt; select a
+    | `all_no, _, _ ->
+    warning "no";
+    print_string prompt; select no
+    | _, _, _ ->
+    warning "wildcar!";
+      let default_ref = ref default in
+      let change_selection =
+        fun opt ->
+          rollback_terminal nlines; (* restore cursor pos *)
+          default_ref := opt;
+          raise Exit
+      in
+      try
+        short_user_input ~prompt ~default:default_s @@ fun x -> 
+               error "received %S" x;
+               match x with 
+        | "" -> None
+        | "\027" -> Some (select no) (* echap *)
+        | "\027[A" (* up *) | "\027[D" (* left *) ->
+          change_selection (prev_option default options)
+        | "\027[B" (* down *) | "\027[C" (* right *) ->
+          change_selection (prev_option default (List.rev options))
+        | i -> OpamStd.List.assoc_opt i nums_options
+      with Exit -> menu !default_ref
+  in
+  Printf.ksprintf (fun prompt_msg ->
+      formatted_msg "%s\n" prompt_msg;
+      let default = OpamStd.Option.default (fst (List.hd options)) default in
+      menu default
+    ) fmt
+
 let menu ?default ?unsafe_yes ?yes ~no ~options fmt =
   assert (List.length options < 10);
   let options_nums =
