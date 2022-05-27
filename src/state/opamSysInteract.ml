@@ -140,14 +140,12 @@ let yum_cmd = lazy begin
 end
 
 let packages_status packages =
-OpamConsole.error "packages %s" (OpamSysPkg.Set.to_string packages);
   let (+++) pkg set = OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) set in
   (* Some package managers don't permit to request on available packages. In
      this case, we consider all non installed packages as [available]. *)
   let open OpamSysPkg.Set.Op in
   let compute_sets ?sys_available sys_installed =
     let installed = packages %% sys_installed in
-    OpamConsole.error "installed %s" (OpamSysPkg.Set.to_string installed);
     let available, not_found =
       match sys_available with
       | Some sys_available ->
@@ -158,8 +156,6 @@ OpamConsole.error "packages %s" (OpamSysPkg.Set.to_string packages);
         let available = packages -- installed in
         available, OpamSysPkg.Set.empty
     in
-    OpamConsole.error "available %s" (OpamSysPkg.Set.to_string available);
-    OpamConsole.error "not_found %s" (OpamSysPkg.Set.to_string not_found);
     available, not_found
   in
   let to_string_list pkgs =
@@ -708,14 +704,11 @@ let install packages =
   else
     let commands, vars = install_packages_commands_t packages in
     let vars = OpamStd.Option.map (List.map (fun x -> `add, x)) vars in
-    ()
-(*
     List.iter
       (fun (cmd, args) ->
          try sudo_run_command ?vars cmd args
          with Failure msg -> failwith ("System package install " ^ msg))
       commands
-*)
 
 let update () =
   let cmd =

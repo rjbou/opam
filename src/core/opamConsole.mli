@@ -134,14 +134,10 @@ val confirm:
     [default] is the option to choose on an active empty input ("\n").
     Max 9 options. *)
 val menu:
-  ?default:'a -> ?unsafe_yes:'a -> ?yes:'a -> no:'a ->
+  ?default:'a -> ?default_ni:'a -> ?unsafe_yes:'a -> ?yes:'a -> no:'a ->
   options:('a * string) list ->
   ('b, unit, string, 'a) format4 -> 'b
   type answerr = [ `Continue | `Yes | `No | `Ignore | `Quit ]
-val menu_answer:
-  ?default:answerr -> ?default_ni:answerr -> ?unsafe_yes:answerr -> ?yes:answerr -> no:answerr ->
-  options:(answerr * string) list ->
-  ('b, unit, string, answerr) format4 -> 'b
 
 (** Read some input from the user (returns a string option) *)
 val read: ('a, unit, string, string option) format4 -> 'a
