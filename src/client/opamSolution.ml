@@ -1152,6 +1152,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
     else
       manual_install t sys_packages
   and menu t sys_packages =
+    (* Called only if run install is true *)
     let answer =
       let pkgman = OpamConsole.colorise `yellow (pkg_manager_name ()) in
       OpamConsole.menu_answer ~unsafe_yes:`Yes ~default:`Yes ~no:`Quit
@@ -1196,7 +1197,8 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
   and manual_install t sys_packages =
     print_command sys_packages;
     let answer =
-      OpamConsole.menu_answer ~default:`Continue ~no:`Quit "Would you like opam to:"
+      OpamConsole.menu_answer ~default:`Continue ~default_ni:`Ignore ~no:`Quit
+        "Would you like opam to:"
         ~options:[
           `Continue, "Check again, as the package is now installed";
           `Ignore, "Attempt installation anyway, and permanently register that \
@@ -1217,20 +1219,29 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
       OpamConsole.error "%s" msg;
       check_again t sys_packages
   and check_again t sys_packages =
-  OpamConsole.error "checkign again";
-    OpamConsole.error "sys_packages %s" (OpamSysPkg.Set.to_string sys_packages);
-    let needed, _notfound = OpamSysInteract.packages_status sys_packages in
+    let open OpamSysPkg.Set.Op in
+    OpamConsole.error "checkign again";
+    OpamConsole.error "Bef sys_packages %s" (OpamSysPkg.Set.to_string sys_packages);
+    let needed, notfound = OpamSysInteract.packages_status sys_packages in
+    let needed = OpamSysPkg.(Set.singleton (of_string "inexistant")) in
+    let notfound = notfound -- needed in
     OpamConsole.warning "needed %s" (OpamSysPkg.Set.to_string needed);
-    let installed = OpamSysPkg.Set.diff sys_packages needed in
+    let still_missing = needed ++ notfound in
+    let installed = sys_packages -- still_missing in
     OpamConsole.warning "installed %s" (OpamSysPkg.Set.to_string installed);
-    let t, sys_packages =
-      map_sysmap (fun sysp -> OpamSysPkg.Set.diff sysp installed) t, needed
+    let t =
+      map_sysmap (fun sysp -> OpamSysPkg.Set.diff sysp installed) t
     in
-    OpamConsole.error "sys_packages %s" (OpamSysPkg.Set.to_string sys_packages);
-    if OpamSysPkg.Set.is_empty sys_packages then t else
+    OpamConsole.error "Aft still_missing %s" (OpamSysPkg.Set.to_string still_missing);
+    if OpamSysPkg.Set.is_empty still_missing then t else
+    if OpamSysPkg.Set.(not (is_empty notfound) && is_empty needed) then
+      (OpamConsole.error "These packages are still missing and not found via package manager: %s\n"
+         (syspkgs_to_string notfound);
+       manual_install t still_missing)
+    else
       (OpamConsole.error "These packages are still missing: %s\n"
-         (syspkgs_to_string sys_packages);
-         entry_point t sys_packages)
+         (syspkgs_to_string still_missing);
+       entry_point t still_missing)
   and bypass t =
     OpamConsole.note
       "Run 'opam option depext=false' if you wish to permanently disable \

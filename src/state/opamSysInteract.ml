@@ -708,11 +708,14 @@ let install packages =
   else
     let commands, vars = install_packages_commands_t packages in
     let vars = OpamStd.Option.map (List.map (fun x -> `add, x)) vars in
+    ()
+(*
     List.iter
       (fun (cmd, args) ->
          try sudo_run_command ?vars cmd args
          with Failure msg -> failwith ("System package install " ^ msg))
       commands
+*)
 
 let update () =
   let cmd =

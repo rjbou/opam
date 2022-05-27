@@ -139,7 +139,7 @@ val menu:
   ('b, unit, string, 'a) format4 -> 'b
   type answerr = [ `Continue | `Yes | `No | `Ignore | `Quit ]
 val menu_answer:
-  ?default:answerr -> ?unsafe_yes:answerr -> ?yes:answerr -> no:answerr ->
+  ?default:answerr -> ?default_ni:answerr -> ?unsafe_yes:answerr -> ?yes:answerr -> no:answerr ->
   options:(answerr * string) list ->
   ('b, unit, string, answerr) format4 -> 'b
 

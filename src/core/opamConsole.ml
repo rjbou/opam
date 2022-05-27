@@ -956,19 +956,17 @@ let print_table ?cut oc ~sep table =
 
 type answerr =  [ `Continue | `Yes | `No | `Ignore | `Quit ]
 let str0a : answerr -> string = function
-| `Yes -> "YES"
-| `No -> "NO"
-| `Ignore -> "IGNORE"
-| `Quit -> "QUIT"
-| `Continue -> "CONTINUE"
+  | `Yes -> "YES"
+  | `No -> "NO"
+  | `Ignore -> "IGNORE"
+  | `Quit -> "QUIT"
+  | `Continue -> "CONTINUE"
 
 let count = ref 0
-let menu_answer ?default ?unsafe_yes ?yes ~no ~options fmt =
-if !count > 1 then assert false;
-incr count;
+let menu_answer ?default ?default_ni ?unsafe_yes ?yes ~no ~options fmt =
   assert (List.length options < 10);
   let _ =
-   error "TTY %B || answer %s unsafe yes %s yes %s default %s no %s"
+    error "TTY %B || answer %s unsafe yes %s yes %s default %s no %s"
       OpamStd.Sys.tty_out
       (match OpamCoreConfig.answer () with
        | `unsafe_yes -> "unsafe_yes"
@@ -981,6 +979,8 @@ incr count;
       (OpamStd.Option.to_string ~none:"XXX" str0a default)
       (str0a no)
   in
+  if !count > 3 then assert false;
+  incr count;
   let options_nums =
     List.mapi (fun n (ans, _) -> ans, string_of_int (n+1)) options
   in
@@ -1052,9 +1052,14 @@ incr count;
   in
   Printf.ksprintf (fun prompt_msg ->
       formatted_msg "%s\n" prompt_msg;
-      let default = OpamStd.Option.default (fst (List.hd options)) default in
+      let default =
+        match default, default_ni with
+        | _, Some dni when not OpamStd.Sys.tty_out -> dni
+        | Some d, _ -> d
+        | None, _ -> fst (List.hd options)
+      in
       let y =
-      menu default
+        menu default
       in
       error "final result! %s" (str0a y);
       y
