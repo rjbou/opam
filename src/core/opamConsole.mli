@@ -137,7 +137,6 @@ val menu:
   ?default:'a -> ?default_ni:'a -> ?unsafe_yes:'a -> ?yes:'a -> no:'a ->
   options:('a * string) list ->
   ('b, unit, string, 'a) format4 -> 'b
-  type answerr = [ `Continue | `Yes | `No | `Ignore | `Quit ]
 
 (** Read some input from the user (returns a string option) *)
 val read: ('a, unit, string, string option) format4 -> 'a

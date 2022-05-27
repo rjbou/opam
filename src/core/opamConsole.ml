@@ -726,7 +726,6 @@ let short_user_input ~prompt ?default f =
   in
   try
     if OpamStd.Sys.(not tty_out || os () = Win32 || os () = Cygwin) then
-    let _ = warning "not tty_out" in
       let rec loop () =
         prompt ();
         let input = match String.lowercase_ascii (read_line ()) with
@@ -954,7 +953,7 @@ let print_table ?cut oc ~sep table =
   in
   List.iter (fun l -> print_line (cleanup_trailing l)) table
 
-let menu ?default ?unsafe_yes ?yes ~no ~options fmt =
+let menu ?default ?default_ni ?unsafe_yes ?yes ~no ~options fmt =
   assert (List.length options < 10);
   let options_nums =
     List.mapi (fun n (ans, _) -> ans, string_of_int (n+1)) options
@@ -1014,7 +1013,12 @@ let menu ?default ?unsafe_yes ?yes ~no ~options fmt =
   in
   Printf.ksprintf (fun prompt_msg ->
       formatted_msg "%s\n" prompt_msg;
-      let default = OpamStd.Option.default (fst (List.hd options)) default in
+      let default =
+        match default, default_ni with
+        | _, Some dni when not OpamStd.Sys.tty_out -> dni
+        | Some d, _ -> d
+        | None, _ -> fst (List.hd options)
+      in
       menu default
     ) fmt
 
