@@ -958,6 +958,23 @@
    (run ./run.exe %{bin:opam} %{dep:switch-invariant.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-switch-list)
+ (action
+  (diff switch-list.test switch-list.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-switch-list)))
+
+(rule
+ (targets switch-list.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:switch-list.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-switch-set)
  (action
   (diff switch-set.test switch-set.out)))
