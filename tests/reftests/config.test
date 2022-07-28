@@ -1,5 +1,6 @@
 N0REP0
 ### OCAMLRUNPARAM=b OPAMDEBUG=1
+### opam config report
 ### OPAMVAR_os=another opam config report
 found!
 ### opam var os=yetanother --global
