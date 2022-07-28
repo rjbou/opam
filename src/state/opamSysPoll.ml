@@ -23,12 +23,15 @@ let command_output c =
 let norm s = if s = "" then None else Some (String.lowercase_ascii s)
 
 let syspoll var laz ?(env=OpamVariable.Map.empty) () =
+OpamConsole.error "var %s" var;
+try
   match OpamVariable.Full.read_from_env (OpamVariable.Full.of_string var) with
   | Some (S c) -> Some c
   | _ ->
     match OpamVariable.Map.find_opt (OpamVariable.of_string var) env with
     | Some (lazy (Some (OpamTypes.S c)), _) -> Some c
     | _ -> Lazy.force laz
+    with e -> Printexc.print_backtrace stdout; raise e
 
 let normalise_arch raw =
   match String.lowercase_ascii raw with
