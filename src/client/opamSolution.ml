@@ -159,8 +159,7 @@ let check_availability ?permissive t set atoms =
            (OpamFormula.short_string_of_atom atom)
            msg
            (OpamStd.Option.map_default (Printf.sprintf "\n%s.") ""
-              (OpamSysInteract.repo_enablers
-                 ~env:t.switch_global.global_variables ())))
+              (OpamSysInteract.repo_enablers ())))
     | None -> None
   in
   let check_atom (name, cstr as atom) =
@@ -831,7 +830,7 @@ let parallel_apply t
         | `Remove nv
           when not (OpamPackage.has_name t.pinned nv.name) ->
           OpamAction.cleanup_package_artefacts t nv
-        (* if reinstalled, only removes build dir *)
+          (* if reinstalled, only removes build dir *)
         | `Install nv
           when not (OpamPackage.has_name t.pinned nv.name)
             || OpamSwitchState.is_version_pinned t nv.name ->
@@ -967,40 +966,40 @@ let parallel_apply t
         let actions = List.sort PackageAction.compare actions in
         if actions <> [] then
           OpamConsole.(msg "%s%s\n%s%s\n"
-                         (colorise tint
-                            (Printf.sprintf "%s%s "
-                               (utf8_symbol Symbols.box_drawings_light_down_and_right "+")
-                               (utf8_symbol Symbols.box_drawings_light_horizontal "-")))
-                         header
-                         (OpamStd.Format.itemize
-                            ~bullet:(colorise tint
-                                       (utf8_symbol Symbols.box_drawings_light_vertical "|" ^ " "))
-                            (fun x -> x)
-                            (List.map (String.concat " ") @@
-                             OpamStd.Format.align_table
-                               (PackageAction.to_aligned_strings ~explicit:true actions)))
-                         (colorise tint
-                            (Printf.sprintf "%s%s "
-                               (utf8_symbol Symbols.box_drawings_light_up_and_right "+")
-                               (utf8_symbol Symbols.box_drawings_light_horizontal "-"))))
+            (colorise tint
+               (Printf.sprintf "%s%s "
+                  (utf8_symbol Symbols.box_drawings_light_down_and_right "+")
+                  (utf8_symbol Symbols.box_drawings_light_horizontal "-")))
+            header
+            (OpamStd.Format.itemize
+               ~bullet:(colorise tint
+                 (utf8_symbol Symbols.box_drawings_light_vertical "|" ^ " "))
+               (fun x -> x)
+               (List.map (String.concat " ") @@
+                OpamStd.Format.align_table
+                  (PackageAction.to_aligned_strings ~explicit:true actions)))
+            (colorise tint
+               (Printf.sprintf "%s%s "
+                  (utf8_symbol Symbols.box_drawings_light_up_and_right "+")
+                  (utf8_symbol Symbols.box_drawings_light_horizontal "-"))))
         else match empty with
           | Some s ->
             OpamConsole.(msg "%s%s\n"
-                           (colorise tint
-                              (Printf.sprintf "%s%s "
-                                 (utf8_symbol Symbols.box_drawings_light_right "-")
-                                 (utf8_symbol Symbols.box_drawings_light_horizontal "")))
-                           s)
+              (colorise tint
+                 (Printf.sprintf "%s%s "
+                    (utf8_symbol Symbols.box_drawings_light_right "-")
+                    (utf8_symbol Symbols.box_drawings_light_horizontal "")))
+              s)
           | None -> ()
       in
       if removes_missing_source <> [] then
         (OpamConsole.msg "\n";
          OpamConsole.warning
-           "The sources of the following couldn't be obtained, they may be \
-            uncleanly removed:\n%s"
-           (OpamStd.Format.itemize OpamPackage.to_string
-              (List.flatten
-                 (List.map action_contents removes_missing_source))));
+                 "The sources of the following couldn't be obtained, they may be \
+                  uncleanly removed:\n%s"
+                 (OpamStd.Format.itemize OpamPackage.to_string
+                    (List.flatten
+                       (List.map action_contents removes_missing_source))));
       OpamConsole.msg "\n";
       OpamConsole.header_msg "Error report";
       if OpamConsole.debug () || OpamConsole.verbose () then
@@ -1025,12 +1024,12 @@ let simulate_new_state state t =
   let installed =
     OpamSolver.ActionGraph.Topological.fold
       (fun action installed ->
-         match action with
-         | `Install p | `Change (_,_,p) | `Reinstall p ->
-           OpamPackage.Set.add p installed
-         | `Remove p ->
-           OpamPackage.Set.remove p installed
-         | `Build _ | `Fetch _ -> installed
+        match action with
+        | `Install p | `Change (_,_,p) | `Reinstall p ->
+          OpamPackage.Set.add p installed
+        | `Remove p ->
+          OpamPackage.Set.remove p installed
+        | `Build _ | `Fetch _ -> installed
       )
       t state.installed in
   { state with installed }
@@ -1129,10 +1128,8 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
     else
       OpamSysPkg.Set.empty
   in
-  let env = t.switch_global.global_variables in
   let pkg_manager_name () =
-    match OpamSysInteract.install_packages_commands
-            ~env OpamSysPkg.Set.empty with
+    match OpamSysInteract.install_packages_commands OpamSysPkg.Set.empty with
     | (pkgman, _) :: _ -> pkgman
     | [] -> assert false
   in
@@ -1190,7 +1187,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
     | `Quit -> give_up_msg (); OpamStd.Sys.exit_because `Aborted
   and print_command sys_packages =
     let commands =
-      OpamSysInteract.install_packages_commands sys_packages ~env
+      OpamSysInteract.install_packages_commands sys_packages
       |> List.map (fun (c,a) -> c::a)
     in
     OpamConsole.formatted_msg
@@ -1218,7 +1215,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
     | `Quit -> give_up ()
   and auto_install t sys_packages =
     try
-      OpamSysInteract.install ~env sys_packages; (* handles dry_run *)
+      OpamSysInteract.install sys_packages; (* handles dry_run *)
       map_sysmap (fun _ -> OpamSysPkg.Set.empty) t
     with Failure msg ->
       OpamConsole.error "%s" msg;
@@ -1232,7 +1229,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t packages =
     if OpamSysPkg.Set.is_empty sys_packages then t else
       (OpamConsole.error "These packages are still missing: %s\n"
          (syspkgs_to_string sys_packages);
-       entry_point t sys_packages)
+         entry_point t sys_packages)
   and bypass t =
     OpamConsole.note
       "Run 'opam option depext=false' if you wish to permanently disable \

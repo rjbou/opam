@@ -602,10 +602,7 @@ let make_command st opam ?dir ?text_command (cmd, args) =
     let open OpamStd.Option.Op in
     String.concat " | " [
       OpamVersion.(to_string current);
-      (let env =st.switch_global.global_variables in
-      Printf.sprintf "%s/%s"
-      (OpamSysPoll.os ~env () +! "unknown")
-      (OpamSysPoll.arch ~env () +! "unknown"));
+      (OpamSysPoll.os () +! "unknown") ^"/"^ (OpamSysPoll.arch () +! "unknown");
       (OpamStd.List.concat_map " " OpamPackage.to_string
          OpamPackage.Set.(elements @@
                           inter st.compiler_packages st.installed_roots));
