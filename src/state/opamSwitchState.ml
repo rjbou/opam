@@ -965,7 +965,6 @@ let universe st
   in
   let u_depopts = get_deps OpamFile.OPAM.depopts st.opams in
   let u_conflicts = get_conflicts st st.packages st.opams in
-  let base = st.compiler_packages in
   let u_invariant =
     if OpamStateConfig.(!r.unlock_base) then OpamFormula.Empty
     else st.switch_invariant
@@ -1018,7 +1017,6 @@ let universe st
   u_conflicts;
   u_installed_roots = st.installed_roots;
   u_pinned    = OpamPinned.packages st;
-  u_base      = base;
   u_invariant;
   u_reinstall;
   u_attrs     = ["opam-query", requested;
@@ -1029,6 +1027,32 @@ let universe st
   log ~level:2 "Universe load: %.3fs" (chrono ());
   u
 
+let invariant_root_packages st =
+  OpamPackage.Set.filter (OpamFormula.verifies st.switch_invariant) st.installed
+
+let compute_invariant_packages st =
+  let pkgs = invariant_root_packages st in
+  OpamSolver.dependencies ~build:false ~post:false
+    ~depopts:false ~installed:true ~unavailable:false
+    (universe st ~requested:pkgs Query)
+    pkgs
+
+let compute_compiler_packages st =
+  let dependencies = compute_invariant_packages st in
+  let compiler_packages =
+    OpamPackage.Set.filter (fun nv ->
+        try OpamFile.OPAM.has_flag Pkgflag_Compiler (opam st nv)
+        with Not_found -> false)
+      dependencies
+  in
+  let compiler_deps =
+    OpamSolver.dependencies ~build:false ~post:true
+      ~depopts:false ~installed:true ~unavailable:false
+      (universe st ~requested:compiler_packages Query)
+      compiler_packages
+  in
+  compiler_deps
+
 let dump_pef_state st oc =
   let conflicts = get_conflicts st st.packages st.opams in
   let print_def nv opam =
@@ -1036,7 +1060,7 @@ let dump_pef_state st oc =
     Printf.fprintf oc "version: %s\n" (OpamPackage.version_to_string nv);
     let installed = OpamPackage.Set.mem nv st.installed in
     (* let root = OpamPackage.Set.mem nv st.installed_roots in *)
-    let base = OpamPackage.Set.mem nv st.compiler_packages in
+    let inv = OpamPackage.Set.mem nv st.compiler_packages in
     let pinned = OpamPackage.Set.mem nv st.pinned in
     let available = OpamPackage.Set.mem nv (Lazy.force st.available_packages) in
     let reinstall = OpamPackage.Set.mem nv (Lazy.force st.reinstall) in
@@ -1045,7 +1069,7 @@ let dump_pef_state st oc =
     Printf.fprintf oc "available: %b\n" available;
     if installed then output_string oc "installed: true\n";
     if pinned then output_string oc "pinned: true\n";
-    if base then output_string oc "base: true\n";
+    if inv then output_string oc "invariant-pkg: true\n";
     if reinstall then output_string oc "reinstall: true\n";
 
     (* metadata (resolved for the current switch) *)

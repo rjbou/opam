@@ -275,3 +275,7 @@ module Installed_cache: sig
   val save: OpamFilename.t -> t -> unit
   val remove: OpamFilename.t -> unit
 end
+
+val invariant_root_packages: 'a switch_state -> package_set
+val compute_invariant_packages: 'a switch_state -> package_set
+val compute_compiler_packages: 'a switch_state -> package_set

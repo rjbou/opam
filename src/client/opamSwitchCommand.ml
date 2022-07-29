@@ -43,7 +43,7 @@ let list gt ~print_short =
         in
         let comp =
           OpamPackage.Map.filter
-            (fun nv _ -> OpamPackage.Set.mem nv sel.sel_roots)
+            (fun nv _ -> OpamPackage.Set.mem nv sel.sel_compiler)
             opams
           |> ifempty opams
         in
@@ -238,7 +238,8 @@ let install_compiler
         (OpamSolver.string_of_stats stats)
   in
   let to_install_pkgs = OpamSolver.new_packages solution in
-  let base_comp = OpamPackage.packages_of_names to_install_pkgs comp_roots in
+  let base_comp = OpamSwitchState.compute_invariant_packages { t with installed = t.installed ++ to_install_pkgs } in
+(*   OpamPackage.packages_of_names to_install_pkgs comp_roots in *)
   let has_comp_flag =
     let is_comp nv =
       try OpamFile.OPAM.has_flag Pkgflag_Compiler (OpamSwitchState.opam t nv)
@@ -247,12 +248,15 @@ let install_compiler
     (* Packages with the Compiler flag, or with a direct dependency with that
        flag (just for the warning) *)
     OpamPackage.Set.filter
+    is_comp
+(*
       (fun nv ->
          is_comp nv ||
          OpamPackage.Set.exists is_comp
            (OpamFormula.packages t.packages
               (OpamPackageVar.all_depends ~filter_default:true t
                  (OpamSwitchState.opam t nv))))
+*)
       base_comp
   in
   if invariant = OpamFormula.Empty then
@@ -262,7 +266,7 @@ let install_compiler
   else if OpamPackage.Set.is_empty has_comp_flag then
     OpamConsole.note
       "Packages %s don't have the 'compiler' flag set (nor any of their \
-       direct dependencies).\n\
+       dependencies).\n\
        You may want to use `opam switch set-invariant' to keep a stable \
        compiler version on upgrades."
       (OpamStd.List.concat_map ", " OpamPackage.to_string
@@ -306,6 +310,7 @@ let install_compiler
       solution in
   OpamSolution.check_solution ~quiet:OpamClientConfig.(not !r.show) t
     (Success result);
+  OpamSwitchAction.write_selections t;
   t
 
 let create
