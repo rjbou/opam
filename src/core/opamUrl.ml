@@ -189,8 +189,7 @@ let to_string_t ?subpath url =
   let subpath =
     match subpath with
     | Some sb ->
-      Printf.sprintf "directory %s%s in "
-        Filename.dir_sep
+      Printf.sprintf "directory %s in "
         (OpamFilename.SubPath.to_string sb)
     | None -> ""
   in

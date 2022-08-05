@@ -509,7 +509,7 @@ module SubPath = struct
     OpamSystem.back_to_forward s
     |> OpamStd.String.remove_prefix ~prefix:"./"
     |> of_string
-  let to_string = OpamSystem.forward_to_back
+  let to_string s = OpamSystem.forward_to_back (Filename.dir_sep ^ s)
   let normalised_string s = s
 
   let (/) d s = d / to_string s
