@@ -366,8 +366,7 @@ The following actions are simulated:
 === install 1 package
   - install j 1
 
-Fatal error: Undefined boolean filter value: os = "win32"
-# Return code 99 #
+j.1
 ### <pkg:h.1>
 opam-version: "2.0"
 flags: compiler
