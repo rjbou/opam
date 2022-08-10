@@ -825,6 +825,23 @@
    (run ./run.exe %{bin:opam} %{dep:switch-set.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-tree)
+ (action
+  (diff tree.test tree.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-tree)))
+
+(rule
+ (targets tree.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{bin:opam} %{dep:tree.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-update-upgrade)
  (action
   (diff update-upgrade.test update-upgrade.out)))
