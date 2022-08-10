@@ -37,18 +37,23 @@ let installed st names =
     OpamSwitchState.find_installed_package_by_name st n :: state
   ) [] |> OpamPackage.Set.of_list
 
-let build_condition_map ?(post=false) ?(dev=false) ?(doc=false) ?(test=false)
-    ?(tools=false) st : condition OpamPackage.Name.Map.t OpamPackage.Map.t =
-  let partial_env var =
-    let remove flag = if flag then None else Some (B false) in
-    match OpamVariable.Full.to_string var with
-    | "build" -> Some (B false)
-    | "post" -> remove post
-    | "dev" -> remove dev
-    | "with-doc" -> remove doc
-    | "with-test" -> remove test
-    | "with-tools" -> remove tools
-    | _ -> None
+let build_condition_map tog st : condition OpamPackage.Name.Map.t OpamPackage.Map.t =
+  let OpamListCommand.{ recursive = _; depopts = _;
+                        build; post; test; tools; doc; dev; } = tog in
+  let partial_env =
+    let vars = [
+      "build", build;
+      "post", post;
+      "dev", dev;
+      "with-doc", doc;
+      "with-test", test;
+      "with-tools", tools;
+    ] |> List.map (fun (v, f) -> v, if f then None else Some (B false))
+    in
+    fun var ->
+      OpamStd.List.find_map_opt (fun (v,c) ->
+          if String.equal v (OpamVariable.Full.to_string var) then
+            c else None) vars
   in
   OpamPackage.Set.fold (fun package cmap ->
     let map =
@@ -67,7 +72,10 @@ let build_condition_map ?(post=false) ?(dev=false) ?(doc=false) ?(test=false)
                 if not is_valid then
                   is_valid, orig
                 else
-                  let filtered = OpamFilter.filter_deps ~build:false ~post ~doc ~test ~tools ~dev (Atom orig) in
+                let filtered =
+                  OpamFilter.filter_deps ~build ~post ~doc ~test ~tools ~dev
+                    (Atom orig)
+                in
                   match filtered with
                   | Atom (name, _) ->
                     let package =
@@ -122,14 +130,13 @@ let cut_leaves (mode: [ `succ | `pred]) ~names ~root st graph =
   (* return the new roots and the new graph *)
   OpamPackage.Set.inter root packages, graph
 
-let build_deps_forest st universe ?(post=false) ?(dev=false) ?(doc=false) ?(test=false)
-    ?(tools=false) filter names =
+let build_deps_forest st universe tog filter names =
   let names = installed st names in
+  let OpamListCommand.{ build; post; _ } = tog in
   let root, graph =
     let graph =
       OpamSolver.dependency_graph
-        ~depopts:false ~build:false ~post ~installed:true
-        universe
+        ~depopts:false ~build ~post ~installed:true universe
     in
     let root =
       st.installed |> OpamPackage.Set.filter (is_root graph)
@@ -139,7 +146,7 @@ let build_deps_forest st universe ?(post=false) ?(dev=false) ?(doc=false) ?(test
     | false, Leads_to -> cut_leaves `pred ~names ~root st graph
     | true, _ -> root, graph
   in
-  let condition_map = build_condition_map ~post ~doc ~test ~tools ~dev st in
+  let condition_map = build_condition_map tog st in
   let rec build visited package node =
     if visited |> OpamPackage.Set.mem package then
       let node =
@@ -169,14 +176,13 @@ let build_deps_forest st universe ?(post=false) ?(dev=false) ?(doc=false) ?(test
   |> OpamStd.List.fold_left_map build_root OpamPackage.Set.empty
   |> snd
 
-let build_revdeps_forest st universe ?(post=false) ?(dev=false) ?(doc=false)
-    ?(test=false) ?(tools=false) filter names =
+let build_revdeps_forest st universe tog filter names =
   let names = installed st names in
+  let OpamListCommand.{ build; post; _ } = tog in
   let root, graph =
     let graph =
       OpamSolver.dependency_graph
-        ~depopts:false ~build:false ~post ~installed:true
-        universe
+        ~depopts:false ~build ~post ~installed:true universe
     in
     let root =
       st.installed |> OpamPackage.Set.filter (is_leaf graph)
@@ -186,7 +192,7 @@ let build_revdeps_forest st universe ?(post=false) ?(dev=false) ?(doc=false)
     | false, Leads_to -> cut_leaves `succ ~names ~root st graph
     | true, _ -> root, graph
   in
-  let condition_map = build_condition_map ~post ~doc ~test ~tools ~dev st in
+  let condition_map = build_condition_map tog st in
   let rec build visited package node =
     if visited |> OpamPackage.Set.mem package then
       let node =
@@ -228,12 +234,12 @@ type result =
   | DepsForest of deps node forest
   | RevdepsForest of revdeps node forest
 
-let build st universe ?post ?dev ?doc ?test ?tools mode filter names =
+let build st universe tog mode filter names =
   match mode with
   | Deps ->
-    DepsForest (build_deps_forest st universe ?post ?dev ?doc ?test ?tools filter names)
+    DepsForest (build_deps_forest st universe tog filter names)
   | ReverseDeps ->
-    RevdepsForest (build_revdeps_forest st universe ?post ?dev ?doc ?test ?tools filter names)
+    RevdepsForest (build_revdeps_forest st universe tog filter names)
 
 let string_of_condition (c: condition) =
   let custom ~context:_ ~paren:_ = function
@@ -282,8 +288,9 @@ let print ?no_constraint (forest: result) =
     trees |> List.iter (fun tree -> print_newline (); Tree.print ~printer tree)
   | DepsForest [] | RevdepsForest [] -> ()
 
-let get_universe ?doc ?test ?tools st =
-  OpamSwitchState.universe st ?doc ?test ?tools ~requested:st.installed Query
+let get_universe tog st =
+  let OpamListCommand.{doc; test; tools; _} = tog in
+  OpamSwitchState.universe st ~doc ~test ~tools ~requested:st.installed Query
 
 let print_sln st new_st missing solution =
   OpamConsole.msg "The following actions are simulated:\n";
@@ -320,7 +327,7 @@ let print_sln st new_st missing solution =
     solution;
   OpamConsole.msg "\n"
 
-let dry_install ?doc ?test ?tools st universe missing =
+let dry_install tog st universe missing =
   let req =
     let install = missing |> List.map (fun name -> name, None) in
     OpamSolver.request ~install ()
@@ -329,7 +336,7 @@ let dry_install ?doc ?test ?tools st universe missing =
   | Success solution ->
     let new_st = OpamSolution.dry_run st solution in
     print_sln st new_st (OpamPackage.Name.Set.of_list missing) solution;
-    new_st, get_universe ?doc ?test ?tools new_st
+    new_st, get_universe tog new_st
   | Conflicts cs ->
     OpamConsole.error
       "Could not simulate installing the specified package(s) to this switch:";
@@ -338,16 +345,16 @@ let dry_install ?doc ?test ?tools st universe missing =
           (OpamSwitchState.unavailable_reason st) cs);
     OpamStd.Sys.exit_because `No_solution
 
-let run st ?post ?dev ?doc ?test ?tools ?no_constraint mode filter packages =
+let run st tog ?no_constraint mode filter packages =
   let select, missing =
     List.partition (OpamSwitchState.is_name_installed st) packages
   in
   let st, universe =
-    let universe = get_universe ?doc ?test ?tools st in
+    let universe = get_universe tog st in
     match mode with
     | Deps ->
       if missing = [] then st, universe
-      else dry_install ?doc ?test ?tools st universe missing
+      else dry_install tog st universe missing
     | ReverseDeps ->
       (* non-installed packages don't make sense in rev-deps *)
       if missing <> [] then
@@ -364,6 +371,6 @@ let run st ?post ?dev ?doc ?test ?tools ?no_constraint mode filter packages =
     OpamConsole.error_and_exit `Not_found "No package is installed"
   else
     let result =
-      build st universe ?post ?dev ?doc ?test ?tools mode filter (select @ missing)
+      build st universe tog mode filter (select @ missing)
     in
     print ?no_constraint result

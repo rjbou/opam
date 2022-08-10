@@ -28,7 +28,7 @@ type tree_filter =
 val run :
   [< unlocked > `Lock_write ] switch_state ->
   (* package selection options *)
-  ?post:bool -> ?dev:bool -> ?doc:bool -> ?test:bool -> ?tools:bool ->
+  OpamListCommand.dependency_toggles ->
   (* output format options *)
   ?no_constraint:bool ->
   mode -> tree_filter -> name list -> unit
