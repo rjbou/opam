@@ -31,6 +31,18 @@ type 'a node =
 module Tree = OpamConsole.Tree
 type 'a forest = 'a Tree.t list
 
+type tree_filter =
+  | Roots_from
+  | Leads_to
+
+type mode =
+  | Deps
+  | ReverseDeps
+
+type resulting_forest =
+  | DepsForest of deps node forest
+  | RevdepsForest of revdeps node forest
+
 let installed st names =
   names |> List.fold_left (fun state n ->
     (* non-installed packages should already be simulated to be installed *)
@@ -96,10 +108,6 @@ let build_condition_map tog st =
     in
     cmap |> OpamPackage.Map.add package map
   ) st.installed OpamPackage.Map.empty
-
-type tree_filter =
-  | Roots_from
-  | Leads_to
 
 let is_root graph p =
   OpamSolver.PkgGraph.in_degree graph p = 0
@@ -225,14 +233,6 @@ let build_revdeps_forest st universe tog filter names =
   |> OpamPackage.Set.elements
   |> OpamStd.List.fold_left_map build_root OpamPackage.Set.empty
   |> snd
-
-type mode =
-  | Deps
-  | ReverseDeps
-
-type result =
-  | DepsForest of deps node forest
-  | RevdepsForest of revdeps node forest
 
 let build st universe tog mode filter names =
   match mode with
