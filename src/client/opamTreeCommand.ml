@@ -351,11 +351,12 @@ let run st tog ?no_constraint mode filter packages =
   in
   let st, universe =
     let universe = get_universe tog st in
-    match mode with
-    | Deps ->
-      if missing = [] then st, universe
-      else dry_install tog st universe missing
-    | ReverseDeps ->
+    match mode, filter, missing with
+    | Deps, _, [] -> st, universe
+    | Deps, Roots_from, _::_ ->
+      dry_install tog st universe missing
+    | Deps, Leads_to, _::_
+    | ReverseDeps, _, _ ->
       (* non-installed packages don't make sense in rev-deps *)
       if missing <> [] then
         OpamConsole.warning "Not installed package%s %s, skipping"
@@ -370,7 +371,5 @@ let run st tog ?no_constraint mode filter packages =
   if OpamPackage.Set.is_empty st.installed then
     OpamConsole.error_and_exit `Not_found "No package is installed"
   else
-    let result =
-      build st universe tog mode filter (select @ missing)
-    in
-    print ?no_constraint result
+    print ?no_constraint
+      (build st universe tog mode filter packages)
