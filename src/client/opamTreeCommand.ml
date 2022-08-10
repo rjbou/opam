@@ -89,7 +89,7 @@ let build_condition_map tog st =
                 else
                 let filtered =
                   OpamFilter.filter_deps ~build ~post ~doc ~test ~tools ~dev
-                    (Atom orig)
+                    ~default:true (Atom orig)
                 in
                   match filtered with
                   | Atom (name, _) ->
