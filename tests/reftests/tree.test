@@ -218,3 +218,86 @@ Done.
 ### opam tree j
 j.1
 '-- a.1
+### opam tree
+c.1
+|-- a.1
+'-- b.1
+    '-- a.1 [*]
+
+d.1
+
+e.1
+'-- a.1 [*]
+
+h.1
+|-- f.1
+|   '-- b.1 (< 2) [*]
+'-- g.1
+    '-- b.1 (>= 1 & < 3) [*]
+
+i.1
+'-- b.1 (< 3) [*]
+
+j.1
+'-- a.1 [*]
+### opam switch create void --empty
+### opam tree f h
+The following actions are simulated:
+=== install 5 packages
+  - install a 1 [required by b]
+  - install b 1 [required by f]
+  - install f 1
+  - install g 1 [required by h]
+  - install h 1
+
+f.1
+'-- b.1 (< 2)
+    '-- a.1
+
+h.1
+|-- f.1 [*]
+'-- g.1
+    '-- b.1 (>= 1 & < 3) [*]
+### opam tree j --with-test
+The following actions are simulated:
+=== install 2 packages
+  - install a 1 [required by j]
+  - install j 1
+
+j.1
+'-- a.1
+### opam tree e
+The following actions are simulated:
+=== install 3 packages
+  - install a 1 [required by e]
+  - install b 1
+  - install e 1
+
+e.1
+'-- a.1
+### opam tree --leads-to a
+The following actions are simulated:
+=== install 1 package
+  - install a 1
+
+a.1
+### <pkg:j.1>
+opam-version: "2.0"
+flags: compiler
+conflicts: "a"
+### opam switch create j
+
+<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+Switch invariant: ["j"]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed j.1
+Done.
+### opam tree e
+[ERROR] Could not simulate installing the specified package(s) to this switch:
+  * Incompatible packages:
+    - (invariant) -> j
+    - e -> a
+    You can temporarily relax the switch invariant with `--update-invariant'
+
+# Return code 20 #
