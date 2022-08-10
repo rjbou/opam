@@ -335,25 +335,45 @@ let get_universe tog st =
   let OpamListCommand.{doc; test; tools; _} = tog in
   OpamSwitchState.universe st ~doc ~test ~tools ~requested:st.installed Query
 
-let dry_install tog st universe missing =
-  let req =
-    let install = missing |> List.map (fun name -> name, None) in
-    OpamSolver.request ~install ()
-  in
-  match OpamSolver.resolve universe req with
+let simulate_new_state tog st universe install names =
+  match OpamSolver.resolve universe
+          (OpamSolver.request ~install ()) with
   | Success solution ->
     let new_st = OpamSolution.dry_run st solution in
-    print_solution st new_st (OpamPackage.Name.Set.of_list missing) solution;
+    print_solution st new_st names solution;
     new_st, get_universe tog new_st
   | Conflicts cs ->
     OpamConsole.error
       "Could not simulate installing the specified package(s) to this switch:";
     OpamConsole.errmsg "%s"
       (OpamCudf.string_of_conflicts st.packages
-          (OpamSwitchState.unavailable_reason st) cs);
+         (OpamSwitchState.unavailable_reason st) cs);
     OpamStd.Sys.exit_because `No_solution
 
-let run st tog ?no_constraint mode filter names =
+let dry_install tog st universe missing =
+  let install = missing |> List.map (fun name -> name, None) in
+  simulate_new_state tog st universe install (OpamPackage.Name.Set.of_list missing)
+
+let raw_state tog st names =
+  let OpamListCommand.{doc; test; tools; _} = tog in
+  let install = List.map (fun name -> name, None) names in
+  let names = OpamPackage.Name.Set.of_list names in
+  let requested =
+    OpamPackage.packages_of_names
+      (Lazy.force st.available_packages)
+      names
+  in
+  let universe =
+    OpamSwitchState.universe st ~doc ~test ~tools ~requested Query
+  in
+  let universe =
+    { universe
+      with u_installed = OpamPackage.Set.empty;
+           u_installed_roots = OpamPackage.Set.empty }
+  in
+  simulate_new_state tog st universe install names
+
+let run st tog ?no_constraint ?(no_switch=false) mode filter names =
   let select, missing =
     List.partition (OpamSwitchState.is_name_installed st) names
   in
@@ -362,7 +382,10 @@ let run st tog ?no_constraint mode filter names =
     match mode, filter, missing with
     | Deps, _, [] -> st, universe
     | Deps, Roots_from, _::_ ->
-      dry_install tog st universe missing
+      if no_switch then
+        raw_state tog st missing
+      else
+        dry_install tog st universe missing
     | Deps, Leads_to, _::_
     | ReverseDeps, _, _ ->
       (* non-installed names don't make sense in rev-deps *)

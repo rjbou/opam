@@ -31,4 +31,6 @@ val run :
   OpamListCommand.dependency_toggles ->
   (* output format options *)
   ?no_constraint:bool ->
+  (* do no keep switch consistency *)
+  ?no_switch:bool ->
   mode -> tree_filter -> name list -> unit

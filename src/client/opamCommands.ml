@@ -789,22 +789,32 @@ let tree ?(why=false) cli =
     mk_flag ~cli (cli_from cli2_2) ["no-constraint"] ~section:display_docs
       "Do not display the version constraints e.g. $(i,(>= 1.0.0))."
   in
-  let tree global_options mode filter post dev doc test tools no_constraint names () =
-    apply_global_options cli global_options;
-    OpamGlobalState.with_ `Lock_none @@ fun gt ->
-    OpamSwitchState.with_ `Lock_none gt @@ fun st ->
-    let tog = OpamListCommand.{
-        post; test; doc; dev; tools;
-        recursive = false;
-        depopts = false;
-        build = false;
-      } in
-    OpamTreeCommand.run st tog ~no_constraint mode filter names
+  let no_switch =
+    mk_flag ~cli (cli_from cli2_2) ["no-switch"] ~section:selection_docs
+      "Do not take into account switch consistency"
   in
-  mk_command ~cli (cli_from cli2_2) "tree" ~doc ~man
+  let tree global_options mode filter post dev doc test tools no_constraint
+      no_switch names () =
+    if names = [] && no_switch then
+       `Error
+         (true, "--no-switch can't be used without specifying a name")
+    else
+      (apply_global_options cli global_options;
+       OpamGlobalState.with_ `Lock_none @@ fun gt ->
+       OpamSwitchState.with_ `Lock_none gt @@ fun st ->
+       let tog = OpamListCommand.{
+           post; test; doc; dev; tools;
+           recursive = false;
+           depopts = false;
+           build = false;
+         } in
+       OpamTreeCommand.run st tog ~no_constraint ~no_switch mode filter names;
+       `Ok ())
+  in
+  mk_command_ret ~cli (cli_from cli2_2) "tree" ~doc ~man
     Term.(const tree $global_options cli $mode $filter
           $post $dev $doc_flag $test $tools
-          $no_cstr
+          $no_cstr $no_switch
           $name_list)
 
 (* SHOW *)
