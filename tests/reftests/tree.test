@@ -352,20 +352,38 @@ j.1
 k.1
 ### <pkg:j.1>
 opam-version: "2.0"
-flags: compiler
-conflicts: "a"
-### opam switch create j
-
-<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
-Switch invariant: ["j"]
+depends: "a" {  os = "win32"}
+### opam install a
+The following actions will be performed:
+=== install 1 package
+  - install a 1
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed j.1
+-> installed a.1
+Done.
+### opam tree j --no-switch
+The following actions are simulated:
+=== install 1 package
+  - install j 1
+
+Fatal error: Undefined boolean filter value: os = "win32"
+# Return code 99 #
+### <pkg:h.1>
+opam-version: "2.0"
+flags: compiler
+conflicts: "a"
+### opam switch create h
+
+<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+Switch invariant: ["h"]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed h.1
 Done.
 ### opam tree e
 [ERROR] Could not simulate installing the specified package(s) to this switch:
   * Incompatible packages:
-    - (invariant) -> j
+    - (invariant) -> h
     - e -> a
     You can temporarily relax the switch invariant with `--update-invariant'
 
