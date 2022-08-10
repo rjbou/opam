@@ -758,10 +758,10 @@ let tree ?(why=false) cli =
   let filter =
     let default = OpamTreeCommand.Roots_from in
     mk_vflag default ~cli ~section:filter_docs [
-      cli_from cli2_2, Roots_from, ["roots-from"],
+      cli_from cli2_2, OpamTreeCommand.Roots_from, ["roots-from"],
         "Display only the trees which roots from one of the $(i,PACKAGES) \
          (this is the default).";
-      cli_from cli2_2, Leads_to,   ["leads-to"],
+      cli_from cli2_2, OpamTreeCommand.Leads_to,   ["leads-to"],
         "Display only the branches which leads to one of the $(i,PACKAGES).";
     ]
   in
