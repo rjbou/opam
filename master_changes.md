@@ -30,6 +30,8 @@ users)
   * [BUG] Fix display of pinned packages in action list [#5079 @rjbou]
   * [BUG] Fix spaces in root and switch dirs [#5203 @jonahbeckford]
   * Use menu for init setup [#5057 @AltGr; #5217 @dra27]
+  * ◈ Add `tree` subcommand to display a dependency tree of currently installed packages [#5171 @cannorin - fix #3775]
+  * ◈ Add `why` subcommand to examine how the versions of currently installed packages get constrained (alias to `tree --rev-deps`) [#5171 @cannorin - fix #3775]
 
 ## Plugins
   *
@@ -313,6 +315,8 @@ users)
   * Add test for switch upgrade from 2.0 root, with pinned compiler [#5176 @rjbou @kit-ty-kate]
   * Add switch import (for pinned packages) test [#5181 @rjbou]
   * Add `--with-tools` test [#5160 @rjbou]
+  * Add test for opam tree command [#5171 @cannorin]
+
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -408,7 +412,9 @@ users)
   * `OpamAuxCommand`: add `?locked` (and handle lock file then) argument to `name_and_dir_of_opam_file`, `opams_of_dir`, `opams_of_dir_w_target`, `resolve_locals`, `autopin`, and `simulate_autopin` [#5080 @rjbou]
   * `OpamClient.PIN`: change `?locked:bool` argument into `string`, to have lock extension name [#5080 @rjbou]
   * `OpamClient.Pin.post_pin_action`: no more updates depexts information, moved to `OpamSwitchState.update_pin` [#5047 @rjbou]
-
+  * Add `OpamTreeCommand` [#5171 @cannorin]
+  * `OpamSolution`: add `dry_run` to simulate the new switch state after applying a solution [#5171 @cannorin]
+  
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
   * New download functions for shared source, old ones kept [#4893 @rjbou]
@@ -463,6 +469,8 @@ users)
   * `OpamTypes`: `request.wish_install` now takes a formula instead of  a conjunction [#4975 @AltGr]
   * `OpamFilter`: add `?tools` filtering argument in `filter_deps` [#5016 @rjbou]
   * `OpamFile.OPAM`: Add `locked`, file origin and extension, in the record with its modifiers/getter [#5080 @rjbou]
+  * `OpamFormula`: add generic `formula_to_cnf` and `formula_to_dnf`, and use them in `to_cnf` and `to_dnf` [#5171 @cannorin]
+  * `OpamFilter`: add `?custom` argument in `to_string` to tweak the output [#5171 @cannorin]
 
 ## opam-core
   * OpamSystem: avoid calling Unix.environment at top level [#4789 @hannesm]
@@ -484,3 +492,6 @@ users)
   * `OpamCompat`: add `Lazy` module and `Lazy.map` function [#5176 @dra27]
   * `OpamConsole.menu`: add `noninteractive` option to choose a different default when output is not a tty [#5156 @rjbou]
   * `OpamStd.Sys`: add `all_shells` list of all supported shells [#5217 @dra27]
+  * `OpamConsole`: add a `Tree` submodule to draw a unicode/ascii-art tree [#5171 @cannorin]
+  * `OpamStd.List`: add `find_map_opt` (for ocaml < 4.10) and `fold_left_map` (for ocaml < 4.11) [#5171 @cannorin]
+  * `OpamCompat`: add `Int.equal` (for ocaml < 4.12)
