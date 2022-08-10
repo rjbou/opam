@@ -37,7 +37,7 @@ let installed st names =
     OpamSwitchState.find_installed_package_by_name st n :: state
   ) [] |> OpamPackage.Set.of_list
 
-let build_condition_map tog st : condition OpamPackage.Name.Map.t OpamPackage.Map.t =
+let build_condition_map tog st =
   let OpamListCommand.{ recursive = _; depopts = _;
                         build; post; test; tools; doc; dev; } = tog in
   let partial_env =
@@ -241,12 +241,12 @@ let build st universe tog mode filter names =
   | ReverseDeps ->
     RevdepsForest (build_revdeps_forest st universe tog filter names)
 
-let string_of_condition (c: condition) =
+let string_of_condition cond =
   let custom ~context:_ ~paren:_ = function
     | FString s -> Some s
     | _ -> None
   in
-  let print_atom (fc: filter filter_or_constraint) =
+  let string_of_atom fc =
     match fc with
     | Filter f -> OpamFilter.to_string ~custom f
     | Constraint (relop, f) ->
@@ -254,7 +254,7 @@ let string_of_condition (c: condition) =
         (OpamPrinter.FullPos.relop_kind relop)
         (OpamFilter.to_string ~custom f)
   in
-  "(" ^ OpamFormula.string_of_formula print_atom c ^ ")"
+  "(" ^ OpamFormula.string_of_formula string_of_atom cond ^ ")"
 
 let print_deps ?(no_constraint=false) = function
   | Root p -> OpamPackage.to_string p
@@ -276,8 +276,7 @@ let print_revdeps ?(no_constraint=false) = function
     | None | Some Empty -> Printf.sprintf "%s%s" p dup
     | Some c -> Printf.sprintf "%s %s%s" (string_of_condition c) p dup
 
-let print ?no_constraint (forest: result) =
-  match forest with
+let print ?no_constraint = function
   | DepsForest (tree :: trees) ->
     let printer = print_deps ?no_constraint in
     Tree.print ~printer tree;
@@ -292,7 +291,7 @@ let get_universe tog st =
   let OpamListCommand.{doc; test; tools; _} = tog in
   OpamSwitchState.universe st ~doc ~test ~tools ~requested:st.installed Query
 
-let print_sln st new_st missing solution =
+let print_solution st new_st missing solution =
   OpamConsole.msg "The following actions are simulated:\n";
   let messages p =
     let opam = OpamSwitchState.opam new_st p in
@@ -335,7 +334,7 @@ let dry_install tog st universe missing =
   match OpamSolver.resolve universe req with
   | Success solution ->
     let new_st = OpamSolution.dry_run st solution in
-    print_sln st new_st (OpamPackage.Name.Set.of_list missing) solution;
+    print_solution st new_st (OpamPackage.Name.Set.of_list missing) solution;
     new_st, get_universe tog new_st
   | Conflicts cs ->
     OpamConsole.error
@@ -345,9 +344,9 @@ let dry_install tog st universe missing =
           (OpamSwitchState.unavailable_reason st) cs);
     OpamStd.Sys.exit_because `No_solution
 
-let run st tog ?no_constraint mode filter packages =
+let run st tog ?no_constraint mode filter names =
   let select, missing =
-    List.partition (OpamSwitchState.is_name_installed st) packages
+    List.partition (OpamSwitchState.is_name_installed st) names
   in
   let st, universe =
     let universe = get_universe tog st in
@@ -357,13 +356,13 @@ let run st tog ?no_constraint mode filter packages =
       dry_install tog st universe missing
     | Deps, Leads_to, _::_
     | ReverseDeps, _, _ ->
-      (* non-installed packages don't make sense in rev-deps *)
+      (* non-installed names don't make sense in rev-deps *)
       if missing <> [] then
         OpamConsole.warning "Not installed package%s %s, skipping"
           (match missing with | [_] -> "" | _ -> "s")
           (OpamStd.Format.pretty_list
             (List.map OpamPackage.Name.to_string missing));
-      if select = [] && packages <> [] then
+      if select = [] && names <> [] then
         OpamConsole.error_and_exit `Not_found "No package to display"
       else
         st, universe
@@ -372,4 +371,4 @@ let run st tog ?no_constraint mode filter packages =
     OpamConsole.error_and_exit `Not_found "No package is installed"
   else
     print ?no_constraint
-      (build st universe tog mode filter packages)
+      (build st universe tog mode filter names)

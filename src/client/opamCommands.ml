@@ -789,7 +789,7 @@ let tree ?(why=false) cli =
     mk_flag ~cli (cli_from cli2_2) ["no-constraint"] ~section:display_docs
       "Do not display the version constraints e.g. $(i,(>= 1.0.0))."
   in
-  let tree global_options mode filter post dev doc test tools no_constraint packages () =
+  let tree global_options mode filter post dev doc test tools no_constraint names () =
     apply_global_options cli global_options;
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
     OpamSwitchState.with_ `Lock_none gt @@ fun st ->
@@ -799,7 +799,7 @@ let tree ?(why=false) cli =
         depopts = false;
         build = false;
       } in
-    OpamTreeCommand.run st tog ~no_constraint mode filter packages
+    OpamTreeCommand.run st tog ~no_constraint mode filter names
   in
   mk_command ~cli (cli_from cli2_2) "tree" ~doc ~man
     Term.(const tree $global_options cli $mode $filter
