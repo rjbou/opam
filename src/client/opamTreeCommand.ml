@@ -39,9 +39,6 @@ let installed st names =
 
 let build_condition_map ?(post=false) ?(dev=false) ?(doc=false) ?(test=false)
     ?(tools=false) st : condition OpamPackage.Name.Map.t OpamPackage.Map.t =
-  let open OpamFilter in
-  let open OpamFormula in
-  let open OpamSwitchState in
   let partial_env var =
     let remove flag = if flag then None else Some (B false) in
     match OpamVariable.Full.to_string var with
@@ -55,27 +52,30 @@ let build_condition_map ?(post=false) ?(dev=false) ?(doc=false) ?(test=false)
   in
   OpamPackage.Set.fold (fun package cmap ->
     let map =
-      opam st package
+      OpamSwitchState.opam st package
       |> OpamFile.OPAM.depends
       (* remove any irrelevant variables to simplify the output *)
-      |> partial_filter_formula partial_env
-      |> formula_to_dnf
+      |> OpamFilter.partial_filter_formula partial_env
+      |> OpamFormula.formula_to_dnf
       |> OpamStd.List.find_map_opt (fun cnj ->
           let is_valid, result =
             cnj
             (* filter out non-installed dependencies *)
-            |> List.filter (fun (name, _) -> is_name_installed st name)
+            |> List.filter (fun (name, _) ->
+                OpamSwitchState.is_name_installed st name)
             |> OpamStd.List.fold_left_map (fun is_valid orig ->
                 if not is_valid then
                   is_valid, orig
                 else
-                  let filtered = filter_deps ~build:false ~post ~doc ~test ~tools ~dev (Atom orig) in
+                  let filtered = OpamFilter.filter_deps ~build:false ~post ~doc ~test ~tools ~dev (Atom orig) in
                   match filtered with
                   | Atom (name, _) ->
-                    let package = find_installed_package_by_name st name in
+                    let package =
+                      OpamSwitchState.find_installed_package_by_name st name
+                    in
                     let is_valid =
-                      to_atom_formula filtered
-                      |> eval (fun atom -> check atom package)
+                      OpamFormula.eval (fun atom -> OpamFormula.check atom package)
+                        (OpamFormula.to_atom_formula filtered)
                     in
                     is_valid, orig
                   | _ -> false, orig (* should be impossible *)
@@ -100,11 +100,10 @@ let is_leaf graph p =
   OpamSolver.PkgGraph.out_degree graph p = 0
 
 let cut_leaves (mode: [ `succ | `pred]) ~names ~root st graph =
-  let open OpamSolver.PkgGraph in
   let fold, is_final =
     match mode with
-    | `succ -> fold_succ, is_leaf graph
-    | `pred -> fold_pred, is_root graph
+    | `succ -> OpamSolver.PkgGraph.fold_succ, is_leaf graph
+    | `pred -> OpamSolver.PkgGraph.fold_pred, is_root graph
   in
   (* compute the packages which are connected to one of the `names` *)
   let rec go package set =
@@ -213,8 +212,7 @@ let build_revdeps_forest st universe ?(post=false) ?(dev=false) ?(doc=false)
       visited, Tree.create ~children node
   in
   let build_root visited package =
-    let open OpamPackage.Set in
-    let visited = remove package (union visited root) in
+    let visited = OpamPackage.Set.(remove package (union visited root)) in
     build visited package (Root package)
   in
   root
