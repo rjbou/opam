@@ -49,6 +49,9 @@ let installed st names =
     OpamSwitchState.find_installed_package_by_name st n :: state
   ) [] |> OpamPackage.Set.of_list
 
+
+(** Forest building *)
+
 let build_condition_map tog st =
   let OpamListCommand.{ recursive = _; depopts = _;
                         build; post; test; tools; doc; dev; } = tog in
@@ -241,6 +244,9 @@ let build st universe tog mode filter names =
   | ReverseDeps ->
     RevdepsForest (build_revdeps_forest st universe tog filter names)
 
+
+(* Forest printing *)
+
 let string_of_condition cond =
   let custom ~context:_ ~paren:_ = function
     | FString s -> Some s
@@ -287,10 +293,6 @@ let print ?no_constraint = function
     trees |> List.iter (fun tree -> print_newline (); Tree.print ~printer tree)
   | DepsForest [] | RevdepsForest [] -> ()
 
-let get_universe tog st =
-  let OpamListCommand.{doc; test; tools; _} = tog in
-  OpamSwitchState.universe st ~doc ~test ~tools ~requested:st.installed Query
-
 let print_solution st new_st missing solution =
   OpamConsole.msg "The following actions are simulated:\n";
   let messages p =
@@ -325,6 +327,13 @@ let print_solution st new_st missing solution =
     ~skip (* hide recompiled packages because they don't make sense here *)
     solution;
   OpamConsole.msg "\n"
+
+
+(** Setting states for building *)
+
+let get_universe tog st =
+  let OpamListCommand.{doc; test; tools; _} = tog in
+  OpamSwitchState.universe st ~doc ~test ~tools ~requested:st.installed Query
 
 let dry_install tog st universe missing =
   let req =
