@@ -262,11 +262,13 @@ let string_of_condition cond =
   in
   "(" ^ OpamFormula.string_of_formula string_of_atom cond ^ ")"
 
+let duplicated = "[*]"
+
 let print_deps ?(no_constraint=false) = function
   | Root p -> OpamPackage.to_string p
   | Dependency { package; satisfies; is_dup } ->
     let p = OpamPackage.to_string package in
-    let dup = if is_dup then " [*]" else "" in
+    let dup = if is_dup then " "^duplicated else "" in
     match satisfies with
     | _ when no_constraint -> Printf.sprintf "%s%s" p dup
     | None | Some Empty -> Printf.sprintf "%s%s" p dup
@@ -276,7 +278,7 @@ let print_revdeps ?(no_constraint=false) = function
   | Root p -> OpamPackage.to_string p
   | Requirement { package; demands; is_dup } ->
     let p = OpamPackage.to_string package in
-    let dup = if is_dup then " [*]" else "" in
+    let dup = if is_dup then " "^duplicated else "" in
     match demands with
     | _ when no_constraint -> Printf.sprintf "%s%s" p dup
     | None | Some Empty -> Printf.sprintf "%s%s" p dup
