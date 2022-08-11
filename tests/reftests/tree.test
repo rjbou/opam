@@ -71,9 +71,11 @@ b.1
 c.1
 '-- b.1
     '-- a.1
+### <pkg:c-build.1>
+opam-version: "2.0"
 ### <pkg:c.1>
 opam-version: "2.0"
-depends: [ "b" "a" ]
+depends: [ "b" "a" "c-build" {build} ]
 ### opam tree c
 c.1
 |-- a.1
