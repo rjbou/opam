@@ -806,7 +806,7 @@ let tree ?(why=false) cli =
            post; test; doc; dev; tools;
            recursive = false;
            depopts = false;
-           build = false;
+           build = true;
          } in
        OpamTreeCommand.run st tog ~no_constraint ~no_switch mode filter names;
        `Ok ())
