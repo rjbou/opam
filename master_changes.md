@@ -35,6 +35,7 @@ users)
   * ◈ Add `tree` subcommand to display a dependency tree of currently installed packages [#5171 @cannorin - fix #3775]
   * ◈ Add `why` subcommand to examine how the versions of currently installed packages get constrained (alias to `tree --rev-deps`) [#5171 @cannorin - fix #3775]
   * Make the plugin lookup faster when mistyping a subcommand [#5297 @kit-ty-kate]
+  * Use menu for init setup [#5057 @AltGr #5217 @dra27]
 
 ## Plugins
   *
@@ -80,8 +81,11 @@ users)
   * Add support for `opam switch -` (go to previous non-local switch) [#4910 @kit-ty-kate - fix 4866]
   * On loading, check for executable external files if they are in `PATH`, and warn if not the case [#4932 @rjbou - fix #4923]
   * When inferring a 2.1+ switch invariant from 2.0 base packages, don't filter out pinned packages as that causes very wide invariants for pinned compiler packages [#5176 @dra27 - fix #4501]
-  * Really install invariant formula if not installed in switch [#5188 @rjbou]
+  * When setting invariant, really install invariant formula if not installed in switch [#5188 @rjbou]
+  * When setting invariant, update switch state to compute invariant packages [#5208 @rjbou]
   * On import, check that installed pinned packages changed, reinstall if so [#5181 @rjbou - fix #5173]
+  * Update compiler / base packages handling: always updated, the field contains installed packages resolving invariant formula [#5208 @rjbou]
+  * Fill empty switch synopsis with invariant formula instead of compiler package name [#5208 @rjbou]
 
 ## Config
   * Reset the "jobs" config variable when upgrading from opam 2.0 [#5284 @kit-ty-kate]
@@ -106,6 +110,8 @@ users)
   * Improve performance of some opam list combination (e.g. --available --installable) [#4999 @kit-ty-kate]
   * Improve performance of opam list --conflicts-with when combined with other filters [#4999 @kit-ty-kate]
   * Fix coinstallability filter corner case [#5024 @AltGr]
+  * Colorise as unavailable (magenta) packages that are specified in the invariant formula and that do not verify it (previous was non installed compiler package) [#5208 @rjbou]
+  * ✘ Change `--base` into `--invariant`, column name and the content is invariant formula installed dependencies [#5208 @rjbou]
 
 ## Show
   * Add `depexts` to default printer [#4898 @rjbou]
@@ -234,6 +240,7 @@ users)
   * Switch autoconf required version to 2.71 [#5161 @dra27]
   * Remove src/client/no-git-version when calling make clean [#5290 @kit-ty-kate]
   * Update the bootstrap compiler to 4.14.0 [#5250 @kit-ty-kate]
+  * `opam-state` depends on `opam-solver` [#5208 @rjbou]
 
 ## Infrastructure
   * Fix caching of Cygwin compiler on AppVeyor [#4988 @dra27]
@@ -287,6 +294,7 @@ users)
   * [BUG] Fix all empty conflict explanations [#4982 #5263 @kit-ty-kate]
   * Fix json double printing [#5143 @rjbou]
   * [BUG] Fix passing `archive-mirrors` field from init config file to config [#5315 @hannesm]
+  * PEF output: change `base` field into `invariant-pkg` [#5208 @rjbou]
 
 ## Internal
   * Add license and lowerbounds to opam files [#4714 @kit-ty-kate]
@@ -366,6 +374,7 @@ users)
   * Add test for init configuration with opamrc [#5315 @rjbou]
   * Test opam pin remove <pkg>.<version> [#5325 @kit-ty-kate]
 
+  * Add `switch list` test, add some in `switch invariant` and `switch import` [#5208 @rjbou]
 ### Engine
   * Add `opam-cat` to normalise opam file printing [#4763 @rjbou @dra27] [2.1.0~rc2 #4715]
   * Fix meld reftest: open only with failing ones [#4913 @rjbou]
@@ -474,6 +483,8 @@ users)
   * `OpamArg`: externalise `post`, `dev`, `doc_flag`, `test`, and `devsetup` package selection flags, to avoid redefining them [#5299 @rjbou]
   * `OpamConfigCommand.global_allowed_fields`: add `archive-mirrors` (`dl_cache`) to allowed modifiable fields, extendable [#5321 @hannesm @rjbou]
   * `OpamClient.update_with_init_config`: Fix passing the `dl_cache` from `InitConfig` to `Config` [#5315 @hannesm]
+  * ✘ `OpamListCommand.apply_selector`, `string_of_selector`: change column name base to invariant, and the content is invariant formula installed dependencies [#5208 @rjbou]
+  * `OpamSwitchCommand.install_compiler`: fill empty switch synopsis with invariant formula instead of compiler package name [#5208 @rjbou]
 
 ## opam-repository
   * `OpamRepositoryConfig`: add in config record `repo_tarring` field and as an argument to config functions, and a new constructor `REPOSITORYTARRING` in `E` environment module and its access function [#5015 @rjbou]
@@ -506,6 +517,8 @@ users)
   * Add `OpamPinned.version_opt` [#5325 @kit-ty-kate]
 
   * Add optional argument `?env:(variable_contents option Lazy.t * string) OpamVariable.Map.t` to `OpamSysPoll` and `OpamSysInteract` functions. It is used to get syspolling variables from the environment first. [#4892 @rjbou]
+  * `OpamSwitchState.load`: fill empty switch synopsis with invariant formula instead of compiler package name [#5208 @rjbou]
+
 ## opam-solver
   * `OpamCudf`: Change type of `conflict_case.Conflict_cycle` (`string list list` to `Cudf.package action list list`) and `cycle_conflict`, `string_of_explanations`, `conflict_explanations_raw` types accordingly [#4039 @gasche]
   * `OpamCudf`: add `conflict_cycles` [#4039 @gasche]
@@ -521,6 +534,8 @@ users)
   * `OpamCudf`: add `trim_universe`, `opam_deprequest_package_name`, and `opam_deprequest_package` [#4975 @AltGr]
   * `OpamCudf.print_solution`: add optional `skip`, to avoid filtering solution beforehand [#4975 @AltGr]
   * `OpamCudf.filter_solution`: can do not remove recursively actions with optional `~recursive:true` [#4975 @AltGr]
+  * `OpamSwitchState`: add `invariant_root_packages`, `compute_invariant_packages`, `compute_compiler_packages` [#5208 @rjbou]
+  * `OpamSwitchAction.update_switch_state`: `compiler_packages` now computes dependency cone of invariant formula [#5208 @rjbou]
 
 ## opam-format
   * Exposed `with_*` functions in `OpamFile.Dot_install` [#5169 @panglesd]
@@ -538,6 +553,7 @@ users)
   * `OpamFile.OPAM.effectively_equal`: return true if an extra-source url changes but not its checksum (as for url) [#5258 @kit-ty-kate]
   * `OpamFormula`: add generic `formula_to_cnf` and `formula_to_dnf`, and use them in `to_cnf` and `to_dnf` [#5171 @cannorin]
   * `OpamFilter`: add `?custom` argument in `to_string` to tweak the output [#5171 @cannorin]
+  * `OpamTypes.universe`: remove `u_base` field, as it is no more needed with switch invariant [#5208 @rjbou]
 
 ## opam-core
   * OpamSystem: avoid calling Unix.environment at top level [#4789 @hannesm]
