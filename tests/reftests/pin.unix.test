@@ -1,8 +1,8 @@
 N0REP0
 ### : depext update :
 ### OPAMYES=1
-### opam option depext-run-installs=false
-Set to 'false' the field depext-run-installs in global configuration
+### opam var --global os-family=dummy-success
+Added '[os-family "dummy-success" "Set through 'opam var'"]' to field global-variables in global configuration
 ### <pin:bar/bar.opam>
 opam-version: "2.0"
 depends: "qux"
@@ -14,7 +14,7 @@ echo "pin-depends: [ \"qux.dev\" \"file://$BASEDIR/qux\" ]" >> bar/bar.opam
 opam-version: "2.0"
 depexts: [ "another-inexistant" ]
 ### opam switch create pinning --empty
-### opam pin ./bar | '(apt-get|brew|port)' -> 'syspkgmanager' | 'pacman -Su' -> 'syspkgmanager install'
+### opam pin ./bar
 Package bar does not exist, create as a NEW package? [y/n] y
 The following additional pinnings are required by bar.dev:
   - qux.dev at file://${BASEDIR}/qux
@@ -34,27 +34,22 @@ The following system packages will first need to be installed:
 
 <><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
 
-This command should get the requirements installed:
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Attempt installation anyway, and permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
 
-    syspkgmanager install another-inexistant inexistant
+[1/2/3/4] 1
 
-Would you like opam to:
-  1. Check again, as the package is now installed
-> 2. Attempt installation anyway, and permanently register that this external dependency is present, but not detectable
-  3. Abort the installation
-
-[1/2/3] 2
-
-[NOTE] Run 'opam option depext=false' if you wish to permanently disable handling of system packages.
-
++ /usr/bin/echo "another-inexistant" "inexistant"
+- another-inexistant inexistant
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> retrieved bar.dev  (file://${BASEDIR}/bar)
 -> retrieved qux.dev  (file://${BASEDIR}/qux)
 -> installed qux.dev
-[NOTE] Requirement for system package another-inexistant overridden in this switch. Use `opam option depext-bypass-=another-inexistant' to revert.
 -> installed bar.dev
-[NOTE] Requirement for system package inexistant overridden in this switch. Use `opam option depext-bypass-=inexistant' to revert.
 Done.
 ### opam unpin bar qux
 Ok, qux is no longer pinned to file://${BASEDIR}/qux (version dev)
@@ -68,9 +63,7 @@ The following actions will be performed:
 -> removed   bar.dev
 -> removed   qux.dev
 Done.
-### opam option 'depext-bypass-=["another-inexistant" "inexistant"]'
-Removed '["another-inexistant" "inexistant"]' from field depext-bypass in switch pinning
-### opam install ./bar | '(apt-get|brew|port)' -> 'syspkgmanager' | 'pacman -Su' -> 'syspkgmanager install'
+### opam install ./bar
 Package bar does not exist, create as a NEW package? [y/n] y
 The following additional pinnings are required by bar.dev:
   - qux.dev at file://${BASEDIR}/qux
@@ -89,25 +82,20 @@ The following system packages will first need to be installed:
 
 <><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
 
-This command should get the requirements installed:
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Attempt installation anyway, and permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
 
-    syspkgmanager install another-inexistant inexistant
+[1/2/3/4] 1
 
-Would you like opam to:
-  1. Check again, as the package is now installed
-> 2. Attempt installation anyway, and permanently register that this external dependency is present, but not detectable
-  3. Abort the installation
-
-[1/2/3] 2
-
-[NOTE] Run 'opam option depext=false' if you wish to permanently disable handling of system packages.
-
++ /usr/bin/echo "another-inexistant" "inexistant"
+- another-inexistant inexistant
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> retrieved bar.dev  (file://${BASEDIR}/bar)
 -> retrieved qux.dev  (file://${BASEDIR}/qux)
 -> installed qux.dev
-[NOTE] Requirement for system package another-inexistant overridden in this switch. Use `opam option depext-bypass-=another-inexistant' to revert.
 -> installed bar.dev
-[NOTE] Requirement for system package inexistant overridden in this switch. Use `opam option depext-bypass-=inexistant' to revert.
 Done.
