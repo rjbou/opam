@@ -720,24 +720,21 @@
    (run ./run.exe %{bin:opam} %{dep:pin.test} %{read-lines:testing-env}))))
 
 (rule
- (alias reftest-pin.unix)
- (enabled_if (= %{os_type} "Unix"))
+ (alias reftest-pin2)
  (action
-  (diff pin.unix.test pin.unix.out)))
+  (diff pin2.test pin2.out)))
 
 (alias
  (name reftest)
- (enabled_if (= %{os_type} "Unix"))
- (deps (alias reftest-pin.unix)))
+ (deps (alias reftest-pin2)))
 
 (rule
- (targets pin.unix.out)
+ (targets pin2.out)
  (deps root-N0REP0)
- (enabled_if (= %{os_type} "Unix"))
  (action
   (with-stdout-to
    %{targets}
-   (run ./run.exe %{bin:opam} %{dep:pin.unix.test} %{read-lines:testing-env}))))
+   (run ./run.exe %{bin:opam} %{dep:pin2.test} %{read-lines:testing-env}))))
 
 (rule
  (alias reftest-rebuild)
