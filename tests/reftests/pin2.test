@@ -15,7 +15,7 @@ echo "pin-depends: [ \"qux.dev\" \"file://$basedir/qux\" ]" >> bar/bar.opam
 opam-version: "2.0"
 depexts: [ "another-inexistant" ]
 ### opam switch create pinning --empty
-### opam pin ./bar
+### opam pin ./bar | '.*(/|\\|")echo(\.exe)?"? "' -> 'echo "'
 Package bar does not exist, create as a NEW package? [y/n] y
 The following additional pinnings are required by bar.dev:
   - qux.dev at file://${BASEDIR}/qux
@@ -43,7 +43,7 @@ opam believes some required external dependencies are missing. opam can:
 
 [1/2/3/4] 1
 
-+ /usr/bin/echo "another-inexistant" "inexistant"
+echo "another-inexistant" "inexistant"
 - another-inexistant inexistant
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
@@ -64,7 +64,7 @@ The following actions will be performed:
 -> removed   bar.dev
 -> removed   qux.dev
 Done.
-### opam install ./bar
+### opam install ./bar | '.*(/|\\|")echo(\.exe)?"? "' -> 'echo "'
 Package bar does not exist, create as a NEW package? [y/n] y
 The following additional pinnings are required by bar.dev:
   - qux.dev at file://${BASEDIR}/qux
@@ -91,7 +91,7 @@ opam believes some required external dependencies are missing. opam can:
 
 [1/2/3/4] 1
 
-+ /usr/bin/echo "another-inexistant" "inexistant"
+echo "another-inexistant" "inexistant"
 - another-inexistant inexistant
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
