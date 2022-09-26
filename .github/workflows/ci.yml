@@ -10,7 +10,7 @@ env:
   OPAM_TEST_REPO_SHA: 3d6779beedc761067596bf5c3f5c25ab57a7e3e7
   OPAM_REPO_SHA: 3d6779beedc761067596bf5c3f5c25ab57a7e3e7
   # Default ocaml version for some jobs
-  OCAML_VERSION: 4.12.0
+  OCAML_VERSION: 4.14.0
   ## variables for cache paths
   GH_OCAML_CACHE: ~/.cache/ocaml-local/**
   SOLVER:

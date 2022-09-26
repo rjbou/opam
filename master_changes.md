@@ -54,6 +54,7 @@ New option/command/subcommand are prefixed with ◈.
   *
 
 ## Build
+  * Update the bootstrap compiler to 4.14.0 [#5250 @kit-ty-kate]
 
 ## Infrastructure
   *
