@@ -67,7 +67,7 @@ type +'lock global_state = {
       The extra string is the supplied variable documentation *)
 
   global_state_to_upgrade: ([ `Repo | `Switch ] * OpamVersion.t) option;
-  (** If remaining, the xtate that need to be upgraded after a root upgrade
+  (** If remaining, the state that need to be upgraded after a root upgrade
       (version update), and the old root version. *)
 
 } constraint 'lock = 'lock lock
