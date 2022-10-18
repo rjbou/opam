@@ -495,7 +495,7 @@ let common_filters ?opam dir =
     | None -> []
     | Some opam ->
     [
-    alt [ str opam, str (OpamSystem.back_to_forward opam) ],
+    alt [ str opam; str (OpamSystem.back_to_forward opam) ],
     Sed "${OPAM}"
     ])
 
