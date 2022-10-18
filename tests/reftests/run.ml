@@ -493,7 +493,11 @@ let common_filters ?opam dir =
    ] @
    (match opam with
     | None -> []
-    | Some opam -> [ str opam, Sed "${OPAM}" ])
+    | Some opam ->
+    [
+    alt [ str opam, str (OpamSystem.back_to_forward opam) ],
+    Sed "${OPAM}"
+    ])
 
 let run_cmd ~opam ~dir ?(vars=[]) ?(filter=[]) ?(silent=false) cmd args =
   let filter = filter @ common_filters ~opam dir in
