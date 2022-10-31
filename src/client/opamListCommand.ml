@@ -225,12 +225,14 @@ let apply_selector ~base st = function
   | (Required_by ({recursive=true; _} as tog, atoms)
     | Depends_on ({recursive=true; _} as tog, atoms)) as direction ->
     let deps_fun = match direction with
-      | Required_by _ -> OpamSolver.dependencies
-      | Depends_on _ -> OpamSolver.reverse_dependencies
+      | Required_by _ -> OpamSwitchState.dependencies
+      | Depends_on _ -> OpamSwitchState.reverse_dependencies
       | _ -> assert false
     in
-    deps_fun ~depopts:tog.depopts ~build:tog.build ~post:tog.post
+    deps_fun ~test:tog.test ~doc:tog.doc ~dev_setup:tog.dev_setup ~dev:tog.dev
+      ~depopts:tog.depopts ~build:tog.build ~post:tog.post
       ~installed:false ~unavailable:true
+      st
       (get_universe st tog)
       (packages_of_atoms st atoms)
   | Required_by (tog, atoms) ->
