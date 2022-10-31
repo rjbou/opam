@@ -47,6 +47,16 @@ val load_virtual:
 val load_selections:
   ?lock_kind: 'a lock -> 'b global_state -> switch -> switch_selections
 
+val dependencies:
+  depopts:bool -> build:bool -> post:bool -> installed:bool -> ?test:bool ->
+  ?doc:bool -> ?dev_setup:bool -> ?dev:bool -> ?unavailable:bool ->
+  'a switch_state -> universe -> package_set -> package_set
+
+val reverse_dependencies:
+  depopts:bool -> build:bool -> post:bool -> installed:bool -> ?test:bool ->
+  ?doc:bool -> ?dev_setup:bool -> ?dev:bool -> ?unavailable:bool ->
+  'a switch_state -> universe -> package_set -> package_set
+
 (** Raw function to compute the availability of all packages, in [opams], given
     the switch configuration and the set of pinned packages. (The result is
     precomputed in global_state.available_packages once the state is loaded) *)
