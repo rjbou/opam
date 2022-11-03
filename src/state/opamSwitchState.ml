@@ -1332,10 +1332,40 @@ let dependencies_filter_to_formula ~build ~post ~test ~doc
   in
   OpamFilter.filter_formula ~default:true env formula
 
+let timer () =
+  let t = Unix.gettimeofday () in
+  fun () -> Unix.gettimeofday () -. t
+
+let test_deps solver_fun state_fun packages label =
+  let solver_time = timer () in
+  let solver = solver_fun () in
+  let solver_time = solver_time () in
+  let state_time = timer () in
+  let state = state_fun () in
+  let state_time = state_time () in
+  let filename = OpamSystem.temp_file ~dir:"/tmp/dependencies_time" label in
+  (if OpamPackage.Set.(is_empty (diff state solver)) then
+     let oc = open_out (filename ^ ".ok") in
+     let out =
+       Printf.sprintf "solver %f state %f %B"
+         solver_time state_time (solver_time > state_time)
+     in
+     output_string oc out
+   else
+   let oc = open_out (filename ^ ".ko") in
+   let out =
+     Printf.sprintf "solver %f state %f %B\nError: %s"
+       solver_time state_time (solver_time > state_time)
+       (OpamPackage.Set.to_string packages)
+   in
+   output_string oc out);
+  solver
+
 let dependencies ~depopts ~build ~post ~installed ?(test=false) ?(doc=false)
     ?(dev_setup=false) ?(dev=false) ?(unavailable=false)
     st universe packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Set.empty else
+  let neww () =
   let base =
     packages ++
     if installed then  universe.u_installed
@@ -1377,11 +1407,17 @@ let dependencies ~depopts ~build ~post ~installed ?(test=false) ?(doc=false)
     else aux (all ++ new_deps) (new_deps -- all)
   in
   aux packages packages
+  in
+  test_deps (fun () ->
+      OpamSolver.dependencies ~build ~post ~installed ~unavailable ~depopts
+        universe packages)
+    neww packages "deps"
 
 let reverse_dependencies ~depopts ~build ~post ~installed ?(test=false)
     ?(doc=false) ?(dev_setup=false) ?(dev=false) ?(unavailable=false)
     st universe packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Set.empty else
+  let neww () =
   let base =
     packages ++
     if installed then  universe.u_installed
@@ -1462,3 +1498,8 @@ let reverse_dependencies ~depopts ~build ~post ~installed ?(test=false)
       | Some nv -> OpamPackage.Set.add nv result
       | None -> OpamStd.Sys.exit_because `Internal_error)
     deps packages
+  in
+  test_deps (fun () ->
+      OpamSolver.reverse_dependencies ~build ~post ~installed ~unavailable
+        ~depopts universe packages)
+    neww packages "revdeps"
