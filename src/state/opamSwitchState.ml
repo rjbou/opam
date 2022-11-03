@@ -1023,32 +1023,6 @@ let universe st
   log ~level:2 "Universe load: %.3fs" (chrono ());
   u
 
-let invariant_root_packages st =
-  OpamPackage.Set.filter (OpamFormula.verifies st.switch_invariant) st.installed
-
-let compute_invariant_packages st =
-  let pkgs = invariant_root_packages st in
-  OpamSolver.dependencies ~build:false ~post:false
-    ~depopts:false ~installed:true ~unavailable:false
-    (universe st ~requested:pkgs Query)
-    pkgs
-
-let compute_compiler_packages st =
-  let dependencies = compute_invariant_packages st in
-  let compiler_packages =
-    OpamPackage.Set.filter (fun nv ->
-        try OpamFile.OPAM.has_flag Pkgflag_Compiler (opam st nv)
-        with Not_found -> false)
-      dependencies
-  in
-  let compiler_deps =
-    OpamSolver.dependencies ~build:false ~post:true
-      ~depopts:false ~installed:true ~unavailable:false
-      (universe st ~requested:compiler_packages Query)
-      compiler_packages
-  in
-  compiler_deps
-
 let dump_pef_state st oc =
   let conflicts = get_conflicts st st.packages st.opams in
   let print_def nv opam =
@@ -1491,3 +1465,29 @@ let reverse_dependencies ~depopts ~build ~post ~installed
       | Some nv -> OpamPackage.Set.add nv result
       | None -> OpamStd.Sys.exit_because `Internal_error)
     deps packages
+
+(* invariant computation *)
+let invariant_root_packages st =
+  OpamPackage.Set.filter (OpamFormula.verifies st.switch_invariant) st.installed
+
+let compute_invariant_packages st =
+  let pkgs = invariant_root_packages st in
+  dependencies ~test:false ~doc:false ~dev_setup:false ~dev:false
+    ~build:false ~post:false ~depopts:false ~installed:true ~unavailable:false
+    st (universe st ~requested:pkgs Query) pkgs
+
+let compute_compiler_packages st =
+  let depends = compute_invariant_packages st in
+  let compiler_packages =
+    OpamPackage.Set.filter (fun nv ->
+        try OpamFile.OPAM.has_flag Pkgflag_Compiler (opam st nv)
+        with Not_found -> false)
+      depends
+  in
+  let compiler_deps =
+    dependencies ~test:false ~doc:false ~dev_setup:false ~dev:false
+      ~build:false ~post:false ~depopts:false ~installed:true ~unavailable:false
+      st (universe st ~requested:compiler_packages Query)
+      compiler_packages
+  in
+  compiler_deps
