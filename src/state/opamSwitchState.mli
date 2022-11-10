@@ -57,13 +57,13 @@ val load_selections:
     [unavaiable]: also consider unavailable packages
 *)
 val dependencies:
-  depopts:bool -> build:bool -> post:bool -> installed:bool ->
-  ?unavailable:bool -> 'a switch_state -> universe -> package_set -> package_set
+  'a switch_state -> build:bool -> post:bool -> depopts:bool ->
+  installed:bool -> ?unavailable:bool -> universe -> package_set -> package_set
 
 (** Same as [dependencies] but for reverse dependencies. *)
 val reverse_dependencies:
-  depopts:bool -> build:bool -> post:bool -> installed:bool ->
-  ?unavailable:bool -> 'a switch_state -> universe -> package_set -> package_set
+  'a switch_state -> build:bool -> post:bool -> depopts:bool ->
+  installed:bool -> ?unavailable:bool -> universe -> package_set -> package_set
 
 (** Raw function to compute the availability of all packages, in [opams], given
     the switch configuration and the set of pinned packages. (The result is
