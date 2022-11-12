@@ -169,6 +169,11 @@ users)
   * Update action cache to v4 [#6081 @rjbou]
   * Update action checkout to v4 [#6081 @rjbou]
   * Update action upload-artifact to v4 [#6081 @rjbou]
+  * Add coreutils install for cheksum validation tests [#5560 @rjbou]
+  * Add `wget` on Cygwin install [#5607 @rjbou]
+  * Fix hygiene scripts for install check: it was missing a conversion `~` -> `-` for dev version [#5588 @rjbou]
+  * Add configure autoupdate test [#5555 @rjbou]
+  * Add doc job: generation under linux & macos [#5349 @rjbou]
 
 ## Doc
   * Remove the ppa from the installation instructions on Ubuntu [#5988 @kit-ty-kate - fix #5987]
