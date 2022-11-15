@@ -321,6 +321,16 @@ users)
   * Support MSYS2: two-phase rsync on MSYS2 to allow MSYS2's behavior of copying rather than symlinking [#4817 @jonahbeckford]
   * Environment: translate PATH from Windows to Unix during opam env. [#4844 @jonahbeckford]
   * Correct invocation of Cygwin binaries when Cygwin bin directory is first in PATH [#5293 @dra27]
+  * Generalise `mk_tristate_opt` to `mk_state_opt` [#4575 @rjbou]
+  * Fix `mk_state_opt` and rename to `mk_enum_opt` [#4626 @rjbou]
+  * Fix `opam exec` on native Windows when calling cygwin executables [#4588 @AltGr]
+  * Fix temporary file with a too long name causing errors on Windows [#4590 @AltGr]
+  * CLI: Add flag deprecation and replacement helper [#4595 @rjbou]
+  * Win32 Console: fix VT100 support [#3897 @dra27]
+  * Tidied the opam files [#4620 @dra27]
+  * Externalise cli versioning tools from `OpamArg` into `OpamArgTools` [#4606 @rjbou]
+  * Each library defines its own environment variables, that fills the config record [#4606 @rjbou]
+  * Harden cygpath wrapper [#4625 @dra27]
 
 ## Test
   * Update crowbar with compare functions [#4918 @rjbou]
