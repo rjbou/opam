@@ -1176,7 +1176,6 @@ let as_necessary ?reinit requested_lock global_lock root config =
     else
       false, `Lock_write
   in
-  in
   let light config =
     let config =
       List.fold_left (fun config (v, from) ->
