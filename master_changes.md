@@ -88,6 +88,7 @@ users)
 
 ## Config
   * Reset the "jobs" config variable when upgrading from opam 2.0 [#5284 @kit-ty-kate]
+  * Introduce OpamStd.Env.Name to abstract environment variable names [#5356 @dra27]
 
 ## Pin
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
