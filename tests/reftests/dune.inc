@@ -771,6 +771,23 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:pin.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-plugin)
+ (action
+  (diff plugin.test plugin.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-plugin)))
+
+(rule
+ (targets plugin.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:plugin.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-rebuild)
  (action
   (diff rebuild.test rebuild.out)))
