@@ -103,6 +103,10 @@ val add_aux_files:
   ?dir:dirname -> files_subdir_hashes:bool -> OpamFile.OPAM.t -> OpamFile.OPAM.t
 
 (** {2 Tools to manipulate the [OpamFile.OPAM.t] contents} *)
+val all_variables:
+  ?exclude_post:bool -> ?command:command list -> OpamFile.OPAM.t
+  -> full_variable list
+
 val map_all_variables:
   (full_variable -> full_variable) -> OpamFile.OPAM.t -> OpamFile.OPAM.t
 
