@@ -59,15 +59,8 @@ jobs: 1
 ### OPAMDEBUG=-1 OPAMDEBUGSECTIONS=FMT_UPG
 ### opam plg-no-opam
 FMT_UPG                         On-the-fly config upgrade, from 2.0 to 2.1
-[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
-           opam option jobs=1 --global
+[NOTE] The 'jobs' option was reset for this launch, its new value will vary according to the current number of cores on your machine.
 FMT_UPG                         Format upgrade done
-Opam plugin "plg-no-opam" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-Already up-to-date.
-Nothing to do.
-
-<><> Carrying on to "${OPAM} plg-no-opam"
-
 launched [no opam dependant]
 ### <OPAM/config>
 opam-version: "2.0"
@@ -79,27 +72,30 @@ download-jobs: 3
 jobs: 1
 ### opam plg-opam-direct
 FMT_UPG                         On-the-fly config upgrade, from 2.0 to 2.1
-[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
-           opam option jobs=1 --global
+[NOTE] The 'jobs' option was reset for this launch, its new value will vary according to the current number of cores on your machine.
 FMT_UPG                         Format upgrade done
 Opam plugin "plg-opam-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-Already up-to-date.
-Nothing to do.
+FMT_UPG                         Light config upgrade, from 2.0 to 2.1
+This version of opam requires an update to the layout of ${BASEDIR}/OPAM from version 2.0 to version 2.1, which can't be reverted.
+You may want to back it up before going further.
+
+Continue? [y/n] y
+[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
+           opam option jobs=1 --global
+Format upgrade done.
+The following actions will be performed:
+=== recompile 1 package
+  - recompile plg-opam-direct 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   plg-opam-direct.1
+-> installed plg-opam-direct.1
+Done.
 
 <><> Carrying on to "${OPAM} plg-opam-direct"
 
 launched [needs opam directly]
 ### opam plg-opam-direct
-FMT_UPG                         On-the-fly config upgrade, from 2.0 to 2.1
-[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
-           opam option jobs=1 --global
-FMT_UPG                         Format upgrade done
-Opam plugin "plg-opam-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-Already up-to-date.
-Nothing to do.
-
-<><> Carrying on to "${OPAM} plg-opam-direct"
-
 launched [needs opam directly]
 ### <OPAM/config>
 opam-version: "2.0"
@@ -111,27 +107,30 @@ download-jobs: 3
 jobs: 1
 ### opam plg-opam-no-direct
 FMT_UPG                         On-the-fly config upgrade, from 2.0 to 2.1
-[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
-           opam option jobs=1 --global
+[NOTE] The 'jobs' option was reset for this launch, its new value will vary according to the current number of cores on your machine.
 FMT_UPG                         Format upgrade done
 Opam plugin "plg-opam-no-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-Already up-to-date.
-Nothing to do.
+FMT_UPG                         Light config upgrade, from 2.0 to 2.1
+This version of opam requires an update to the layout of ${BASEDIR}/OPAM from version 2.0 to version 2.1, which can't be reverted.
+You may want to back it up before going further.
+
+Continue? [y/n] y
+[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
+           opam option jobs=1 --global
+Format upgrade done.
+The following actions will be performed:
+=== recompile 1 package
+  - recompile plg-opam-no-direct 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   plg-opam-no-direct.1
+-> installed plg-opam-no-direct.1
+Done.
 
 <><> Carrying on to "${OPAM} plg-opam-no-direct"
 
 launched [dependency needs opam]
 ### opam plg-opam-no-direct
-FMT_UPG                         On-the-fly config upgrade, from 2.0 to 2.1
-[NOTE] The 'jobs' option was reset, its value was 1 and its new value will vary according to the current number of cores on your machine. If it really was intended, you can set it again using:
-           opam option jobs=1 --global
-FMT_UPG                         Format upgrade done
-Opam plugin "plg-opam-no-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-Already up-to-date.
-Nothing to do.
-
-<><> Carrying on to "${OPAM} plg-opam-no-direct"
-
 launched [dependency needs opam]
 ### # global hard upgrade
 ### <OPAM/config>
@@ -157,18 +156,6 @@ Format upgrade done.
 Update done, please now retry your command.
 # Return code 10 #
 ### opam plg-no-opam
-Opam plugin "plg-no-opam" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-The following actions will be performed:
-=== recompile 1 package
-  - recompile plg-no-opam 1
-
-<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   plg-no-opam.1
--> installed plg-no-opam.1
-Done.
-
-<><> Carrying on to "${OPAM} plg-no-opam"
-
 launched [no opam dependant]
 ### <OPAM/config>
 opam-version: "2.0"
@@ -193,18 +180,6 @@ Format upgrade done.
 Update done, please now retry your command.
 # Return code 10 #
 ### opam plg-opam-direct
-Opam plugin "plg-opam-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-The following actions will be performed:
-=== recompile 1 package
-  - recompile plg-opam-direct 1
-
-<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   plg-opam-direct.1
--> installed plg-opam-direct.1
-Done.
-
-<><> Carrying on to "${OPAM} plg-opam-direct"
-
 launched [needs opam directly]
 ### <OPAM/config>
 opam-version: "2.0"
@@ -229,16 +204,4 @@ Format upgrade done.
 Update done, please now retry your command.
 # Return code 10 #
 ### opam plg-opam-no-direct
-Opam plugin "plg-opam-no-direct" may require upgrading/reinstalling. Reinstall the plugin on the current switch? [y/n] y
-The following actions will be performed:
-=== recompile 1 package
-  - recompile plg-opam-no-direct 1
-
-<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> removed   plg-opam-no-direct.1
--> installed plg-opam-no-direct.1
-Done.
-
-<><> Carrying on to "${OPAM} plg-opam-no-direct"
-
 launched [dependency needs opam]
