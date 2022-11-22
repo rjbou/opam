@@ -196,14 +196,11 @@ let check_and_run_external_commands () =
               "%s reports a newer opam version, aborting."
               (OpamFilename.Dir.to_string root_dir)
           else
-            cmp = 0
+            cmp <> 0
         in
         (true, root_upgraded)
     in
     let plugins_bin = OpamPath.plugins_bin root_dir in
-    let plugin_symlink_present =
-      OpamFilename.is_symlink (OpamPath.plugin_bin root_dir (OpamPackage.Name.of_string name))
-    in
     let env =
       if has_init then
         let updates =
@@ -220,7 +217,7 @@ let check_and_run_external_commands () =
         Unix.environment ()
     in
     match OpamSystem.resolve_command ~env command with
-    | Some command when plugin_symlink_present && root_upgraded ->
+    | Some command when not root_upgraded ->
       let argv = Array.of_list (command :: args) in
       raise (OpamStd.Sys.Exec (command, argv, env))
     | None when not has_init -> (cli, argv)
@@ -272,55 +269,78 @@ let check_and_run_external_commands () =
              name
              (OpamPackage.to_string (OpamPackage.Set.max_elt candidates));
            exit (OpamStd.Sys.get_exit_code `Bad_arguments))
-        else if
-          (if cmd = None then
-             OpamConsole.confirm "Opam plugin \"%s\" is not installed. \
-                                  Install it on the current switch?"
-           else
-             OpamConsole.confirm "Opam plugin \"%s\" may require upgrading/reinstalling. \
-                                  Reinstall the plugin on the current switch?") name
-        then
-          let nv =
-            try
-              (* If the command was resolved, attempt to find the package to reinstall. *)
-              if cmd = None then
-                raise Not_found
-              else
-                OpamPackage.package_of_name installed (OpamPackage.Name.of_string prefixed_name)
-            with Not_found ->
+        else
+        let dependencies =
+          OpamSwitchState.dependencies st ~build:true ~post:true ~installed:true
+            ~unavailable:false ~depopts:true
+            (OpamSwitchState.universe st ~requested:installed Query) installed
+        in
+        let depends_on_opam =
+          let opamv = OpamVariable.Full.of_string "opam-version" in
+          (* XXX TODO change this to an eists unless we want to print it *)
+          OpamPackage.Set.filter (fun nv ->
+              OpamSwitchState.opam st nv
+              |> OpamFileTools.all_variables
+              |> List.exists (OpamVariable.Full.equal opamv)
+            ) dependencies
+        in
+        match cmd with
+        | Some command when OpamPackage.Set.is_empty depends_on_opam ->
+          let argv = Array.of_list (command :: args) in
+          raise (OpamStd.Sys.Exec (command, argv, env))
+        | cmd ->
+          let confirm_msg : ('a, unit, string, bool) format4 =
+            match cmd with
+            | None ->
+              "Opam plugin \"%s\" is not installed. \
+               Install it on the current switch?"
+            | Some _ ->
+              "Opam plugin \"%s\" may require upgrading/reinstalling. \
+               Reinstall the plugin on the current switch?"
+          in
+
+          if OpamConsole.confirm confirm_msg name then
+            let nv =
+              try
+                (* If the command was resolved, attempt to find the package to reinstall. *)
+                if cmd = None then
+                  raise Not_found
+                else
+                  OpamPackage.package_of_name installed (OpamPackage.Name.of_string prefixed_name)
+              with Not_found ->
               try
                 OpamPackage.max_version plugins
                   (OpamPackage.Name.of_string prefixed_name)
               with Not_found ->
                 OpamPackage.max_version plugins
                   (OpamPackage.Name.of_string name)
-          in
-          OpamRepositoryConfig.init ();
-          OpamSolverConfig.init ();
-          OpamClientConfig.init ();
-          OpamSwitchState.with_ `Lock_write gt (fun st ->
-              OpamSwitchState.drop @@ (
-              if cmd = None then
-                OpamClient.install st [OpamSolution.eq_atom_of_package nv]
-              else if root_upgraded then
-                OpamClient.reinstall st [OpamSolution.eq_atom_of_package nv]
-              else
-                OpamClient.upgrade st ~all:false [OpamSolution.eq_atom_of_package nv])
-            );
-          match OpamSystem.resolve_command ~env command with
-          | None ->
-            OpamConsole.error_and_exit `Package_operation_error
-              "Plugin %s was installed, but no %s command was found.\n\
-               This is probably an error in the plugin package."
-              (OpamPackage.to_string nv)
-              command
-          | Some command ->
-            OpamConsole.header_msg "Carrying on to \"%s\""
-              (String.concat " " (Array.to_list Sys.argv));
-            OpamConsole.msg "\n";
-            let argv = Array.of_list (command :: args) in
-            raise (OpamStd.Sys.Exec (command, argv, env))
-        else (cli, argv)
+            in
+            (OpamRepositoryConfig.init ();
+             OpamSolverConfig.init ();
+             OpamClientConfig.init ();
+             OpamGlobalState.with_ `Lock_write @@ fun gt ->
+             OpamSwitchState.with_ `Lock_write gt @@ fun st ->
+             OpamSwitchState.drop @@ (
+               if cmd = None then
+                 OpamClient.install st [OpamSolution.eq_atom_of_package nv]
+               else if root_upgraded then
+                 OpamClient.reinstall st [OpamSolution.eq_atom_of_package nv]
+               else
+                 OpamClient.upgrade st ~all:false [OpamSolution.eq_atom_of_package nv]));
+            match OpamSystem.resolve_command ~env command with
+            | None ->
+              OpamConsole.error_and_exit `Package_operation_error
+                "Plugin %s was installed, but no %s command was found.\n\
+                 This is probably an error in the plugin package."
+                (OpamPackage.to_string nv)
+                command
+            | Some command ->
+              OpamConsole.header_msg "Carrying on to \"%s\""
+                (String.concat " " (Array.to_list Sys.argv));
+              OpamConsole.msg "\n";
+              let argv = Array.of_list (command :: args) in
+              raise (OpamStd.Sys.Exec (command, argv, env))
+          else (cli, argv)
 
 let display_cli_error msg =
   Format.eprintf

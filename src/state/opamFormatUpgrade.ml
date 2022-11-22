@@ -1218,10 +1218,8 @@ let as_necessary ?reinit requested_lock global_lock root config =
           add_chg change changes)
         (config, None) light_upg
     in
-    if not on_the_fly then begin
+    if not on_the_fly then
       OpamFile.Config.write (OpamPath.config root) config;
-      erase_plugin_links root;
-    end;
     config, changes
   in
   let hard config =
@@ -1231,7 +1229,6 @@ let as_necessary ?reinit requested_lock global_lock root config =
         (* save the current version to mitigate damage is the upgrade goes
              wrong afterwards *)
         OpamFile.Config.write (OpamPath.config root) config;
-        erase_plugin_links root;
         config)
       config hard_upg
   in
