@@ -242,6 +242,7 @@ let check_and_run_external_commands () =
                    with Failure _ -> None)
                 [ prefixed_name; name ]))
         in
+        if OpamPackage.Set.is_empty candidates then (cli, argv) else
         let plugins =
           OpamPackage.Set.filter (fun nv ->
               OpamFile.OPAM.has_flag Pkgflag_Plugin (OpamSwitchState.opam st nv))
@@ -256,8 +257,7 @@ let check_and_run_external_commands () =
             OpamPackage.Set.inter plugins (Lazy.force st.available_packages)
         in
         let installed = OpamPackage.Set.inter plugins st.installed in
-        if OpamPackage.Set.is_empty candidates then (cli, argv)
-        else if not OpamPackage.Set.(is_empty installed) && cmd = None then
+        if not OpamPackage.Set.(is_empty installed) && cmd = None then
           (OpamConsole.error
              "Plugin %s is already installed, but no %s command was found.\n\
               Try upgrading, and report to the package maintainer if \
