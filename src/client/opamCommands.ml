@@ -598,6 +598,8 @@ let list ?(force_search=false) cli =
                 invariant packages)";
         cli_original, OpamListCommand.Pinned, ["pinned"],
           "List only the pinned packages";
+        cli_from cli2_3, OpamListCommand.Latests_only, ["latests-only"],
+          "List only the latest version of each package.";
       ]
   in
   let section = selection_docs in
