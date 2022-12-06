@@ -35,83 +35,69 @@ depends: "consectetur"
 ### <pkg:elit.2>
 opam-version: "2.0"
 depends: "adipiscing"
-### opam list --depends-on sit --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit) & (installed | available)
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-elit       2         1  2
-sit        2         1  2
-### opam list --latests-only --depends-on sit --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit) & latest-only
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-elit       2         1  2
-sit        2         1  2
-### opam list --depends-on sit.1 --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit.1) & (installed | available)
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-elit       2         1  2
-sit        1         1  2
-### opam list --latests-only --depends-on sit.1 --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit.1) & latest-only
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-elit       2         1  2
-sit        1         1  2
-### opam list --depends-on sit.2 --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit.2) & (installed | available)
-# Name # Version # Versions
-sit    2         1  2
-### opam list --latests-only --depends-on sit.2 --recursive --columns name,version,all-versions
-# Packages matching: rec-depends-on(sit.2) & latest-only
-# Name # Version # Versions
-sit    2         1  2
-### opam list --required-by elit --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit) & (installed | available)
-# Name      # Version # Versions
-adipiscing  2         1  2
-amet        2         1  2
-consectetur 2         1  2
-dolor       2         1  2
-elit        2         1  2
-sit         1         1  2
-### opam list --latests-only --required-by elit --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit) & latest-only
-# Name      # Version # Versions
-adipiscing  2         1  2
-amet        2         1  2
-consectetur 2         1  2
-dolor       2         1  2
-elit        2         1  2
-sit         1         1  2
-### opam list --required-by elit.1 --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit.1) & (installed | available)
-# Name      # Version # Versions
-consectetur 2         1  2
-elit        1         1  2
-### opam list --latests-only --required-by elit.1 --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit.1) & latest-only
-# Name      # Version # Versions
-consectetur 2         1  2
-elit        1         1  2
-### opam list --required-by elit.2 --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit.2) & (installed | available)
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-dolor      2         1  2
-elit       2         1  2
-sit        1         1  2
-### opam list --latests-only --required-by elit.2 --recursive --columns name,version,all-versions
-# Packages matching: rec-required-by(elit.2) & latest-only
-# Name     # Version # Versions
-adipiscing 2         1  2
-amet       2         1  2
-dolor      2         1  2
-elit       2         1  2
-sit        1         1  2
+### opam list --depends-on sit --recursive --short --all-versions
+adipiscing.2
+amet.2
+elit.2
+sit.1
+sit.2
+### opam list --latests-only --depends-on sit --recursive --short --all-versions
+adipiscing.2
+amet.2
+elit.2
+sit.2
+### opam list --depends-on sit.1 --recursive --short --all-versions
+adipiscing.2
+amet.2
+elit.2
+sit.1
+### opam list --latests-only --depends-on sit.1 --recursive --short --all-versions
+adipiscing.2
+amet.2
+elit.2
+sit.1
+### opam list --depends-on sit.2 --recursive --short --all-versions
+sit.2
+### opam list --latests-only --depends-on sit.2 --recursive --short --all-versions
+sit.2
+### opam list --required-by elit --recursive --short --all-versions
+adipiscing.1
+adipiscing.2
+amet.1
+amet.2
+consectetur.1
+consectetur.2
+dolor.1
+dolor.2
+elit.1
+elit.2
+sit.1
+### opam list --latests-only --required-by elit --recursive --short --all-versions
+adipiscing.2
+amet.2
+consectetur.2
+dolor.2
+elit.2
+sit.1
+### opam list --required-by elit.1 --recursive --short --all-versions
+consectetur.1
+consectetur.2
+elit.1
+### opam list --latests-only --required-by elit.1 --recursive --short --all-versions
+consectetur.2
+elit.1
+### opam list --required-by elit.2 --recursive --short --all-versions
+adipiscing.1
+adipiscing.2
+amet.1
+amet.2
+dolor.1
+dolor.2
+elit.2
+sit.1
+### opam list --latests-only --required-by elit.2 --recursive --short --all-versions
+adipiscing.2
+amet.2
+dolor.2
+elit.2
+sit.1
