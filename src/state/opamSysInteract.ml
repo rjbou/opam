@@ -135,7 +135,7 @@ let family ~env () =
       Cygwin
     | family ->
       Printf.ksprintf failwith
-        "External dependency handling not supported for OS family '%s'  '%s'."
+        "External dependency handling not supported for OS family '%s'."
         family
 
 let yum_cmd = lazy begin
