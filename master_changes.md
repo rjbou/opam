@@ -96,6 +96,7 @@ users)
   * Display a warning on hard upgrade when the `jobs` config variable is re-written [#5305 @rjbou]
     * update note [#5305 @rjbou]
   * Add `sys-pkg-manager-cmd` field to store specific system package manager command paths [#5433 @rjbou]
+  * Regenerate the environment file when a local switch is moved [#5476 @dra27 - fix #3411]
 
 ## Pin
   * Switch the default version when undefined from ~dev to dev [#4949 @kit-ty-kate]
