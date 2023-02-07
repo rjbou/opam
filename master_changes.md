@@ -365,6 +365,7 @@ users)
   * Use grep -F instead of fgrep, as the latter is deprecated [#5309 @MisterDA]
   * Always open files with `O_SHARE_DELETE`, which eliminates unnecessary "access denied" errors in various situations on Windows. [#5435 @dra27]
   * Ensure the cwd is restored when launching a process fails [#5441 @dra27]
+  * Use `Sys.rename` instead of `mv` [#5438 @dra27]
 
 ## Internal: Windows
   * Support MSYS2: treat MSYS2 and Cygwin as equivalent [#4813 @jonahbeckford]
