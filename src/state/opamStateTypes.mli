@@ -46,6 +46,8 @@ type +'a lock = [< unlocked > `Lock_write ] as 'a
 type gt_variables =
   (variable_contents option Lazy.t * string) OpamVariable.Map.t
 
+type gt_changes = { gtc_repo: bool; gtc_switch: bool }
+
 (** Global state corresponding to an opam root and its configuration *)
 type +'lock global_state = {
   global_lock: OpamSystem.lock;
@@ -66,7 +68,7 @@ type +'lock global_state = {
       `.opam/config`. They may need evaluation so are stored as lazy values.
       The extra string is the supplied variable documentation *)
 
-  global_state_to_upgrade: ([ `Repo | `Switch ] * OpamVersion.t) option;
+  global_state_to_upgrade: gt_changes option;
   (** If remaining, the state that need to be upgraded after a root upgrade
       (version update), and the old root version. *)
 

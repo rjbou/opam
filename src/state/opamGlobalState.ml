@@ -216,9 +216,21 @@ let fix_switch_list gt =
   else gt
 
 let as_necessary_repo_switch_upgrade lock_kind kind gt =
+  match gt.global_state_to_upgrade with
+  | None -> ()
+  | Some { gtc_repo; gtc_switch } ->
+    match lock_kind, kind with
+    (* ro repo & rw switch & only repo changes case *)
+    | `Lock_write, `Switch when not gtc_switch && gtc_repo -> ()
+    | `Lock_write, _ ->
+      OpamFormatUpgrade.repo_switch_light_upgrade gt.global_state_to_upgrade
+        gt.global_lock gt.root gt.config
+    | _, _ -> ()
+(*
   OpamStd.Option.iter (fun (upgrade, version) ->
       if upgrade = kind && lock_kind = `Lock_write then
         OpamFormatUpgrade.repo_switch_hard_upgrade version gt.global_lock
           gt.root gt.config)
     gt.global_state_to_upgrade
+*)
 

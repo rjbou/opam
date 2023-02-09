@@ -36,7 +36,7 @@ val latest_version: OpamVersion.t
 val as_necessary:
   ?reinit:(OpamFile.Config.t -> unit) -> 'a lock -> OpamSystem.lock -> dirname ->
   OpamFile.Config.t ->
-  OpamFile.Config.t * ([ `Repo | `Switch ] * OpamVersion.t) option
+  OpamFile.Config.t * gt_changes option
 
 (* [repo_switch_hard_upgrade oldv lock root config] finished opam root upgrade
    of repository and switch layers. It is called when an on-the-fly upgrade of
@@ -45,8 +45,8 @@ val as_necessary:
    switch/repo files and writes the global config file. [oldv] is the root
    version before on-the-fly upgrade, [lock] the current global lock, and
    [config] the current config file (with upgrade applied). *)
-val repo_switch_hard_upgrade:
-  OpamVersion.t -> OpamSystem.lock -> dirname -> OpamFile.Config.t -> unit
+val repo_switch_light_upgrade:
+  gt_changes option -> OpamSystem.lock -> dirname -> OpamFile.Config.t -> unit
 
 (* Try to launch a hard upgrade from 2;1 alpha's & beta's root
    to 2.1~rc one. Raises [Upgrade_done] (catched by main
