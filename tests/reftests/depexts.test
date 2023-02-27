@@ -33,3 +33,148 @@ opam believes some required external dependencies are missing. opam can:
 [NOTE] You can retry with '--assume-depexts' to skip this check, or run 'opam option depext=false' to permanently disable handling of system packages.
 
 # Return code 10 #
+### : testing the testing system :
+### opam var --global os-family=dummy-success
+Added '[os-family "dummy-success" "Set through 'opam var'"]' to field global-variables in global configuration
+### <pkg:a.1>
+opam-version: "2.0"
+depexts: ["depext-1" "depext-ok" "depext-unav" "depext-avail"]
+### opam install a
+The following actions will be performed:
+=== install 1 package
+  - install a 1
+
+The following system packages will first need to be installed:
+    depext-1 depext-avail depext-ok depext-unav
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Continue anyway, and, upon success, permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
+
+[1/2/3/4] 1
+
++ /usr/bin/echo "depext-1" "depext-avail" "depext-ok" "depext-unav"
+- depext-1 depext-avail depext-ok depext-unav
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed a.1
+Done.
+### opam remove a
+[WARNING] Opam package a.1 depends on the following system packages that can no longer be found: depext-1 depext-avail depext-ok depext-unav
+The following actions will be performed:
+=== remove 1 package
+  - remove a 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   a.1
+Done.
+### opam var --global os-family=dummy-success:depext-ok:
+Added '[os-family "dummy-success:depext-ok:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam install a
+The following actions will be performed:
+=== install 1 package
+  - install a 1
+
+The following system packages will first need to be installed:
+    depext-1 depext-avail depext-unav
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Continue anyway, and, upon success, permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
+
+[1/2/3/4] 1
+
++ /usr/bin/echo "depext-1" "depext-avail" "depext-unav"
+- depext-1 depext-avail depext-unav
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed a.1
+Done.
+### opam remove a
+[WARNING] Opam package a.1 depends on the following system packages that can no longer be found: depext-1 depext-avail depext-unav
+The following actions will be performed:
+=== remove 1 package
+  - remove a 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   a.1
+Done.
+### opam var --global os-family=dummy-success::depext-avail
+Added '[os-family "dummy-success::depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam install a
+[ERROR] Package a depends on the unavailable system packages 'depext-1', 'depext-ok' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
+# Return code 5 #
+### opam remove a
+[NOTE] a is not installed.
+
+Nothing to do.
+### opam var --global os-family=dummy-success:*:
+Added '[os-family "dummy-success:*:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam install a
+The following actions will be performed:
+=== install 1 package
+  - install a 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed a.1
+Done.
+### opam remove a
+The following actions will be performed:
+=== remove 1 package
+  - remove a 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   a.1
+Done.
+### opam var --global os-family=dummy-success:0:
+Added '[os-family "dummy-success:0:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam install a
+The following actions will be performed:
+=== install 1 package
+  - install a 1
+
+The following system packages will first need to be installed:
+    depext-1 depext-avail depext-ok depext-unav
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Continue anyway, and, upon success, permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
+
+[1/2/3/4] 1
+
++ /usr/bin/echo "depext-1" "depext-avail" "depext-ok" "depext-unav"
+- depext-1 depext-avail depext-ok depext-unav
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed a.1
+Done.
+### opam remove a
+[WARNING] Opam package a.1 depends on the following system packages that can no longer be found: depext-1 depext-avail depext-ok depext-unav
+The following actions will be performed:
+=== remove 1 package
+  - remove a 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   a.1
+Done.
+### opam var --global os-family=dummy-success:depext-ok:depext-avail
+Added '[os-family "dummy-success:depext-ok:depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam install a
+[ERROR] Package a depends on the unavailable system packages 'depext-1' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
+# Return code 5 #
+### opam remove a
+[NOTE] a is not installed.
+
+Nothing to do.
