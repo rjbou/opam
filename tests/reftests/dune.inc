@@ -910,6 +910,23 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:resolve-variables.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-robur)
+ (action
+  (diff robur.test robur.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-robur)))
+
+(rule
+ (targets robur.out)
+ (deps root-N0REP0)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:robur.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-shared-fetch)
  (action
   (diff shared-fetch.test shared-fetch.out)))
