@@ -1,13 +1,14 @@
 diff -Naur a/src/configure.ml b/src/configure.ml
 --- a/src/configure.ml	2021-01-19 23:51:04.000000000 +0000
 +++ b/src/configure.ml	2021-07-22 11:07:11.000000000 +0000
-@@ -1,15 +1,21 @@
+@@ -1,15 +1,22 @@
  open Printf
  
  let show_bytes s =
 -    let (_:int) = Sys.command (sprintf "ocamlfind query -format %s bytes" (Filename.quote s)) in ()
 +  if Sys.command (sprintf "ocamlfind query -format %s bytes" (Filename.quote s)) <> 0 then
 +    print_endline "WITH_DUMMY"
++
 +
 +let define v =
 +  print_endline "-D";
