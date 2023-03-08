@@ -900,6 +900,29 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
        "Field 'extra-files' contains duplicated files"
        ?detail
        has_double);
+    (let has_double, detail =
+       check_double OpamHash.compare_kind OpamHash.string_of_kind
+         (match OpamFile.OPAM.url t with
+          | Some url ->
+            List.map OpamHash.kind (OpamFile.URL.checksum url)
+          | None -> [])
+     in
+     cond 70 `Error
+       "Field 'url.checksum' contains duplicated checksums"
+       ?detail has_double);
+    (let relative =
+       match t.extra_files with
+       | None -> []
+       | Some extra_files ->
+         List.filter_map (fun (base, _) ->
+             let path = OpamFilename.Base.to_string base in
+             if OpamStd.String.contains ~sub:".." path then Some path else None)
+           extra_files
+     in
+     cond 71 `Error
+       "Field 'extra-files' contains path with '..'"
+       ~detail:relative
+       (relative <> []));
   ]
   in
   format_errors @
