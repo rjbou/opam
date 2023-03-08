@@ -886,3 +886,55 @@ bug-reports: "https://nobug"
 ### opam lint ./lint.opam
 ${BASEDIR}/lint.opam: Warnings.
            warning 68: Missing field 'license'
+### : E69: Field 'extra-files' contains duplicated files
+### <pkg:lint.1>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+authors: "the testing team"
+homepage: "egapemoh"
+maintainer: "maint@tain.er"
+license: "ISC"
+dev-repo: "hg+https://to@li.nt"
+bug-reports: "https://nobug"
+extra-files: [
+  [ "quadra-file" "md5=00000000000000000000000000000000" ]
+  [ "single-file" "md5=00000000000000000000000000000000" ]
+  [ "quadra-file" "md5=00000000000000000000000000000000" ]
+  [ "double-file" "md5=00000000000000000000000000000000" ]
+  [ "quadra-file" "md5=00000000000000000000000000000000" ]
+  [ "quadra-file" "md5=00000000000000000000000000000000" ]
+  [ "double-file" "md5=00000000000000000000000000000000" ]
+]
+### opam lint --package lint
+<default>/lint.1: Errors.
+             error 53: Mismatching 'extra-files:' field: "quadra-file", "single-file", "quadra-file", "double-file", "quadra-file", "quadra-file", "double-file"
+             error 69: Field 'extra-files' contains duplicated files: "double-file: 2 occurences", "quadra-file: 4 occurences"
+# Return code 1 #
+### : several extra-source
+### <lint.opam>
+opam-version: "2.0"
+synopsis: "A word"
+description: "Two words."
+authors: "the testing team"
+homepage: "egapemoh"
+maintainer: "maint@tain.er"
+license: "ISC"
+dev-repo: "hg+https://to@li.nt"
+bug-reports: "https://nobug"
+extra-source "double-file" {
+  src:"https://git.url/repo.tgz"
+  checksum:"md5=00000000000000000000000000000000"
+}
+extra-source "single-file" {
+  src:"https://git.url/repo.tgz"
+  checksum:"md5=00000000000000000000000000000000"
+}
+extra-source "double-file" {
+  src:"https://git.url/repo.tgz"
+  checksum:"md5=00000000000000000000000000000000"
+}
+### opam lint ./lint.opam
+${BASEDIR}/lint.opam: Errors.
+             error  3: File format error in 'extra-source': Duplicate section extra-source
+# Return code 1 #

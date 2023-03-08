@@ -1308,10 +1308,12 @@ Clearing cache of downloaded files
 ### opam lint --package extra-good-md5-good-sha256
 <default>/extra-good-md5-good-sha256.1: Errors.
              error 53: Mismatching 'extra-files:' field: "p.patch", "p.patch"
+             error 69: Field 'extra-files' contains duplicated files: "p.patch: 2 occurences"
 # Return code 1 #
 ### opam lint --package extra-good-md5-good-sha256 --check-upstream
 <default>/extra-good-md5-good-sha256.1: Errors.
              error 53: Mismatching 'extra-files:' field: "p.patch", "p.patch"
+             error 69: Field 'extra-files' contains duplicated files: "p.patch: 2 occurences"
 # Return code 1 #
 ### opam install extra-good-md5-good-sha256
 The following actions will be performed:
@@ -1396,10 +1398,12 @@ Clearing cache of downloaded files
 ### opam lint --package extra-good-md5-bad-sha256
 <default>/extra-good-md5-bad-sha256.1: Errors.
              error 53: Mismatching 'extra-files:' field: "p.patch", "p.patch"
+             error 69: Field 'extra-files' contains duplicated files: "p.patch: 2 occurences"
 # Return code 1 #
 ### opam lint --package extra-good-md5-bad-sha256 --check-upstream
 <default>/extra-good-md5-bad-sha256.1: Errors.
              error 53: Mismatching 'extra-files:' field: "p.patch", "p.patch"
+             error 69: Field 'extra-files' contains duplicated files: "p.patch: 2 occurences"
 # Return code 1 #
 ### opam install extra-good-md5-bad-sha256
 The following actions will be performed:
