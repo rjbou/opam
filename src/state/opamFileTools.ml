@@ -1118,9 +1118,10 @@ let add_aux_files ?dir ~files_subdir_hashes opam =
       match OpamFile.OPAM.extra_files opam, extra_files with
       | None, None -> opam
       | None, Some ef ->
-        log ~level:2 "Missing extra-files field for %s, adding them."
+        log ~level:2 "Missing extra-files field for %s for %s, adding them."
           (OpamStd.List.concat_map ", "
-             (fun (_,f) -> OpamFilename.Base.to_string f) ef);
+             (fun (_,f) -> OpamFilename.Base.to_string f) ef)
+          (OpamPackage.to_string (OpamFile.OPAM.package opam));
         let ef =
           List.map
             (fun (file, basename) ->
