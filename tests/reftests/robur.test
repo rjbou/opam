@@ -1461,6 +1461,7 @@ Clearing cache of downloaded files
 <default>/extra-no-checksum.1: Errors.
              error  3: File format error in 'extra-files' at line 11, column 2: expected [file checksum]
 # Return code 1 #
+### # extra files is added with its checksum at repo loading
 ### opam install extra-no-checksum
 [ERROR] In the opam file for extra-no-checksum.1:
           - At ${BASEDIR}/OPAM/repo/default/packages/extra-no-checksum/extra-no-checksum.1/opam:11:2-11:13::
