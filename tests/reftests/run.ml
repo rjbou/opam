@@ -478,6 +478,9 @@ let common_filters ?opam dir =
            alt [ str "#=== ERROR";
                  seq [ str "# "; alt @@ List.map str
                          [ "context";
+                           "pinned";
+                           "repo";
+                           "compiler-packages";
                            "path";
                            "command";
                            "exit-code";
