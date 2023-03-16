@@ -334,7 +334,9 @@ The following actions will be performed:
           "code": "1",
           "duration": 6.2831853071,
           "info": {
-            "context": "currentv | linux/x86_64 |  | file://${BASEDIR}/REPO",
+            "context": "currentv | linux/x86_64",
+            "repo": "file://${BASEDIR}/REPO",
+            "compiler-packages": "none",
             "path": "${BASEDIR}/OPAM/json-empty/.opam-switch/build/ko.2",
             "command": "${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh build false",
             "exit-code": "1",
@@ -495,7 +497,9 @@ The former state can be restored with:
           "code": "1",
           "duration": 6.2831853071,
           "info": {
-            "context": "currentv | linux/x86_64 |  | file://${BASEDIR}/REPO",
+            "context": "currentv | linux/x86_64",
+            "repo": "file://${BASEDIR}/REPO",
+            "compiler-packages": "none",
             "path": "${BASEDIR}/OPAM/json-empty/.opam-switch/build/ko.2",
             "command": "${BASEDIR}/OPAM/opam-init/hooks/sandbox.sh build false",
             "exit-code": "1",

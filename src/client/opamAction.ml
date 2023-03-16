@@ -604,18 +604,28 @@ let make_command st opam ?dir ?text_command (cmd, args) =
   in
   let context =
     let open OpamStd.Option.Op in
+    "context",
     String.concat " | " [
       OpamVersion.(to_string current);
       (let env = st.switch_global.global_variables in
        Printf.sprintf "%s/%s"
          (OpamSysPoll.os env +! "unknown")
          (OpamSysPoll.arch env +! "unknown"));
-      (OpamStd.List.concat_map " " OpamPackage.to_string
-         OpamPackage.Set.(elements @@
-                          OpamSwitchState.invariant_root_packages st));
-      if OpamPackage.Set.mem nv st.pinned then
+    ]
+  in
+  let compiler_packages =
+    let compilers = OpamSwitchState.compiler_packages st in
+    "compiler-packages",
+    if OpamPackage.Set.is_empty compilers then "none" else
+      OpamPackage.Set.elements compilers
+      |> List.map OpamPackage.to_string
+      |> OpamStd.Format.pretty_list
+  in
+  let pinned_or_repo =
+    if OpamPackage.Set.mem nv st.pinned then
+      let url =
         match OpamFile.OPAM.url opam with
-        | None -> "pinned"
+        | None -> "true"
         | Some url ->
           let u = OpamFile.URL.url url in
           let src =
@@ -623,30 +633,34 @@ let make_command st opam ?dir ?text_command (cmd, args) =
               nv.name
           in
           let rev = OpamProcess.Job.run (OpamRepository.revision src u) in
-          Printf.sprintf "pinned(%s%s)"
+          Printf.sprintf "%s%s"
             (OpamUrl.to_string_w_subpath (OpamFile.URL.subpath url) u)
             (OpamStd.Option.to_string
                (fun r -> "#"^OpamPackage.Version.to_string r) rev)
-      else
-        match
-          OpamRepositoryState.find_package_opt st.switch_repos
-            (OpamSwitchState.repos_list st) nv
-        with
-        | None -> "no repo"
-        | Some (r, _) ->
-          let rt = st.switch_repos in
-          let repo = OpamRepositoryName.Map.find r rt.repositories in
-          let stamp =
-            OpamFile.Repo.stamp
-              (OpamRepositoryName.Map.find r rt.repos_definitions)
-          in
-          OpamUrl.to_string repo.repo_url ^
-          OpamStd.Option.to_string (fun s -> "#"^s) stamp
-    ]
+      in
+      "pinned", url
+    else
+    let repo =
+      match
+        OpamRepositoryState.find_package_opt st.switch_repos
+          (OpamSwitchState.repos_list st) nv
+      with
+      | None -> "no repo"
+      | Some (r, _) ->
+        let rt = st.switch_repos in
+        let repo = OpamRepositoryName.Map.find r rt.repositories in
+        let stamp =
+          OpamFile.Repo.stamp
+            (OpamRepositoryName.Map.find r rt.repos_definitions)
+        in
+        OpamUrl.to_string repo.repo_url ^
+        OpamStd.Option.to_string (fun s -> "#"^s) stamp
+    in
+    "repo", repo
   in
   OpamSystem.make_command ~env ~name ?dir ~text
     ~resolve_path:OpamStateConfig.(not !r.dryrun)
-    ~metadata:["context", context]
+    ~metadata:[context; pinned_or_repo; compiler_packages]
     ~verbose:(OpamConsole.verbose ())
     cmd args
 
