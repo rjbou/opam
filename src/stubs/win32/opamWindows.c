@@ -674,26 +674,3 @@ CAMLprim value OPAMW_GetConsoleAlias(value alias, value exe_name)
 
   return result;
 }
-
-CAMLprim value OPAMW_uptime(void)
-{
-  HQUERY hQuery;
-  HCOUNTER counter;
-  PDH_FMT_COUNTERVALUE uptime;
-
-  if (PdhOpenQuery(NULL, 0, &hQuery) != ERROR_SUCCESS)
-    return caml_copy_double(0.0);
-
-  if (PdhAddCounter(hQuery, L"\\\\.\\System\\System Up Time",
-                    0, &counter) != ERROR_SUCCESS ||
-      PdhCollectQueryData(hQuery) != ERROR_SUCCESS ||
-      PdhGetFormattedCounterValue(counter, PDH_FMT_LARGE,
-                                  NULL, &uptime) != ERROR_SUCCESS) {
-    PdhCloseQuery(hQuery);
-    return caml_copy_double(0.0);
-  }
-
-  PdhCloseQuery(hQuery);
-
-  return caml_copy_double(uptime.largeValue);
-}
