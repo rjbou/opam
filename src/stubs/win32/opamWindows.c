@@ -26,7 +26,6 @@
 #include <Windows.h>
 #include <Shlobj.h>
 #include <TlHelp32.h>
-#include <pdh.h>
 
 #include <stdio.h>
 
