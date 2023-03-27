@@ -162,6 +162,7 @@ users)
   * W62: use the spdx_licenses library to check for valid licenses. This allows to use compound expressions such as "MIT AND (GPL-2.0-only OR LGPL-2.0-only)", as well as user defined licenses e.g. "LicenseRef-my-custom-license" [#4768 @kit-ty-kate - fixes #4598]
   * E57 (capital on synopsis) not trigger W47 (empty descr) [#5070 @rjbou]
   * [BUG] Fix linting packages from repository with tarred repositories, the file in temporary repository was no more avaiable when lint is done [#5068 @rjbou]
+    * Fix extra-files handling [#5559 @rjbou]
   * Update repository package filename display [#5068 @rjbou]
   * E67: check checksums only for vcs urls [#4960 @rjbou]
   * E57: Enforce synopsis to always be there, restoring behaviour from opam 2.1 [#5442 @kit-ty-kate]
