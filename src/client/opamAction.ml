@@ -524,21 +524,28 @@ let compilation_env t opam =
   let build_env =
     List.map (OpamEnv.env_expansion ~opam t) (OpamFile.OPAM.build_env opam)
   in
+  let cygwin_env =
+    match OpamSysInteract.Cygwin.cygbin_opt t.switch_global.config with
+    | Some cygbin ->
+      [ "PATH", PlusEq, OpamFilename.Dir.to_string cygbin, Some "Cygwin path" ]
+    | None -> []
+  in
   let scrub = OpamClientConfig.(!r.scrubbed_environment_variables) in
   OpamEnv.get_full ~scrub ~set_opamroot:true ~set_opamswitch:true
     ~force_path:true t ~updates:([
-      "CDPATH", Eq, "", Some "shell env sanitization";
-      "MAKEFLAGS", Eq, "", Some "make env sanitization";
-      "MAKELEVEL", Eq, "", Some "make env sanitization";
-      "OPAM_PACKAGE_NAME", Eq,
-      OpamPackage.Name.to_string (OpamFile.OPAM.name opam),
-      Some "build environment definition";
-      "OPAM_PACKAGE_VERSION", Eq,
-      OpamPackage.Version.to_string (OpamFile.OPAM.version opam),
-      Some "build environment definition";
-      "OPAMCLI", Eq, "2.0", Some "opam CLI version";
-    ] @
-      build_env)
+        "CDPATH", Eq, "", Some "shell env sanitization";
+        "MAKEFLAGS", Eq, "", Some "make env sanitization";
+        "MAKELEVEL", Eq, "", Some "make env sanitization";
+        "OPAM_PACKAGE_NAME", Eq,
+        OpamPackage.Name.to_string (OpamFile.OPAM.name opam),
+        Some "build environment definition";
+        "OPAM_PACKAGE_VERSION", Eq,
+        OpamPackage.Version.to_string (OpamFile.OPAM.version opam),
+        Some "build environment definition";
+        "OPAMCLI", Eq, "2.0", Some "opam CLI version";
+      ] @
+        cygwin_env @
+        build_env)
 
 let installed_opam_opt st nv =
   OpamStd.Option.Op.(

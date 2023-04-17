@@ -408,10 +408,10 @@ let t_resolve_command =
         if (st_perm land mask) <> 0 then
           true
         else
-          match OpamACL.get_acl_executable_info f st_uid with
-          | None -> false
-          | Some [] -> true
-          | Some gids -> OpamStd.IntSet.(not (is_empty (inter (of_list gids) groups)))
+        match OpamACL.get_acl_executable_info f st_uid with
+        | None -> false
+        | Some [] -> true
+        | Some gids -> OpamStd.IntSet.(not (is_empty (inter (of_list gids) groups)))
       with e -> OpamStd.Exn.fatal e; false
   in
   let resolve ?dir env name =
@@ -420,7 +420,8 @@ let t_resolve_command =
       if not (Sys.file_exists name) then `Not_found
       else if not (check_perms name) then `Denied
       else `Cmd name
-    end else if is_external_cmd name then begin
+    end else
+    if is_external_cmd name then begin
       (* relative path *)
       let cmd = match dir with
         | None -> name
@@ -448,13 +449,11 @@ let t_resolve_command =
     match List.find check_perms possibles with
     | cmdname -> `Cmd cmdname
     | exception Not_found ->
-      if possibles = [] then
-        `Not_found
-      else
-        `Denied
+      if possibles = [] then `Not_found
+      else `Denied
   in
   fun ?env ?dir name ->
-    let env = match env with None -> Lazy.force OpamProcess.default_env | Some e -> e in
+    let env = match env with None -> OpamProcess.default_env () | Some e -> e in
     resolve env ?dir name
 
 let resolve_command ?env ?dir name =
@@ -481,13 +480,18 @@ let apply_cygpath name =
 let get_cygpath_function =
   if Sys.win32 then
     fun ~command ->
-      lazy (if OpamStd.(Option.map_default Sys.is_cygwin_variant `Native (resolve_command command)) = `Cygwin then
-              apply_cygpath
-            else
-              fun x -> x)
+      lazy (
+        if OpamStd.Option.map_default
+            (OpamStd.Sys.is_cygwin_variant
+               ~cygbin:(OpamCoreConfig.(!r.cygbin)))
+               false
+               (resolve_command command) then
+          apply_cygpath
+        else fun x -> x
+      )
   else
-    let f = Lazy.from_val (fun x -> x) in
-    fun ~command:_ -> f
+  let f = Lazy.from_val (fun x -> x) in
+  fun ~command:_ -> f
 
 let apply_cygpath_path_transform path =
   let r =
@@ -525,7 +529,7 @@ let make_command
     ?verbose ?env ?name ?text ?metadata ?allow_stdin ?stdout
     ?dir ?(resolve_path=true)
     cmd args =
-  let env = match env with None -> Lazy.force OpamProcess.default_env | Some e -> e in
+  let env = match env with None -> OpamProcess.default_env () | Some e -> e in
   let name = log_file name in
   let verbose =
     OpamStd.Option.default OpamCoreConfig.(!r.verbose_level >= 2) verbose
@@ -547,7 +551,7 @@ let make_command
 
 let run_process
     ?verbose ?env ~name ?metadata ?stdout ?allow_stdin command =
-  let env = match env with None -> Lazy.force OpamProcess.default_env | Some e -> e in
+  let env = match env with None -> OpamProcess.default_env () | Some e -> e in
   let chrono = OpamConsole.timer () in
   runs := command :: !runs;
   match command with
@@ -675,7 +679,9 @@ let copy_dir src dst =
     symlinks, and the second pass copies everything that remained. Rsync is the
     perfect tool for that.
    *)
-  if OpamStd.Sys.get_windows_executable_variant "rsync" = `Msys2 then
+(*   if OpamStd.Sys.get_windows_executable_variant "rsync" = `Msys2 then *)
+  if OpamStd.Sys.get_windows_executable_variant
+      ~cygbin:OpamCoreConfig.(!r.cygbin) "rsync" = `Msys2 then
     let convert_path = Lazy.force (get_cygpath_function ~command:"rsync") in
     (* ensure that rsync doesn't recreate a subdir: add trailing '/' even if
        cygpath may add one *)
@@ -845,29 +851,29 @@ let install ?(warning=default_install_warning) ?exec src dst =
     if exec then begin
       let (dst, cygcheck) =
         match classify_executable src with
-          `Exe _ ->
-            if not (Filename.check_suffix dst ".exe") && not (Filename.check_suffix dst ".dll") then begin
-              warning dst `Add_exe;
-              (dst ^ ".exe", true)
-            end else
-              (dst, true)
-        | `Dll _ ->
-            warning dst `Install_dll;
+        | `Exe _ ->
+          if not (Filename.check_suffix dst ".exe")
+          && not (Filename.check_suffix dst ".dll") then begin
+            warning dst `Add_exe;
+            (dst ^ ".exe", true)
+          end else
             (dst, true)
+        | `Dll _ ->
+          warning dst `Install_dll;
+          (dst, true)
         | `Script ->
-            warning dst `Install_script;
-            (dst, false)
+          warning dst `Install_script;
+          (dst, false)
         | `Unknown ->
-            warning dst `Install_unknown;
-            (dst, false)
+          warning dst `Install_unknown;
+          (dst, false)
       in
       copy_file_aux ~src ~dst ();
       if cygcheck then
-        match OpamStd.Sys.get_windows_executable_variant dst with
-        | `Native ->
-            ()
-        | (`Cygwin | `Msys2 | `Tainted _) as code ->
-            warning dst code
+        match OpamStd.Sys.get_windows_executable_variant
+                ~cygbin:OpamCoreConfig.(!r.cygbin) dst with
+        | `Native -> ()
+        | (`Cygwin | `Msys2 | `Tainted _) as code -> warning dst code
     end else
       copy_file_aux ~src ~dst ()
   else

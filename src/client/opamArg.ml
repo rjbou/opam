@@ -523,6 +523,7 @@ let apply_global_options cli o =
     ?confirm_level:o.confirm_level
     ?yes
     ?safe_mode:(flag o.safe_mode)
+(*     ?cygbin *)
     (* ?lock_retries:int *)
     (* ?log_dir:OpamTypes.dirname *)
     (* ?keep_log_dir:bool *)
@@ -570,8 +571,12 @@ let apply_global_options cli o =
     OpamJson.append "opam-version" (`String OpamVersion.(to_string (full ())));
     OpamJson.append "command-line"
       (`A (List.map (fun s -> `String s) (Array.to_list Sys.argv)))
-  )
-
+  );
+  ignore @@ let open OpamStd.Option.Op in
+   OpamStateConfig.load ~lock_kind:`Lock_none OpamStateConfig.(!r.root_dir)
+   >>= OpamSysInteract.Cygwin.cygbin_opt
+   >>| OpamFilename.Dir.to_string
+   >>| (fun cygbin -> OpamCoreConfig.update ~cygbin ())
 
 (** Build options *)
 
