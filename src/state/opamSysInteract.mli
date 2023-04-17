@@ -42,6 +42,12 @@ val repo_enablers: ?env:gt_variables -> OpamFile.Config.t -> string option
 
 
 module Cygwin : sig
-val install: unit -> (*string option*)unit OpamProcess.job
-val update: OpamFile.Config.t -> gt_variables -> unit
+val install: packages:OpamSysPkg.t list -> OpamFilename.t
+val update: OpamFile.Config.t -> unit
+val check_install: path:string -> setup:OpamFilename.t option -> (OpamFilename.t, string) result
+val cygcheck_opt: OpamFile.Config.t -> OpamFilename.t option
+val cygbin_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
+val cygroot_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
+val cygsetup_opt: OpamFile.Config.t -> OpamFilename.t option
+val local_install: string
 end

@@ -126,15 +126,15 @@ let dl_tool () =
 let recommended_tools () =
   let make = OpamStateConfig.(Lazy.force !r.makecmd) in
   [
-    [make], None, Some not_win32_filter;
+    [make], None, None (* Some not_win32_filter*);
     ["cc"], None, Some not_win32_filter;
   ]
 
 let required_tools ~sandboxing () =
   req_dl_tools () @
   [
-    ["diff"], None, Some not_win32_filter;
-    ["patch"], None, Some (FAnd (not_win32_filter, patch_filter));
+    ["diff"], None, None (*Some not_win32_filter*);
+    ["patch"], None, Some ((*FAnd (not_win32_filter,*) patch_filter);
     ["gpatch"], None, Some gpatch_filter;
     ["tar"], None, Some tar_filter;
     ["gtar"], None, Some gtar_filter;
@@ -145,6 +145,14 @@ let required_tools ~sandboxing () =
     [bwrap_cmd], Some (bwrap_string()), Some bwrap_filter;
     ["sandbox-exec"], None, Some macos_filter;
   ] else []
+
+let required_packages_for_cygwin =
+  [ "diffutils";
+    "git"; (* XXX hg & mercurial ? *)
+    "patch";
+    "tar";
+    "make"
+  ] |> List.map OpamSysPkg.of_string
 
 let init_scripts () = [
   ("sandbox.sh", OpamScript.bwrap), Some bwrap_filter;

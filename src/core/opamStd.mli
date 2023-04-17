@@ -455,6 +455,9 @@ module Env : sig
   val getopt_full: Name.t -> Name.t * string option
 
   val list: unit -> (Name.t * string) list
+  val raw_env: unit -> string Array.t
+  val cyg_env: string -> string Array.t
+  val cyg_env_list: string -> (Name.t * string) list
 end
 
 (** {2 System query and exit handling} *)
@@ -536,12 +539,13 @@ module Sys : sig
 
       Both cygcheck and an unqualified command will be resolved if necessary
       using the current PATH. *)
-  val get_windows_executable_variant: ?cygcheck:string ->
+  val get_windows_executable_variant: cygbin:string option ->
     string -> [ `Native | `Cygwin | `Tainted of [ `Msys2 | `Cygwin] | `Msys2 ]
 
-  (** Determines if a given cygcheck executable comes from a Cygwin or MSYS2
-      installation. Determined by analysing the cygpath command found with it. *)
-  val is_cygwin_cygcheck : string -> bool
+  (** Determines if cygcheck in given cygwin binary directory comes from a
+      Cygwin or MSYS2 installation. Determined by analysing the cygpath command
+      found with it. *)
+  val is_cygwin_cygcheck : cygbin:string option -> bool
 
   (** For native Windows builds, returns [`Cygwin] if the command is a Cygwin-
       or Msys2- compiled executable, and [`CygLinked] if the command links to a
@@ -551,7 +555,10 @@ module Sys : sig
 
       Both cygcheck and an unqualified command will be resolved using the
       current PATH. *)
-  val is_cygwin_variant: string -> [ `Native | `Cygwin | `CygLinked ]
+  val get_cygwin_variant: cygbin:string option -> string -> [ `Native | `Cygwin | `CygLinked ]
+
+  (** Returns true if [get_cygwin_variant] is [`Cygwin] *)
+  val is_cygwin_variant: cygbin:string option -> string -> bool
 
   (** {3 Exit handling} *)
 
