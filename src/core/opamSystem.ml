@@ -117,7 +117,10 @@ let rec remove_dir dir =
 
 let remove_dir dir =
   log "rmdir %s" dir;
-  remove_dir dir
+  if Sys.is_directory dir then
+    remove_dir dir
+  else
+    remove_file dir
 
 let temp_files = Hashtbl.create 1024
 let logs_cleaner =
