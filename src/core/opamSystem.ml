@@ -92,13 +92,26 @@ let get_files dirname =
   Unix.closedir dir;
   files
 
+(* From stdune/src/fpath.ml *)
+let win32_unlink fn =
+  try Unix.unlink fn
+  with Unix.Unix_error (Unix.EACCES, _, _) as e -> (
+    try
+      (* Try removing the read-only attribute *)
+      Unix.chmod fn 0o666;
+      Unix.unlink fn
+    with _ -> raise e)
+
 let remove_file file =
   if
     try ignore (Unix.lstat file); true with Unix.Unix_error _ -> false
   then (
     try
       log "rm %s" file;
-      Unix.unlink file
+      if Sys.win32 then
+        win32_unlink file
+      else
+        Unix.unlink file
     with Unix.Unix_error _ as e ->
       internal_error "Cannot remove %s (%s)." file (Printexc.to_string e)
   )
