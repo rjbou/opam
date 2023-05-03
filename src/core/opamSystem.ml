@@ -112,7 +112,8 @@ let rec remove_dir dir =
       remove_dir file
     | {Unix.st_kind = Unix.(S_REG | S_LNK | S_CHR | S_BLK | S_FIFO | S_SOCK); _} ->
       remove_file file
-  ) files
+  ) files;
+  Unix.rmdir dir
 
 let remove_dir dir =
   log "rmdir %s" dir;
