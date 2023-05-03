@@ -727,12 +727,20 @@ let copy_dir src dst =
        command ~verbose:(verbose_for_base_commands ())
          [ "cp"; "-PRp"; src; dst ])
 
+(*
 let mv_aux f src dst =
   if file_or_symlink_exists dst then remove_file dst;
   mkdir (Filename.dirname dst);
   command ~verbose:(verbose_for_base_commands ()) ("mv"::(cygify f [src; dst]))
 
 let mv = mv_aux (get_cygpath_function ~command:"mv")
+*)
+
+let mv src dst =
+  if file_or_symlink_exists dst then remove_file dst;
+  mkdir (Filename.dirname dst);
+  let mv = if Sys.win32 then "move" else "mv" in
+  command ~verbose:(verbose_for_base_commands ()) (mv::[src; dst])
 
 let is_exec file =
   let stat = Unix.stat file in
