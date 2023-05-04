@@ -102,12 +102,13 @@ let win32_unlink fn =
       Unix.unlink fn
     with _ -> raise e)
 
-let remove_file file =
+let remove_file_t ?(debug=true) file =
   if
     try ignore (Unix.lstat file); true with Unix.Unix_error _ -> false
   then (
     try
-      log "rm %s" file;
+      if debug || OpamCoreConfig.(!r.debug_level) >= 3 then
+        log "rm %s" file;
       if Sys.win32 then
         win32_unlink file
       else
@@ -116,23 +117,25 @@ let remove_file file =
       internal_error "Cannot remove %s (%s)." file (Printexc.to_string e)
   )
 
-let rec remove_dir dir =
+let rec remove_dir_t dir =
   let files = get_files dir in
   List.iter (fun file ->
     let file = Filename.concat dir file in
     match Unix.lstat file with
     | {Unix.st_kind = Unix.S_DIR; _} ->
-      remove_dir file
+      remove_dir_t file
     | {Unix.st_kind = Unix.(S_REG | S_LNK | S_CHR | S_BLK | S_FIFO | S_SOCK); _} ->
-      remove_file file
-  ) files;
-  Unix.rmdir dir
+      remove_file_t ~debug:false file
+    ) files;
+    Unix.rmdir dir
+
+let remove_file = remove_file_t ~debug:true
 
 let remove_dir dir =
   log "rmdir %s" dir;
   if Sys.file_exists dir then begin
     if Sys.is_directory dir then
-      remove_dir dir
+      remove_dir_t dir
     else
       remove_file dir
   end
@@ -660,7 +663,7 @@ let read_command_output ?verbose ?env ?metadata ?allow_stdin
 let verbose_for_base_commands () =
   OpamCoreConfig.(!r.verbose_level) >= 3
 
-let copy_file src dst =
+let copy_file_t ?(debug=true) src dst =
   if (try Sys.is_directory src
       with Sys_error _ -> raise (File_not_found src))
   then internal_error "Cannot copy %s: it is a directory." src;
@@ -669,15 +672,17 @@ let copy_file src dst =
   if file_or_symlink_exists dst
   then remove_file dst;
   mkdir (Filename.dirname dst);
-  log "copy %s -> %s" src dst;
+  if debug || OpamCoreConfig.(!r.debug_level) >= 3 then
+    log "copy %s -> %s" src dst;
   copy_file_aux ~src ~dst ()
 
-let rec link src dst =
+let rec link_t ?(debug=true) src dst =
   mkdir (Filename.dirname dst);
   if file_or_symlink_exists dst then
     remove_file dst;
   try
-    log "ln -s %s %s" src dst;
+    if debug || OpamCoreConfig.(!r.debug_level) >= 3 then
+      log "ln -s %s %s" src dst;
     Unix.symlink src dst
   with Unix.Unix_error (Unix.EXDEV, _, _) ->
     (* Fall back to copy if symlinks are not supported *)
@@ -686,44 +691,52 @@ let rec link src dst =
       else src
     in
     if Sys.is_directory src then
-      copy_dir src dst
+      copy_dir_t src dst
     else
-      copy_file src dst
+      copy_file_t src dst
 
-and copy_dir src dst =
+and copy_dir_t ?(debug=true) src dst =
+  if debug || OpamCoreConfig.(!r.debug_level) >= 3 then
+    log "copydir %s -> %s" src dst;
   let files = get_files src in
   mkdir dst;
+  let debug = false in
   List.iter (fun file ->
-    let src = Filename.concat src file in
-    let dst = Filename.concat dst file in
-    match Unix.lstat src with
-    | {Unix.st_kind = Unix.S_REG; _} ->
-      copy_file src dst
-    | {Unix.st_kind = Unix.S_DIR; _} ->
-      copy_dir src dst
-    | {Unix.st_kind = Unix.S_LNK; _} ->
-      let src = Unix.readlink src in
-      link src dst
-    | {Unix.st_kind = Unix.S_CHR; _} ->
-      failwith (Printf.sprintf "Copying character devices (%s) is unsupported" src)
-    | {Unix.st_kind = Unix.S_BLK; _} ->
-      failwith (Printf.sprintf "Copying block devices (%s) is unsupported" src)
-    | {Unix.st_kind = Unix.S_FIFO; _} ->
-      failwith (Printf.sprintf "Copying named pipes (%s) is unsupported" src)
-    | {Unix.st_kind = Unix.S_SOCK; _} ->
-      failwith (Printf.sprintf "Copying sockets (%s) is unsupported" src)
-  ) files
+      let src = Filename.concat src file in
+      let dst = Filename.concat dst file in
+      match Unix.lstat src with
+      | {Unix.st_kind = Unix.S_REG; _} ->
+        copy_file_t ~debug src dst
+      | {Unix.st_kind = Unix.S_DIR; _} ->
+        copy_dir_t ~debug src dst
+      | {Unix.st_kind = Unix.S_LNK; _} ->
+        let src = Unix.readlink src in
+        link_t ~debug src dst
+      | {Unix.st_kind = Unix.S_CHR; _} ->
+        failwith (Printf.sprintf "Copying character devices (%s) is unsupported" src)
+      | {Unix.st_kind = Unix.S_BLK; _} ->
+        failwith (Printf.sprintf "Copying block devices (%s) is unsupported" src)
+      | {Unix.st_kind = Unix.S_FIFO; _} ->
+        failwith (Printf.sprintf "Copying named pipes (%s) is unsupported" src)
+      | {Unix.st_kind = Unix.S_SOCK; _} ->
+        failwith (Printf.sprintf "Copying sockets (%s) is unsupported" src)
+    ) files
+
+let copy_dir = copy_dir_t ~debug:true
+let copy_file = copy_file_t ~debug:true
 
 let mv src dst =
   if file_or_symlink_exists dst then remove_file dst;
   mkdir (Filename.dirname dst);
+  log "mv %s -> %s" src dst;
   try
     Unix.rename src dst
   with
   | Unix.Unix_error(Unix.EXDEV, _, _) ->
+    let debug = false in
     if Sys.is_directory src
-    then (copy_dir src dst; remove_dir src)
-    else (copy_file src dst; remove_file src)
+    then (copy_dir_t ~debug src dst; remove_dir_t src)
+    else (copy_file_t ~debug src dst; remove_file_t ~debug src)
 
 let is_exec file =
   let stat = Unix.stat file in
