@@ -50,4 +50,10 @@ module Cygwin : sig
   (* Retrieve Cygwin binary path *)
   val cygbin_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
 
+  (* *)
+  val cygcheck_opt: OpamFile.Config.t -> OpamFilename.t option
+
+  (* *)
+  val cygroot_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
+
 end
