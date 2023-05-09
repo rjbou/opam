@@ -222,6 +222,8 @@ module Cygwin = struct
 
   (* Cygwin setup exe must be stored at Cygwin installation root *)
   let setupexe = "setup-x86_64.exe"
+  let cygcheckexe = "cygcheck.exe"
+
   let cygcheck_opt = Commands.cygcheck_opt
   open OpamStd.Option.Op
   let cygbin_opt config =
@@ -234,8 +236,11 @@ module Cygwin = struct
     | Some c -> c
     | None -> failwith "Cygwin install not found"
   let cygroot config = get_opt (cygroot_opt config)
+
+  let internal_cygwin = ".cygwin"
   let cygsetup () =
-    OpamFilename.Op.(OpamStateConfig.(!r.root_dir) / ".cygwin" // setupexe)
+    let open OpamFilename.Op in
+    OpamStateConfig.(!r.root_dir) / internal_cygwin // setupexe
 
   let download_setupexe dst =
     let overwrite = true in
@@ -260,6 +265,49 @@ module Cygwin = struct
       with Not_found -> None
     in
     OpamDownload.download_as ~overwrite ?checksum url_setupexe dst
+
+  let install ~packages =
+    let open OpamProcess.Job.Op in
+    let open OpamFilename.Op in
+    let cygwin_root = OpamStateConfig.(!r.root_dir) / internal_cygwin in
+    let cygwin_bin = cygwin_root / "bin" in
+    let cygcheck = cygwin_bin // cygcheckexe in
+    let local_cygwin_setupexe = cygsetup () in
+    if OpamFilename.exists cygcheck then
+      OpamConsole.warning "Cygwin already installed in root %s"
+        (OpamFilename.Dir.to_string cygwin_root)
+    else
+      (* rjbou: dry run ? there is no dry run on install, from where this
+         function is called *)
+      (OpamProcess.Job.run @@
+       (* download setup.exe *)
+       download_setupexe local_cygwin_setupexe @@+ fun () ->
+       (* launch install *)
+       let args = [
+         "--root"; OpamFilename.Dir.to_string cygwin_root;
+         "--arch"; "x86_64";
+         "--only-site";
+         "--site"; "https://cygwin.mirror.constant.com/";
+         "--no-admin";
+         "--no-desktop";
+         "--no-replaceonreboot";
+         "--no-shortcuts";
+         "--no-startmenu";
+         "--no-write-registry";
+         "--quiet-mode";
+       ] @
+         match packages with
+         | [] -> []
+         | spkgs ->
+           [ "--packages";
+             OpamStd.List.concat_map "," OpamSysPkg.to_string spkgs ]
+       in
+       OpamSystem.make_command
+         (OpamFilename.to_string local_cygwin_setupexe)
+         args @@> fun r ->
+       OpamSystem.raise_on_process_error r;
+       Done ());
+    cygcheck
 
   let default_cygroot = "C:\\cygwin64"
 
@@ -881,8 +929,11 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) config sys_package
         "--no-shortcuts";
         "--no-startmenu";
         "--no-desktop";
+        (*"--only-site"; XXX Commenting out forces use of previous mirror for now
+          "--site"; mirror; (* Use same mirror as from before? *)*)
         "--no-admin";
         "--packages";
+        (* "--upgrade-also";  if internal cygwin install *)
         String.concat "," packages
       ]],
     None
