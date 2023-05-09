@@ -43,6 +43,9 @@ val repo_enablers: ?env:gt_variables -> OpamFile.Config.t -> string option
 
 module Cygwin : sig
 
+(* *)
+val check_install: path:string -> setup:OpamFilename.t option -> (OpamFilename.t, string) result
+
 (* Retrieve Cygwin binary path *)
 val cygbin_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
 
