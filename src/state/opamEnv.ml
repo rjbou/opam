@@ -726,25 +726,25 @@ let string_of_update st shell updates =
     let key, value =
       ident, match symbol with
       | Eq ->
-        begin match shell with
-        | SH_pwsh _ -> "'" ^ OpamStd.Env.escape_powershell string ^ "'"
-        | SH_cmd -> string
-        | _ -> "'" ^ string ^ "'"
-        end
+        (match shell with
+         | SH_pwsh _ ->
+           Printf.sprintf "'%s'" (OpamStd.Env.escape_powershell string)
+         | SH_cmd -> string
+         | _ -> Printf.sprintf "'%s'" string)
       | PlusEq | ColonEq | EqPlusEq ->
         let sep = get_env_property ident Separator in
-        begin match shell with
-        | SH_pwsh _ -> Printf.sprintf "'%s%c' + \"$env:%s\"" (OpamStd.Env.escape_powershell string) sep ident
-        | SH_cmd -> Printf.sprintf "%s%c%%%s%%" string sep ident
-        | _ -> Printf.sprintf "'%s'%c\"$%s\"" string sep ident
-        end
+        (match shell with
+         | SH_pwsh _ ->
+           Printf.sprintf "'%s%c' + \"$env:%s\""
+             (OpamStd.Env.escape_powershell string) sep ident
+         | SH_cmd -> Printf.sprintf "%s%c%%%s%%" string sep ident
+         | _ -> Printf.sprintf "'%s':\"$%s\"" string ident)
       | EqColon | EqPlus ->
         let sep = get_env_property ident Separator in
-        begin match shell with
-        | SH_pwsh _ -> Printf.sprintf "\"$env:%s\" + '%c%s'" ident sep string
-        | SH_cmd -> Printf.sprintf "%%%s%%%c%s" ident sep string
-        | _ -> Printf.sprintf "\"$%s\"%c'%s'" ident sep string
-        end
+        (match shell with
+         | SH_pwsh _ -> Printf.sprintf "\"$env:%s\" + '%c%s'" ident sep string
+         | SH_cmd -> Printf.sprintf "%%%s%%%c%s" ident sep string
+         | _ -> Printf.sprintf "\"$%s\":'%s'" ident string)
     in
     export_in_shell shell (key, value, comment) in
   OpamStd.List.concat_map "" aux updates
