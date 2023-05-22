@@ -489,6 +489,42 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:env.win32.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-extrafiles-field-checks)
+ (action
+  (diff extrafiles-field-checks.test extrafiles-field-checks.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-extrafiles-field-checks)))
+
+(rule
+ (targets extrafiles-field-checks.out)
+ (deps root-N0REP0)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:extrafiles-field-checks.test} %{read-lines:testing-env}))))
+
+(rule
+ (alias reftest-extrasources-section-checks)
+ (action
+  (diff extrasources-section-checks.test extrasources-section-checks.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-extrasources-section-checks)))
+
+(rule
+ (targets extrasources-section-checks.out)
+ (deps root-N0REP0)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:extrasources-section-checks.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-init)
  (action
   (diff init.test init.out)))
@@ -1252,6 +1288,24 @@
   (with-stdout-to
    %{targets}
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:upgrade.test} %{read-lines:testing-env}))))
+
+(rule
+ (alias reftest-url-section-checks)
+ (action
+  (diff url-section-checks.test url-section-checks.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-url-section-checks)))
+
+(rule
+ (targets url-section-checks.out)
+ (deps root-N0REP0)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:url-section-checks.test} %{read-lines:testing-env}))))
 
 (rule
  (alias reftest-var-option)
