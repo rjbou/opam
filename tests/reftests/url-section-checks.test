@@ -1104,3 +1104,73 @@ MD5: link, to sha256 archive
 SHA256: archive, with matching checksum
 ### opam clean --download-cache
 Clearing cache of downloaded files
+### :II:6: Corrupt linked archive
+### opam remove good-sha256-good-md5.1
+The following actions will be performed:
+=== remove 1 package
+  - remove good-sha256-good-md5 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   good-sha256-good-md5.1
+Done.
+### opam install good-sha256-good-md5.1
+The following actions will be performed:
+=== install 1 package
+  - install good-sha256-good-md5 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved good-sha256-good-md5.1  (file://${BASEDIR}/archive.tgz)
+-> installed good-sha256-good-md5.1
+Done.
+### sh check-cache.sh
+MD5: link, to sha256 archive
+SHA256: archive, with matching checksum
+### opam remove good-sha256.1
+The following actions will be performed:
+=== remove 1 package
+  - remove good-sha256 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   good-sha256.1
+Done.
+### rm "$ARCHIVE_SHA256_PATH"
+### opam install good-sha256.1
+The following actions will be performed:
+=== install 1 package
+  - install good-sha256 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> retrieved good-sha256.1  (file://${BASEDIR}/archive.tgz)
+-> installed good-sha256.1
+Done.
+### sh check-cache.sh
+MD5: link, to sha256 archive
+SHA256: archive, with matching checksum
+### opam remove good-sha256.1
+The following actions will be performed:
+=== remove 1 package
+  - remove good-sha256 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   good-sha256.1
+Done.
+### rm "$ARCHIVE_SHA256_PATH"
+### tar czf "$ARCHIVE_SHA256_PATH" check-cache.sh
+### sh check-cache.sh
+MD5: link, to sha256 archive
+SHA256: archive, with mismatching checksum
+### opam install good-sha256.1 | '[0-9a-z]{32,64}' -> 'hash'
+The following actions will be performed:
+=== install 1 package
+  - install good-sha256 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+[ERROR] Conflicting file hashes, or broken or compromised cache!
+          - sha256=hash (MISMATCH)
+
+-> retrieved good-sha256.1  (file://${BASEDIR}/archive.tgz)
+-> installed good-sha256.1
+Done.
+### sh check-cache.sh
+MD5: link, to sha256 archive
+SHA256: archive, with matching checksum

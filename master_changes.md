@@ -463,6 +463,7 @@ users)
   * Add `switch list` test, add some in `switch invariant` and `switch import` [#5208 @rjbou]
   * Add opam env hooks test: change switch, set switch via `OPAMSWITCH`, entering directory, moving switch ; and opam exec with missing environment file [#5476 @rjbou @dra27]
   * Add a new reftest ensuring that the local cache is checked and behave correctly when corrupted [#5538 @kit-ty-kate @rjbou]
+    * Moved into url-field-checks test [#5559 @rjbou]
   * Add several checksum & cache validation checks for url & extra-source sections, and extra-file field [#5559 @rjbou]
 
 ### Engine
