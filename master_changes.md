@@ -102,6 +102,7 @@ users)
 ### Engine
 
 ## Github Actions
+  * Add coreutils install for cheksum validation tests [#5560 @rjbou]
 
 ## Doc
 
