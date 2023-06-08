@@ -769,12 +769,9 @@ let windows_checks config =
            |> OpamStd.Option.map OpamFilename.of_string
            |> get_cygwin
         )
-      | _ ->
-      config
+      | _ -> config
     else
-      (OpamConsole.note "Using Cygwin installation at  for depexts";
-      let config = success (OpamFilename.of_string "/tmp/bin/cygwin/sbin/cygcheck.exe") in
-      config)
+      config
   in
   OpamCoreConfig.update
     ?cygbin:OpamStd.Option.Op.(
