@@ -43,9 +43,15 @@ val repo_enablers: ?env:gt_variables -> OpamFile.Config.t -> string option
 
 module Cygwin : sig
 
+  (* Default Cygwin installation prefix C:\cygwin64 *)
+  val default_cygroot: string
+
   (* [check_install ~path ~setup] checks a Cygwin installation at [path], and setup executable at [setup]. It checks that 'path\cygcheck.exe' or 'path\bin\cygcheck.exe' exists. Then, if [setup] is not [None] it checks its existence,  *)
   val check_install:
-    path:string -> setup:OpamFilename.t option -> (OpamFilename.t, string) result
+    string -> (OpamFilename.t, string) result
+
+  val check_setup:
+    cygroot:OpamFilename.Dir.t -> setup:OpamFilename.t option -> unit
 
   (* Retrieve Cygwin binary path *)
   val cygbin_opt: OpamFile.Config.t -> OpamFilename.Dir.t option
