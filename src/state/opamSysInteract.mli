@@ -50,8 +50,7 @@ module Cygwin : sig
   val check_install:
     string -> (OpamFilename.t, string) result
 
-  val check_setup:
-    cygroot:OpamFilename.Dir.t -> setup:OpamFilename.t option -> unit
+  val check_setup: OpamFilename.t option -> unit
 
   (* Retrieve Cygwin binary path *)
   val cygbin_opt: OpamFile.Config.t -> OpamFilename.Dir.t option

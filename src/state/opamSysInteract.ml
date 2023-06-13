@@ -230,15 +230,12 @@ module Cygwin = struct
   let cygroot_opt config =
     cygbin_opt config
     >>| OpamFilename.dirname_dir
-  let cygsetup_raw cygroot = OpamFilename.Op.(cygroot // setupexe)
-  let cygsetup_opt config =
-    cygroot_opt config
-    >>| cygsetup_raw
   let get_opt = function
     | Some c -> c
     | None -> failwith "Cygwin install not found"
   let cygroot config = get_opt (cygroot_opt config)
-  let cygsetup config = get_opt (cygsetup_opt config)
+  let cygsetup () =
+    OpamFilename.Op.(OpamStateConfig.(!r.root_dir) / ".cygwin" // setupexe)
 
   let download_setupexe dst =
     let open OpamProcess.Job.Op in
@@ -259,7 +256,7 @@ module Cygwin = struct
     in
     OpamDownload.download_as ~overwrite:true ?checksum url_setupexe dst
 
-  let default_cygroot = "C:\cygwin64"
+  let default_cygroot = "C:\\cygwin64"
 
   let check_install path =
     if not (Sys.file_exists path) then
@@ -292,20 +289,40 @@ module Cygwin = struct
         (Printf.sprintf "bin\\cygcheck.exe not found in %s"
            path)
 
+(*
+  let check_setup () =
+    let setup = OpamFilename.Op.(cygroot // setupexe) in
+    (* checks existence *)
+    try OpamFilename.is_exec setup
+    with OpamSystem.Internal_error _ -> false
+
   (* Set setup.exe in the good place, ie in cygroot/ *)
-  let check_setup ~cygroot ~setup =
+  let set_setup ~cygroot ~setup =
     let dst = OpamFilename.Op.(cygroot // setupexe) in
+    match setup with
+     | Some setup ->
+       OpamConsole.note "Copying %s into %s"
+         (OpamFilename.to_string setup)
+         (OpamFilename.Dir.to_string cygroot);
+       OpamFilename.copy ~src:setup ~dst
+     | None ->
+       log "Donwloading setup exe";
+       OpamProcess.Job.run @@ download_setupexe dst
+*)
+
+  (* Set setup.exe in the good place, ie in cygroot/ *)
+  let check_setup setup =
+    let dst = cygsetup () in
     if OpamFilename.exists dst then () else
       (match setup with
        | Some setup ->
-         OpamConsole.note "Copying %s into %s"
+         log "Copying %s into %s"
            (OpamFilename.to_string setup)
-           (OpamFilename.Dir.to_string cygroot);
+           (OpamFilename.to_string dst);
          OpamFilename.copy ~src:setup ~dst
        | None ->
          log "Donwloading setup exe";
          OpamProcess.Job.run @@ download_setupexe dst)
-
 end
 
 let yum_cmd = lazy begin
@@ -874,7 +891,7 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) config sys_package
   | Cygwin ->
     (* We use setp_x86_64 to install package instead of `cygcheck` that is
        stored in `sys-pkg-manager-cmd` field *)
-    [`AsUser (OpamFilename.to_string (Cygwin.cygsetup config)),
+    [`AsUser (OpamFilename.to_string (Cygwin.cygsetup ())),
       [ "--root"; (OpamFilename.Dir.to_string (Cygwin.cygroot config));
         "--quiet-mode";
         "--no-shortcuts";

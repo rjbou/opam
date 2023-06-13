@@ -684,22 +684,19 @@ let windows_checks config =
     | Some _ | None ->
       let rec menu () =
         let enter_paths () =
-          let prompt_setup cygroot =
+          let prompt_setup () =
             let options = [
-              `manual, "Manually enter Cygwin setup executable location";
-              `download,
-              (Printf.sprintf "Let opam downloads Cygwin store it up in \
-                               Cygwin installation prefix (%s)"
-                 (OpamFilename.Dir.to_string cygroot));
+              `download, "Let opam downloads download it";
+              `manual, "Manually enter its location on disk";
               `abort, "Abort initialisation";
             ]
             in
             OpamConsole.menu
-              "Opam needs Cygwin setup executable (e.g. 'setup-x86_64.exe')"
-              ~no:`download ~options
+              "Opam needs Cygwin setup executable 'setup-x86_64.exe'"
+              ~default:`download ~no:`download ~options
           in
-          let rec enter_setup cygroot =
-            match prompt_setup cygroot with
+          let rec enter_setup () =
+            match prompt_setup () with
             | `abort -> OpamStd.Sys.exit_because `Aborted
             | `download -> None
             | `manual ->
@@ -710,7 +707,7 @@ let windows_checks config =
                 if OpamFilename.exists setup then Some setup else
                   (OpamConsole.msg "Cygwin setup executable doesn't exist at %s\n"
                      (OpamFilename.to_string setup);
-                   enter_setup cygroot)
+                   enter_setup ())
           in
           (* Check for default cygwin installation path *)
           let default =
@@ -722,12 +719,12 @@ let windows_checks config =
                   "Manually enter prefix of an existing Cygwin installation \
                    (e.g. C:\\cygwin64)";
                   `default,
-                  (Printf.sprintf "Use default installation %s"
+                  (Printf.sprintf "Use default Cygwin installation at %s"
                      OpamSysInteract.Cygwin.default_cygroot);
                   `abort, "Abort initialisation";
                 ] in
                 OpamConsole.menu "Opam needs pre-existent Cygwin installation"
-                  ~no:`default ~options
+                  ~default:`default ~no:`default ~options
               in
               (match prompt_cygroot () with
                | `abort -> OpamStd.Sys.exit_because `Aborted
@@ -741,7 +738,7 @@ let windows_checks config =
             | None ->
               match OpamConsole.read
                       "Enter the prefix of an existing Cygwin installation \
-                       (e.g. C:\\cygwin64):" with
+                       (e.g. C:\\cygwin64)" with
               | None -> None
               | Some entry ->
                 let cygcheck =
@@ -753,10 +750,7 @@ let windows_checks config =
           in
           match cygcheck with
           | Some cygcheck ->
-            let cygroot =
-              OpamFilename.(dirname_dir (dirname cygcheck))
-            in
-            OpamSysInteract.Cygwin.check_setup ~cygroot ~setup:(enter_setup cygroot);
+            OpamSysInteract.Cygwin.check_setup (enter_setup ());
             Some (success cygcheck)
           | None -> None
         in
@@ -794,9 +788,7 @@ let windows_checks config =
            (match OpamSysInteract.Cygwin.check_install
                     (OpamFilename.Dir.to_string cygroot) with
            | Ok cygcheck ->
-             OpamSysInteract.Cygwin.check_setup
-               ~cygroot:OpamFilename.(dirname_dir (dirname cygcheck))
-               ~setup:None;
+             OpamSysInteract.Cygwin.check_setup None;
              success cygcheck
            | Error err -> OpamConsole.error "%s" err; get_cygwin None)
          | None ->
