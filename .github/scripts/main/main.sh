@@ -53,6 +53,7 @@ export PATH="$PREFIX/bin:$PATH"
 opam --version
 
 if [ "$OPAM_DOC" = "1" ]; then
+  rm -rf src_ext/
   make -C doc html man-html pages
 
   env | grep GITHUB
