@@ -56,8 +56,6 @@ if [ "$OPAM_DOC" = "1" ]; then
   rm -rf src_ext/
   make -C doc html man-html pages
 
-  env | grep GITHUB
-
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/preamble.sh
     diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
