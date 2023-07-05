@@ -113,35 +113,6 @@ jobs:
       run: sudo apt install man2html
     - name: Checkout tree
       uses: actions/checkout@v3
-    - name: src_ext/archives and opam-repository Cache
-      id: archives
-      uses: ocaml-opam/cache@opam
-      with:
-        path: |
-          src_ext/archives
-          ~/opam-repository
-        key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
-    - name: OCaml ${{ matrix.ocamlv }} Cache
-      id: ocaml-cache
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/ocaml-local/**
-        key: ${{ runner.os }}-ocaml-${{ matrix.ocamlv }}-${{ needs.Analyse.outputs.ocaml-cache }}
-    - name: Create OCaml ${{ matrix.ocamlv }} cache
-      if: steps.ocaml-cache.outputs.cache-hit != 'true'
-      run: bash -exu .github/scripts/main/ocaml-cache.sh ${{ runner.os }} ${{ matrix.ocamlv }}
-    - name: opam bootstrap Cache
-      id: opam-bootstrap
-      uses: actions/cache@v3
-      with:
-        path: |
-          ${{ env.OPAMBSROOT }}/**
-          ~/.cache/opam-local/bin/**
-        key: opamdoc-${{ runner.os }}-${{ env.OPAMBSVERSION }}-${{ matrix.ocamlv }}-${{ env.OPAM_REPO_SHA }}-${{ needs.Analyse.outputs.opam-bs-cache }}
-    - name: Create opam bootstrap cache
-      if: steps.opam-bootstrap.outputs.cache-hit != 'true'
-      run: bash -exu .github/scripts/main/opam-bs-cache.sh
     - name: Compile
       env:
         BASE_REF_SHA: ${{ github.event.pull_request.base.sha }}
