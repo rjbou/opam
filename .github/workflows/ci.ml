@@ -402,7 +402,13 @@ let doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ?s
   let platform = os_of_platform runner in
   let host = host_of_platform platform in
   let only_on target = only_on platform target in
-  let needs = [analyse_job; (match platform with Linux -> build_linux_job | Windows -> build_windows_job | MacOS -> build_macOS_job)] in
+  let needs = [
+    analyse_job;
+    (match platform with
+       Linux -> build_linux_job
+     | Windows -> build_windows_job
+     | MacOS -> build_macOS_job)
+  ] in
   let env = [("OPAM_DOC", "1")] in
   let matrix = platform_ocaml_matrix ~fail_fast:false latest_ocaml in
   let ocamlv = "${{ matrix.ocamlv }}" in
