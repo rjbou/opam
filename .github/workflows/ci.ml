@@ -415,7 +415,7 @@ let doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ?s
     ++ build_cache OCaml platform ocamlv host
     ++ cache OpamBS ocamlv "doc"
     ++ build_cache OpamBS ocamlv "doc"
-    ++ run "Compile" ["bash -exu .github/scripts/main/main.sh " ^ host]
+    ++ run "Compile" ~env:[("BASE_REF_SHA", "${{ github.event.pull_request.base.sha }}"); ("PR_REF_SHA", "${{ github.event.pull_request.head.sha }}")] ["bash -exu .github/scripts/main/main.sh " ^ host]
     ++ end_job f
 
 let solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ?section runner ~oc ~workflow f =
