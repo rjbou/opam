@@ -24,9 +24,8 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   set -e
   git show $BASE_REF_SHA
   git show HEAD -q
-  git show HEAD^ -q
-  git show $PR_REF_SHA -q
   git log -3
+  git show $PR_REF_SHA -q
   git diff $BASE_REF_SHA..$PR_REF_SHA --name-only
 fi
 

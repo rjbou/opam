@@ -12,49 +12,49 @@ unset-dev-version () {
 export OCAMLRUNPARAM=b
 
 (set +x ; echo -en "::group::build opam\r") 2>/dev/null
-if [[ $OPAM_TEST -eq 1 ]] || [[ $OPAM_DOC -eq 1 ]] ; then
-  export OPAMROOT=$OPAMBSROOT
-  # If the cached root is newer, regenerate a binary compatible root
-  opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
-  eval $(opam env)
-fi
-
-case "$1" in
-  *-pc-windows|*-w64-mingw32)
-    CONFIGURE_PREFIX='D:\Local'
-    PREFIX="$(cygpath "$CONFIGURE_PREFIX")";;
-  *)
-    PREFIX=~/local
-    CONFIGURE_PREFIX="$PREFIX";;
-esac
-
-if [ -e "$OCAML_LOCAL/_build" ]; then
-  cp -a "$OCAML_LOCAL/_build" .
-fi
-
-./configure --prefix $CONFIGURE_PREFIX --with-vendored-deps --with-mccs
-if [ "$OPAM_TEST" != "1" ]; then
-  echo 'DUNE_PROFILE=dev' >> Makefile.config
-fi
-
-if [ $OPAM_UPGRADE -eq 1 ]; then
-  unset-dev-version
-fi
-# Disable implicit transitive deps
-sed -i -e '/(implicit_transitive_deps /s/true/false/' dune-project
-make all admin
-sed -i -e '/(implicit_transitive_deps /s/false/true/' dune-project
-
-rm -f "$PREFIX/bin/opam"
-make install
-(set +x ; echo -en "::endgroup::build opam\r") 2>/dev/null
-
-export PATH="$PREFIX/bin:$PATH"
-opam --version
+#if [[ $OPAM_TEST -eq 1 ]] || [[ $OPAM_DOC -eq 1 ]] ; then
+#  export OPAMROOT=$OPAMBSROOT
+#  # If the cached root is newer, regenerate a binary compatible root
+#  opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
+#  eval $(opam env)
+#fi
+#
+#case "$1" in
+#  *-pc-windows|*-w64-mingw32)
+#    CONFIGURE_PREFIX='D:\Local'
+#    PREFIX="$(cygpath "$CONFIGURE_PREFIX")";;
+#  *)
+#    PREFIX=~/local
+#    CONFIGURE_PREFIX="$PREFIX";;
+#esac
+#
+#if [ -e "$OCAML_LOCAL/_build" ]; then
+#  cp -a "$OCAML_LOCAL/_build" .
+#fi
+#
+#./configure --prefix $CONFIGURE_PREFIX --with-vendored-deps --with-mccs
+#if [ "$OPAM_TEST" != "1" ]; then
+#  echo 'DUNE_PROFILE=dev' >> Makefile.config
+#fi
+#
+#if [ $OPAM_UPGRADE -eq 1 ]; then
+#  unset-dev-version
+#fi
+## Disable implicit transitive deps
+#sed -i -e '/(implicit_transitive_deps /s/true/false/' dune-project
+#make all admin
+#sed -i -e '/(implicit_transitive_deps /s/false/true/' dune-project
+#
+#rm -f "$PREFIX/bin/opam"
+#make install
+#(set +x ; echo -en "::endgroup::build opam\r") 2>/dev/null
+#
+#export PATH="$PREFIX/bin:$PATH"
+#opam --version
 
 if [ "$OPAM_DOC" = "1" ]; then
-  rm -rf src_ext/
-  make -C doc html man-html pages
+#  rm -rf src_ext/
+#  make -C doc html man-html pages
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
