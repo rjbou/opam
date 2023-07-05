@@ -412,6 +412,8 @@ jobs:
     steps:
     - name: Install bubblewrap
       run: sudo apt install bubblewrap
+    - name: Install man2html
+      run: sudo apt install man2html
     - name: Checkout tree
       uses: actions/checkout@v3
     - name: src_ext/archives and opam-repository Cache
@@ -456,6 +458,8 @@ jobs:
     env:
       OPAM_DOC: 1
     steps:
+    - name: Install man2html
+      run: sudo apt install man2html
     - name: Checkout tree
       uses: actions/checkout@v3
     - name: src_ext/archives and opam-repository Cache

@@ -408,6 +408,7 @@ let doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ?s
   let ocamlv = "${{ matrix.ocamlv }}" in
   job ~oc ~workflow ?section ~runs_on:(Runner [platform]) ~env ~needs ~matrix ("Doc-" ^ name_of_platform platform)
     ++ only_on Linux (run "Install bubblewrap" ["sudo apt install bubblewrap"])
+    ++ run "Install man2html" ["sudo apt install man2html"]
     ++ checkout ()
     ++ cache Archives
     ++ cache OCaml platform ocamlv host
