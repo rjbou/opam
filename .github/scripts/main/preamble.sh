@@ -67,6 +67,9 @@ EOF
     # extlib is installed, since UChar.cmi causes problems with the search
     # order. See also the removal of uChar and uTF8 in src_ext/jbuild-extlib-src
     opam install . --deps-only
+    if [ "$OPAM_DOC" = "1" ]; then
+      opam install omd odoc
+    fi
 
     rm -f "$OPAMBSROOT"/log/*
   fi

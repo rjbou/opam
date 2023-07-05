@@ -53,19 +53,25 @@ export PATH="$PREFIX/bin:$PATH"
 opam --version
 
 if [ "$OPAM_DOC" = "1" ]; then
-  opam install odoc omd
   make -C doc html man-html pages
-  diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
-  files=`$diff --name-only --diff-filter=A | grep 'src/.*mli'`
-  if [ -n "$files" ]; then
-    echo '::group::new module added - checking it'
-    if $diff --name-only --exit-code -- doc/index.html ; then
-      echo '::error new module added but index not updates'
-      echo "$files"
+
+  env | grep GITHUB
+
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+    . .github/scripts/common/preamble.sh
+    diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
+    files=`$diff --name-only --diff-filter=A | grep 'src/.*mli'`
+    if [ -n "$files" ]; then
+      echo '::group::new module added - checking it'
+      if $diff --name-only --exit-code -- doc/index.html ; then
+        echo '::error new module added but index not updates'
+        echo "$files"
+        exit 3
+      fi
+      echo '::engroup::'
+    else
+      echo 'No new module added'
     fi
-    echo '::engroup::'
-  else
-    echo 'No new module added'
   fi
 fi
 
