@@ -143,4 +143,7 @@ jobs:
       if: steps.opam-bootstrap.outputs.cache-hit != 'true'
       run: bash -exu .github/scripts/main/opam-bs-cache.sh
     - name: Compile
+      env:
+        BASE_REF_SHA: ${{ github.event.pull_request.base.sha }}
+        PR_REF_SHA: ${{ github.event.pull_request.head.sha }}
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
