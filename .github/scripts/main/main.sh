@@ -57,7 +57,7 @@ if [ "$OPAM_DOC" = "1" ]; then
   make -C doc html man-html pages
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-    . .github/scripts/common/preamble.sh
+    . .github/scripts/common/hygiene-preamble.sh
     diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
     files=`$diff --name-only --diff-filter=A | grep 'src/.*mli'`
     if [ -n "$files" ]; then
