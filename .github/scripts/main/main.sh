@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -xue
 
 
 if [ "$OPAM_DOC" = "1" ]; then
@@ -8,6 +8,7 @@ if [ "$OPAM_DOC" = "1" ]; then
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
     set -x
+    set +e
     diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
     $diff --name-only --diff-filter=A
     $diff --name-only --diff-filter=A | grep 'src/.*mli'
