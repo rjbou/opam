@@ -7,6 +7,7 @@ if [ "$OPAM_DOC" = "1" ]; then
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
+    set -x
     diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
     files=`$diff --name-only --diff-filter=A | grep 'src/.*mli'`
     if [ -n "$files" ]; then
