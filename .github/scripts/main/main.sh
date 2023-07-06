@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -x
 
 
 if [ "$OPAM_DOC" = "1" ]; then
