@@ -61,7 +61,6 @@ jobs:
 ####
   Doc-Linux:
     runs-on: ubuntu-latest
-    needs: [ Analyse ]
     strategy:
       matrix:
         ocamlv: [ 4.14.1 ]
