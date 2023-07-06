@@ -7,6 +7,7 @@ fi
 # Don't use BASE_REF_SHA and PR_REF_SHA on non pull request jobs, they are not
 # defined. See .github/workflows/ci.yml hygiene job.
 
+set -x
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   # needed for git diffs and rev-list
   # we need to get history from base ref to head ref for check configure
