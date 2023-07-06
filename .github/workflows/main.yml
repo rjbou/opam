@@ -57,10 +57,49 @@ defaults:
 jobs:
 
 ####
+# Caches
+####
+  Analyse:
+    runs-on: ubuntu-latest
+    outputs:
+      archives: ${{ steps.keys.outputs.archives }}
+      ocaml-cache: ${{ steps.keys.outputs.ocaml-cache }}
+      cygwin: ${{ steps.keys.outputs.cygwin }}
+      opam-bs-cache: ${{ steps.keys.outputs.opam-bs-cache }}
+    steps:
+    - name: Checkout tree
+      uses: actions/checkout@v3
+    - name: Determine cache keys
+      id: keys
+      run: |
+        echo archives=archives-1-${{ hashFiles('src_ext/Makefile.sources', 'src_ext/Makefile', '.github/scripts/common/preamble.sh', '.github/scripts/main/preamble.sh', '.github/scripts/main/archives-cache.sh') }}-${{ env.OPAM_REPO_SHA }}
+        echo archives=archives-1-${{ hashFiles('src_ext/Makefile.sources', 'src_ext/Makefile', '.github/scripts/common/preamble.sh', '.github/scripts/main/preamble.sh', '.github/scripts/main/archives-cache.sh') }}-${{ env.OPAM_REPO_SHA }} >> $GITHUB_OUTPUT
+        echo ocaml-cache=${{ hashFiles('.github/scripts/main/ocaml-cache.sh', '.github/scripts/main/preamble.sh', '.github/scripts/main/create-ocaml-cache.sh') }}
+        echo ocaml-cache=${{ hashFiles('.github/scripts/main/ocaml-cache.sh', '.github/scripts/main/preamble.sh', '.github/scripts/main/create-ocaml-cache.sh') }} >> $GITHUB_OUTPUT
+        echo cygwin=${{ hashFiles('.github/scripts/cygwin.cmd') }}-${{ env.CYGWIN_EPOCH }}
+        echo cygwin=${{ hashFiles('.github/scripts/cygwin.cmd') }}-${{ env.CYGWIN_EPOCH }} >> $GITHUB_OUTPUT
+        echo opam-bs-cache=${{ hashFiles('.github/scripts/main/opam-bs-cache.sh', '*.opam', '.github/scripts/main/preamble.sh') }}
+        echo opam-bs-cache=${{ hashFiles('.github/scripts/main/opam-bs-cache.sh', '*.opam', '.github/scripts/main/preamble.sh') }} >> $GITHUB_OUTPUT
+    - name: src_ext/archives and opam-repository Cache
+      id: archives
+      uses: ocaml-opam/cache@opam
+      with:
+        path: |
+          src_ext/archives
+          ~/opam-repository
+        key: ${{ steps.keys.outputs.archives }}
+        check-only: true
+        force-gzip: true
+    - name: Create src_ext/archives and opam-repository cache
+      if: steps.archives.outputs.cache-hit != 'true'
+      run: bash -exu .github/scripts/main/archives-cache.sh
+
+####
 # Compile doc
 ####
   Doc-Linux:
     runs-on: ubuntu-latest
+    needs: [ Analyse ]
     strategy:
       matrix:
         ocamlv: [ 4.14.1 ]
