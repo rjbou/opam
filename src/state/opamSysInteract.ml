@@ -241,6 +241,10 @@ module Cygwin = struct
   let cygsetup () =
     let open OpamFilename.Op in
     OpamStateConfig.(!r.root_dir) / internal_cygwin // setupexe
+  let is_internal config =
+    OpamStd.Option.equal OpamFilename.Dir.equal
+    (cygroot_opt config)
+    OpamFilename.Op.(Some (OpamStateConfig.(!r.root_dir) / internal_cygwin))
 
   let download_setupexe dst =
     let overwrite = true in
