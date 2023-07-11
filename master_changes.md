@@ -45,6 +45,7 @@ users)
 ## Source
 
 ## Lint
+  * E29: The conflicts field's filter does not support package variables [#5535 @kit-ty-kate]
 
 ## Repository
 
@@ -63,12 +64,14 @@ users)
 ## VCS
 
 ## Build
+  * Run autoupdate to silence autogen warnings [#5555 @MisterDA]
 
 ## Infrastructure
 
 ## Release scripts
 
 ## Admin
+  * When linting, clean output when stdout is not tty [#5594 @rjbou]
 
 ## Opam installer
 
@@ -90,6 +93,9 @@ users)
 
 ## Reftests
 ### Tests
+  * Admin: add a full test [#5385 @rjbou]
+  * Lint
+    * E29: Add conflicts test and simplify W41 to no more trigger E29 [#5535 @rjbou]
 
 ### Engine
 
@@ -112,4 +118,4 @@ users)
 ## opam-format
 
 ## opam-core
-
+  * `OpamConsole.carriage_delete`: no-op when not tty out [XXX @rjbou]
