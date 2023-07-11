@@ -635,7 +635,7 @@ let init_checks ?(hard_fail_exn=true) init_config =
   if hard_fail && hard_fail_exn then OpamStd.Sys.exit_because `Configuration_error
   else not (soft_fail || hard_fail)
 
-let windows_checks config =
+let windows_checks ?cygwin_setup config =
   let vars = OpamFile.Config.global_variables config in
   let env =
     List.map (fun (v, c, s) -> v, (lazy (Some c), s)) vars
@@ -790,6 +790,7 @@ let windows_checks config =
       menu ()
   in
   let config =
+    if cygwin_setup = Some `no then config else
     if OpamSysPoll.os env = Some "win32" then
       match OpamSysPoll.os_distribution env with
       | Some "win32" ->
@@ -802,8 +803,38 @@ let windows_checks config =
            there are commands opam requires which are only provided using it
            (patch, etc.). MSYS2 avoids this by requiring os-distribution to be
            set. *)
-        get_cygwin
-          (OpamSysInteract.Cygwin.cygcheck_opt config)
+        let cygcheck = OpamSysInteract.Cygwin.cygcheck_opt config in
+        (match cygwin_setup with
+         | None -> get_cygwin cygcheck
+         | Some setup  ->
+           let cygcheck =
+             match setup with
+             | `internal ->
+               OpamSysInteract.Cygwin.install
+                 ~packages:OpamInitDefaults.required_packages_for_cygwin
+             | `default_location ->
+               (match
+                  OpamSysInteract.Cygwin.(check_install default_cygroot)
+                with
+                | Ok cygcheck -> cygcheck
+                | Error msg ->
+                  OpamConsole.error_and_exit `Not_found
+                    "Error while checking default Cygwin install (%s): %s"
+                    (OpamSysInteract.Cygwin.default_cygroot) msg)
+             | `location dir ->
+               (match
+                  OpamSysInteract.Cygwin.check_install
+                    (OpamFilename.Dir.to_string dir)
+                with
+                | Ok cygcheck -> cygcheck
+                | Error msg ->
+                  OpamConsole.error_and_exit `Not_found
+                    "Error while checking given Cygwin install (%s): %s"
+                    (OpamFilename.Dir.to_string dir) msg)
+             | `no -> assert false
+           in
+           let config = success cygcheck in
+           config)
       | Some "cygwin" ->
         (* We check that current install is good *)
         (match OpamSysInteract.Cygwin.cygroot_opt config with
@@ -862,11 +893,11 @@ let update_with_init_config ?(overwrite=false) config init_config =
 
 let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace
-    ?(check_sandbox=true) ?(bypass_checks=false)
+    ?(check_sandbox=true) ?(bypass_checks=false) ?cygwin_setup
     config shell =
   let root = OpamStateConfig.(!r.root_dir) in
   let config = update_with_init_config config init_config in
-  let config = windows_checks config in
+  let config = windows_checks ?cygwin_setup config in
   let _all_ok =
     if bypass_checks then false else
       init_checks ~hard_fail_exn:false init_config
@@ -907,6 +938,7 @@ let init
     ?repo ?(bypass_checks=false)
     ?dot_profile ?update_config ?env_hook ?(completion=true)
     ?(check_sandbox=true)
+    ?cygwin_setup
     shell =
   log "INIT %a"
     (slog @@ OpamStd.Option.to_string OpamRepositoryBackend.to_string) repo;
@@ -942,7 +974,7 @@ let init
             init_config |>
           OpamFile.Config.with_repositories (List.map fst repos)
         in
-        let config = windows_checks config in
+        let config = windows_checks ?cygwin_setup config in
 
         let dontswitch =
           if bypass_checks then false else
