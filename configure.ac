@@ -1,5 +1,5 @@
-dnl The line below must be formatted AC_INIT([opam],[VERSION]) with no extra spaces
-AC_INIT([opam],[2.2.0~alpha])
+dnl The line below must be formatted AC_INIT(opam,VERSION) with no extra spaces
+AC_INIT(opam,2.2.0~alpha)
 AC_COPYRIGHT(Copyright 2012-2019 OcamlPro SAS)
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -55,14 +55,17 @@ AC_ARG_ENABLE([checks],
 )
 
 AC_ARG_ENABLE([developer_mode],
-  AS_HELP_STRING([--enable-developer-mode],[Enable developer features])
+  AC_HELP_STRING([--enable-developer-mode],
+                 [Enable developer features])
 )
 
 AC_ARG_WITH([mccs],
-  AS_HELP_STRING([--without-mccs],[Compile without a built-in Cudf solver (only works if 'mccs' is not otherwise installed)])
+  AC_HELP_STRING([--without-mccs],
+                 [Compile without a built-in Cudf solver (only works if 'mccs' is not otherwise installed)])
 )
 AC_ARG_WITH([0install-solver],
-  AS_HELP_STRING([--without-0install-solver],[Legacy option (does nothing)])
+  AC_HELP_STRING([--without-0install-solver],
+                 [Legacy option (does nothing)])
 )
 AS_IF([test "x$with_0install_solver" = xno],
   [AC_MSG_ERROR([Compiling opam without 0install solver is no longer possible.])]
@@ -70,21 +73,26 @@ AS_IF([test "x$with_0install_solver" = xno],
 
 
 AC_ARG_WITH([libacl],
-  AS_HELP_STRING([--with-libacl],[Compile opam with libacl support]),,[with_libacl=auto])
+  AC_HELP_STRING([--with-libacl],
+                 [Compile opam with libacl support]),,[with_libacl=auto])
 
 AC_ARG_WITH([private_runtime],
-  AS_HELP_STRING([--with-private-runtime],[For a mingw-w64 build, manifest the runtime DLLs locally in Opam.Runtime.arch]),,[with_private_runtime=no]
+  AC_HELP_STRING([--with-private-runtime],
+                 [For a mingw-w64 build, manifest the runtime DLLs locally in Opam.Runtime.arch]),,[with_private_runtime=no]
 )
 
 AC_ARG_ENABLE([cold_check],
-  AS_HELP_STRING([--enable-cold-check],[Fail on some check necessary for make cold]),[COLD_CHECK=yes],[]
+  AC_HELP_STRING([--enable-cold-check],
+                 [Fail on some check necessary for make cold]),[COLD_CHECK=yes],[]
 )
 
 AC_ARG_WITH([dune],
-  AS_HELP_STRING([--without-dune],[Compile using vendored Dune instead of any in PATH]))
+  AC_HELP_STRING([--without-dune],
+                 [Compile using vendored Dune instead of any in PATH]))
 
 AC_ARG_WITH([vendored-deps],
-  AS_HELP_STRING([--with-vendored-deps],[Use vendored dependencies instead of any available in the compiler installation]))
+  AC_HELP_STRING([--with-vendored-deps],
+                 [Use vendored dependencies instead of any available in the compiler installation]))
 
 AS_IF([test "x" != "x$LIB_PREFIX"], [
   CPATH=$CPATH:$LIB_PREFIX/include
