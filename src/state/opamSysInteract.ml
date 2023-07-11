@@ -928,18 +928,16 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) config sys_package
     (* We use setp_x86_64 to install package instead of `cygcheck` that is
        stored in `sys-pkg-manager-cmd` field *)
     [`AsUser (OpamFilename.to_string (Cygwin.cygsetup ())),
-      [ "--root"; (OpamFilename.Dir.to_string (Cygwin.cygroot config));
-        "--quiet-mode";
-        "--no-shortcuts";
-        "--no-startmenu";
-        "--no-desktop";
-        (*"--only-site"; XXX Commenting out forces use of previous mirror for now
-          "--site"; mirror; (* Use same mirror as from before? *)*)
-        "--no-admin";
-        "--packages";
-        (* "--upgrade-also";  if internal cygwin install *)
-        String.concat "," packages
-      ]],
+     [ "--root"; (OpamFilename.Dir.to_string (Cygwin.cygroot config));
+       "--quiet-mode";
+       "--no-shortcuts";
+       "--no-startmenu";
+       "--no-desktop";
+       "--no-admin";
+       "--packages";
+       String.concat "," packages;
+     ] @ (if Cygwin.is_internal config then ["--upgrade-also"] else [])
+    ],
     None
   | Debian ->
     [`AsAdmin "apt-get", "install"::yes ["-qq"; "-yy"] packages],
