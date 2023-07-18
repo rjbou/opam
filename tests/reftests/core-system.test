@@ -15,7 +15,8 @@ system
 Fatal error: exception ${OPAM}: "execvpe" failed on ${BASEDIR}/bin/echo: Permission denied
 # Return code 2 #
 ### opam exec --no-switch -- echo system
-system
+Fatal error: exception ${OPAM}: "execvpe" failed on ${BASEDIR}/bin/echo: Permission denied
+# Return code 2 #
 ### :I:c: is not executable
 ### rm -rf bin/echo
 ### <bin/echo>
@@ -24,10 +25,11 @@ echo 'echo'
 [ERROR] Command not found 'echo'
 # Return code 127 #
 ### opam exec --no-switch -- echo system
-system
+[ERROR] Command not found 'echo'
+# Return code 127 #
 ### :I:d: is executable
 ### chmod +x bin/echo
 ### opam exec -- echo system
 echo
 ### opam exec --no-switch -- echo system
-system
+echo
