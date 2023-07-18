@@ -252,6 +252,24 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:conflict-solo5.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-core-system)
+ (action
+  (diff core-system.test core-system.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-core-system)))
+
+(rule
+ (targets core-system.out)
+ (deps root-N0REP0)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:core-system.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-cudf-preprocess)
  (action
   (diff cudf-preprocess.test cudf-preprocess.out)))
