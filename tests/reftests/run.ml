@@ -295,6 +295,10 @@ let rec with_temp_dir f =
   (mkdir_p s;
    finally f s @@ fun () -> rm_rf s)
 
+type export =
+  | Simple of (string * string)
+  | Plus of (string * [`pluseq | `eqplus] * string)
+
 type command =
   | File_contents of string
   | Repo_pkg_file_contents of string
@@ -309,7 +313,7 @@ type command =
              filter: (Re.t * filt_sort) list;
              output: string option;
              unordered: bool; }
-  | Export of (string * string) list
+  | Export of export list
   | Comment of string
 
 module Parse = struct
@@ -352,6 +356,14 @@ module Parse = struct
       rep space;
     ]
 
+  let re_varbindplus =
+    seq [
+      group @@ seq [alpha; rep (alt [alnum; set "_-"])];
+      group @@ alt [ str "+="; str "=+"];
+      group @@ re_str_atom;
+      rep space;
+    ]
+
   let re_package =
     seq [
       str "<pkg:";
@@ -388,6 +400,18 @@ module Parse = struct
       let gr = exec (compile @@ rep re_varbind) str in
       List.map (fun gr -> Group.get gr 1, get_str (Group.get gr 2))
         (all (compile @@ re_varbind) (Group.get gr 0)),
+      Group.stop gr 0
+    in
+    let varplus, pos =
+      let gr = exec (compile @@ rep re_varbindplus) str in
+      List.map (fun gr ->
+          Group.get gr 1,
+          (match Group.get gr 2 with
+           | "+=" -> `pluseq
+           | "=+" -> `eqplus
+           | _ -> assert false),
+            get_str (Group.get gr 3))
+        (all (compile @@ re_varbindplus) (Group.get gr 0)),
       Group.stop gr 0
     in
     let cmd, pos =
@@ -434,8 +458,8 @@ module Parse = struct
                 opt @@ char '"';
                 Re.str " "
               ]
-(*                 Printf.sprintf "+ .*(/|\\\\|\")%s(\\.exe)?\"? " cmd *)
-                in
+              (*                 Printf.sprintf "+ .*(/|\\\\|\")%s(\\.exe)?\"? " cmd *)
+            in
             let str = Printf.sprintf "%s " cmd in
             get_rewr (unordered, (re, Sed str) :: acc) r
           | ">$" :: output :: [] ->
@@ -468,7 +492,11 @@ module Parse = struct
         unordered;
       }
     | None ->
-      Export varbinds
+      let binds =
+        (List.map (fun v -> Simple v) varbinds)
+        @ List.map (fun v -> Plus v) varplus
+      in
+      Export binds
 end
 
 let parse_command = Parse.command
@@ -703,12 +731,28 @@ let run_test ?(vars=[]) ~opam t =
           vars
         | Export bindings ->
           List.fold_left
-            (fun vars (v, r) ->
-               let r =
-                 str_replace_path ~escape:`Backslashes
-                   OpamSystem.forward_to_back (filters_of_var vars) r
-               in
-               (v, r) :: List.filter (fun (w, _) -> not (String.equal v w)) vars)
+            (fun vars -> function
+               | Simple (v, r) ->
+                 let r =
+                   str_replace_path ~escape:`Backslashes
+                     OpamSystem.forward_to_back (filters_of_var vars) r
+                 in
+                 (v, r) :: List.filter (fun (w, _) -> not (String.equal v w)) vars
+               | Plus (v, op, r) ->
+                 let r' =
+                   str_replace_path ~escape:`Backslashes
+                     OpamSystem.forward_to_back (filters_of_var vars) r
+                 in
+                 let value =
+                   match List.find_opt (fun (v',_) -> String.equal v v') (base_env @ vars) with
+                   | Some (_,c) ->
+                     let sep = if Sys.win32 then ";" else ":" in
+                     (match op with
+                      | `pluseq -> r'^sep^c
+                      | `eqplus -> c^sep^r')
+                   | None -> r'
+                 in
+                 (v, value) :: List.filter (fun (w, _) -> not (String.equal v w)) vars)
             vars bindings
         | Cat { files; filter } ->
           let files =
