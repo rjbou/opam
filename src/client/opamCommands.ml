@@ -304,19 +304,25 @@ let init cli =
        it is possible for a broken package script to delete all your files."
   in
   let cygwin_internal =
-    mk_vflag ~cli `none [
-      cli_from cli2_2, `internal, ["cygwin-internal-install"],
-      "Let opam setup and manage an internal Cygwin install";
-      cli_from cli2_2, `default_location, ["cygwin-local-install"],
-      "Use preexistent Cygwin install";
-      cli_from cli2_2, `no, ["no-cygwin-setup"],
-      "Don't setup Cygwin";
-    ]
+    if Sys.win32 then
+      mk_vflag ~cli `none [
+        cli_from cli2_2, `internal, ["cygwin-internal-install"],
+        "Let opam setup and manage an internal Cygwin install";
+        cli_from cli2_2, `default_location, ["cygwin-local-install"],
+        "Use preexistent Cygwin install";
+        cli_from cli2_2, `no, ["no-cygwin-setup"],
+        "Don't setup Cygwin";
+      ]
+    else
+      Term.const `none
   in
   let cygwin_location =
-    mk_opt ~cli (cli_from cli2_2) ["cygwin-location"] "DIR"
-      "Specify Cygwin root location"
-      Arg.(some dirname) None
+    if Sys.win32 then
+      mk_opt ~cli (cli_from cli2_2) ["cygwin-location"] "DIR"
+        "Specify Cygwin root location"
+        Arg.(some dirname) None
+    else
+      Term.const None
   in
   let init global_options
       build_options repo_kind repo_name repo_url
