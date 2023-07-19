@@ -53,6 +53,7 @@ users)
   * Fix extra-files handling when linting packages from repositories, see #5068 [#5639 @rjbou]
 
 ## Repository
+  * Fix `OPAMCURL` and `OPAMFETCH` handling [#5607 @rjbou - fix #5597]
 
 ## Lock
 
