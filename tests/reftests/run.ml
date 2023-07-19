@@ -422,17 +422,29 @@ module Parse = struct
             get_rewr (true, acc) r
           | "|" :: "sed-cmd" :: cmd :: r ->
             let re =
-              seq [
-                Re.str "+ ";
-                rep any;
-                alt [ set "/\\\"" ];
-                Re.str cmd;
-                opt @@ Re.str ".exe";
-                opt @@ char '"';
-                Re.str " "
+              alt [
+                seq [
+                  Re.char '\\';
+                  Re.char '"';
+                  alt [ char '/'; seq [alpha; char ':'; char '\\']];
+                  rep any;
+                  alt [ set "/\\\"" ];
+                  Re.str cmd;
+                  opt @@ Re.str ".exe";
+                  Re.str " "
+                ]
+                ;
+                seq [
+                  Re.str "+ ";
+                  rep any;
+                  alt [ set "/\\\"" ];
+                  Re.str cmd;
+                  opt @@ Re.str ".exe";
+                  opt @@ char '"';
+                  Re.str " "
+                ]
               ]
-(*                 Printf.sprintf "+ .*(/|\\\\|\")%s(\\.exe)?\"? " cmd *)
-                in
+            in
             let str = Printf.sprintf "%s " cmd in
             get_rewr (unordered, (re, Sed str) :: acc) r
           | ">$" :: output :: [] ->
