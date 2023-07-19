@@ -22,11 +22,9 @@ Fatal error: exception ${OPAM}: "execvpe" failed on ${BASEDIR}/bin/echo: Permiss
 ### <bin/echo>
 echo 'echo'
 ### opam exec -- echo system
-[ERROR] Command not found 'echo'
-# Return code 127 #
+system
 ### opam exec --no-switch -- echo system
-[ERROR] Command not found 'echo'
-# Return code 127 #
+system
 ### :I:d: is executable
 ### chmod +x bin/echo
 ### opam exec -- echo system
