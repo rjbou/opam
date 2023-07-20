@@ -761,7 +761,7 @@ let windows_checks ?cygwin_setup config =
             `Internal,
             "Automatically create an internal Cygwin installation \
              that will be managed by opam";
-            `Specify, "Enter the location of an existing Cygwin installation"; 
+            `Specify, "Enter the location of an existing Cygwin installation";
             `Abort, "Abort initialisation";
           ] in
           OpamConsole.menu "How should opam handle Cygwin?"
@@ -812,15 +812,20 @@ let windows_checks ?cygwin_setup config =
              | `internal ->
                OpamSysInteract.Cygwin.install
                  ~packages:OpamInitDefaults.required_packages_for_cygwin
-             | `default_location ->
-               (match
-                  OpamSysInteract.Cygwin.(check_install default_cygroot)
-                with
+             | (`default_location | `location _ as setup) ->
+               let cygroot =
+                 match setup with
+                 | `default_location -> OpamSysInteract.Cygwin.default_cygroot
+                 | `location dir -> OpamFilename.Dir.to_string dir
+               in
+               (match OpamSysInteract.Cygwin.check_install cygroot with
                 | Ok cygcheck -> cygcheck
                 | Error msg ->
                   OpamConsole.error_and_exit `Not_found
-                    "Error while checking default Cygwin install (%s): %s"
+                    "Error while checking %sCygwin install (%s): %s"
+                    (match setup with `default_location -> " default" | `location _ -> "")
                     (OpamSysInteract.Cygwin.default_cygroot) msg)
+(*
              | `location dir ->
                (match
                   OpamSysInteract.Cygwin.check_install
@@ -831,8 +836,10 @@ let windows_checks ?cygwin_setup config =
                   OpamConsole.error_and_exit `Not_found
                     "Error while checking given Cygwin install (%s): %s"
                     (OpamFilename.Dir.to_string dir) msg)
+*)
              | `no -> assert false
            in
+           OpamSysInteract.Cygwin.check_setup None;
            let config = success cygcheck in
            config)
       | Some "cygwin" ->
