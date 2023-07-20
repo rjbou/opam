@@ -216,9 +216,11 @@ let family ~env () =
         family
 
 module Cygwin = struct
+  open OpamFilename.Op
 
   let url_setupexe = OpamUrl.of_string "https://cygwin.com/setup-x86_64.exe"
   let url_setupexe_sha512 = OpamUrl.of_string "https://cygwin.com/sha512.sum"
+  let mirror = "https://cygwin.mirror.constant.com/"
 
   (* Cygwin setup exe must be stored at Cygwin installation root *)
   let setupexe = "setup-x86_64.exe"
@@ -237,14 +239,14 @@ module Cygwin = struct
     | None -> failwith "Cygwin install not found"
   let cygroot config = get_opt (cygroot_opt config)
 
-  let internal_cygwin = ".cygwin"
-  let cygsetup () =
-    let open OpamFilename.Op in
-    OpamStateConfig.(!r.root_dir) / internal_cygwin // setupexe
+  let internal_cygwin = OpamStateConfig.(!r.root_dir) / ".cygwin"
+  let internal_cygroot = internal_cygwin / "root"
+  let internal_cygcache = internal_cygwin / "cache"
+  let cygsetup () = internal_cygwin // setupexe
   let is_internal config =
     OpamStd.Option.equal OpamFilename.Dir.equal
-    (cygroot_opt config)
-    OpamFilename.Op.(Some (OpamStateConfig.(!r.root_dir) / internal_cygwin))
+      (cygroot_opt config)
+      (Some internal_cygroot)
 
   let download_setupexe dst =
     let overwrite = true in
@@ -272,8 +274,7 @@ module Cygwin = struct
 
   let install ~packages =
     let open OpamProcess.Job.Op in
-    let open OpamFilename.Op in
-    let cygwin_root = OpamStateConfig.(!r.root_dir) / internal_cygwin in
+    let cygwin_root = internal_cygroot in
     let cygwin_bin = cygwin_root / "bin" in
     let cygcheck = cygwin_bin // cygcheckexe in
     let local_cygwin_setupexe = cygsetup () in
@@ -291,7 +292,8 @@ module Cygwin = struct
          "--root"; OpamFilename.Dir.to_string cygwin_root;
          "--arch"; "x86_64";
          "--only-site";
-         "--site"; "https://cygwin.mirror.constant.com/";
+         "--site"; mirror;
+         "--local-package-dir"; OpamFilename.Dir.to_string internal_cygcache;
          "--no-admin";
          "--no-desktop";
          "--no-replaceonreboot";
@@ -936,7 +938,12 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) config sys_package
        "--no-admin";
        "--packages";
        String.concat "," packages;
-     ] @ (if Cygwin.is_internal config then ["--upgrade-also"] else [])
+     ] @ (if Cygwin.is_internal config then
+            [ "--upgrade-also";
+              "--only-site";
+              "--site"; Cygwin.mirror;
+              "--local-package-dir"; OpamFilename.Dir.to_string Cygwin.internal_cygcache;
+            ] else [])
     ],
     None
   | Debian ->
