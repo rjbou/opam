@@ -673,7 +673,7 @@ let windows_checks ?cygwin_setup config =
          (OpamFile.Config.sys_pkg_manager_cmd config))
       config
       in
-      OpamConsole.note "Configured with with%s"
+      OpamConsole.note "Configured with with %s.\n"
         (if OpamSysInteract.Cygwin.is_internal config then
            "internal Cygwin install"
          else
@@ -820,6 +820,7 @@ let windows_checks ?cygwin_setup config =
         (match cygwin_setup with
          | None -> get_cygwin cygcheck
          | Some setup  ->
+           header ();
            let cygcheck =
              match setup with
              | `internal ->
@@ -843,26 +844,26 @@ let windows_checks ?cygwin_setup config =
            in
            OpamSysInteract.Cygwin.check_setup None;
            success cygcheck)
-      | Some "cygwin" ->
-        (* We check that current install is good *)
-        (match OpamSysInteract.Cygwin.cygroot_opt config with
-         | Some cygroot ->
-           (match OpamSysInteract.Cygwin.check_install
-                    (OpamFilename.Dir.to_string cygroot) with
-           | Ok cygcheck ->
-             OpamSysInteract.Cygwin.check_setup None;
-             success cygcheck
-           | Error err -> OpamConsole.error "%s" err; get_cygwin None)
-         | None ->
-           (* Cygwin is detected from environment (path), we check the install
-              in that case and stores it in config *)
-           OpamSystem.resolve_command "cygcheck"
-           |> OpamStd.Option.map OpamFilename.of_string
-           |> get_cygwin
-        )
-      | _ -> config
-    else
-      config
+        | Some "cygwin" ->
+          (* We check that current install is good *)
+          (match OpamSysInteract.Cygwin.cygroot_opt config with
+           | Some cygroot ->
+             (match OpamSysInteract.Cygwin.check_install
+                      (OpamFilename.Dir.to_string cygroot) with
+             | Ok cygcheck ->
+               OpamSysInteract.Cygwin.check_setup None;
+               success cygcheck
+             | Error err -> OpamConsole.error "%s" err; get_cygwin None)
+           | None ->
+             (* Cygwin is detected from environment (path), we check the install
+                in that case and stores it in config *)
+             OpamSystem.resolve_command "cygcheck"
+             |> OpamStd.Option.map OpamFilename.of_string
+             |> get_cygwin
+          )
+        | _ -> config
+      else
+        config
   in
   OpamCoreConfig.update
     ?cygbin:OpamStd.Option.Op.(
