@@ -673,7 +673,7 @@ let windows_checks ?cygwin_setup config =
          (OpamFile.Config.sys_pkg_manager_cmd config))
       config
       in
-      OpamConsole.msg "Configuring opam with%s"
+      OpamConsole.note "Configured with with%s"
         (if OpamSysInteract.Cygwin.is_internal config then
            "internal Cygwin install"
          else
