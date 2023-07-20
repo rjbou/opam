@@ -667,11 +667,21 @@ let windows_checks ?cygwin_setup config =
         else
           OpamStd.Sys.exit_because `Aborted
     in
+    let config =
     OpamFile.Config.with_sys_pkg_manager_cmd
       (OpamStd.String.Map.add "cygwin" cygcheck
          (OpamFile.Config.sys_pkg_manager_cmd config))
       config
+      in
+      OpamConsole.msg "Configuring opam with%s"
+        (if OpamSysInteract.Cygwin.is_internal config then
+           "internal Cygwin install"
+         else
+           Printf.sprintf "Cygwin at %s"
+             OpamFilename.(Dir.to_string (dirname_dir (dirname cygcheck))));
+      config
   in
+  let header () = OpamConsole.header_msg "Unix support infrastructure" in
   let get_cygwin = function
     | Some cygcheck
       when OpamFilename.exists cygcheck
@@ -717,13 +727,13 @@ let windows_checks ?cygwin_setup config =
                 let options = [
                   `manual,
                   "Manually enter prefix of an existing Cygwin installation \
-                   (e.g. C:\\cygwin64)";
+                   (e.g. D:\\cygwin64)";
                   `default,
                   (Printf.sprintf "Use default Cygwin installation at %s"
                      OpamSysInteract.Cygwin.default_cygroot);
                   `abort, "Abort initialisation";
                 ] in
-                OpamConsole.menu "Opam needs pre-existent Cygwin installation"
+                OpamConsole.menu "Cygwin location"
                   ~default:`default ~no:`default ~options
               in
               (match prompt_cygroot () with
@@ -781,7 +791,7 @@ let windows_checks ?cygwin_setup config =
           | Some config -> config
           | None -> menu ()
       in
-      OpamConsole.header_msg "Unix support infrastructure";
+      header ();
       OpamConsole.msg
         "\n\
          opam and the OCaml ecosystem in general require various Unix tools \
