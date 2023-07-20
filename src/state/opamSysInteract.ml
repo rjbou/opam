@@ -240,7 +240,9 @@ module Cygwin = struct
   let cygroot config = get_opt (cygroot_opt config)
 
   let internal_cygwin =
-    let internal = lazy (OpamStateConfig.(!r.root_dir) / ".cygwin") in
+    let internal =
+      Lazy.from_fun @@ fun () -> (OpamStateConfig.(!r.root_dir) / ".cygwin")
+    in
     fun () -> Lazy.force internal
   let internal_cygroot () = internal_cygwin () / "root"
   let internal_cygcache () = internal_cygwin () / "cache"
