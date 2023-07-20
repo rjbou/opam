@@ -790,19 +790,22 @@ let windows_checks ?cygwin_setup config =
       menu ()
   in
   let config =
-    if cygwin_setup = Some `no then config else
-    if OpamSysPoll.os env = Some "win32" then
-      match OpamSysPoll.os_distribution env with
-      | Some "win32" ->
-        (* If there's a "cygwin" entry in sys-pkg-manager-cmd, but os-distribution
-           hasn't (yet) been set to "cygwin", then that'll be done here.
-           Otherwise, the user must either allow opam to install Cygwin or must
-           provide the path to it.
+    match cygwin_setup with
+    | Some `no -> config
+    | (Some (`internal | `default_location | `location _) | None)
+      as cygwin_setup ->
+      if OpamSysPoll.os env = Some "win32" then
+        match OpamSysPoll.os_distribution env with
+        | Some "win32" ->
+          (* If there's a "cygwin" entry in sys-pkg-manager-cmd, but
+             os-distribution hasn't (yet) been set to "cygwin", then that'll be
+             done here.  Otherwise, the user must either allow opam to install
+             Cygwin or must provide the path to it.
 
-           Note that a depext solution is _mandatory_ on Windows for now, because
-           there are commands opam requires which are only provided using it
-           (patch, etc.). MSYS2 avoids this by requiring os-distribution to be
-           set. *)
+             Note that a depext solution is _mandatory_ on Windows for now,
+             because there are commands opam requires which are only provided
+             using it (patch, etc.). MSYS2 avoids this by requiring
+             os-distribution to be set. *)
         let cygcheck = OpamSysInteract.Cygwin.cygcheck_opt config in
         (match cygwin_setup with
          | None -> get_cygwin cygcheck
@@ -823,25 +826,13 @@ let windows_checks ?cygwin_setup config =
                 | Error msg ->
                   OpamConsole.error_and_exit `Not_found
                     "Error while checking %sCygwin install (%s): %s"
-                    (match setup with `default_location -> " default" | `location _ -> "")
+                    (match setup with
+                     | `default_location -> " default"
+                     | `location _ -> "")
                     (OpamSysInteract.Cygwin.default_cygroot) msg)
-(*
-             | `location dir ->
-               (match
-                  OpamSysInteract.Cygwin.check_install
-                    (OpamFilename.Dir.to_string dir)
-                with
-                | Ok cygcheck -> cygcheck
-                | Error msg ->
-                  OpamConsole.error_and_exit `Not_found
-                    "Error while checking given Cygwin install (%s): %s"
-                    (OpamFilename.Dir.to_string dir) msg)
-*)
-             | `no -> assert false
            in
            OpamSysInteract.Cygwin.check_setup None;
-           let config = success cygcheck in
-           config)
+           success cygcheck)
       | Some "cygwin" ->
         (* We check that current install is good *)
         (match OpamSysInteract.Cygwin.cygroot_opt config with
