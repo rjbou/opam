@@ -239,14 +239,16 @@ module Cygwin = struct
     | None -> failwith "Cygwin install not found"
   let cygroot config = get_opt (cygroot_opt config)
 
-  let internal_cygwin = OpamStateConfig.(!r.root_dir) / ".cygwin"
-  let internal_cygroot = internal_cygwin / "root"
-  let internal_cygcache = internal_cygwin / "cache"
-  let cygsetup () = internal_cygwin // setupexe
+  let internal_cygwin =
+    let internal = lazy (OpamStateConfig.(!r.root_dir) / ".cygwin") in
+    fun () -> Lazy.force internal
+  let internal_cygroot () = internal_cygwin () / "root"
+  let internal_cygcache () = internal_cygwin () / "cache"
+  let cygsetup () = internal_cygwin () // setupexe
   let is_internal config =
     OpamStd.Option.equal OpamFilename.Dir.equal
       (cygroot_opt config)
-      (Some internal_cygroot)
+      (Some (internal_cygroot ()))
 
   let download_setupexe dst =
     let overwrite = true in
@@ -274,7 +276,7 @@ module Cygwin = struct
 
   let install ~packages =
     let open OpamProcess.Job.Op in
-    let cygwin_root = internal_cygroot in
+    let cygwin_root = internal_cygroot () in
     let cygwin_bin = cygwin_root / "bin" in
     let cygcheck = cygwin_bin // cygcheckexe in
     let local_cygwin_setupexe = cygsetup () in
@@ -293,7 +295,8 @@ module Cygwin = struct
          "--arch"; "x86_64";
          "--only-site";
          "--site"; mirror;
-         "--local-package-dir"; OpamFilename.Dir.to_string internal_cygcache;
+         "--local-package-dir";
+         OpamFilename.Dir.to_string (internal_cygcache ());
          "--no-admin";
          "--no-desktop";
          "--no-replaceonreboot";
@@ -942,7 +945,8 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) config sys_package
             [ "--upgrade-also";
               "--only-site";
               "--site"; Cygwin.mirror;
-              "--local-package-dir"; OpamFilename.Dir.to_string Cygwin.internal_cygcache;
+              "--local-package-dir";
+              OpamFilename.Dir.to_string (Cygwin.internal_cygcache ());
             ] else [])
     ],
     None
