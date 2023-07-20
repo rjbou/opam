@@ -489,12 +489,21 @@ let t_resolve_command =
       else name
     in
     let possibles =
+      OpamConsole.error "looking for %s" name;
       OpamStd.List.filter_map (fun path ->
           let candidate = Filename.concat path name in
+          OpamConsole.warning "file ? %B directory ? %B path %s"
+            (Sys.file_exists candidate) (Sys.is_directory candidate)
+            (String.map (function '/' -> '|' | c -> c) path);
           if Sys.file_exists candidate && not (Sys.is_directory candidate) then
             Some candidate else None)
         path
     in
+    OpamConsole.error "possibles %s"
+      (OpamStd.List.to_string (fun x ->
+           Printf.sprintf "%s:%B"
+             (String.map (function '/' -> '|' | c -> c) x) (check_perms x))
+          possibles);
     match List.find check_perms possibles with
     | cmdname -> `Cmd cmdname
     | exception Not_found ->
