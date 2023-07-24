@@ -493,7 +493,9 @@ let t_resolve_command =
       OpamStd.List.filter_map (fun path ->
           let candidate = Filename.concat path name in
           OpamConsole.warning "file ? %B directory ? %B path %s"
-            (Sys.file_exists candidate) (Sys.is_directory candidate)
+            (Sys.file_exists candidate)
+            (try Sys.is_directory candidate
+            with Sys_error _ -> false)
             (String.map (function '/' -> '|' | c -> c) path);
           if Sys.file_exists candidate && not (Sys.is_directory candidate) then
             Some candidate else None)
