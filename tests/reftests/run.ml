@@ -156,6 +156,7 @@ let escape_regexps s =
   Buffer.contents buf
 
 let str_replace_path ?escape whichway filters s =
+let whichway x = x in
   let s =
     match escape with
     | Some `Unescape -> Re.(replace_string (compile @@ str "\\\\") ~by:"\\" s)
