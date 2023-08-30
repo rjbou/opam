@@ -34,6 +34,15 @@ pin-depends: [
   [ "pinned.1" "/my/../pinned/package" ]
 ]
 ### opam lint ./lint.opam
+url                               |backend|relative|escapable|final
+file://./my/url/path              |true   |true    |false    |true
+file:///good/mirror               |true   |false   |false    |false
+file:///wrong/../mirror           |true   |false   |true     |true
+file:///another/./mirror/         |true   |false   |false    |false
+git+file://./../to@li.nt          |true   |true    |true     |true
+file:///my/./../extrasource/path  |true   |false   |true     |true
+file:///my/extrasource..path.patch|true   |false   |false    |false
+file:///my/../pinned/package      |true   |false   |true     |true
 ${BASEDIR}/lint.opam: Errors.
              error 65: URLs must be absolute: "./my/url/path", "/wrong/../mirror", "./../to@li.nt", "/my/./../extrasource/path", "/my/../pinned/package"
 # Return code 1 #

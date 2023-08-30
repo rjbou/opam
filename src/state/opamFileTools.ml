@@ -811,6 +811,31 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
 *)
     (let relative =
        let open OpamUrl in
+       let _ =
+         let acc =
+           List.map (fun u ->
+               [
+                 (OpamUrl.to_string u);
+                 string_of_bool (match u.backend, u.transport with
+                     | (#version_control | `rsync),
+                       ("file" | "path" | "local" | "rsync") -> true
+                     | _, _ -> false);
+                 string_of_bool (Filename.is_relative u.path);
+                 string_of_bool (OpamFilename.is_escapable u.path);
+                 string_of_bool
+                 ((match u.backend, u.transport with
+                  | (#version_control | `rsync),
+                    ("file" | "path" | "local" | "rsync") -> true
+                  | _, _ -> false)
+                 && (Filename.is_relative u.path
+                     || OpamFilename.is_escapable u.path)) ;
+               ]
+             ) (all_urls t)
+         in
+         if acc = [] then () else
+         OpamConsole.print_table stdout ~sep:"|"
+           (OpamStd.Format.align_table @@ [ "url"; "backend" ; "relative"; "escapable"; "final" ] :: acc)
+       in
        List.filter (fun u ->
            (* OpamUrl.local_dir is not used because it checks the existence of
               the directory *)
@@ -819,7 +844,8 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
               ("file" | "path" | "local" | "rsync") -> true
             | _, _ -> false)
            && (Filename.is_relative u.path
-               || OpamFilename.is_escapable u.path))
+               || OpamFilename.is_escapable u.path)
+         )
          (all_urls t)
      in
      cond 65 `Error
