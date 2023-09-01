@@ -156,7 +156,7 @@ let escape_regexps s =
   Buffer.contents buf
 
 let str_replace_path ?escape whichway filters s =
-let whichway x = x in
+(* let whichway x = x in *)
   let s =
     match escape with
     | Some `Unescape -> Re.(replace_string (compile @@ str "\\\\") ~by:"\\" s)
@@ -487,11 +487,15 @@ let common_filters ?opam dir =
      GrepV;
      seq [bol; str cmd_prompt],
      Sed "##% ";
-     alt [str dir; str (OpamSystem.back_to_forward dir)],
+     str dir,
+     (*      alt [str dir; str (OpamSystem.back_to_forward dir)], *)
      Sed "${BASEDIR}";
      seq [opt (str "/private");
+          str tmpdir;
+(*
           alt [str tmpdir;
                str (OpamSystem.back_to_forward tmpdir)];
+*)
           rep (set "/\\");
           str "opam-";
           rep1 (alt [xdigit; char '-'])],
