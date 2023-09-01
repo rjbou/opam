@@ -492,11 +492,12 @@ let t_resolve_command =
       OpamConsole.error "looking for %s" name;
       OpamStd.List.filter_map (fun path ->
           let candidate = Filename.concat path name in
-          OpamConsole.warning "file ? %B directory ? %B path %s"
+          OpamConsole.warning "file ? %B directory ? %B path %s exists ? %B"
             (Sys.file_exists candidate)
             (try Sys.is_directory candidate
             with Sys_error _ -> false)
-            (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) path);
+            (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) path)
+            (Sys.file_exists path);
           if Sys.file_exists candidate && not (Sys.is_directory candidate) then
             Some candidate else None)
         path
