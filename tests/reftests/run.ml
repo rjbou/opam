@@ -727,7 +727,7 @@ let run_test ?(vars=[]) ~opam t =
           List.fold_left
             (fun vars -> fun (v, op, r) ->
                let r' =
-                 str_replace_path ~escape:`Backslashes
+                 str_replace_path ~escape:`Unescape
                    OpamSystem.forward_to_back (filters_of_var vars) r
                in
                let value =
