@@ -421,18 +421,59 @@ module Parse = struct
           | "|" :: "unordered" :: r ->
             get_rewr (true, acc) r
           | "|" :: "sed-cmd" :: cmd :: r ->
+            let repn r = repn r 1 None in
             let re =
-              seq [
-                Re.str "+ ";
-                rep any;
-                alt [ set "/\\\"" ];
-                Re.str cmd;
-                opt @@ Re.str ".exe";
-                opt @@ char '"';
-                Re.str " "
+              alt [
+              (* Sandbox prefix
+              >[...] /tmp/build_592d92_dune/opam-reftest-2b89f9/OPAM/opam-init/hooks/sandbox.sh "build" "cmd" <
+              >[...] ${BASEDIR}/opam-init/hooks/sandbox.sh "build" "cmd" <
+              -->
+              >[...] cmd <
+              *)
+                seq [
+                  alt [ char '/'; Re.str "${"; ];
+                  repn any; Re.str "sandbox.sh";
+                  space;
+                  char '"';
+                  alt @@ List.map Re.str [ "build"; "install"; "remove" ];
+                  char '"';
+                  space;
+                  char '"'; Re.str cmd; char '"';
+                  space;
+                ];
+                (* Unix & Mac command prefix
+                >[...] /usr/bin/cmd <
+                >[...] /usr/bin/cmd <
+                -->
+                >[...] cmd <
+                *)
+                seq [
+                  opt @@ char '"';
+                  repn @@ seq [ char '/'; repn @@ diff any (char '/') ];
+                  char '/';
+                  Re.str cmd;
+                  opt @@ char '"';
+                  space
+                ];
+                (* Windows command prefix
+                >[...] C:\Windows\system32\cmd.exe <
+                >[...] C:\Windows\system32\cmd <
+                >[...] C:\Windows\system 32\cmd <
+                -->
+                >[...] cmd <
+                *)
+                seq [
+                  opt @@ char '"';
+                  alpha; char ':';
+                  repn @@ seq [ char '\\'; repn @@ diff any (char '\\') ];
+                  char '\\';
+                  Re.str cmd;
+                  opt @@ Re.str ".exe";
+                  opt @@ char '"';
+                  space
+                ]
               ]
-(*                 Printf.sprintf "+ .*(/|\\\\|\")%s(\\.exe)?\"? " cmd *)
-                in
+            in
             let str = Printf.sprintf "%s " cmd in
             get_rewr (unordered, (re, Sed str) :: acc) r
           | ">$" :: output :: [] ->
