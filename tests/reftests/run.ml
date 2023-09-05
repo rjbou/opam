@@ -179,8 +179,16 @@ let str_replace_path ?escape whichway filters s =
         ) in
       match by with
       | Sed by ->
+      let r =
         Re.replace (Re.compile re_path) s ~f:(fun g ->
             escape_regexps by ^ escape_backslashes (whichway (Re.Group.(get g (nb_groups g - 1)))))
+            in
+            if OpamStd.String.contains ~sub:"sandbox" s then
+            OpamConsole.error "---\n%s\n%s"
+            s
+            r
+            ;
+            r
       | Grep | GrepV ->
         if (by = Grep) = Re.execp (Re.compile re) s then s else "\\c")
     s filters
