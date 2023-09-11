@@ -469,12 +469,13 @@ let t_resolve_command =
       else `Cmd name
     end else if is_external_cmd name then begin
       (* relative path *)
-      let cmd = match dir with
+      let cmd_ = match dir with
         | None -> name
         | Some d -> Filename.concat d name
       in
-      if not (Sys.file_exists cmd) then `Not_found
-      else if not (check_perms cmd) then `Denied
+      let cmd = name in
+      if not (Sys.file_exists cmd_) then `Not_found
+      else if not (check_perms cmd_) then `Denied
       else `Cmd cmd
     end else
     (* bare command, lookup in PATH *)

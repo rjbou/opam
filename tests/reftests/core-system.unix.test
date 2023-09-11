@@ -62,8 +62,8 @@ The following actions will be performed:
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  2/3: [foo: ./configure]
-+ ${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1/./configure  (CWD=${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1)
-- I have $0 as ${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1/./configure
++ ./configure  (CWD=${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1)
+- I have $0 as ./configure
 -> compiled  foo.1
 -> installed foo.1
 Done.
