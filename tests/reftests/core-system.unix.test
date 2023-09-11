@@ -1,0 +1,69 @@
+N0REP0
+### rm -rf OPAM
+### <pkg:comp.1>
+opam-version: "2.0"
+flags: compiler
+### <pkg:foo.1>
+opam-version: "2.0"
+build: [["./configure" ]]
+### <pkg:foo.1:configure>
+#!/bin/sh
+echo "I have \$0 as $0"
+### chmod +x REPO/packages/foo/foo.1/files/configure
+### sh  REPO/packages/foo/foo.1/files/configure
+I have $0 as REPO/packages/foo/foo.1/files/configure
+### opam init -na REPO --root ./OPAMSB --compiler comp --bypass-checks
+No configuration file found, using built-in defaults.
+
+<><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
+[default] Initialised
+
+<><> Creating initial switch 'comp' (invariant ["comp"]) ><><><><><><><><><><><>
+
+<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+Switch invariant: ["comp"]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed comp.1
+Done.
+### opam init -na REPO --root ./OPAMNOSB --disable-sandboxing --compiler comp
+No configuration file found, using built-in defaults.
+Checking for available remotes: rsync and local, git, mercurial, darcs. Perfect!
+
+<><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
+[default] Initialised
+
+<><> Creating initial switch 'comp' (invariant ["comp"]) ><><><><><><><><><><><>
+
+<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+Switch invariant: ["comp"]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed comp.1
+Done.
+### OPAMVERBOSE=2
+### opam install foo --root ./OPAMSB
+The following actions will be performed:
+=== install 1 package
+  - install foo 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/3: [foo: ./configure]
++ ${BASEDIR}/OPAMSB/opam-init/hooks/sandbox.sh "build" "./configure" (CWD=${BASEDIR}/OPAMSB/comp/.opam-switch/build/foo.1)
+- I have $0 as ./configure
+-> compiled  foo.1
+-> installed foo.1
+Done.
+### #OCAMLRUNPARAM=b OPAMDEBUG=1
+### opam install foo --root ./OPAMNOSB
+The following actions will be performed:
+=== install 1 package
+  - install foo 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Processing  2/3: [foo: ./configure]
++ ${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1/./configure  (CWD=${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1)
+- I have $0 as ${BASEDIR}/OPAMNOSB/comp/.opam-switch/build/foo.1/./configure
+-> compiled  foo.1
+-> installed foo.1
+Done.
