@@ -500,7 +500,7 @@ let t_resolve_command =
             (Sys.file_exists path);
           if Sys.file_exists candidate && not (Sys.is_directory candidate) then
             Some candidate else None)
-        path
+        (Sys.getcwd () ::path)
     in
     OpamConsole.error "possibles %s"
       (OpamStd.List.to_string (fun x ->

@@ -29,4 +29,3 @@ system
 echo
 ### opam exec --no-switch -- echo system
 echo
-### sh -c "pwd | xargs sed -e 's/\//|/g'"
