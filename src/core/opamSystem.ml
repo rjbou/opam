@@ -489,7 +489,7 @@ let t_resolve_command =
       else name
     in
     let seps = String.map (function '/' -> '|' | '\\' -> '!' | c -> c) in
-    let dirs =
+    let _dirs =
       let pwd = Sys.getcwd () in
       let sel rec_ =
         List.filter (fun s ->
@@ -507,6 +507,7 @@ let t_resolve_command =
         (item rec_files);
       sel rec_dirs
     in
+(*
     let _check_path =
       match List.find_opt (fun s -> OpamStd.String.contains ~sub:"opam-reftest" s) path, dirs with
       | Some path, [dir] ->
@@ -520,6 +521,7 @@ let t_resolve_command =
            done)
       | _, _ -> OpamConsole.note "not found"
     in
+*)
     let possibles =
       OpamConsole.error "looking for %s" name;
       OpamStd.List.filter_map (fun path ->
