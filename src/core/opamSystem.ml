@@ -492,8 +492,8 @@ let t_resolve_command =
     let pwd = Sys.getcwd () in
     OpamConsole.error "------\n%s\n---\n%s\n---\n%s\n-------"
     pwd
-    (OpamStd.Format.itemize (fun x -> x) (List.filter (fun s -> not (OpamStd.String.contains ~sub:"OPAM" s)) @@ rec_files pwd))
-    (OpamStd.Format.itemize (fun x -> x) (List.filter (fun s -> not (OpamStd.String.contains ~sub:"OPAM" s)) @@ rec_dirs pwd))
+    (OpamStd.Format.itemize (fun x -> x) (List.filter_map (fun s -> if (OpamStd.String.contains ~sub:"OPAM" s) then None else Some (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) s)) @@ rec_files pwd))
+    (OpamStd.Format.itemize (fun x -> x) (List.filter_map (fun s -> if (OpamStd.String.contains ~sub:"OPAM" s) then None else Some (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) s)) @@ rec_dirs pwd))
     in
     let possibles =
       OpamConsole.error "looking for %s" name;
