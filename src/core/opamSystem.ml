@@ -489,20 +489,29 @@ let t_resolve_command =
       else name
     in
     let _ =
-    let pwd = Sys.getcwd () in
-    OpamConsole.error "------\n%s\n---\n%s\n---\n%s\n-------"
-    pwd
-    (OpamStd.Format.itemize (fun x -> x) (List.filter_map (fun s -> if (OpamStd.String.contains ~sub:"OPAM" s) then None else Some (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) s)) @@ rec_files pwd))
-    (OpamStd.Format.itemize (fun x -> x) (List.filter_map (fun s -> if (OpamStd.String.contains ~sub:"OPAM" s) then None else Some (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) s)) @@ rec_dirs pwd))
+      let pwd = Sys.getcwd () in
+      let aux rec_ =
+        List.filter_map (fun s ->
+            if (OpamStd.String.contains ~sub:"OPAM" s) then None else
+              Some (
+                (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) s),
+                Sys.file_exists s))
+          (rec_ pwd)
+      in
+      let item rec_ = OpamStd.Format.itemize (fun (p,x) -> Printf.sprintf "%s -- %B" p x) (aux rec_) in
+      OpamConsole.error "------\n%s\n---\n%s\n---\n%s\n-------"
+        pwd
+        (item rec_dirs)
+        (item rec_files)
     in
     let possibles =
       OpamConsole.error "looking for %s" name;
       OpamStd.List.filter_map (fun path ->
           let candidate = Filename.concat path name in
-          OpamConsole.warning "file ? %B directory ? %B path %s exists ? %B"
+          OpamConsole.warning "candidate file ? %B directory ? %B -- path %s exists ? %B"
             (Sys.file_exists candidate)
             (try Sys.is_directory candidate
-            with Sys_error _ -> false)
+             with Sys_error _ -> false)
             (String.map (function '/' -> '|' | '\\' -> '!' | c -> c) path)
             (Sys.file_exists path);
           if Sys.file_exists candidate && not (Sys.is_directory candidate) then
