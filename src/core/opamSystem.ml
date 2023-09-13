@@ -491,25 +491,34 @@ let t_resolve_command =
     let seps = String.map (function '/' -> '|' | '\\' -> '!' | c -> c) in
     let dirs =
       let pwd = Sys.getcwd () in
-      let aux rec_ =
-        List.filter_map (fun s ->
-            if (OpamStd.String.contains ~sub:"OPAM" s) || (OpamStd.String.contains ~sub:"REPO" s) then None else
-              Some ((seps s), Sys.file_exists s))
+      let sel rec_ =
+        List.filter (fun s ->
+            not ((OpamStd.String.contains ~sub:"OPAM" s) || (OpamStd.String.contains ~sub:"REPO" s)))
           (rec_ pwd)
+      in
+      let aux rec_ =
+        List.map (fun s -> (seps s), Sys.file_exists s)
+        (sel rec_)
       in
       let item rec_ = OpamStd.Format.itemize (fun (p,x) -> Printf.sprintf "%s -- %B" p x) (aux rec_) in
       OpamConsole.error "------\n%s\n---\n%s\n---\n%s\n-------"
         pwd
         (item rec_dirs)
         (item rec_files);
-aux rec_dirs
+      sel rec_dirs
     in
     let _check_path =
-    match List.find_opt (fun s -> OpamStd.String.contains ~sub:"Temp" s) path, dirs with
-    | Some path, [(dir,_)] ->
-    OpamConsole.error "found %s" (seps path);
-    OpamConsole.error "is it the same %B lentgth %B" (String.equal path dir) (String.length path = String.length dir);
-    | None, _ -> OpamConsole.note "not found"
+      match List.find_opt (fun s -> OpamStd.String.contains ~sub:"opam-reftest" s) path, dirs with
+      | Some path, [dir] ->
+        OpamConsole.error "found %s" (seps path);
+        OpamConsole.error "is it the same %B lentgth %B" (String.equal path dir) (String.length path = String.length dir);
+        if not (String.equal path dir) then
+          (for i = 0 to (max (String.length dir) (String.length path)) do
+             let p = try path.[i] with Invalid_argument _ -> 'X' in
+             let d = try dir.[i] with Invalid_argument _ -> 'X' in
+             OpamConsole.note "'%c' - '%c' - %B" p d (Char.equal p d)
+           done)
+      | _, _ -> OpamConsole.note "not found"
     in
     let possibles =
       OpamConsole.error "looking for %s" name;
