@@ -10,7 +10,7 @@ system
 system
 ### :I:b: is a directory
 ### mkdir -p bin/echo
-### PATH+=$BASEDIR/bin/
+### PATH+=$BASEDIR/bin
 ### opam exec -- echo system
 system
 ### opam exec --no-switch -- echo system
