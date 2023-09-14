@@ -9,14 +9,14 @@ system
 ### opam exec --no-switch -- echo system
 system
 ### :I:b: is a directory
-### mkdir -p bin/echo
+### mkdir -p bin/echo bin/echo.exe
 ### PATH+=$BASEDIR/bin
 ### opam exec -- echo system
 system
 ### opam exec --no-switch -- echo system
 system
 ### :I:c: is not executable
-### rm -rf bin/echo
+### rm -rf bin/echo bin/echo.exe
 ### <bin/echo>
 echo 'echo'
 ### <bin/echo.exe>
@@ -26,7 +26,7 @@ system
 ### opam exec --no-switch -- echo system
 system
 ### :I:d: is executable
-### chmod +x bin/echo
+### chmod +x bin/echo bin/echo.exe
 ### opam exec -- echo system
 echo
 ### opam exec --no-switch -- echo system
