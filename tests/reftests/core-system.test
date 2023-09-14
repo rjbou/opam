@@ -16,7 +16,7 @@ system
 ### opam exec --no-switch -- echo system
 system
 ### :I:c: is not executable
-### rm -rf bin/echo bin/echo.exe
+### rm -rf bin
 ### <bin/echo>
 echo 'echo'
 ### <bin/echo.exe>
