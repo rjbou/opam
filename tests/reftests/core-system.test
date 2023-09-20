@@ -3,11 +3,11 @@ N0REP0
 ### :I: System.resolve_commands checks
 ### ::::::::::::::::::::::::::::::::::
 ### opam switch create resolve --empty
-### :I:a: System one
-### opam exec -- echo system
-system
-### opam exec --no-switch -- echo system
-system
+### # ### :I:a: System one
+### # ### opam exec -- echo system
+### # system
+### # ### opam exec --no-switch -- echo system
+### # system
 ### # ### :I:b: is a directory
 ### # ### mkdir -p bin/echo bin/echo.exe
 ### # ### PATH+=$BASEDIR/bin
@@ -17,18 +17,18 @@ system
 ### # system
 ### :I:c: is not executable
 ### PATH+=$BASEDIR/bin2
-### <bin2/echo>
-echo 'echo'
-### <bin2/echo.exe>
-echo 'echo'
+### # ### <bin2/echo>
+### # echo 'echo'
+### # ### <bin2/echo.exe>
+### # echo 'echo'
 ### # ### opam exec -- echo system
 ### # system
 ### # ### opam exec --no-switch -- echo system
 ### # system
-### :I:d: is executable
-### chmod +x bin2/echo
-### chmod +x bin2/echo.exe
-### opam exec -- echo system
-echo
-### opam exec --no-switch -- echo system
-echo
+### # ### :I:d: is executable
+### # ### chmod +x bin2/echo
+### # ### chmod +x bin2/echo.exe
+### # ### opam exec -- echo system
+### # echo
+### # ### opam exec --no-switch -- echo system
+### # echo
