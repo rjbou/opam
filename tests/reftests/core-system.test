@@ -21,8 +21,8 @@ N0REP0
 echo 'echo'
 ### <bin2/echo.exe>
 echo 'echo'
-### # ### opam exec -- echo system
-### # system
+### opam exec -- echo system
+system
 ### # ### opam exec --no-switch -- echo system
 ### # system
 ### # ### :I:d: is executable
