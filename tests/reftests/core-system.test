@@ -8,13 +8,6 @@ N0REP0
 system
 ### opam exec --no-switch -- echo system
 system
-### :I:b: is a directory
-### mkdir -p bin/echo bin/echo.exe
-### PATH+=$BASEDIR/bin
-### opam exec -- echo system
-system
-### opam exec --no-switch -- echo system
-system
 ### :I:c: is not executable
 ### PATH+=$BASEDIR/bin2
 ### <bin2/echo>
@@ -32,3 +25,10 @@ system
 echo
 ### opam exec --no-switch -- echo system
 echo
+### :I:b: is a directory
+### mkdir -p bin/echo bin/echo.exe
+### PATH+=$BASEDIR/bin
+### opam exec -- echo system
+system
+### opam exec --no-switch -- echo system
+system
