@@ -16,4 +16,18 @@ system
 ### opam exec --no-switch -- echo system
 system
 ### :I:c: is not executable
-### ls -lah bin
+### PATH+=$BASEDIR/bin2
+### <bin2/echo>
+echo 'echo'
+### <bin2/echo.exe>
+echo 'echo'
+### opam exec -- echo system
+system
+### opam exec --no-switch -- echo system
+system
+### :I:d: is executable
+### chmod +x bin/echo bin/echo.exe
+### opam exec -- echo system
+echo
+### opam exec --no-switch -- echo system
+echo
