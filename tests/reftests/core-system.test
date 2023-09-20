@@ -8,27 +8,27 @@ N0REP0
 system
 ### opam exec --no-switch -- echo system
 system
-### # ### :I:b: is a directory
-### # ### mkdir -p bin/echo bin/echo.exe
-### # ### PATH+=$BASEDIR/bin
+### :I:b: is a directory
+### mkdir -p bin/echo bin/echo.exe
+### PATH+=$BASEDIR/bin
+### opam exec -- echo system
+system
+### opam exec --no-switch -- echo system
+system
+### # ### :I:c: is not executable
+### # ### PATH+=$BASEDIR/bin2
+### # ### <bin2/echo>
+### # echo 'echo'
+### # ### <bin2/echo.exe>
+### # echo 'echo'
 ### # ### opam exec -- echo system
 ### # system
 ### # ### opam exec --no-switch -- echo system
 ### # system
-### :I:c: is not executable
-### PATH+=$BASEDIR/bin2
-### <bin2/echo>
-echo 'echo'
-### <bin2/echo.exe>
-echo 'echo'
-### opam exec -- echo system
-system
-### opam exec --no-switch -- echo system
-system
-### :I:d: is executable
-### chmod +x bin2/echo
-### chmod +x bin2/echo.exe
-### opam exec -- echo system
-echo
-### opam exec --no-switch -- echo system
-echo
+### # ### :I:d: is executable
+### # ### chmod +x bin2/echo
+### # ### chmod +x bin2/echo.exe
+### # ### opam exec -- echo system
+### # echo
+### # ### opam exec --no-switch -- echo system
+### # echo
