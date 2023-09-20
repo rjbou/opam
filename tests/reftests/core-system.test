@@ -17,8 +17,8 @@ N0REP0
 ### # system
 ### :I:c: is not executable
 ### PATH+=$BASEDIR/bin2
-### # ### <bin2/echo>
-### # echo 'echo'
+### <bin2/echo>
+echo 'echo'
 ### # ### <bin2/echo.exe>
 ### # echo 'echo'
 ### # ### opam exec -- echo system
