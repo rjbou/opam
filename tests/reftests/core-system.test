@@ -19,8 +19,8 @@ N0REP0
 ### PATH+=$BASEDIR/bin2
 ### <bin2/echo>
 echo 'echo'
-### # ### <bin2/echo.exe>
-### # echo 'echo'
+### <bin2/echo.exe>
+echo 'echo'
 ### # ### opam exec -- echo system
 ### # system
 ### # ### opam exec --no-switch -- echo system
