@@ -27,7 +27,7 @@ system
 system
 ### # ### :I:d: is executable
 ### chmod +x bin2/echo
-### # ### chmod +x bin2/echo.exe
+### chmod +x bin2/echo.exe
 ### # ### opam exec -- echo system
 ### # echo
 ### # ### opam exec --no-switch -- echo system
