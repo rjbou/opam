@@ -30,5 +30,5 @@ system
 ### chmod +x bin2/echo.exe
 ### opam exec -- echo system
 echo
-### # ### opam exec --no-switch -- echo system
-### # echo
+### opam exec --no-switch -- echo system
+echo
