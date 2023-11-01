@@ -527,7 +527,7 @@ let compilation_env t opam =
   let cygwin_env =
     match OpamSysInteract.Cygwin.cygbin_opt t.switch_global.config with
     | Some cygbin ->
-      [ "PATH", EqPlus, OpamFilename.Dir.to_string cygbin, Some "Cygwin path" ]
+      [ "PATH", PlusEq, OpamFilename.Dir.to_string cygbin, Some "Cygwin path" ]
     | None -> []
   in
   let scrub = OpamClientConfig.(!r.scrubbed_environment_variables) in
