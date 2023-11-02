@@ -102,6 +102,11 @@ val header_msg : ('a, unit, string, unit) format4 -> 'a
 val header_error :
   ('a, unit, string, ('b, unit, string, unit) format4 -> 'b) format4 -> 'a
 
+(** Disable automatic addition of carriage return on Windows or Cygwin if
+    output is not tty on given continuation.
+    Otherwise, just applies the continuation. *)
+val disable_carriage_return: (unit -> unit) -> unit
+
 (** Erase the current line on stdout (doesn't flush stdout) *)
 val carriage_delete: unit -> unit
 

@@ -434,6 +434,21 @@ let win32_print_message ch msg =
       flush ocaml_ch;
       f 0 0 false
 
+let disable_carriage_return =
+  if Sys.win32 && not OpamStd.Sys.tty_out then
+    let m = Mutex.create () in
+    fun k ->
+      OpamCompat.Mutex.protect m @@ fun () ->
+      let old_value_out = OpamStubs.getBinaryMode stdout in
+      let old_value_err = OpamStubs.getBinaryMode stderr in
+      if old_value_out && old_value_err then k () else
+        (set_binary_mode_out stdout true;
+         set_binary_mode_out stderr true;
+         k ();
+         set_binary_mode_out stdout old_value_out;
+         set_binary_mode_out stderr old_value_err)
+  else fun k -> k ()
+
 let carriage_delete_unix _ =
   print_string "\r\027[K"
 
