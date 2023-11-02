@@ -67,7 +67,7 @@ let possibly_unix_path_env_value k v =
     (Lazy.force OpamSystem.get_cygpath_path_transform) ~pathlist:true v
   else v
 
-let rec print_env = function
+let rec print_env_t = function
   | [] -> ()
   | (k, v, comment) :: r ->
     if OpamConsole.verbose () then
@@ -77,9 +77,13 @@ let rec print_env = function
       let v' = possibly_unix_path_env_value k v in
       OpamConsole.msg "%s='%s'; export %s;\n"
         k (OpamStd.Env.escape_single_quotes v') k);
-    print_env r
+    print_env_t r
 
-let rec print_csh_env = function
+let print_env env =
+  OpamConsole.disable_carriage_return @@ fun () ->
+  print_env_t env
+
+let rec print_csh_env_t = function
   | [] -> ()
   | (k, v, comment) :: r ->
     if OpamConsole.verbose () then
@@ -89,7 +93,11 @@ let rec print_csh_env = function
       let v' = possibly_unix_path_env_value k v in
       OpamConsole.msg "setenv %s '%s';\n"
         k (OpamStd.Env.escape_single_quotes v'));
-    print_csh_env r
+    print_csh_env_t r
+
+let print_csh_env env =
+  OpamConsole.disable_carriage_return @@ fun () ->
+  print_csh_env_t env
 
 let rec print_pwsh_env = function
   | [] -> ()
@@ -135,7 +143,7 @@ let print_sexp_env env =
   aux env;
   OpamConsole.msg ")\n"
 
-let rec print_fish_env env =
+let rec print_fish_env_t env =
   let set_arr_cmd ?(modf=fun x -> x) k v =
     let v = modf @@ OpamStd.String.split v ':' in
     OpamConsole.msg "set -gx %s %s;\n" k
@@ -173,7 +181,11 @@ let rec print_fish_env env =
        | _ ->
          OpamConsole.msg "set -gx %s '%s';\n"
            k (OpamStd.Env.escape_single_quotes ~using_backslashes:true v));
-    print_fish_env r
+    print_fish_env_t r
+
+let print_fish_env env =
+  OpamConsole.disable_carriage_return @@ fun () ->
+  print_fish_env_t env
 
 let print_eval_env ~csh ~sexp ~fish ~pwsh ~cmd env =
   let env = (env : OpamTypes.env :> (string * string * string option) list) in

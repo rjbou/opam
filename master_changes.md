@@ -45,6 +45,9 @@ users)
 
 ## Exec
 
+## Env
+  * Fix `opam env` containing carriage return on Cygwin [#5715 @rjbou - fix #5684]
+
 ## Source
 
 ## Lint
