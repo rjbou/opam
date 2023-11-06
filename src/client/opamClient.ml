@@ -949,6 +949,7 @@ let windows_checks ?cygwin_setup ?gitbin config =
         (OpamFilename.Dir.of_string gitbin) config
     | None -> config
   in
+  assert false;
   config
 
 let update_with_init_config ?(overwrite=false) config init_config =

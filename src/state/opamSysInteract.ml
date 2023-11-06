@@ -281,6 +281,7 @@ module Cygwin = struct
     let cygwin_root = internal_cygroot () in
     let cygwin_bin = cygwin_root / "bin" in
     let cygcheck = cygwin_bin // cygcheckexe in
+(*
     let local_cygwin_setupexe = cygsetup () in
     if OpamFilename.exists cygcheck then
       OpamConsole.warning "Cygwin already installed in root %s"
@@ -318,6 +319,7 @@ module Cygwin = struct
          args @@> fun r ->
        OpamSystem.raise_on_process_error r;
        Done ());
+*)
     cygcheck
 
   let default_cygroot = "C:\\cygwin64"
@@ -1015,6 +1017,8 @@ let install ?env config packages =
   if OpamSysPkg.Set.is_empty packages then
     log "Nothing to install"
   else
+  OpamConsole.error "installed %s" (OpamSysPkg.Set.to_string packages)
+(*
     let commands, vars = install_packages_commands_t ?env config packages in
     let vars = OpamStd.Option.map (List.map (fun x -> `add, x)) vars in
     List.iter
@@ -1022,6 +1026,7 @@ let install ?env config packages =
          try sudo_run_command ?env ?vars cmd args
          with Failure msg -> failwith ("System package install " ^ msg))
       commands
+*)
 
 let update ?(env=OpamVariable.Map.empty) config =
   let cmd =
