@@ -128,6 +128,7 @@ users)
   * Add environment variables path addition [#5606 @rjbou]
   * Remove duplicated environment variables in environmenet [#5606 @rjbou]
   * Add `PATH` to replaceable variables [#5606 @rjbou]
+  * Set `SHELL` to `/bin/sh` in Windows to ensure `opam env` commands are consistent [#5723 @dra27]
 
 ## Github Actions
   * Add coreutils install for cheksum validation tests [#5560 @rjbou]
