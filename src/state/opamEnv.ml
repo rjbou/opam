@@ -83,7 +83,7 @@ let resolve_separator_and_format :
           (OpamStd.List.assoc OpamVariable.equal fv)
           OpamSysPoll.variables >>= Lazy.force))
   in
-  let resolve var to_str ~default formula =
+  let resolve var to_str formula =
     let evaluated =
       OpamFormula.map (fun (x, filter) ->
           let eval = OpamFilter.eval_to_bool ~default:false env filter in
@@ -94,8 +94,8 @@ let resolve_separator_and_format :
           | x -> x)
     in
     match evaluated with
-    | Empty  -> default
-    | Atom (x, FBool true) -> x
+    | Empty  -> None
+    | Atom (x, FBool true) -> Some x
     | _ ->
       let sep, pfmt = default_sep_fmt_str var in
       OpamConsole.error
@@ -106,23 +106,30 @@ let resolve_separator_and_format :
              OpamFilter.to_string f) formula)
         (char_of_separator sep)
         (string_of_path_format pfmt);
-      default
+      None
   in
   fun upd ->
     let var = upd.envu_var in
     let envu_rewrite =
       match upd.envu_rewrite with
       | Some (SPF_Unresolved (sep_f, pfmt_f)) ->
-        let def_sep, def_fmt = default_sep_fmt_str var in
+        let def_sep, def_pfmt = default_sep_fmt_str var in
         let sep =
           resolve upd.envu_var
             (fun sep -> String.make 1 (char_of_separator sep))
-            ~default:def_sep sep_f
+            sep_f
         in
         let pfmt =
-          resolve upd.envu_var string_of_path_format ~default:def_fmt pfmt_f
+          resolve upd.envu_var string_of_path_format pfmt_f
         in
-        Some (SPF_Resolved (Some (sep, pfmt)))
+        let sep_pfmt =
+          match sep, pfmt with
+          | Some sep, Some pfmt -> Some (sep, pfmt)
+          | Some sep, None -> Some (sep, def_pfmt)
+          | None, Some pfmt -> Some (def_sep, pfmt)
+          | None, None -> None
+        in
+        Some (SPF_Resolved (sep_pfmt))
       | Some (SPF_Resolved _) -> upd.envu_rewrite
       | None -> None
     in
