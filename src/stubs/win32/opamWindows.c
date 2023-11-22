@@ -10,7 +10,11 @@
 
 /* We need the UTF16 conversion functions (which prior to 4.13 were internal)
    and also the internal length calculations functions, which are still
-   internal. */
+   internal.
+   We also need to use io.h binary mode getter (caml_channel_binary_mode) &
+   channel lock macros (Lock/Unlock) or functions
+   (caml_channel_lock/caml_channel_unlock) (see OPAMW_GetBinaryMode).
+   */
 #define CAML_INTERNALS
 
 #include <caml/mlvalues.h>
@@ -22,6 +26,7 @@
 #include <caml/osdeps.h>
 #include <caml/signals.h>
 #include <caml/unixsupport.h>
+#include <caml/io.h>
 
 #include <Windows.h>
 #include <Shlobj.h>
@@ -777,4 +782,23 @@ CAMLprim value OPAMW_GetConsoleWindowClass(value unit)
   }
 
   CAMLreturn(result);
+}
+
+/*
+ * OPAMW_GetBinaryMode(channel) takes an out channel and returns its current
+ * mode, true if binary, false if text.
+ * It uses [caml_channel_binary_mode].
+ */
+CAMLprim value OPAMW_GetBinaryMode(value vchannel) {
+
+  CAMLparam1 (vchannel);
+  struct channel *channel = Channel(vchannel);
+
+  int i;
+
+  Lock(channel);
+  i = caml_channel_binary_mode(channel);
+  Unlock(channel);
+
+  CAMLreturn (Val_bool(i));
 }

@@ -120,3 +120,4 @@ users)
 
 ## opam-core
   * `OpamSystem.apply_cygpath`: runs `cygpath` over the argument [#5723 @dra27 - function itself added in #3348]
+  * `OpamStubs`: add `getBinaryMode` to retrieve current mode of a channel, via `io.c/caml_channel_binary_mode` [#5715 @rjbou]

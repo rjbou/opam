@@ -135,3 +135,7 @@ val win_create_process : string -> string -> string option -> Unix.file_descr ->
 val getConsoleWindowClass : unit -> string option
 (** Windows only. Returns the name of the class for the Console window or [None]
     if there is no console. *)
+
+val getBinaryMode : out_channel -> bool
+(** Retrieve current binary ([true])  or text ([false]) mode, that can be set
+    by [set_binary_mode_{out,err}] functions. *)

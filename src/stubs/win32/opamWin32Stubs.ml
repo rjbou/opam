@@ -35,3 +35,4 @@ external sendMessageTimeout : nativeint -> int -> int -> 'a -> 'b -> 'c -> int *
 external getProcessAncestry : unit -> (int32 * string) list = "OPAMW_GetProcessAncestry"
 external getConsoleAlias : string -> string -> string = "OPAMW_GetConsoleAlias"
 external getConsoleWindowClass : unit -> string option = "OPAMW_GetConsoleWindowClass"
+external getBinaryMode: out_channel -> bool = "OPAMW_GetBinaryMode"
