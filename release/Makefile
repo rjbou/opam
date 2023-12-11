@@ -57,14 +57,14 @@ SHA_LINK = $(if $(shell tar xOf "$(OUTDIR)/opam-full-$(VERSION).tar.gz" opam-ful
 # Actually, this is for alpine 3.13, and varies
 CLINKING_linux = \
 -Wl,-Bstatic \
--lunix -lmccs_stubs -lmccs_glpk_stubs $(SHA_LINK) \
+-lunix -lthreads -lmccs_stubs -lmccs_glpk_stubs $(SHA_LINK) \
 -lstdc++ \
 -static-libgcc \
 -static
 # -Wl,-Bdynamic
 
 CLINKING_macos = \
--lunix -lmccs_stubs -lmccs_glpk_stubs $(SHA_LINK) \
+-lunix -lthreads -lmccs_stubs -lmccs_glpk_stubs $(SHA_LINK) \
 -lstdc++
 
 CLINKING_openbsd = $(CLINKING_macos)

@@ -68,6 +68,7 @@ users)
 ## VCS
 
 ## Build
+  * Add dependency to `base-threads` [#5715 @rjbou]
 
 ## Infrastructure
 
