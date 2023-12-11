@@ -147,3 +147,15 @@ Quoting commands for execution by cmd.exe is difficult.
 
   include Stdlib.Filename
 end
+
+module Mutex = struct
+
+  (* NOTE: OCaml >= 5.1 *)
+  let protect m k =
+    Mutex.lock m;
+    match k () with
+    | x -> Mutex.unlock m; x
+    | exception e -> Mutex.unlock m; raise e
+
+  include Mutex
+end

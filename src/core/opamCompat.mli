@@ -38,3 +38,12 @@ module Filename: sig
     string -> ?stdin:string -> ?stdout:string -> ?stderr:string
     -> string list -> string
 end
+
+module Mutex: sig
+
+  type t = Mutex.t
+
+  (* NOTE: OCaml >= 5.1 *)
+  val protect : t -> (unit -> 'a) -> 'a
+
+end
