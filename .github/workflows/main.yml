@@ -94,26 +94,6 @@ jobs:
       if: steps.archives.outputs.cache-hit != 'true'
       run: bash -exu .github/scripts/main/archives-cache.sh
 
-  Cygwin:
-    runs-on: windows-2019
-    needs: Analyse
-    steps:
-    - name: Cygwin64 Cache
-      id: cygwin64
-      uses: ocaml-opam/cache@opam
-      with:
-        path: D:\Cache\cygwin\x86_64-pc-cygwin
-        key: cygwin64-${{ needs.Analyse.outputs.cygwin }}
-        check-only: true
-        force-gzip: true
-    - name: Checkout tree
-      if: steps.cygwin64.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
-    - name: Create Cygwin64 cache
-      if: steps.cygwin64.outputs.cache-hit != 'true'
-      shell: cmd
-      run: .github\scripts\cygwin.cmd x86_64-pc-cygwin D:\Cache\cygwin create
-
 ####
 # Build
 ####
@@ -122,7 +102,7 @@ jobs:
     needs: Analyse
     strategy:
       matrix:
-        ocamlv: [ 4.08.1, 4.09.1, 4.10.2, 4.11.2, 4.12.1, 4.13.1, 5.0.0, 5.1.0, 4.14.1 ]
+        ocamlv: [ 4.08.1, 4.14.1 ]
       fail-fast: true
     steps:
     - name: Install bubblewrap
