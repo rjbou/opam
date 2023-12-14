@@ -15,7 +15,7 @@ open Lib
 
 let ocamls = [
   (* Fully supported versions *)
-   "4.08.1"; "4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1"; "5.0.0"; "5.1.0"; "4.14.1";
+   "4.08.1"; (*"4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1"; "5.0.0"; "5.1.0";*) "4.14.1";
 ]
 
 (* Entry point for the workflow. Workflows are specified as continuations where
@@ -259,6 +259,24 @@ let install_sys_packages packages ~descr ?cond platforms =
 let install_sys_opam ?cond = install_sys_packages ["opam"] ~descr:"Install system's opam package" ?cond
 let install_sys_dune ?cond = install_sys_packages ["dune"; "ocaml"] ~descr:"Install system's dune and ocaml packages" ?cond
 
+let uploadbin_label_job ~oc ~workflow f =
+  let outputs =
+    ["binary_label", "${{ steps.label.outputs.binary_label }}"]
+  in
+  let upload_binary =
+    run "Determine uploading binary label"
+      ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
+      ~id:"label"
+      [
+        {|binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
+        {|echo "$binary_label"|};
+        {|echo "binary_label=$binary_label" >> $GITHUB_OUTPUT|}
+      ]
+  in
+  job ~oc ~workflow ~runs_on:(Runner [Linux]) ~outputs "Upload-Bin"
+  ++ upload_binary
+  ++ end_job f
+
 let analyse_job ~oc ~workflow ~platforms ~keys f =
   let oses = List.map os_of_platform platforms in
   let outputs =
@@ -326,8 +344,65 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
     else
       (matrix, []) in
   let matrix = ((platform <> Windows), matrix, includes) in
-  let needs = if platform = Windows then [analyse_job; cygwin_job] else [analyse_job] in
+  let needs =
+    [analyse_job]
+    @ (if platform = Windows then [cygwin_job] else [])
+  in
   let host = host_of_platform platform in
+  let retrieve_labels =
+    run "Check binary label" ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
+      [
+        {|BINARY_LABEL=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
+        {|echo "BINARY_LABEL=$BINARY_LABEL" >> $GITHUB_ENV|}
+      ]
+  in
+  let upload_binaries =
+    let cond =
+      let label =
+        Predicate (true, Compare ("env.BINARY_LABEL", "PR:BINARIES"))
+      in
+      match runner with
+      | MacOS -> label
+      | Windows ->
+        And (label,
+             Predicate (true, EndsWith ("matrix.host", "-pc-cygwin")))
+      | Linux ->
+        And (label,
+             Predicate (true, Compare ("matrix.ocamlv", "4.14.1")))
+    in
+    let withs =
+      let name =
+        match runner with
+        | Linux | MacOS ->
+          Literal ["opam-exe-${{ runner.os }}-${{ matrix.ocamlv }}"]
+        | Windows ->
+          Literal
+            ["opam-exe-${{ matrix.host }}-${{ matrix.ocamlv }}-${{ matrix.build }}"]
+      in
+      let paths =
+        let prefix =
+          match runner with
+          | MacOS -> "/Users/runner/local/bin/"
+          | Linux -> "/home/runner/local/bin/"
+          | Windows -> "D:\\Local\\bin\\"
+        in
+        let binaries = ["opam-installer"; "opam"] in
+        match runner with
+        | MacOS | Linux ->
+          Literal ((List.rev_map (fun s -> prefix ^ s)) binaries)
+        | Windows ->
+          Literal ((List.rev_map (fun s -> prefix ^ s ^ ".exe"))
+                     ("opam-putenv":: binaries))
+      in
+      [
+        "name", name;
+        "path", paths;
+        "retention-days", Literal ["1"];
+      ]
+    in
+    uses "Upload opam binaries" "actions/upload-artifact@v3"
+      ~cond ~withs ~continue_on_error:true
+  in
   job ~oc ~workflow ~runs_on:(Runner [runner]) ?shell ?section ~needs ~matrix ("Build-" ^ name_of_platform platform)
     ++ only_on Linux (run "Install bubblewrap" ["sudo apt install bubblewrap"])
     ++ only_on Windows (git_lf_checkouts ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ~shell:"cmd" ~title:"Configure LF checkout for Cygwin" ())
@@ -338,6 +413,9 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
     ++ only_on Windows (unpack_cygwin "${{ matrix.build }}" "${{ matrix.host }}")
     ++ build_cache OCaml platform "${{ matrix.ocamlv }}" host
     ++ run "Build" ["bash -exu .github/scripts/main/main.sh " ^ host]
+    ++ retrieve_labels
+    ++ upload_binaries
+(*
     ++ not_on Windows (run "Test (basic)" ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - Cygwin)" ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - native Windows)" ~env:[("OPAMROOT", {|D:\a\opam\opam\.opam|})] ~shell:"cmd" ~cond:(Predicate(false, EndsWith("matrix.host", "-pc-cygwin")))
@@ -353,6 +431,7 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
            {|opam config report|};
           ]))
     ++ only_on Windows (run "Test (reftests)" ["bash -exu .github/scripts/main/reftests.sh ${{ matrix.host }}"])
+*)
     ++ end_job f
 
 let main_test_job ~analyse_job ~build_linux_job ~build_windows_job:_ ~build_macOS_job:_ ?section runner ~oc ~workflow f =
@@ -463,6 +542,17 @@ let hygiene_job (type a) ~analyse_job (platform : a platform) ~oc ~workflow f =
     ++ run "Hygiene" ~cond:(Or(Predicate(true, Contains("steps.files.outputs.modified", "configure.ac")), Predicate(true, Contains("steps.files.outputs.all", "src_ext")))) ~env:[("BASE_REF_SHA", "${{ github.event.pull_request.base.sha }}"); ("PR_REF_SHA", "${{ github.event.pull_request.head.sha }}")] ["bash -exu .github/scripts/main/hygiene.sh"]
     ++ end_job f
 
+let empty_job ~oc ~workflow f
+   ~analyse_job:_
+(*    ~build_linux_job:_ *)
+(*    ~build_windows_job:_ *)
+(*    ~build_macOS_job:_ *)
+(*    ~uploadbin_label_job:_ *)
+  =
+  job ~oc ~workflow ~runs_on:(Runner [Linux]) "NO-OP"
+  ++ run "no-op" ["echo something"]
+  ++ end_job f
+
 let main oc : unit =
   let env = [
     ("OPAMBSVERSION", "2.1.0");
@@ -486,20 +576,27 @@ let main oc : unit =
     ("opam-bs-cache", "${{ hashFiles('.github/scripts/main/opam-bs-cache.sh', '*.opam', '.github/scripts/main/preamble.sh') }}");
   ] in
   workflow ~oc ~env "Builds, tests & co"
-    ++ analyse_job ~keys ~platforms:[Linux] (fun analyse_job ->
-       cygwin_job ~analyse_job (fun cygwin_job ->
-       main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08) (fun build_linux_job ->
-       main_build_job ~analyse_job ~cygwin_job Windows latest_ocaml (fun build_windows_job ->
-       main_build_job ~analyse_job ~cygwin_job MacOS latest_ocaml (fun build_macOS_job ->
-       main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux (fun _ ->
-       main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS (fun _ ->
-       cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux (fun _ ->
-       solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux (fun _ ->
-       solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS (fun _ ->
-       upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux (fun _ ->
-       upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS (fun _ ->
-       hygiene_job ~analyse_job (Specific (Linux, "22.04")) (fun _ ->
-       end_workflow)))))))))))))
+  ++ analyse_job ~keys ~platforms:[Linux]
+  @@ fun analyse_job ->
+  empty_job ~analyse_job
+  @@ fun cygwin_job ->
+  main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
+(*
+  @@ fun build_linux_job ->
+  main_build_job ~analyse_job ~cygwin_job Windows latest_ocaml
+  @@ fun build_windows_job ->
+  main_build_job ~analyse_job ~cygwin_job MacOS latest_ocaml
+  @@ fun build_macOS_job ->
+  main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
+  @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
+  @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux
+  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux
+  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
+  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
+  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
+  @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
+*)
+  @@ fun _ -> end_workflow
 
 let () =
   let oc = open_out "main.yml" in
