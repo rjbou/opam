@@ -695,14 +695,14 @@ let git_for_windows_check =
       Some (get_gitbin ~gitbin:(OpamFilename.Dir.to_string gitbin) ())
     | Some (Right ()) -> None
     | None ->
-      OpamConsole.msg
-        "Which Git should opam use? Cygwin Git is functional but have credentials issues, we recommend using using:\n%s\n"
-        (OpamStd.Format.itemize (fun s -> s)
-           [ "winget with 'winget install Git.Git'";
-             "Git for Windows available at https://gitforwindows.org" ]);
       let prompt () =
-        OpamConsole.menu "How opam should handle Git?"
-        ~default:`Default ~no:`Default
+        OpamConsole.menu
+            "Which Git should opam use?\n \
+             Cygwin Git is functional but have credentials issues, we recommend using:\n%s\n"
+            (OpamStd.Format.itemize (fun s -> s)
+               [ "winget with 'winget install Git.Git'";
+                 "Git for Windows available at https://gitforwindows.org" ])
+          ~default:`Default ~no:`Default
           ~options:[
             `Default, "Use default Cygwin Git";
             `Specify, "Enter the location of installed Git";
