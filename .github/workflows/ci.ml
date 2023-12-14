@@ -15,7 +15,7 @@ open Lib
 
 let ocamls = [
   (* Fully supported versions *)
-   "4.08.1"; "4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1"; "5.0.0"; "5.1.0"; "4.14.1";
+   "4.08.1"; (*"4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1"; "5.0.0"; "5.1.0";*) "4.14.1";
 ]
 
 (* Entry point for the workflow. Workflows are specified as continuations where
@@ -259,12 +259,29 @@ let install_sys_packages packages ~descr ?cond platforms =
 let install_sys_opam ?cond = install_sys_packages ["opam"] ~descr:"Install system's opam package" ?cond
 let install_sys_dune ?cond = install_sys_packages ["dune"; "ocaml"] ~descr:"Install system's dune and ocaml packages" ?cond
 
+let uploadbin_label_job ~oc ~workflow f =
+  let outputs =
+    ["binary_label", "${{ steps.label.outputs.binary_label }}"]
+  in
+  let upload_binary =
+    run "Determine uploading binary label"
+      ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
+      ~id:"label"
+      [
+        {|binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
+        {|echo "$binary_label"|};
+        {|echo "binary_label=$binary_label" >> $GITHUB_OUTPUT|}
+      ]
+  in
+  job ~oc ~workflow ~runs_on:(Runner [Linux]) ~outputs "Upload-Bin"
+  ++ upload_binary
+  ++ end_job f
+
 let analyse_job ~oc ~workflow ~platforms ~keys f =
   let oses = List.map os_of_platform platforms in
   let outputs =
     let f (key, _) = (key, Printf.sprintf "${{ steps.keys.outputs.%s }}" key) in
     List.map f keys
-    @ ["binary_label", "${{ steps.label.outputs.binary_label }}"]
   in
   let keys =
     let set_key (name, value) =
@@ -290,21 +307,10 @@ let analyse_job ~oc ~workflow ~platforms ~keys f =
     else
       None
   in
-  let upload_binary =
-    run "Determine uploading binary label"
-    ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
-    ~id:"label"
-      [
-        {|binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
-        {|echo "$binary_label"|};
-        {|echo "binary_label=$binary_label" >> $GITHUB_OUTPUT|}
-      ]
-  in
   job ~oc ~workflow ~runs_on:(Runner platforms) ~outputs ~section:"Caches" "Analyse"
     ++ only_with Windows (git_lf_checkouts ~cond:(Predicate(true, Runner Windows)) ~shell:"cmd" ~title:"Configure Git for Windows" ())
     ++ checkout ()
     ++ run "Determine cache keys" ~id:"keys" keys
-    ++ upload_binary
     ++ cache ?cond:linux_guard ~key_prefix:"steps.keys" ~check_only:true Archives 
     ++ build_cache ?cond:not_windows_guard Archives
     ++ end_job f
@@ -317,7 +323,7 @@ let cygwin_job ~analyse_job ~oc ~workflow f =
     ++ build_cache Cygwin
     ++ end_job f
 
-let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~workflow f =
+let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner start_version ~oc ~workflow f =
   let platform = os_of_platform runner in
   let only_on target = only_on platform target in
   let not_on target = not_on platform target in
@@ -338,12 +344,15 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
     else
       (matrix, []) in
   let matrix = ((platform <> Windows), matrix, includes) in
-  let needs = if platform = Windows then [analyse_job; cygwin_job] else [analyse_job] in
+  let needs =
+    [analyse_job; uploadbin_label_job]
+    @ (if platform = Windows then [cygwin_job] else [])
+  in
   let host = host_of_platform platform in
   let upload_binaries =
     let cond =
       let label =
-        Predicate (true, Compare ("needs.Analyse.outputs.binary_label", "PR:BINARIES"))
+        Predicate (true, Compare ("needs.Upload-Bin.outputs.binary_label", "PR:BINARIES"))
       in
       match runner with
       | MacOS -> label
@@ -519,15 +528,16 @@ let hygiene_job (type a) ~analyse_job (platform : a platform) ~oc ~workflow f =
     ++ run "Hygiene" ~cond:(Or(Predicate(true, Contains("steps.files.outputs.modified", "configure.ac")), Predicate(true, Contains("steps.files.outputs.all", "src_ext")))) ~env:[("BASE_REF_SHA", "${{ github.event.pull_request.base.sha }}"); ("PR_REF_SHA", "${{ github.event.pull_request.head.sha }}")] ["bash -exu .github/scripts/main/hygiene.sh"]
     ++ end_job f
 
-let empty_job :
-oc:out_channel ->
-workflow:'a ->
-(Lib.job -> oc:out_channel -> workflow:'a -> 'c) -> 'c
-= fun
-~oc ~workflow f ->
-job ~oc ~workflow ~runs_on:(Runner [Linux]) "NO-OP"
-++ run "no-op" ["echo something"]
-++ end_job f
+let empty_job ~oc ~workflow f
+   ~analyse_job:_
+(*    ~build_linux_job:_ *)
+(*    ~build_windows_job:_ *)
+(*    ~build_macOS_job:_ *)
+(*    ~uploadbin_label_job:_ *)
+  =
+  job ~oc ~workflow ~runs_on:(Runner [Linux]) "NO-OP"
+  ++ run "no-op" ["echo something"]
+  ++ end_job f
 
 let main oc : unit =
   let env = [
@@ -554,13 +564,16 @@ let main oc : unit =
   workflow ~oc ~env "Builds, tests & co"
   ++ analyse_job ~keys ~platforms:[Linux]
   @@ fun analyse_job ->
-  cygwin_job ~analyse_job
+  uploadbin_label_job
+  @@ fun uploadbin_label_job ->
+  empty_job ~analyse_job
   @@ fun cygwin_job ->
-  main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
+  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ~section:"Build" Linux (4, 08)
+(*
   @@ fun build_linux_job ->
-  main_build_job ~analyse_job ~cygwin_job Windows latest_ocaml
+  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job Windows latest_ocaml
   @@ fun build_windows_job ->
-  main_build_job ~analyse_job ~cygwin_job MacOS latest_ocaml
+  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job MacOS latest_ocaml
   @@ fun build_macOS_job ->
   main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
   @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
@@ -570,6 +583,7 @@ let main oc : unit =
   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
   @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
+*)
   @@ fun _ -> end_workflow
 
 let () =

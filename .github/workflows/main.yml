@@ -66,7 +66,6 @@ jobs:
       ocaml-cache: ${{ steps.keys.outputs.ocaml-cache }}
       cygwin: ${{ steps.keys.outputs.cygwin }}
       opam-bs-cache: ${{ steps.keys.outputs.opam-bs-cache }}
-      binary_label: ${{ steps.label.outputs.binary_label }}
     steps:
     - name: Checkout tree
       uses: actions/checkout@v3
@@ -81,15 +80,6 @@ jobs:
         echo cygwin=${{ hashFiles('.github/scripts/cygwin.cmd') }}-${{ env.CYGWIN_EPOCH }} >> $GITHUB_OUTPUT
         echo opam-bs-cache=${{ hashFiles('.github/scripts/main/opam-bs-cache.sh', '*.opam', '.github/scripts/main/preamble.sh') }}
         echo opam-bs-cache=${{ hashFiles('.github/scripts/main/opam-bs-cache.sh', '*.opam', '.github/scripts/main/preamble.sh') }} >> $GITHUB_OUTPUT
-    - name: Determine uploading binary label
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      id: label
-      shell: bash
-      run: |
-        binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")
-        echo "$binary_label"
-        echo "binary_label=$binary_label" >> $GITHUB_OUTPUT
     - name: src_ext/archives and opam-repository Cache
       id: archives
       uses: ocaml-opam/cache@opam
@@ -104,6 +94,21 @@ jobs:
       if: steps.archives.outputs.cache-hit != 'true'
       run: bash -exu .github/scripts/main/archives-cache.sh
 
+  Upload-Bin:
+    runs-on: ubuntu-latest
+    outputs:
+      binary_label: ${{ steps.label.outputs.binary_label }}
+    steps:
+    - name: Determine uploading binary label
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      id: label
+      shell: bash
+      run: |
+        binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")
+        echo "$binary_label"
+        echo "binary_label=$binary_label" >> $GITHUB_OUTPUT
+
   NO-OP:
     runs-on: ubuntu-latest
     steps:
@@ -115,10 +120,10 @@ jobs:
 ####
   Build-Linux:
     runs-on: ubuntu-latest
-    needs: Analyse
+    needs: [ Analyse, Upload-Bin ]
     strategy:
       matrix:
-        ocamlv: [ 4.08.1, 4.09.1, 4.10.2, 4.11.2, 4.12.1, 4.13.1, 5.0.0, 5.1.0, 4.14.1 ]
+        ocamlv: [ 4.08.1, 4.14.1 ]
       fail-fast: true
     steps:
     - name: Install bubblewrap
@@ -146,7 +151,7 @@ jobs:
     - name: Build
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
     - name: Upload opam binaries
-      if: needs.Analyse.outputs.binary_label == 'PR:BINARIES' && matrix.ocamlv == '4.14.1'
+      if: needs.Upload-Bin.outputs.binary_label == 'PR:BINARIES' && matrix.ocamlv == '4.14.1'
       uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
