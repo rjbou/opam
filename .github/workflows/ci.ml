@@ -323,7 +323,7 @@ let cygwin_job ~analyse_job ~oc ~workflow f =
     ++ build_cache Cygwin
     ++ end_job f
 
-let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner start_version ~oc ~workflow f =
+let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~workflow f =
   let platform = os_of_platform runner in
   let only_on target = only_on platform target in
   let not_on target = not_on platform target in
@@ -345,14 +345,21 @@ let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner
       (matrix, []) in
   let matrix = ((platform <> Windows), matrix, includes) in
   let needs =
-    [analyse_job; uploadbin_label_job]
+    [analyse_job]
     @ (if platform = Windows then [cygwin_job] else [])
   in
   let host = host_of_platform platform in
+  let retrieve_labels =
+    run "Check binary label" ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
+      [
+        {|BINARY_LABEL=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
+        {|echo "BINARY_LABEL=$BINARY_LABEL" >> $GITHUB_ENV|}
+      ]
+  in
   let upload_binaries =
     let cond =
       let label =
-        Predicate (true, Compare ("needs.Upload-Bin.outputs.binary_label", "PR:BINARIES"))
+        Predicate (true, Compare ("env.BINARY_LABEL", "PR:BINARIES"))
       in
       match runner with
       | MacOS -> label
@@ -406,6 +413,7 @@ let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner
     ++ only_on Windows (unpack_cygwin "${{ matrix.build }}" "${{ matrix.host }}")
     ++ build_cache OCaml platform "${{ matrix.ocamlv }}" host
     ++ run "Build" ["bash -exu .github/scripts/main/main.sh " ^ host]
+    ++ retrieve_labels
     ++ upload_binaries
 (*
     ++ not_on Windows (run "Test (basic)" ["bash -exu .github/scripts/main/test.sh"])
@@ -570,16 +578,14 @@ let main oc : unit =
   workflow ~oc ~env "Builds, tests & co"
   ++ analyse_job ~keys ~platforms:[Linux]
   @@ fun analyse_job ->
-  uploadbin_label_job
-  @@ fun uploadbin_label_job ->
   empty_job ~analyse_job
   @@ fun cygwin_job ->
-  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ~section:"Build" Linux (4, 08)
+  main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
 (*
   @@ fun build_linux_job ->
-  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job Windows latest_ocaml
+  main_build_job ~analyse_job ~cygwin_job Windows latest_ocaml
   @@ fun build_windows_job ->
-  main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job MacOS latest_ocaml
+  main_build_job ~analyse_job ~cygwin_job MacOS latest_ocaml
   @@ fun build_macOS_job ->
   main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
   @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
