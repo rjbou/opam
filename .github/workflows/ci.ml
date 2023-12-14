@@ -387,7 +387,11 @@ let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner
           Literal ((List.rev_map (fun s -> prefix ^ s ^ ".exe"))
                      ("opam-putenv":: binaries))
       in
-      [ "name", name; "path", paths; ]
+      [
+        "name", name;
+        "path", paths;
+        "retention-days", Literal ["1"];
+      ]
     in
     uses "Upload opam binaries" "actions/upload-artifact@v3"
       ~cond ~withs ~continue_on_error:true

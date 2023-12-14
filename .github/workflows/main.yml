@@ -159,3 +159,4 @@ jobs:
         path: |
           /home/runner/local/bin/opam
           /home/runner/local/bin/opam-installer
+        retention-days: 1
