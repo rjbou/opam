@@ -270,7 +270,6 @@ let analyse_job ~oc ~workflow ~platforms ~keys f =
   let outputs =
     let f (key, _) = (key, Printf.sprintf "${{ steps.keys.outputs.%s }}" key) in
     List.map f keys
-    @ ["binary_label", "${{ steps.label.outputs.binary_label }}"]
   in
   let keys =
     let set_key (name, value) =
@@ -296,21 +295,10 @@ let analyse_job ~oc ~workflow ~platforms ~keys f =
     else
       None
   in
-  let upload_binary =
-    run "Determine uploading binary label"
-    ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
-    ~id:"label"
-      [
-        {|binary_label=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
-        {|echo "$binary_label"|};
-        {|echo "binary_label=$binary_label" >> $GITHUB_OUTPUT|}
-      ]
-  in
   job ~oc ~workflow ~runs_on:(Runner platforms) ~outputs ~section:"Caches" "Analyse"
     ++ only_with Windows (git_lf_checkouts ~cond:(Predicate(true, Runner Windows)) ~shell:"cmd" ~title:"Configure Git for Windows" ())
     ++ checkout ()
     ++ run "Determine cache keys" ~id:"keys" keys
-    ++ upload_binary
     ++ cache ?cond:linux_guard ~key_prefix:"steps.keys" ~check_only:true Archives 
     ++ build_cache ?cond:not_windows_guard Archives
     ++ end_job f
@@ -346,10 +334,17 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
   let matrix = ((platform <> Windows), matrix, includes) in
   let needs = if platform = Windows then [analyse_job; cygwin_job] else [analyse_job] in
   let host = host_of_platform platform in
+  let retrieve_labels =
+    run "Check binary label" ~shell:"bash" ~env:["GH_TOKEN","${{ secrets.GITHUB_TOKEN }}"]
+      [
+        {|BINARY_LABEL=$(gh api --jq '.labels.[].name' /repos/${{ github.repository }}/pulls/${{ github.event.number }} | grep "PR:BINARIES" || echo "other")|};
+        {|echo "BINARY_LABEL=$BINARY_LABEL" >> $GITHUB_ENV|}
+      ]
+  in
   let upload_binaries =
     let cond =
       let label =
-        Predicate (true, Compare ("needs.Analyse.outputs.binary_label", "PR:BINARIES"))
+        Predicate (true, Compare ("env.BINARY_LABEL", "PR:BINARIES"))
       in
       match runner with
       | MacOS -> label
@@ -399,6 +394,7 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
     ++ only_on Windows (unpack_cygwin "${{ matrix.build }}" "${{ matrix.host }}")
     ++ build_cache OCaml platform "${{ matrix.ocamlv }}" host
     ++ run "Build" ["bash -exu .github/scripts/main/main.sh " ^ host]
+    ++ retrieve_labels
     ++ upload_binaries
     ++ not_on Windows (run "Test (basic)" ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - Cygwin)" ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
