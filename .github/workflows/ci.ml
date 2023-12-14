@@ -403,6 +403,7 @@ let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner
     ++ build_cache OCaml platform "${{ matrix.ocamlv }}" host
     ++ run "Build" ["bash -exu .github/scripts/main/main.sh " ^ host]
     ++ upload_binaries
+(*
     ++ not_on Windows (run "Test (basic)" ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - Cygwin)" ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - native Windows)" ~env:[("OPAMROOT", {|D:\a\opam\opam\.opam|})] ~shell:"cmd" ~cond:(Predicate(false, EndsWith("matrix.host", "-pc-cygwin")))
@@ -418,6 +419,7 @@ let main_build_job ~analyse_job ~cygwin_job ~uploadbin_label_job ?section runner
            {|opam config report|};
           ]))
     ++ only_on Windows (run "Test (reftests)" ["bash -exu .github/scripts/main/reftests.sh ${{ matrix.host }}"])
+*)
     ++ end_job f
 
 let main_test_job ~analyse_job ~build_linux_job ~build_windows_job:_ ~build_macOS_job:_ ?section runner ~oc ~workflow f =

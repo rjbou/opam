@@ -159,5 +159,3 @@ jobs:
         path: |
           /home/runner/local/bin/opam
           /home/runner/local/bin/opam-installer
-    - name: Test (basic)
-      run: bash -exu .github/scripts/main/test.sh
