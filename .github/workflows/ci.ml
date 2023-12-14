@@ -258,13 +258,7 @@ let install_sys_packages packages ~descr ?cond platforms =
 
 let install_sys_opam ?cond = install_sys_packages ["opam"] ~descr:"Install system's opam package" ?cond
 let install_sys_dune ?cond = install_sys_packages ["dune"; "ocaml"] ~descr:"Install system's dune and ocaml packages" ?cond
-(*
-oc:out_channel ->
-workflow:'a ->
-platforms:'b Lib.platform list ->
-keys:(string * string) list ->
-(Lib.job -> oc:out_channel -> workflow:'a -> 'c) -> 'c
-*)
+
 let analyse_job ~oc ~workflow ~platforms ~keys f =
   let oses = List.map os_of_platform platforms in
   let outputs =
