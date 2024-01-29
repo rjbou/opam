@@ -129,3 +129,4 @@ users)
 ## opam-format
 
 ## opam-core
+  * `OpamStd.Sys`: add `is_cygwin_variant_cygcheck` that returns true if in path `cygcheck` is from a Cygwin or MSYS2 installation [#5843 @rjbou]
