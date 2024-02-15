@@ -123,6 +123,7 @@ users)
 ## opam-repository
 
 ## opam-state
+  * `OpamSysInteract.Cygwin.check_install`: add `variant` argument to permit checking that it is an Cygwin-like install if it is set to true, keep checking that it is a strictly Cygwin install if false [#5843 @rjbou]
 
 ## opam-solver
 
