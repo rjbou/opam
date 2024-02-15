@@ -20,6 +20,7 @@ users)
 ## Init
   * Add rsync package to internal Cygwin packages list (enables local pinning and is used by the VCS backends [#5808 @dra27]
   * Recommend enabling Developer Mode on Windows [#5831 @dra27]
+  * Fix MSYS2 support [#5843 @rjbou - fix #5683]
 
 ## Config report
 
@@ -119,6 +120,7 @@ users)
 
 # API updates
 ## opam-client
+  * `OpamClient.windows_checks`: On existing cygwin install, permit to detect msys2 and store `os-distribution=msys2` in `global-variables` config file field [#5843 @rjbou]
 
 ## opam-repository
 

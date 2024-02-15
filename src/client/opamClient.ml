@@ -757,18 +757,28 @@ let windows_checks ?cygwin_setup ?git_location config =
     | None -> config
   in
   (* Cygwin handling *)
+  let is_cygwin cygcheck =
+      OpamStd.Sys.is_cygwin_cygcheck
+        ~cygbin:(Some OpamFilename.(Dir.to_string (dirname cygcheck)))
+  in
+  let is_variant cygcheck =
+      OpamStd.Sys.is_cygwin_variant_cygcheck
+        ~cygbin:(Some OpamFilename.(Dir.to_string (dirname cygcheck)))
+  in
+  let is_msys2 cygcheck = is_variant cygcheck && not (is_cygwin cygcheck) in
   let success cygcheck =
+    let distrib = if is_cygwin cygcheck then "cygwin" else "msys2" in
     let config =
       let os_distribution = OpamVariable.of_string "os-distribution" in
       let update vars =
         OpamFile.Config.with_global_variables
-          ((os_distribution, S "cygwin", "Set by opam init")::vars)
+          ((os_distribution, S distrib, "Set by opam init")::vars)
           config
       in
       match OpamStd.List.pick (fun (v,_,_) ->
           OpamVariable.equal v os_distribution)
           vars with
-      | Some (_, S "cygwin", _), _ -> config
+      | Some (_, S d, _), _ when String.equal d distrib -> config
       | None, vars ->  update vars
       | Some (_, vc, _), vars ->
         OpamConsole.warning
@@ -784,18 +794,22 @@ let windows_checks ?cygwin_setup ?git_location config =
           OpamStd.Sys.exit_because `Aborted
     in
     let config =
-    OpamFile.Config.with_sys_pkg_manager_cmd
-      (OpamStd.String.Map.add "cygwin" cygcheck
-         (OpamFile.Config.sys_pkg_manager_cmd config))
-      config
-      in
-      OpamConsole.note "Configured with %s for depexts"
-        (if OpamSysInteract.Cygwin.is_internal config then
+      if is_msys2 cygcheck then config else
+        OpamFile.Config.with_sys_pkg_manager_cmd
+          (OpamStd.String.Map.add distrib cygcheck
+             (OpamFile.Config.sys_pkg_manager_cmd config))
+          config
+    in
+    OpamConsole.note "Configured with %s for depexts"
+      (if is_cygwin cygcheck then
+         if OpamSysInteract.Cygwin.is_internal config then
            "internal Cygwin install"
          else
            Printf.sprintf "Cygwin at %s"
-             OpamFilename.(Dir.to_string (dirname_dir (dirname cygcheck))));
-      config
+             OpamFilename.(Dir.to_string (dirname_dir (dirname cygcheck)))
+       else
+         "MSYS2");
+    config
   in
   let install_cygwin_tools () =
     let packages =
@@ -808,12 +822,10 @@ let windows_checks ?cygwin_setup ?git_location config =
     OpamSysInteract.Cygwin.install ~packages
   in
   let header () = OpamConsole.header_msg "Unix support infrastructure" in
+
   let get_cygwin = function
-    | Some cygcheck
-      when OpamFilename.exists cygcheck
-        && OpamStd.Sys.is_cygwin_cygcheck
-             ~cygbin:(Some OpamFilename.(Dir.to_string (dirname cygcheck))) ->
-      success cygcheck
+    | Some cygcheck when OpamFilename.exists cygcheck && is_variant cygcheck ->
+        success cygcheck
     | Some _ | None ->
       let rec menu () =
         let enter_paths () =
@@ -844,7 +856,8 @@ let windows_checks ?cygwin_setup ?git_location config =
           in
           (* Check for default cygwin installation path *)
           let default =
-            match OpamSysInteract.Cygwin.(check_install default_cygroot) with
+            match OpamSysInteract.Cygwin.(check_install
+                                            ~variant:true default_cygroot) with
             | Ok cygcheck ->
               let prompt_cygroot () =
                 let options = [
@@ -876,7 +889,7 @@ let windows_checks ?cygwin_setup ?git_location config =
               | None -> None
               | Some entry ->
                 let cygcheck =
-                  OpamSysInteract.Cygwin.check_install entry
+                  OpamSysInteract.Cygwin.check_install ~variant:true entry
                 in
                 match cygcheck with
                 | Ok cygcheck -> Some cygcheck
@@ -885,7 +898,8 @@ let windows_checks ?cygwin_setup ?git_location config =
           (* And finally ask for setup.exe *)
           match cygcheck with
           | Some cygcheck ->
-            OpamSysInteract.Cygwin.check_setup (enter_setup ());
+            if is_cygwin cygcheck then
+              OpamSysInteract.Cygwin.check_setup (enter_setup ());
             Some (success cygcheck)
           | None -> None
         in
@@ -949,31 +963,34 @@ let windows_checks ?cygwin_setup ?git_location config =
                    | `default_location -> OpamSysInteract.Cygwin.default_cygroot
                    | `location dir -> OpamFilename.Dir.to_string dir
                  in
-                 (match OpamSysInteract.Cygwin.check_install cygroot with
-                  | Ok cygcheck -> cygcheck
-                  | Error msg ->
-                    OpamConsole.error_and_exit `Not_found
-                      "Error while checking %sCygwin install (%s): %s"
-                      (match setup with
-                       | `default_location -> " default"
-                       | `location _ -> "")
-                      (OpamSysInteract.Cygwin.default_cygroot) msg)
+                 (match OpamSysInteract.Cygwin.check_install ~variant:true
+                          cygroot with
+                 | Ok cygcheck -> cygcheck
+                 | Error msg ->
+                   OpamConsole.error_and_exit `Not_found
+                     "Error while checking %sCygwin install (%s): %s"
+                     (match setup with
+                      | `default_location -> " default"
+                      | `location _ -> "")
+                     (OpamSysInteract.Cygwin.default_cygroot) msg)
              in
-             OpamSysInteract.Cygwin.check_setup None;
+             if is_cygwin cygcheck then
+               OpamSysInteract.Cygwin.check_setup None;
              success cygcheck)
-        | Some "cygwin" ->
+        | Some "cygwin" | Some "msys2" ->
           (* We check that current install is good *)
           (match OpamSysInteract.Cygwin.cygroot_opt config with
            | Some cygroot ->
-             (match OpamSysInteract.Cygwin.check_install
+             (match OpamSysInteract.Cygwin.check_install ~variant:true
                       (OpamFilename.Dir.to_string cygroot) with
              | Ok cygcheck ->
                OpamSysInteract.Cygwin.check_setup None;
                success cygcheck
              | Error err -> OpamConsole.error "%s" err; get_cygwin None)
            | None ->
-             (* Cygwin is detected from environment (path), we check the install
-                in that case and stores it in config *)
+             (* A Cygwin install (Cygwin or MSYS2) is detected from environment
+               (path), we check the install in that case and stores it in
+               config *)
              OpamSystem.resolve_command "cygcheck"
              |> OpamStd.Option.map OpamFilename.of_string
              |> get_cygwin
@@ -982,9 +999,18 @@ let windows_checks ?cygwin_setup ?git_location config =
       else
         config
   in
-  let cygbin = OpamStd.Option.Op.(
-      OpamSysInteract.Cygwin.cygbin_opt config
-      >>| OpamFilename.Dir.to_string)
+  let cygbin =
+    match OpamSysInteract.Cygwin.cygbin_opt config with
+    | Some cygbin -> Some (OpamFilename.Dir.to_string cygbin)
+    | None ->
+      if List.exists (function
+          | (v, S "msys2", _) ->
+            String.equal (OpamVariable.to_string v) "os-distribution"
+          | _ -> false) (OpamFile.Config.global_variables config)
+      then
+        OpamStd.Option.map Filename.dirname
+          (OpamSystem.resolve_command "cygcheck")
+      else None
   in
   OpamCoreConfig.update ?cygbin ();
   config
