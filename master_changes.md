@@ -121,11 +121,13 @@ users)
 # API updates
 ## opam-client
   * `OpamClient.windows_checks`: On existing cygwin install, permit to detect msys2 and store `os-distribution=msys2` in `global-variables` config file field [#5843 @rjbou]
+  * `OpamArg.apply_global_options`: load MSYS2 Cygwin binary path too [#5843 @rjbou]
 
 ## opam-repository
 
 ## opam-state
   * `OpamSysInteract.Cygwin.check_install`: add `variant` argument to permit checking that it is an Cygwin-like install if it is set to true, keep checking that it is a strictly Cygwin install if false [#5843 @rjbou]
+  * `OpamGlobalState.load_config`: load MSYS2 Cygwin binary path too at config file loading [#5843 @rjbou]
 
 ## opam-solver
 
