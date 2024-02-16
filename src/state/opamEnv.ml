@@ -874,26 +874,21 @@ let env_hook_script shell =
 
 let source root shell f =
   let fname = OpamFilename.to_string (OpamPath.init root // f) in
-  OpamConsole.error "original fnam '%s'" fname;
   let fname_unix =
     let cygpath = Lazy.force OpamSystem.get_cygpath_path_transform in
     cygpath ~pathlist:false fname
   in
   match shell with
   | SH_csh ->
-         let fname = OpamStd.Env.escape_single_quotes fname in
-    Printf.sprintf "if ( -f '%s' ) source '%s' >& /dev/null\n" fname_unix fname
+    Printf.sprintf "if ( -f '%s' ) source '%s' >& /dev/null\n" fname_unix fname_unix
   | SH_fish ->
-    let fname = OpamStd.Env.escape_single_quotes ~using_backslashes:true fname in
-    Printf.sprintf "source '%s' > /dev/null 2> /dev/null; or true\n" fname
+    Printf.sprintf "source '%s' > /dev/null 2> /dev/null; or true\n" fname_unix
   | SH_sh | SH_bash ->
-         let fname = OpamStd.Env.escape_single_quotes fname in
     Printf.sprintf "test -r '%s' && . '%s' > /dev/null 2> /dev/null || true\n"
-      fname_unix fname
+      fname_unix fname_unix
   | SH_zsh ->
-         let fname = OpamStd.Env.escape_single_quotes fname in
     Printf.sprintf "[[ ! -r '%s' ]] || source '%s' > /dev/null 2> /dev/null\n"
-      fname_unix fname
+      fname_unix fname_unix
   | SH_cmd ->
     Printf.sprintf "if exist \"%s\" call \"%s\" >NUL 2>NUL\n" fname fname
   | SH_pwsh _ ->
