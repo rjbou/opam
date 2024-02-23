@@ -66,11 +66,8 @@ OPAM_SWITCH_PREFIX='${BASEDIR}/root/fake'; export OPAM_SWITCH_PREFIX;
 PATH='${BASEDIR}/root/fake/bin':"$PATH"; export PATH;
 ### test -f root/opam-init/variables.zsh
 # Return code 1 #
-### cat root/opam-init/variables.fish | grep -v man | grep -v MANPATH
-# Prefix of the current opam switch
-set -gx OPAM_SWITCH_PREFIX '${BASEDIR}/root/fake';
-# Binary dir for opam switch fake
-set -gx PATH '${BASEDIR}/root/fake/bin' $PATH;
+### # ERROR, broken, see opam#5854 testing only its existence
+### test -f root/opam-init/variables.fish
 ### cat root/opam-init/variables.csh | grep -v man | grep -v MANPATH
 # Prefix of the current opam switch
 if ( ! ${?OPAM_SWITCH_PREFIX} ) setenv OPAM_SWITCH_PREFIX ""
