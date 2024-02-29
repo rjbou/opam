@@ -802,10 +802,15 @@ let windows_checks ?cygwin_setup ?git_location config =
         in
         match OpamSystem.resolve_command ~env "pacman.exe" with
         | Some pacman ->
-          OpamFile.Config.with_sys_pkg_manager_cmd
-            (OpamStd.String.Map.add distrib (OpamFilename.of_string pacman)
-               (OpamFile.Config.sys_pkg_manager_cmd config))
-            config
+          if OpamConsole.confirm
+              "Found package manager pacman binary at %s.\n\
+               Do you want to use it for depexts?"
+              pacman then
+            OpamFile.Config.with_sys_pkg_manager_cmd
+              (OpamStd.String.Map.add distrib (OpamFilename.of_string pacman)
+                 (OpamFile.Config.sys_pkg_manager_cmd config))
+              config
+          else config
         | None -> config
       else
         OpamFile.Config.with_sys_pkg_manager_cmd
