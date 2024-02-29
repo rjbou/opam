@@ -767,6 +767,7 @@ let windows_checks ?cygwin_setup ?git_location config =
   in
   let is_msys2 cygcheck = is_variant cygcheck && not (is_cygwin cygcheck) in
   let success cygcheck =
+  let cygbin = OpamFilename.dirname cygcheck in
     let distrib = if is_cygwin cygcheck then "cygwin" else "msys2" in
     let config =
       let os_distribution = OpamVariable.of_string "os-distribution" in
@@ -794,7 +795,19 @@ let windows_checks ?cygwin_setup ?git_location config =
           OpamStd.Sys.exit_because `Aborted
     in
     let config =
-      if is_msys2 cygcheck then config else
+      if is_msys2 cygcheck then
+        let env =
+          OpamStd.Env.cyg_env ~cygbin:(OpamFilename.Dir.to_string cygbin)
+            ~git_location:None
+        in
+        match OpamSystem.resolve_command ~env "pacman.exe" with
+        | Some pacman ->
+          OpamFile.Config.with_sys_pkg_manager_cmd
+            (OpamStd.String.Map.add distrib (OpamFilename.of_string pacman)
+               (OpamFile.Config.sys_pkg_manager_cmd config))
+            config
+        | None -> config
+      else
         OpamFile.Config.with_sys_pkg_manager_cmd
           (OpamStd.String.Map.add distrib cygcheck
              (OpamFile.Config.sys_pkg_manager_cmd config))
@@ -805,10 +818,13 @@ let windows_checks ?cygwin_setup ?git_location config =
          if OpamSysInteract.Cygwin.is_internal config then
            "internal Cygwin install"
          else
+           (* cygcheck is in CYGWINROOT/bin *)
            Printf.sprintf "Cygwin at %s"
-             OpamFilename.(Dir.to_string (dirname_dir (dirname cygcheck)))
+             OpamFilename.(Dir.to_string (dirname_dir cygbin))
        else
-         "MSYS2");
+         (* cygcheck is in MSYS2ROOT/usr/bin *)
+         Printf.sprintf "MSYS2 at %s"
+           OpamFilename.(Dir.to_string (dirname_dir (dirname_dir cygbin))));
     config
   in
   let install_cygwin_tools () =
