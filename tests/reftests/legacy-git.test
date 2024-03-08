@@ -470,7 +470,7 @@ OPAM=$(cygpath ${OPAM} 2>/dev/null || echo ${OPAM})
 echo "Building P3 version ${OPAM_PACKAGE_VERSION}"
 
 if [ "x${OPAM_PACKAGE_NAME}" = "xP3" ]; then
-    LIB=$(${OPAM} var lib | tr -d '\r')
+    LIB=$("${OPAM}" var lib | tr -d '\r')
     ocamlc -a -I $LIB/P1 -I $LIB/P2 p3.ml -o p3.cma
     ocamlopt -a -I $LIB/P1 -I $LIB/P2 p3.ml -o p3.cmxa
     ocamlc -a -I $LIB/P1 -I $LIB/P2 p3_bar.ml -o p3_bar.cma
@@ -552,7 +552,7 @@ build: [ "./build.sh" ]
 
 OPAM=$(cygpath ${OPAM} 2>/dev/null || echo ${OPAM})
 
-opam() { $OPAM "$@" | tr -d '\r'; }
+opam() { "$OPAM" "$@" | tr -d '\r'; }
 
 if [ $OPAM_PACKAGE_VERSION -eq 2 ]; then
     if [ "X${P1:-}" != "Xversion1" ]; then
@@ -599,7 +599,7 @@ Testing transitive closure
 
 OPAM=$(cygpath ${OPAM} 2>/dev/null || echo ${OPAM})
 
-FLAGS="-I `${OPAM} var P1:lib | tr -d '\r'`"
+FLAGS="-I `"${OPAM}" var P1:lib | tr -d '\r'`"
 
 echo "Bytecode Compilation"
 ocamlc ${FLAGS} -a p5.ml -o p5.cma
