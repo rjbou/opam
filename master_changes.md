@@ -60,6 +60,7 @@ users)
 ## Exec
 
 ## Source
+  * Avoid fetching with `--depth 1` for `opam source --dev` command [#5888 @moyodiallo - fix #5061]
 
 ## Lint
 
@@ -166,6 +167,7 @@ users)
   * `OpamArg.apply_global_options`: load MSYS2 Cygwin binary path too [#5843 @rjbou]
 
 ## opam-repository
+  * `OpamRepositoryBackend.pull_url`, `OpamVCS.fetch`: add `full_fetch` optional argument to pull full history if url is a `VCS` [#5888 @moyodiallo - fix #5061]
 
 ## opam-state
   * `OpamEnv.env_expansion`: Fix detection of out-of-date environment variables, a filter predicate was inverted [#5837 @dra27]
