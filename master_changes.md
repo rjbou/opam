@@ -140,6 +140,7 @@ users)
 ### Tests
   * Add init scripts tests [#5864 @rjbou]
   * Add test for init OCaml predefined eval variables and their format upgrade [#5829 @rjbou]
+  * Add test in `source` to show retrieval of full git repository history when retrieved with `opam source --dev` [#5888 @moyodiallo @rjbou @kit-ty-kate]
 
 ### Engine
 
