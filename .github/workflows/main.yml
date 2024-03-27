@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'eval-variables'
       - '2.**'
 
 env:
