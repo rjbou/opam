@@ -60,6 +60,7 @@ users)
 ## Source
 
 ## Lint
+ * Add warning 69: Warn for new syntax when package name in variable in string interpolation contains several '+' [#5840 @rjbou]
 
 ## Repository
 
@@ -138,6 +139,7 @@ users)
   * Add test for init OCaml predefined eval variables and their format upgrade [#5829 @rjbou]
   + Add a test testing showing the current behaviour of opam with variable expansion, in particular when the package contains pluses [#5840 @kit-ty-kate]
   * Update lint test: W41 [#5840 @rjbou]
+  * Update lint test: W41 and W69 [#5840 @rjbou]
 
 ### Engine
 
