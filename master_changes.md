@@ -60,7 +60,7 @@ users)
 ## Exec
 
 ## Source
-  * Avoid fetching with `--depth 1` for `opam source --dev` command [#5888 @moyodiallo - fix #5061]
+  * Using `opam source --dev` with git repositories doesn't fetch with `--depth 1` [#5888 @moyodiallo - fix #5061]
 
 ## Lint
 
