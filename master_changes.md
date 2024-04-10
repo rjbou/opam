@@ -42,6 +42,7 @@ users)
 ## Update / Upgrade
 
 ## Tree
+  * Fix opam tree --tree --doc assigning the with-{test,doc} variables to unrequested packages [#5919 @kit-ty-kate]
 
 ## Exec
 
