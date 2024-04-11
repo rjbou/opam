@@ -170,6 +170,8 @@ type global_options = {
   no_auto_upgrade : bool;
   working_dir : bool;
   ignore_pin_depends : bool;
+  no_checksums: bool;
+  req_checksums : bool;
   cli : OpamCLIVersion.t;
 }
 
@@ -206,12 +208,6 @@ val apply_build_options: OpamCLIVersion.Sourced.t -> build_options -> unit
 (** Lock options *)
 val locked: ?section:string -> OpamCLIVersion.Sourced.t -> bool Term.t
 val lock_suffix: ?section:string -> OpamCLIVersion.Sourced.t -> string Term.t
-
-(** Checksum options *)
-val no_checksums:
-  ?section:string -> OpamCLIVersion.Sourced.t -> validity -> bool Term.t
-val require_checksums:
-  ?section:string -> OpamCLIVersion.Sourced.t -> validity -> bool Term.t
 
 (** {3 Package listing and filtering options} *)
 
