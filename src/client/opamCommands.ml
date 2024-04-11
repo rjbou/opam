@@ -3649,16 +3649,8 @@ let source cli =
       "Choose package without consideration for \
        the current (or any other) switch (installed or pinned packages, etc.)"
   in
-  let no_checksums =
-    mk_flag ~cli (cli_from cli2_2) ["no-checksums"]
-      "Do not verify the checksum of downloaded source.\
-       This is equivalent to setting $(b,\\$OPAMNOCHECKSUMS) to \"true\"."
-  in
-  let req_checksums =
-    mk_flag ~cli (cli_from cli2_2) ["require-checksums"]
-      "Enforce checksum verification befor downloading sources.\
-       This is equivalent to setting $(b,\\$OPAMREQUIRECHECKSUMS) to \"true\"."
-  in
+  let no_checksums = no_checksums cli (cli_from cli2_2) in
+  let req_checksums = require_checksums cli (cli_from cli2_2) in
   let source global_options atom dev_repo pin no_switch dir
       no_checksums req_checksums () =
     apply_global_options cli global_options;
