@@ -49,7 +49,6 @@ Installing bar.1.
 Done.
 ### sh post.sh
 Only in OPAM/dr/.opam-switch: backup
-Only in OPAM/dr/.opam-switch/build: bar.1
 Binary files previous/dr/.opam-switch/packages/cache and OPAM/dr/.opam-switch/packages/cache differ
 # Return code 1 #
 ### :III: package removal :
@@ -93,7 +92,6 @@ Installing nip.dev.
 -> installed nip.dev
 Done.
 ### sh post.sh
-Only in OPAM/dr/.opam-switch/build: nip.dev
 Only in OPAM/dr/.opam-switch: overlay
 Only in OPAM/dr/.opam-switch/packages: bar.1
 Only in OPAM/dr/.opam-switch/packages: cache
