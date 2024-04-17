@@ -417,6 +417,24 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:download.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-dryrun)
+ (action
+  (diff dryrun.test dryrun.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-dryrun)))
+
+(rule
+ (targets dryrun.out)
+ (deps root-N0REP0)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:dryrun.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-empty-conflicts-001)
  (action
   (diff empty-conflicts-001.test empty-conflicts-001.out)))
