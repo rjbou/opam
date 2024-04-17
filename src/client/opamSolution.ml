@@ -841,7 +841,8 @@ let parallel_apply t
     PackageActionGraph.iter_vertex (function
         | `Remove nv
           when not (OpamPackage.has_name t.pinned nv.name) ->
-          OpamAction.cleanup_package_artefacts t nv
+          if OpamStateConfig.(!r.dryrun) then () else
+            OpamAction.cleanup_package_artefacts t nv
           (* if reinstalled, only removes build dir *)
         | `Install nv
           when not (OpamPackage.has_name t.pinned nv.name)
