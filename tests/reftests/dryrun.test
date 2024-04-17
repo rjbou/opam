@@ -25,10 +25,7 @@ Installing foo.1.
 -> installed foo.1
 Done.
 ### sh post.sh
-Only in OPAM: dr
-# Return code 1 #
 ### :II: package installation :
-### rm -r OPAM/dr
 ### opam switch create dr foo
 
 <><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
@@ -49,7 +46,6 @@ Installing bar.1.
 Done.
 ### sh post.sh
 Only in OPAM/dr/.opam-switch: backup
-Binary files previous/dr/.opam-switch/packages/cache and OPAM/dr/.opam-switch/packages/cache differ
 # Return code 1 #
 ### :III: package removal :
 ### opam install bar
@@ -99,6 +95,7 @@ Only in OPAM/dr/.opam-switch: sources
 # Return code 1 #
 ### :V: pin removal :
 ### opam pin ./nip
+Package nip does not exist, create as a NEW package? [y/n] y
 nip is now pinned to file://${BASEDIR}/nip (version dev)
 
 The following actions will be performed:
@@ -106,7 +103,7 @@ The following actions will be performed:
   - install nip dev (pinned)
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> retrieved nip.dev  (no changes)
+-> retrieved nip.dev  (file://${BASEDIR}/nip)
 -> installed nip.dev
 Done.
 ### sh pre.sh
