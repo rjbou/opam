@@ -587,10 +587,10 @@ let env_expansion ?opam st upd =
   in
   { upd with envu_value = s }
 
-(* env_update_resolved_with_default creates an environment update with a fully
+(* [env_update_resolved_with_default] creates an environment update with a fully
    evaluated rewrite rule. It's used internally because the updates in question
    are single directories only, which means that the update will then never be
-   subject to splitting in unzip_to *)
+   subject to splitting in [unzip_to] *)
 let env_update_resolved_with_default ?comment var =
   let rewrite = Some (SPF_Resolved (Some (default_sep_fmt_str var))) in
   env_update_resolved ?comment ~rewrite var
@@ -609,7 +609,7 @@ let compute_updates ?(force_path=false) st =
       (if force_path then PlusEq else EqPlusEq)
       (OpamFilename.Dir.to_string bindir)
       ~comment:("Binary dir for opam switch "^OpamSwitch.to_string st.switch)
- in
+  in
   let man_path =
     let open OpamStd.Sys in
     match os () with
