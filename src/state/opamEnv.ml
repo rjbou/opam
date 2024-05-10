@@ -45,11 +45,20 @@ type sep_path_format = [
   | `rewrite of separator * path_format (* path, rewrite using sep & fmt *)
 ]
 
+type transform = {
+  tr_orig: string; (* original path quoted version *)
+  tr_parsed: string; (* parsed path version *)
+  tr_sep: char; (* separator used *)
+}
+
 let transform_format ~(sepfmt:sep_path_format) var =
   match sepfmt with
   | `norewrite ->
     fun arg ->
-      (arg, arg, OpamTypesBase.char_of_separator (fst (default_sep_fmt var)))
+      { tr_orig = arg;
+        tr_parsed = arg;
+        tr_sep = OpamTypesBase.char_of_separator (fst (default_sep_fmt var));
+      }
   | (`rewrite_default _ | `rewrite _) as sepfmt ->
     let separator, format =
       match sepfmt with
@@ -71,7 +80,10 @@ let transform_format ~(sepfmt:sep_path_format) var =
     | Target | Host ->
       fun arg ->
         let path = translate arg in
-        (path, path, separator)
+        { tr_orig = path;
+          tr_parsed = path;
+          tr_sep = separator;
+        }
     | Target_quoted | Host_quoted ->
       fun arg ->
         let path = translate arg in
@@ -79,7 +91,10 @@ let transform_format ~(sepfmt:sep_path_format) var =
           if String.contains path separator then
             "\""^path^"\"" else path
         in
-        (path, quoted_path, separator)
+        { tr_orig = path;
+          tr_parsed = quoted_path;
+          tr_sep = separator;
+        }
 
 let resolve_separator_and_format :
   type r. (r, 'a) env_update -> (spf_resolved, 'a) env_update =
@@ -149,7 +164,8 @@ let split_path_variable path sep =
       let final = String.sub path last (index - last) in
       let current = current ^ final in
       let current_raw = current_raw ^ final in
-      List.rev ((current, current_raw, sep)::acc)
+      let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
+      List.rev (elem::acc)
     else
       let c = path.[index]
       and next = succ index in
@@ -157,12 +173,14 @@ let split_path_variable path sep =
         let segment = String.sub path last (index - last) in
         let current = current ^ segment in
         let current_raw = current_raw ^ segment in
+        let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
         if c = '"' then
           f acc next current (current_raw ^ "\"") next (not normal)
         else if next = length then (* path ends with a separator *)
-          List.rev (("", "", sep)::(current, current_raw, sep)::acc)
+          let empty = { tr_orig = ""; tr_parsed = ""; tr_sep = sep } in
+          List.rev (empty::elem::acc)
         else (* c = sep; text follows *)
-          f ((current, current_raw, sep)::acc) next "" "" next true
+          f (elem::acc) next "" "" next true
       else
         f acc next current current_raw last normal
   in
@@ -173,7 +191,9 @@ let split_var ~(sepfmt:sep_path_format) var value =
   match sepfmt with
   | `norewrite ->
     let sep = char_of_separator (fst (default_sep_fmt var)) in
-    List.map (fun s -> (s, s, sep)) (OpamStd.String.split_delim value sep)
+    List.map (fun s ->
+        { tr_orig = s; tr_parsed = s; tr_sep = sep})
+      (OpamStd.String.split_delim value sep)
   | (`rewrite_default _ | `rewrite _) as sepfmt ->
     let separator, format =
       match sepfmt with
@@ -182,27 +202,29 @@ let split_var ~(sepfmt:sep_path_format) var value =
     in
     let sep = OpamTypesBase.char_of_separator separator in
     if value = String.make 1 sep then
-      [("", value, sep)]
+      [{ tr_orig = ""; tr_parsed = value; tr_sep = sep }]
     else
-      match format with
-      | Target | Host ->
-        List.map (fun s -> (s, s, sep)) (OpamStd.String.split_delim value sep)
-      | Target_quoted | Host_quoted ->
-        split_path_variable value sep
+    match format with
+    | Target | Host ->
+      List.map (fun s ->
+          { tr_orig = s; tr_parsed = s; tr_sep = sep})
+        (OpamStd.String.split_delim value sep)
+    | Target_quoted | Host_quoted ->
+      split_path_variable value sep
 
 (* Auxiliaries for join_var - cf. String.concat *)
 let rec sum_lengths acc = function
-| [(_, raw, _)] -> acc + String.length raw
-| (_, raw, _)::tl -> sum_lengths (acc + String.length raw + 1) tl
+| [{ tr_parsed = raw; _}] -> acc + String.length raw
+| { tr_parsed = raw; _}::tl -> sum_lengths (acc + String.length raw + 1) tl
 | [] -> acc (* semantically unreachable *)
 
 let rec unsafe_blits dst pos = function
 | [] ->
   Bytes.unsafe_to_string dst
-| [(_, raw, _)] ->
+| [{ tr_parsed = raw; _}] ->
   String.unsafe_blit raw 0 dst pos (String.length raw);
   Bytes.unsafe_to_string dst
-| (_, raw, sep)::tl ->
+| { tr_parsed = raw; tr_sep = sep; _}::tl ->
   let length = String.length raw in
   String.unsafe_blit raw 0 dst pos length;
   Bytes.unsafe_set dst (pos + length) sep;
@@ -210,7 +232,7 @@ let rec unsafe_blits dst pos = function
 
 let join_var values =
   if values = [] then "" else
-  unsafe_blits (Bytes.create (sum_lengths 0 values)) 0 values
+    unsafe_blits (Bytes.create (sum_lengths 0 values)) 0 values
 
 let separator_char_for ~sepfmt var =
   let (separator, _) =
@@ -230,18 +252,23 @@ let unzip_to ~sepfmt var elt current =
   (* If [r = l @ rs] then [remove_prefix l r] is [Some rs], otherwise [None] *)
   let rec remove_prefix l r =
     match l, r with
-    | ((l, _, _)::ls, (r, _, _)::rs) when l = r ->
+    | {tr_orig = l; _}::ls, { tr_orig = r; _}::rs when l = r ->
       remove_prefix ls rs
     | ([], rs) -> Some rs
     | _ -> None
   in
-  match (if String.equal elt "" then [("", "", separator_char_for ~sepfmt var)]
-         else split_var ~sepfmt var elt) with
+  let splitted =
+    if String.equal elt "" then
+      [{ tr_orig = ""; tr_parsed = "";
+         tr_sep = separator_char_for ~sepfmt var }]
+    else split_var ~sepfmt var elt
+  in
+  match splitted with
   | [] -> invalid_arg "OpamEnv.unzip_to"
-  | (hd, _, _)::tl ->
+  | { tr_orig = hd; _}::tl ->
     let rec aux acc = function
       | [] -> None
-      | ((x, _, _) as v)::r ->
+      | ({ tr_orig = x; _} as v)::r ->
         if String.equal x hd then
           match remove_prefix tl r with
           | Some r -> Some (acc, r)
@@ -257,42 +284,43 @@ let rezip_to_string ?insert z =
   join_var (rezip ?insert z)
 
 let apply_op_zip ~sepfmt var op arg (rl1,l2 as zip) =
-  let (_, _, sep) as arg = transform_format ~sepfmt var arg in
+  let arg = transform_format ~sepfmt var arg in
+  let empty_tr = { tr_orig = ""; tr_parsed = ""; tr_sep = arg.tr_sep } in
   let colon_eq ?(eqcol=false) = function (* prepend a, but keep ":"s *)
-    | [] | [("", _, _)] -> [], [arg; ("", "", sep)]
-    | ("", _, _) :: l ->
+    | [] | [{ tr_orig = ""; _}] -> [], [arg; empty_tr]
+    | { tr_orig = ""; _} :: l ->
       (* keep surrounding colons *)
-      if eqcol then l@[("", "", sep)], [arg] else l, [("", "", sep); arg]
+      if eqcol then l@[empty_tr], [arg] else l, [empty_tr; arg]
     | l -> l, [arg]
   in
   let cygwin path =
-    let contains_in (dir, _, _) item =
+    let contains_in {tr_orig = dir; _} item =
       Sys.file_exists (Filename.concat dir item)
     in
     let shadow_list =
       List.filter (contains_in arg)
-                  ["bash.exe"; "sort.exe"; "tar.exe"; "git.exe"]
+        ["bash.exe"; "sort.exe"; "tar.exe"; "git.exe"]
     in
-      let rec loop acc = function
+    let rec loop acc = function
       | [] -> acc, [arg]
       | (d::rest) as suffix ->
-          if List.exists (contains_in d) shadow_list then
-            acc, arg::suffix
-          else
-            loop (d::acc) rest
-      in
-        loop [] path
+        if List.exists (contains_in d) shadow_list then
+          acc, arg::suffix
+        else
+          loop (d::acc) rest
+    in
+    loop [] path
   in
   match op with
   | Eq -> [],[arg]
   | PlusEq ->
     (* New value goes at head of existing list; no prefix *)
     begin match rezip zip with
-      | [("", raw, _)] ->
+      | [{ tr_orig = ""; tr_parsed = raw; _}] ->
         if raw = "" then
           [], [arg]
         else
-          [], [arg; ("", "", sep)]
+          [], [arg; empty_tr]
       | zip -> [], arg::zip
     end
   | EqPlus ->
@@ -300,11 +328,11 @@ let apply_op_zip ~sepfmt var op arg (rl1,l2 as zip) =
           List.rev (List.rev_append rl1 l2)
        Place new value at the end *)
     begin match List.rev_append l2 rl1 with
-      | [("", raw, _)] ->
+      | [{ tr_orig = ""; tr_parsed = raw; _}] ->
         if raw = "" then
           [], [arg]
         else
-          [], [("", "", sep); arg]
+          [], [empty_tr; arg]
       | zip -> zip, [arg]
     end
   | Cygwin ->
@@ -328,7 +356,7 @@ let apply_op_zip ~sepfmt var op arg (rl1,l2 as zip) =
     or empty lists is returned if the variable should be unset or has an unknown
     previous value. *)
 let reverse_env_update ~sepfmt var op arg cur_value =
-  let (arg, _, _) = transform_format ~sepfmt var arg in
+  let { tr_orig = arg; _} = transform_format ~sepfmt var arg in
   if String.equal arg "" && op <> Eq then None else
   match op with
   | Eq ->
@@ -341,11 +369,11 @@ let reverse_env_update ~sepfmt var op arg cur_value =
      | Some (rl1, l2) -> Some (List.rev l2, List.rev rl1))
   | ColonEq ->
     (match unzip_to var ~sepfmt arg cur_value with
-     | Some ([], [("", _, _)]) -> Some ([], [])
+     | Some ([], [{ tr_orig = ""; _}]) -> Some ([], [])
      | r -> r)
   | EqColon ->
     (match unzip_to ~sepfmt var arg (List.rev cur_value) with
-     | Some ([], [("", _, _)]) -> Some ([], [])
+     | Some ([], [{ tr_orig = ""; _}]) -> Some ([], [])
      | Some (rl1, l2) -> Some (List.rev l2, List.rev rl1)
      | None -> None)
 
@@ -1018,7 +1046,7 @@ let string_of_update st shell updates =
       | Some (SPF_Resolved None) -> `rewrite_default envu_var
       | Some (SPF_Resolved (Some spf)) -> `rewrite spf
     in
-    let (_, string, sep) =
+    let { tr_parsed = string; tr_sep = sep; _} =
       transform_format ~sepfmt (OpamStd.Env.Name.of_string envu_var) string
     in
     let key, value =
