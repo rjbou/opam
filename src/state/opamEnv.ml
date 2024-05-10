@@ -167,22 +167,22 @@ let split_path_variable path sep =
       let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
       List.rev (elem::acc)
     else
-      let c = path.[index]
-      and next = succ index in
-      if c = sep && normal || c = '"' then
-        let segment = String.sub path last (index - last) in
-        let current = current ^ segment in
-        let current_raw = current_raw ^ segment in
-        let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
-        if c = '"' then
-          f acc next current (current_raw ^ "\"") next (not normal)
-        else if next = length then (* path ends with a separator *)
-          let empty = { tr_orig = ""; tr_parsed = ""; tr_sep = sep } in
-          List.rev (empty::elem::acc)
-        else (* c = sep; text follows *)
-          f (elem::acc) next "" "" next true
-      else
-        f acc next current current_raw last normal
+    let c = path.[index]
+    and next = succ index in
+    if c = sep && normal || c = '"' then
+      let segment = String.sub path last (index - last) in
+      let current = current ^ segment in
+      let current_raw = current_raw ^ segment in
+      let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
+      if c = '"' then
+        f acc next current (current_raw ^ "\"") next (not normal)
+      else if next = length then (* path ends with a separator *)
+        let empty = { tr_orig = ""; tr_parsed = ""; tr_sep = sep } in
+        List.rev (empty::elem::acc)
+      else (* c = sep; text follows *)
+        f (elem::acc) next "" "" next true
+    else
+      f acc next current current_raw last normal
   in
   f [] 0 "" "" 0 true
 
@@ -214,21 +214,21 @@ let split_var ~(sepfmt:sep_path_format) var value =
 
 (* Auxiliaries for join_var - cf. String.concat *)
 let rec sum_lengths acc = function
-| [{ tr_parsed = raw; _}] -> acc + String.length raw
-| { tr_parsed = raw; _}::tl -> sum_lengths (acc + String.length raw + 1) tl
-| [] -> acc (* semantically unreachable *)
+  | [{ tr_parsed = raw; _}] -> acc + String.length raw
+  | { tr_parsed = raw; _}::tl -> sum_lengths (acc + String.length raw + 1) tl
+  | [] -> acc (* semantically unreachable *)
 
 let rec unsafe_blits dst pos = function
-| [] ->
-  Bytes.unsafe_to_string dst
-| [{ tr_parsed = raw; _}] ->
-  String.unsafe_blit raw 0 dst pos (String.length raw);
-  Bytes.unsafe_to_string dst
-| { tr_parsed = raw; tr_sep = sep; _}::tl ->
-  let length = String.length raw in
-  String.unsafe_blit raw 0 dst pos length;
-  Bytes.unsafe_set dst (pos + length) sep;
-  unsafe_blits dst (pos + length + 1) tl
+  | [] ->
+    Bytes.unsafe_to_string dst
+  | [{ tr_parsed = raw; _}] ->
+    String.unsafe_blit raw 0 dst pos (String.length raw);
+    Bytes.unsafe_to_string dst
+  | { tr_parsed = raw; tr_sep = sep; _}::tl ->
+    let length = String.length raw in
+    String.unsafe_blit raw 0 dst pos length;
+    Bytes.unsafe_set dst (pos + length) sep;
+    unsafe_blits dst (pos + length + 1) tl
 
 let join_var values =
   if values = [] then "" else
