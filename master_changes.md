@@ -61,6 +61,7 @@ users)
   * [BUG] When opam creates an empty variable then add to it a value, no more creates a stray colon [#5935 @dra27 - fix #5925]
   * [BUG] Fix `x-env-path-rewrite` splitting application regarding reverts [#5935 @dra27 - fix #5838]
   * [BUG] Fix prepending empty variable several times erroneously adds trailing separators [#5935 @dra27 - fix #5926]
+  * [BUG] Fix incorrect reverting of `=+` and `=:` [#5935 @dra27]
 
 ## Opamfile
 
