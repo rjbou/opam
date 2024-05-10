@@ -104,6 +104,7 @@ users)
   * env:win32: add test for environment revert not working correctly for Unix-like variables on Windows [#5935 @dra27]
   * env.win32: add regression test for reverting additions to PATH-like variables [#5935 @dra27]
   * env.win32: add test for `+=` prepending an set and empty variable adds a trailing separator [#5935 @dra27]
+  * env.win32: add test for prepending empty variable several times erroneously adds trailing separators [#5935 @dra27]
 
 ### Engine
   * Add `sort` command [#5935 @dra27]
