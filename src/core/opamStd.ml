@@ -716,17 +716,18 @@ module OpamString = struct
       if index = length then
         let current = current ^ String.sub path last (index - last) in
         List.rev (if current <> "" then current::acc else acc)
-      else let c = path.[index]
-        and next = succ index in
-        if c = sep && normal || c = '"' then
-          let current = current ^ String.sub path last (index - last) in
-          if c = '"' then
-            f acc next current next (not normal)
-          else
-          let acc = if current = "" then acc else current::acc in
-          f acc next "" next true
+      else
+      let c = path.[index]
+      and next = succ index in
+      if Char.equal c sep && normal || Char.equal c '"' then
+        let current = current ^ String.sub path last (index - last) in
+        if Char.equal c '"' then
+          f acc next current next (not normal)
         else
-          f acc next current last normal in
+        let acc = if String.equal current "" then acc else current::acc in
+        f acc next "" next true
+      else
+        f acc next current last normal in
     f [] 0 "" 0 true
 
   let fold_left f acc s =
