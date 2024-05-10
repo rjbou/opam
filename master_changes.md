@@ -99,6 +99,7 @@ users)
 
 ## Reftests
 ### Tests
+  * env tests: use `sort` command instead of `unordered` [#5935 @dra27 @rjbou]
 
 ### Engine
   * Add `sort` command [#5935 @dra27]
