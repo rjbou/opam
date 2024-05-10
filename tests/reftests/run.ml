@@ -225,23 +225,22 @@ let command
       Unix.stdin stdout stdout
   in
   Unix.close stdout;
-  let out_buf = ref [] in
-  let rec filter_output ic =
+  let rec filter_output out_buf ic =
     match input_line ic with
     | s ->
       let s = str_replace_path ~escape:`Unescape OpamSystem.back_to_forward filter s in
-      if s = "\\c" then filter_output ic
+      if s = "\\c" then filter_output out_buf ic
       else
-        (out_buf := s::!out_buf;
+        (let out_buf = s::out_buf in
          if not silent && not sort then
            print_endline s;
-         filter_output ic)
-    | exception End_of_file -> ()
+         filter_output out_buf ic)
+    | exception End_of_file -> out_buf
   in
-  filter_output ic;
+  let out_buf = filter_output [] ic in
   let ret = waitpid pid in
   close_in ic;
-  let out = if sort then List.sort String.compare !out_buf else List.rev !out_buf in
+  let out = if sort then List.sort String.compare out_buf else List.rev out_buf in
   if not silent && sort then
     List.iter print_endline out;
   let out = String.concat "\n" out in
