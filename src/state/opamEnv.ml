@@ -169,12 +169,12 @@ let split_path_variable path sep =
     else
     let c = path.[index]
     and next = succ index in
-    if c = sep && normal || c = '"' then
+    if Char.equal c sep && normal || Char.equal c '"' then
       let segment = String.sub path last (index - last) in
       let current = current ^ segment in
       let current_raw = current_raw ^ segment in
       let elem = {tr_orig = current; tr_parsed = current_raw; tr_sep = sep } in
-      if c = '"' then
+      if Char.equal c '"' then
         f acc next current (current_raw ^ "\"") next (not normal)
       else if next = length then (* path ends with a separator *)
         let empty = { tr_orig = ""; tr_parsed = ""; tr_sep = sep } in
@@ -201,7 +201,7 @@ let split_var ~(sepfmt:sep_path_format) var value =
       | `rewrite (sep, fmt) -> sep, fmt
     in
     let sep = OpamTypesBase.char_of_separator separator in
-    if value = String.make 1 sep then
+    if String.equal value (String.make 1 sep) then
       [{ tr_orig = ""; tr_parsed = value; tr_sep = sep }]
     else
     match format with
