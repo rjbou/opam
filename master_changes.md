@@ -176,3 +176,4 @@ users)
   * `OpamStubs.getVersionInfo`: on Windows, retrives the version information block of an executable/library [#5963 @dra27]
   * `OpamStubs.readRegistry`: on Windows, complements `OpamStubs.writeRegistry` [#5963 @dra27]
   * `OpamStubs.get_initial_environment`: on Windows, returns the pristine environment for new shells [#5963 @dra27]
+  * `OpamStd.Sys.resolve_command`: extracted the logic from `OpamSystem.resolve_command`, without the default environment handling from OpamProcess. [#5991 @dra27]
