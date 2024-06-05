@@ -177,3 +177,4 @@ users)
   * `OpamStubs.readRegistry`: on Windows, complements `OpamStubs.writeRegistry` [#5963 @dra27]
   * `OpamStubs.get_initial_environment`: on Windows, returns the pristine environment for new shells [#5963 @dra27]
   * `OpamStd.Sys.resolve_command`: extracted the logic from `OpamSystem.resolve_command`, without the default environment handling from OpamProcess. [#5991 @dra27]
+  * `OpamStd.Sys.resolve_in_path`: split the logic of `OpamStd.Sys.resolve_command` to allow searching for an arbitrary file in the search path [#5991 @dra27]
