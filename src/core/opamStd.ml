@@ -1227,8 +1227,7 @@ module OpamSys = struct
       let forward_to_back =
         if Sys.win32 then
           String.map (function '/' -> '\\' | c -> c)
-        else
-          fun x -> x
+        else fun x -> x
       in
       let name = forward_to_back name in
       OpamString.contains_char name Filename.dir_sep.[0]
@@ -1254,10 +1253,10 @@ module OpamSys = struct
           if (st_perm land mask) <> 0 then
             true
           else
-            match OpamACL.get_acl_executable_info f st_uid with
-            | None -> false
-            | Some [] -> true
-            | Some gids -> IntSet.(not (is_empty (inter (of_list gids) groups)))
+          match OpamACL.get_acl_executable_info f st_uid with
+          | None -> false
+          | Some [] -> true
+          | Some gids -> IntSet.(not (is_empty (inter (of_list gids) groups)))
         with e -> fatal e; false
     in
     let resolve ?dir env name =
