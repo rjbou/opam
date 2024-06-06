@@ -1230,17 +1230,17 @@ module OpamSys = struct
     let name = forward_to_back name in
     OpamString.contains_char name Filename.dir_sep.[0]
 
-  let resolve_in_path env name =
+  let resolve_in_path_t env name =
     if not (Filename.is_relative name) || is_external_cmd name then
       invalid_arg "OpamStd.Sys.resolve_in_path: bare command expected"
     else
-      let path = split_path_variable (env_var env "PATH") in
-      List.filter_map (fun path ->
-          let candidate = Filename.concat path name in
-          match Sys.is_directory candidate with
-          | false -> Some candidate
-          | true | exception (Sys_error _) -> None)
-        path
+    let path = split_path_variable (env_var env "PATH") in
+    List.filter_map (fun path ->
+        let candidate = Filename.concat path name in
+        match Sys.is_directory candidate with
+        | false -> Some candidate
+        | true | exception (Sys_error _) -> None)
+      path
 
   (* OCaml 4.05.0 no longer follows the updated PATH to resolve commands. This
      makes unqualified commands absolute as a workaround. *)
@@ -1294,7 +1294,7 @@ module OpamSys = struct
           name ^ ".exe"
         else name
       in
-      let possibles = resolve_in_path env name in
+      let possibles = resolve_in_path_t env name in
       (* Following the shell sematics for looking up PATH, programs with the
          expected name but not the right permissions are skipped silently.
          Therefore, only two outcomes are possible in that case, [`Cmd ..] or
@@ -1313,7 +1313,7 @@ module OpamSys = struct
 
   let resolve_in_path ?env name =
     let env = match env with None -> Env.raw_env () | Some e -> e in
-    match resolve_in_path env name with
+    match resolve_in_path_t env name with
     | result::_ -> Some result
     | [] -> None
 
