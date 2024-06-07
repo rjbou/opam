@@ -384,7 +384,8 @@ module Cygwin = struct
     let cygbin =
       if not (Sys.file_exists path) then
         Error (path ^ " not found!")
-      else if Filename.remove_extension (Filename.basename path) = "cygcheck" then
+      else if Filename.remove_extension (Filename.basename path)
+              = "cygcheck" then
         (* path refers to cygcheck directly *)
         Ok (Filename.dirname path)
       else if not (Sys.is_directory path) then
@@ -402,12 +403,12 @@ module Cygwin = struct
       match List.filter contains_cygcheck tests with
       | [] ->
         Error (Printf.sprintf
-          "cygcheck.exe not found in %s, or subdirectories bin and usr\\bin"
-          path)
+                 "cygcheck.exe not found in %s, or subdirectories \
+                  bin and usr\\bin" path)
       | _::_::_ ->
         Error (Printf.sprintf
-          "cygcheck.exe found in multiple places in %s which suggests it is \
-           not a Cygwin/MSYS2 installation" path)
+                 "cygcheck.exe found in multiple places in %s which suggests \
+                  it is not a Cygwin/MSYS2 installation" path)
       | [path] ->
         Ok path
     in
@@ -418,41 +419,42 @@ module Cygwin = struct
           let cygpath = Filename.concat dir "cygpath.exe" in
           if not (Sys.file_exists cygpath) then
             Error (Printf.sprintf
-              "cygcheck.exe found in %s, but cygpath.exe was not" dir)
+                     "cygcheck.exe found in %s, but cygpath.exe was not" dir)
           else
-            match OpamStd.Sys.get_windows_executable_variant ~search_in_first:dir cygpath with
-            | `Native | `Tainted _ ->
+          match OpamStd.Sys.get_windows_executable_variant
+                  ~search_in_first:dir cygpath with
+          | `Native | `Tainted _ ->
+            Error (Printf.sprintf
+                     "cygcheck.exe found in %s; but it does not appear \
+                      to be part of a Cygwin or MSYS2 installation" dir)
+          | (`Msys2 | `Cygwin) as kind ->
+            (* Check that pacman.exe is present with MSYS2: it is typically
+               not present with a Git-for-Windows Git Bash session, and as
+               these are basically unusable (they don't have all the required
+               tools, and we have no package manager with which to add them),
+               it's better to exclude them). *)
+            if kind = `Msys2
+            && not (Sys.file_exists (Filename.concat dir "pacman.exe")) then
               Error (Printf.sprintf
-                "cygcheck.exe found in %s; but it does not appear to be part of a \
-                 Cygwin or MSYS2 installation" dir)
-            | (`Msys2 | `Cygwin) as kind ->
-              (* Check that pacman.exe is present with MSYS2: it is typically
-                 not present with a Git-for-Windows Git Bash session, and as
-                 these are basically unusable (they don't have all the required
-                 tools, and we have no package manager with which to add them),
-                 it's better to exclude them). *)
-              if kind = `Msys2
-                 && not (Sys.file_exists (Filename.concat dir "pacman.exe")) then
-                Error (Printf.sprintf
-                  "cygcheck.exe found in %s, which appears to be from an MSYS2 \
-                   installation, but pacman.exe was not" dir)
-              else
-              let r =
-                OpamProcess.run
-                  (OpamProcess.command ~name:(OpamSystem.temp_file "command")
-                    ~allow_stdin:false cygpath ["-w"; "--"; "/"])
-              in
-              OpamProcess.cleanup ~force:true r;
-              if OpamProcess.is_success r then
-                match r.OpamProcess.r_stdout with
-                | [] ->
-                  Error ("Unexpected error translating \"/\" with " ^ cygpath)
-                | _::_ ->
-                  let cygcheck =
-                    OpamFilename.of_string (Filename.concat dir "cygpath.exe")
-                  in
-                  Ok (kind, cygcheck)
-              else
+                       "cygcheck.exe found in %s, which appears to be from \
+                        an MSYS2 installation, but pacman.exe was not" dir)
+            else
+            let r =
+              OpamProcess.run
+                (OpamProcess.command ~name:(OpamSystem.temp_file "command")
+                   ~allow_stdin:false cygpath ["-w"; "--"; "/"])
+            in
+            OpamProcess.cleanup ~force:true r;
+            if OpamProcess.is_success r then
+              match r.OpamProcess.r_stdout with
+              | [] ->
+                Error ("Unexpected error translating \"/\" with " ^ cygpath)
+              | _::_ ->
+                let cygcheck =
+                  OpamFilename.of_string (Filename.concat dir "cygpath.exe")
+                in
+                Ok (kind, cygcheck)
+            else
               Error ("Could not determine the root for " ^ cygpath)
         in
         Hashtbl.add analysis_cache dir result;
