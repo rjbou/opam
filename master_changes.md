@@ -195,5 +195,4 @@ users)
   * `OpamStd.Sys.resolve_in_path`: split the logic of `OpamStd.Sys.resolve_command` to allow searching for an arbitrary file in the search path [#5991 @dra27]
   * `OpamStubs.enumRegistry`: on Windows, retrieves all the values of a given type from a registry key, with their names [#6000 @dra27]
   * `OpamCompat`: add `Seq.find_map` from OCaml 4.14 [#6000 @dra27]
-  * Added `OpamCompat.Seq.find_map` from OCaml 4.14 [#6000 @dra27]
   * `OpamStd.Sys.{get_windows_executable_variant,get_cygwin_variant,is_cygwin_variant}`: renamed `~cygbin` to `?search_in_path` with a change in semantics so that it acts as though the directory was simply the first entry in PATH [#6000 @dra27]
