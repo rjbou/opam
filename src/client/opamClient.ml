@@ -688,8 +688,8 @@ let rec is_git_for_windows git =
       false
 
 let string_of_kind = function
-| `Msys2 -> "MSYS2"
-| `Cygwin -> "Cygwin"
+  | `Msys2 -> "MSYS2"
+  | `Cygwin -> "Cygwin"
 
 let git_for_windows kind mechanism cygwin_is_tweakable =
   let contains_git p =
@@ -1001,10 +1001,6 @@ let cygwin_searches ?first () =
   seq cygwin_searches
 
 let rec cygwin_menu header =
-  let string_of_kind = function
-    | `Msys2 -> "MSYS2"
-    | `Cygwin -> "Cygwin"
-  in
   let start = Unix.gettimeofday () in
   let test_mechanism (roots, count, mechanisms) search =
     match test_mechanism header search with
