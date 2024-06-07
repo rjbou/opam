@@ -818,7 +818,9 @@ let git_for_windows ?git_location () =
   git_location
 
 let check_git_location_or_exit git_location source =
-  let git = Filename.concat (OpamFilename.Dir.to_string git_location) "git.exe" in
+  let git =
+    Filename.concat (OpamFilename.Dir.to_string git_location) "git.exe"
+  in
   if OpamSystem.resolve_command ~env:[||] git = None then
     OpamConsole.error_and_exit `Not_found
       "The location specified with %s does not appear to contain a Git \
@@ -852,7 +854,7 @@ let windows_checks ?cygwin_setup ?git_location config =
       git_location
     | None, Some git_location ->
       check_git_location_or_exit git_location
-        "the 'git-location' field in opamrc)";
+        "the 'git-location' field in opamrc";
       Some (Left git_location)
     | (Some (Left git_location)) as result, git_location_opamrc ->
       if git_location_opamrc <> None then
