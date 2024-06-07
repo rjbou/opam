@@ -194,4 +194,4 @@ users)
   * `OpamStd.Sys.resolve_command`: extracted the logic from `OpamSystem.resolve_command`, without the default environment handling from OpamProcess. [#5991 @dra27]
   * `OpamStd.Sys.resolve_in_path`: split the logic of `OpamStd.Sys.resolve_command` to allow searching for an arbitrary file in the search path [#5991 @dra27]
   * `OpamStubs.enumRegistry`: on Windows, retrieves all the values of a given type from a registry key, with their names [#6000 @dra27]
-  * Added `OpamCompat.Seq.find_map` from OCaml 4.14 [#6000 @dra27]
+  * `OpamCompat`: add `Seq.find_map` from OCaml 4.14 [#6000 @dra27]
