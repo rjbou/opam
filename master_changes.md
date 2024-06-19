@@ -55,6 +55,7 @@ users)
 ## Repository
   * [BUG] Fix SWH archive cooking request for wget [#6036 @rjbou - fix #5721]
   * [BUG] Fix SWH liveness check [#6036 @rjbou]
+  * Update SWH API request [#6036 @rjbou]
 
 ## Lock
 
