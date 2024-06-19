@@ -53,6 +53,7 @@ users)
 ## Lint
 
 ## Repository
+  * [BUG] Fix SWH archive cooking request for wget [#6036 @rjbou - fix #5721]
 
 ## Lock
 
@@ -119,6 +120,7 @@ users)
 ## opam-client
 
 ## opam-repository
+  * `OpamDownload.get_output`: fix `wget` option for `POST` requests [#6036 @rjbou]
 
 ## opam-state
 
