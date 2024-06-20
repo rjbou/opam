@@ -246,6 +246,7 @@ module SWHID = struct
     full_url ("vault/" ^ kind) ("swh:1:dir:" ^ hash)
 
   let check_liveness () =
+    (* TODO XXX separate stdout from ou to have the poper output instead of string.starts_with *)
     OpamProcess.Job.catch (fun _ -> Done false)
     @@ fun () ->
     get_output ~post:false OpamUrl.Op.(instance / "api" / "1" / "ping" / "")
@@ -278,54 +279,121 @@ module SWHID = struct
      }
   *)
 
-  let get_output ?(post=false) url =
+  let fallback_err fmt = Printf.sprintf ("SWH fallback: "^^fmt)
+
+  let get_output_t2 ?(post=false) url =
     get_output ~post url @@| function
     | Some out ->
-      Some (String.concat "" out)
+      String.concat "" out
     | None ->
-      OpamConsole.error "Software Heritage fallback needs %s or %s installed"
-        (OpamConsole.colorise `underline "curl")
-        (OpamConsole.colorise `underline "wget");
-      None
+      (* We already checked that post tool is already used *)
+      assert false
 
-  let get_dir hash =
-    (* https://archive.softwareheritage.org/api/1/vault/flat/doc/ *)
-    let url = vault_url "flat" hash in
-    (* The POST is needed only for asking to cook the archive, it's a no-op on
-       status check *)
-    get_output ~post:true url @@| OpamStd.Option.replace @@ fun json ->
+  let read_flat_out json =
     let status = get_value "status" json in
     let fetch_url = get_value "fetch_url" json in
     match status, fetch_url with
-    | None, _ | _, None -> None
+    | None, _ | _, None ->
+    OpamConsole.error "OUT %s" json;
+    `Malformed
     | Some status, Some fetch_url ->
-      Some (match status with
-          | "done" -> `Done (OpamUrl.of_string fetch_url)
-          | "pending" -> `Pending
-          | "new" -> `New
-          | "failed" -> `Failed
-          | _ -> `Unknown)
+      match status with
+      | "done" -> `Done (OpamUrl.of_string fetch_url)
+      | "pending" -> `Pending
+      | "new" -> `New
+      | "failed" -> `Failed
+      | _ -> `Unknown
 
-  let fallback_err fmt = Printf.sprintf ("SWH fallback: "^^fmt)
+  let parse_err json =
+ (*
+      {
+        "error":"Resource not found","reason":"The resource /api/1/vault/flat/swh:1:dir:6b700f4b287aee509adbc723d030309188684f4/ could not be found on the server."
+      }
+      {
+        "exception":"NotFoundExc",
+        "reason":"Cooking of swh:1:dir:6b700f4b287aee509adbc723d030309188684f04 was never requested."
+      }
+      *)
+    match get_value "exception" json with
+    | Some "NotfoundExc" -> `Uncooked
+    | None | Some _ -> `Error
+
+  let is_it_cooked url =
+    let dst = OpamSystem.temp_file ~auto_clean:false "swh-out" in
+    let cmd, args, tool =
+      match
+        download_args ~url ~out:dst
+          ~retry:OpamRepositoryConfig.(!r.retries)
+          ~compress:false ()
+      with
+      | "curl" as cmd::args -> cmd, "-i"::args, `curl
+      | "wget" as cmd::args -> cmd, args, `wget
+        (* TODO XXX have the good option for wget to retrieve http response body *)
+      | _ -> assert false
+    in
+    let stdout = OpamSystem.temp_file ~auto_clean:false "dl" in
+    OpamProcess.Job.finally (fun () -> OpamSystem.remove_file stdout)
+    @@ fun () ->
+    OpamSystem.make_command ~allow_stdin:false ~stdout cmd args
+    @@> fun ret ->
+    let status =
+      match tool with
+      | `curl ->
+        (match ret with
+         | OpamProcess.{ r_code = 0 ; r_stdout = (_::_ as l); _ } ->
+           let code = List.hd (List.rev l) in
+           let num = try int_of_string code with Failure _ -> 999 in
+           if num < 400 then
+             let json = OpamSystem.read dst in
+             if String.equal json "" then `Error else `Cooked json
+           else if num = 404 then
+             let json = OpamSystem.read dst in (* TODO XXX read last line of file *)
+             parse_err json
+           else `Error
+         | _ -> `Error)
+      | `wget ->
+        match ret.OpamProcess.r_code with
+        | 0 ->
+          let json = OpamSystem.read dst in (* TODO XXX read last line of file *)
+          if String.equal json "" then `Error else `Cooked json
+        | 8 ->
+          let json = OpamSystem.read dst in (* TODO XXX read last line of file *)
+          parse_err json
+        | _ -> `Error
+    in
+    OpamSystem.remove_file dst; (* TODO XXX and in case of error raised ? *)
+    Done status
 
   let get_url ?(max_tries=6) swhid =
     let attempts = max_tries in
     let hash = OpamSWHID.hash swhid in
-    let rec aux max_tries =
-      if max_tries <= 0 then
-        Done (Not_available
-                (Some (fallback_err "max_tries"),
-                 fallback_err "%d attempts tried; aborting" attempts))
-      else
-        get_dir hash @@+ function
-        | Some (`Done fetch_url) -> Done (Result fetch_url)
-        | Some (`Pending | `New) ->
-          Unix.sleep 10;
-          aux (max_tries - 1)
-        | None | Some (`Failed | `Unknown) ->
-          Done (Not_available (None, fallback_err "Unknown swhid"))
+    (* https://archive.softwareheritage.org/api/1/vault/flat/doc/ *)
+    let url = vault_url "flat" hash in
+    let rec loop max_tries json =
+      match read_flat_out json with
+      | `Done fetch_url -> Done (Result fetch_url)
+      | `Pending | `New ->
+        if max_tries <= 0 then
+          Done (Not_available
+                  (Some (fallback_err "max_tries"),
+                   fallback_err "%d attempts tried; aborting" attempts))
+        else
+          (Unix.sleep 10;
+           get_output_t2 ~post:false url
+           @@+ loop (max_tries - 1))
+      | `Malformed ->
+        Done (Not_available (None, fallback_err "Malformed request answer"))
+      | `Failed | `Unknown ->
+        Done (Not_available (None, fallback_err "Unknown swhid"))
     in
-    aux max_tries
+    is_it_cooked url
+    @@+ function
+    | `Error -> Done (Not_available (None, fallback_err "Request error"))
+    | `Cooked json ->
+      loop max_tries json
+    | `Uncooked ->
+      get_output_t2 ~post:true url
+      @@+ loop max_tries
 
   (* for the moment only used in sources, not extra sources or files *)
   let archive_fallback ?max_tries urlf dirnames =
