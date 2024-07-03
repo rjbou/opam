@@ -93,21 +93,25 @@ let fetch_from_cache =
       failwith "Version control not allowed as cache URL"
   in
   try
-    let hit_file =
-      OpamStd.List.find_map (fun ck ->
-          let f = cache_file cache_dir ck in
-          if OpamFilename.exists f then Some f else None)
-        checksums
+    let rec full_sanity_check = function
+      | [] -> raise Not_found
+      | ck::cks ->
+        let f = cache_file cache_dir ck in
+        if not (OpamFilename.exists f) then
+          raise Not_found;
+        if not (List.for_all
+                  (OpamHash.check_file (OpamFilename.to_string f))
+                  checksums) then
+          mismatch f
+        else if cks = [] then
+          Done (Up_to_date (f, OpamUrl.empty))
+        else
+          full_sanity_check cks
     in
-    if List.for_all
-        (fun ck -> OpamHash.check_file (OpamFilename.to_string hit_file) ck)
-        checksums
-    then Done (Up_to_date (hit_file, OpamUrl.empty))
-    else mismatch hit_file
+    full_sanity_check checksums
   with Not_found -> match checksums with
     | [] -> let m = "cache miss" in Done (Not_available (Some m, m))
-    | checksum::_ ->
-      (* Try all cache urls in order, but only the first checksum *)
+    | checksum::other_checksums ->
       let local_file = cache_file cache_dir checksum in
       let tmpfile = OpamFilename.add_extension local_file "tmp" in
       let rec try_cache_dl = function
@@ -125,6 +129,10 @@ let fetch_from_cache =
               checksums
           then
             (OpamFilename.move ~src:tmpfile ~dst:local_file;
+             List.iter (fun chk ->
+                 let link = cache_file cache_dir chk in
+                 OpamFilename.link ~relative:true ~target:local_file ~link)
+               other_checksums;
              Done (Result (local_file, root_cache_url)))
           else mismatch tmpfile
       in

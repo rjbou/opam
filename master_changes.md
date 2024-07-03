@@ -93,6 +93,7 @@ users)
   * Add opam 2.2.0 to the install scripts [#6062 @kit-ty-kate]
 
 ## Admin
+  * Make opam admin cache store a symlink to every checksums, not just the best one [#6068 @kit-ty-kate]
 
 ## Opam installer
 

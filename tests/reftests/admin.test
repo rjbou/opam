@@ -541,8 +541,6 @@ url.src:
 url.checksum:
 ### rm -r packages/an-old-package
 ### opam admin add-hashes sha512
-[file://${BASEDIR}/arch1.tgz] found in cache
-[file://${BASEDIR}/arch2.tgz] found in cache
 ### opam show --just-file ./packages/dolor/dolor.1/opam --field url.src,url.checksum | "=[0-9a-f]\+\(,\|$\)" -> =HASH
 url.src:      file://${BASEDIR}/arch1.tgz
 url.checksum: md5=HASH sha256=HASH sha512=HASH
@@ -615,7 +613,7 @@ opam-version: "2.0"
 ### openssl sha512 arch1.tgz | '.*= ' -> '' >$ DL_SHA512
 ### sh -c "echo '$DL_SHA512' | cut -c 1-2" >$ PRE_DL_SHA512
 ### : create cache :
-### opam admin cache
+### opam admin cache | unordered
 [dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
 [ocaml-variants.1.2+1] synchronised (file://${BASEDIR}/old-comp.1.2+1.tgz)
 [sit.1] synchronised (file://${BASEDIR}/arch2.tgz)
@@ -633,19 +631,20 @@ Done.
 ### test -f cache/sha512/$PRE_DL_SHA512/$DL_SHA512
 ### :VII:2: remove weakest hashes and recompute :
 ### rm -rf cache/md5 cache/sha256
-### opam admin cache
+### opam admin cache | unordered
+[dolor.1] synchronised (file://${BASEDIR}/cache)
+[ocaml-variants.1.2+1] synchronised (file://${BASEDIR}/cache)
+[sit.1] synchronised (file://${BASEDIR}/cache)
+[ocaml-base-compiler.1.2] synchronised (file://${BASEDIR}/cache)
 Done.
 ### test -f cache/md5/$PRE_OC_MD5/$OC_MD5
-# Return code 1 #
 ### test -f cache/sha512/$PRE_OC_SHA512/$OC_SHA512
 ### test -f cache/md5/$PRE_DL_MD5/$DL_MD5
-# Return code 1 #
 ### test -f cache/sha256/$PRE_DL_SHA256/$DL_SHA256
-# Return code 1 #
 ### test -f cache/sha512/$PRE_DL_SHA512/$DL_SHA512
 ### :VII:3: remove strongest hash and recompute :
 ### rm -rf cache
-### opam admin cache
+### opam admin cache | unordered
 [dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
 [ocaml-variants.1.2+1] synchronised (file://${BASEDIR}/old-comp.1.2+1.tgz)
 [sit.1] synchronised (file://${BASEDIR}/arch2.tgz)
@@ -654,7 +653,7 @@ Done.
 ### sh -c "find cache | wc -l"
 24
 ### rm -rf cache/sha512
-### opam admin cache
+### opam admin cache | unordered
 [dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
 [ocaml-variants.1.2+1] synchronised (file://${BASEDIR}/old-comp.1.2+1.tgz)
 [sit.1] synchronised (file://${BASEDIR}/arch2.tgz)
@@ -670,7 +669,7 @@ Done.
 ### <packages/dolor/dolor.1/opam>
 opam-version: "2.0"
 ### sh add-urls.sh arch1 1 dolor
-### opam admin cache
+### opam admin cache | unordered
 [dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
 Done.
 ### test -f cache/md5/$PRE_DL_MD5/$DL_MD5
@@ -681,12 +680,11 @@ Done.
 ### opam show --just-file ./packages/dolor/dolor.1/opam --field url.src,url.checksum | "${DL_MD5}" -> MD5_DOLOR | "${DL_SHA512}" -> SHA512_DOLOR
 url.src:      file://${BASEDIR}/arch1.tgz
 url.checksum: md5=MD5_DOLOR, sha512=SHA512_DOLOR
-### opam admin cache
-[dolor.1] synchronised (cached)
+### opam admin cache | unordered
+[dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
 Done.
 ### test -f cache/md5/$PRE_DL_MD5/$DL_MD5
 ### test -f cache/sha512/$PRE_DL_SHA512/$DL_SHA512
-# Return code 1 #
 ### :::::::::::::::::::::::
 ### :VIII: Specific cases :
 ### :::::::::::::::::::::::
