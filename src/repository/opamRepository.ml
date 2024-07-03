@@ -44,6 +44,13 @@ let cache_file cache_dir checksum =
   in
   aux cache_dir (OpamHash.to_path checksum)
 
+let link_files ~target f l =
+  List.iter (fun x ->
+      try
+        OpamFilename.link ~relative:true ~target ~link:(f x)
+      with Sys_error _ -> ()) (* Can happen on Windows *)
+    l
+
 let fetch_from_cache =
   let currently_downloading = ref [] in
   let rec no_concurrent_dls key f x =
@@ -91,9 +98,6 @@ let fetch_from_cache =
       end
     | #OpamUrl.version_control ->
       failwith "Version control not allowed as cache URL"
-  in
-  let link_files ~target f l =
-    List.iter (fun x -> OpamFilename.link ~relative:true ~target ~link:(f x)) l
   in
   try
     match
@@ -161,14 +165,9 @@ let validate_and_add_to_cache label url cache_dir file checksums =
     (let checksums = OpamHash.sort checksums in
      match cache_dir, checksums with
      | Some dir, best_chks :: others_chks ->
-       OpamFilename.copy ~src:file ~dst:(cache_file dir best_chks);
-       List.iter (fun checksum ->
-           let target = cache_file dir best_chks in
-           let link = cache_file dir checksum in
-           try
-             OpamFilename.link ~relative:true ~target ~link
-           with Sys_error _ -> ())
-         others_chks;
+       let target = cache_file dir best_chks in
+       OpamFilename.copy ~src:file ~dst:target;
+       link_files ~target (cache_file dir) others_chks;
      | _ -> ());
     true
 
