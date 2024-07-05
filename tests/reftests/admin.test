@@ -541,6 +541,8 @@ url.src:
 url.checksum:
 ### rm -r packages/an-old-package
 ### opam admin add-hashes sha512
+[file://${BASEDIR}/arch1.tgz] found in cache
+[file://${BASEDIR}/arch2.tgz] found in cache
 ### opam show --just-file ./packages/dolor/dolor.1/opam --field url.src,url.checksum | "=[0-9a-f]\+\(,\|$\)" -> =HASH
 url.src:      file://${BASEDIR}/arch1.tgz
 url.checksum: md5=HASH sha256=HASH sha512=HASH
@@ -632,10 +634,10 @@ Done.
 ### :VII:2: remove weakest hashes and recompute :
 ### rm -rf cache/md5 cache/sha256
 ### opam admin cache | unordered
-[dolor.1] synchronised (file://${BASEDIR}/cache)
-[ocaml-variants.1.2+1] synchronised (file://${BASEDIR}/cache)
-[sit.1] synchronised (file://${BASEDIR}/cache)
-[ocaml-base-compiler.1.2] synchronised (file://${BASEDIR}/cache)
+[dolor.1] synchronised (cached)
+[ocaml-variants.1.2+1] synchronised (cached)
+[sit.1] synchronised (cached)
+[ocaml-base-compiler.1.2] synchronised (cached)
 Done.
 ### test -f cache/md5/$PRE_OC_MD5/$OC_MD5
 ### test -f cache/sha512/$PRE_OC_SHA512/$OC_SHA512
@@ -681,7 +683,7 @@ Done.
 url.src:      file://${BASEDIR}/arch1.tgz
 url.checksum: md5=MD5_DOLOR, sha512=SHA512_DOLOR
 ### opam admin cache | unordered
-[dolor.1] synchronised (file://${BASEDIR}/arch1.tgz)
+[dolor.1] synchronised (cached)
 Done.
 ### test -f cache/md5/$PRE_DL_MD5/$DL_MD5
 ### test -f cache/sha512/$PRE_DL_SHA512/$DL_SHA512

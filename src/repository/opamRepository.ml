@@ -92,23 +92,28 @@ let fetch_from_cache =
     | #OpamUrl.version_control ->
       failwith "Version control not allowed as cache URL"
   in
+  let link_files ~target f l =
+    List.iter (fun x -> OpamFilename.link ~relative:true ~target ~link:(f x)) l
+  in
   try
-    let rec full_sanity_check = function
-      | [] -> raise Not_found
-      | ck::cks ->
-        let f = cache_file cache_dir ck in
-        if not (OpamFilename.exists f) then
-          raise Not_found;
-        if not (List.for_all
-                  (OpamHash.check_file (OpamFilename.to_string f))
-                  checksums) then
-          mismatch f
-        else if cks = [] then
-          Done (Up_to_date (f, OpamUrl.empty))
-        else
-          full_sanity_check cks
-    in
-    full_sanity_check checksums
+    match
+      List.fold_left (fun (hit, misses) ck ->
+          let f = cache_file cache_dir ck in
+          if OpamFilename.exists f
+          then (Some f, misses)
+          else (hit, f :: misses))
+        (None, []) checksums
+    with
+    | None, _ -> raise Not_found
+    | Some hit_file, miss_files ->
+      if List.for_all
+          (fun ck -> OpamHash.check_file (OpamFilename.to_string hit_file) ck)
+          checksums
+      then begin
+        link_files ~target:hit_file Fun.id miss_files;
+        Done (Up_to_date (hit_file, OpamUrl.empty))
+      end else
+        mismatch hit_file
   with Not_found -> match checksums with
     | [] -> let m = "cache miss" in Done (Not_available (Some m, m))
     | checksum::other_checksums ->
@@ -129,10 +134,7 @@ let fetch_from_cache =
               checksums
           then
             (OpamFilename.move ~src:tmpfile ~dst:local_file;
-             List.iter (fun chk ->
-                 let link = cache_file cache_dir chk in
-                 OpamFilename.link ~relative:true ~target:local_file ~link)
-               other_checksums;
+             link_files ~target:local_file (cache_file cache_dir) other_checksums;
              Done (Result (local_file, root_cache_url)))
           else mismatch tmpfile
       in
