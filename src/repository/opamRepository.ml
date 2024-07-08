@@ -46,9 +46,7 @@ let cache_file cache_dir checksum =
 
 let link_files ~target f l =
   List.iter (fun x ->
-      try
-        OpamFilename.link ~relative:true ~target ~link:(f x)
-      with Sys_error _ -> ()) (* Can happen on Windows *)
+      OpamFilename.link ~relative:true ~target ~link:(f x)
     l
 
 let fetch_from_cache =
