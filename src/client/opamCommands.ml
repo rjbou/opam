@@ -1655,6 +1655,35 @@ let exec cli =
        reverted instead."
   in
   let exec global_options inplace_path set_opamroot set_opamswitch no_switch cmd () =
+    let time_OpamSystem_read_10  read =
+      let time_OpamSystem_read () =
+        let ic = Stdlib.open_in_bin "/tmp/k" in
+        let before = Unix.gettimeofday () in
+        let rec loop () =
+          match Stdlib.input_line ic with
+          | file -> ignore (read file); loop ()
+          | exception End_of_file -> Unix.gettimeofday () -. before
+        in
+        loop ()
+      in
+      let n = 10 in
+      let l = List.init n (fun _ -> time_OpamSystem_read ()) in
+      List.fold_left (+.) 0.0 l /. float_of_int n
+    in
+    ([ "old"; "new"; "stdlib"; "old/new"; "old/stdlib"; "new/stdlib"; ]
+     ::
+     (let told = time_OpamSystem_read_10 OpamSystem.read in
+      let tnew = time_OpamSystem_read_10 OpamSystem.read_new in
+      let tstdlib = time_OpamSystem_read_10 OpamSystem.read_stdlib in
+      [List.map (Printf.sprintf "%03.6f")
+        [ told; tnew; tstdlib; told/.tnew; told/.tstdlib; tnew/.tstdlib ]]))
+    |> OpamStd.Format.align_table
+    |> OpamConsole.print_table stdout ~sep:"  |  ";
+    exit 0
+
+
+
+
     apply_global_options cli global_options;
     if set_opamswitch && no_switch then
       `Error (true, "--no-switch and --set-switch option can't be used together")

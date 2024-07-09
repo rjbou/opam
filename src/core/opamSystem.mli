@@ -111,6 +111,8 @@ exception File_not_found of string
 (** [read filename] returns the contents of [filename] (while taking an advisory
     read lock to prevent concurrent writes) *)
 val read: string -> string
+val read_new: string -> string
+val read_stdlib: string -> string
 val read_test: string list -> unit
 
 (** [write filename contents] write [contents] to [filename] (while taking an

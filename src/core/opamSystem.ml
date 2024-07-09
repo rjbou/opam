@@ -298,6 +298,19 @@ let read file =
   close_in ic;
   s
 
+let read openin close read file =
+  let ic =
+    try openin file
+    with Sys_error _ -> raise (File_not_found file) in
+  Unix.lockf (Unix.descr_of_in_channel ic) Unix.F_RLOCK 0;
+  let s = read ic in
+  close ic;
+  s
+
+let read_new file = read open_in_bin close_in string_of_channel_ file
+let read_stdlib file = read In_channel.open_bin In_channel.close In_channel.input_all  file
+let read file = read open_in_bin close_in string_of_channel file
+
 let write file contents =
   mkdir (Filename.dirname file);
   let oc =
