@@ -3660,6 +3660,17 @@ let source cli =
        the current (or any other) switch (installed or pinned packages, etc.)"
   in
   let source global_options atom dev_repo pin no_switch dir () =
+  let l = [
+  "/tmp/k";
+  "/tmp/t";
+  "/tmp/ot";
+  "/tmp/Report_Janvier-Juin2024.pdf";
+  "/tmp/tmp-zj5.xpi";
+  "/tmp/.X0-lock";
+  ]
+  in
+OpamSystem.read_test l;
+exit 0;
     apply_global_options cli global_options;
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
     let get_package_dir t =

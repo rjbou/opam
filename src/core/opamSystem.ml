@@ -236,6 +236,59 @@ let string_of_channel ic =
   iter ic b s;
   Buffer.contents b
 
+let string_of_channel_ ic =
+  let n = 4096 in
+  let b = Buffer.create n in
+  let rec iter ic b =
+    match Buffer.add_channel b ic n with
+    | () -> iter ic b
+    | exception End_of_file -> ()
+  in
+  iter ic b;
+  Buffer.contents b
+
+let read_test files =
+  let run openin close read file_ =
+    let file = openin file_ in
+    let time_OpamSystem_read () =
+      let before = Unix.gettimeofday () in
+      for _ = 0 to 100000 do
+        ignore (read file);
+      done;
+      Unix.gettimeofday () -. before
+    in
+    let n = 100 in
+    let l = List.init n (fun _ -> time_OpamSystem_read ()) in
+    close file;
+    List.fold_left (+.) 0.0 l /. float_of_int n
+  in
+  let result =
+    (List.map (fun f ->
+         try
+           let size =
+             Printf.sprintf "%d" @@ (Unix.stat f).st_size
+           in
+           let told = run open_in_bin close_in string_of_channel f in
+           let tnew = run open_in_bin close_in string_of_channel_ f in
+           let tstdlib = run In_channel.open_bin In_channel.close In_channel.input_all f in
+           let str = Printf.sprintf "%03.6f" in
+           let gain = told /. tnew in
+           [ f; size; str told; str tnew; str tstdlib; str gain ]
+         with Sys_error _ -> [ f; "0"; "œ"; "œ"; "œ" ]
+       ) files
+    )
+  in
+  result
+  |> List.sort (fun x y ->
+      match x,y with
+      | _::sx::_ , _::sy::_ -> compare (int_of_string sx) (int_of_string sy)
+      | _ -> assert false)
+  |> (fun l -> ["file"; "size"; "current"; "new"; "stdlib"; "gain"]::l)
+  |> OpamStd.Format.align_table
+  |> OpamConsole.print_table stdout ~sep:"  |  "
+
+
+
 let read file =
   let ic =
     try open_in_bin file
