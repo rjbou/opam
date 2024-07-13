@@ -325,9 +325,6 @@ opam-version: "2.0"
 MD5(arch-evil.tgz)= LR_MD5
 ### sh add-urls.sh lorem
 ### opam admin cache
-[dolor.1] synchronised (cached)
-[ipsum.1] synchronised (cached)
-[sit.1] synchronised (cached)
 [lorem.1] synchronised (file://${BASEDIR}/arch-lorem.tgz)
 Done.
 ### opam admin add-hashes sha256 --package lorem
@@ -341,19 +338,16 @@ lorem : sha256 : not found
 lorem : sha512 : not found
 ### opam admin cache
 [lorem.1] synchronised (cached)
-[dolor.1] synchronised (cached)
-[ipsum.1] synchronised (cached)
-[sit.1] synchronised (cached)
 Done.
 ### sh cache-analysi.sh
 lorem : md5 : exists
-lorem : sha256 : not found
+lorem : sha256 : exists, link to md5
 lorem : sha512 : not found
 ### mv arch-evil.tgz cache/md5/$PRE_LR_MD5/$LR_MD5
 ### opam admin add-hashes sha512 --package lorem
 ### sh cache-analysi.sh
 lorem : md5 : exists
-lorem : sha256 : not found
+lorem : sha256 : exists, link to md5
 lorem : sha512 : not found
 ### opam admin cache | "${LR_MD5}" -> LR_MD5 | "${LR_SHA256}" -> LR_SHA256 | "${LR_SHA512}" -> LR_SHA512
 [ERROR] Conflicting file hashes, or broken or compromised cache!
@@ -361,9 +355,6 @@ lorem : sha512 : not found
           - sha256=LR_SHA256 (MISMATCH)
           - md5=LR_MD5 (match)
 
-[dolor.1] synchronised (cached)
-[ipsum.1] synchronised (cached)
-[sit.1] synchronised (cached)
 [lorem.1] synchronised (file://${BASEDIR}/arch-lorem.tgz)
 Done.
 ### sh cache-analysi.sh
