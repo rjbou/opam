@@ -118,7 +118,9 @@ sh analysi.sh amet  sha512 $MT_SHA512
 [amet.1] synchronised (file://${BASEDIR}/arch-amet.tgz)
 Adding cache to ${BASEDIR}/repo...
 Done.
-### :VII:1: check hashes presence :
+### :::::::::::::::::::::::::::
+### :I: check hashes presence :
+### :::::::::::::::::::::::::::
 ### sh cache-analysi.sh
 ipsum : md5 : exists, link to sha512
 ipsum : sha256 : exists, link to sha512
@@ -132,7 +134,9 @@ sit : sha512 : exists
 amet : md5 : exists, link to sha512
 amet : sha256 : exists, link to sha512
 amet : sha512 : exists
-### :VII:2: remove weakest hashes and recompute :
+### ::::::::::::::::::::::::::::::::::::::::::
+### :II: remove weakest hashes and recompute :
+### ::::::::::::::::::::::::::::::::::::::::::
 ### rm -rf cache/md5 cache/sha256
 ### opam admin cache | unordered
 Done.
@@ -149,7 +153,9 @@ sit : sha512 : exists
 amet : md5 : not found
 amet : sha256 : not found
 amet : sha512 : exists
-### :VII:3: remove strongest hash and recompute :
+### :::::::::::::::::::::::::::::::::::::::::::
+### :III: remove strongest hash and recompute :
+### :::::::::::::::::::::::::::::::::::::::::::
 ### rm -rf cache
 ### opam admin cache | unordered
 [ipsum.1] synchronised (file://${BASEDIR}/arch-ipsum.tgz)
@@ -190,10 +196,12 @@ sit : sha512 : exists
 amet : md5 : exists, link to sha512
 amet : sha256 : exists, link to sha512
 amet : sha512 : exists
-### :VII:4: add a other hashes afterwards :
-### : ISPUM : only md5 then adding sha512
-### : DL : md5 & sha256 then adding sha512
-### : ST  : sha256 then adding md5 & sha512
+### ::::::::::::::::::::::::::::::::::::
+### :IV: add a other hashes afterwards :
+### ::::::::::::::::::::::::::::::::::::
+### : ipsum : only md5 then adding sha512
+### : dolor : md5 & sha256 then adding sha512
+### : sit   : sha256 then adding md5 & sha512
 ### sed -i '/"sha512=.*/d' packages/ipsum/ipsum.1/opam
 ### sed -i '/"sha256=.*/d' packages/ipsum/ipsum.1/opam
 ### sed -i '/"sha512=.*/d' packages/dolor/dolor.1/opam
@@ -275,7 +283,9 @@ sit : sha512 : not found
 amet : md5 : exists, link to sha512
 amet : sha256 : exists, link to sha512
 amet : sha512 : exists
-### :VII:5: corrupted md5
+### ::::::::::::::::::
+### :V: corrupted md5:
+### ::::::::::::::::::
 ### <packages/lorem/lorem.1/opam>
 opam-version: "2.0"
 ### <hex1>
