@@ -942,6 +942,24 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:list-coinstallable.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-list-repo)
+ (action
+  (diff list-repo.test list-repo.out)))
+
+(alias
+ (name reftest)
+ (deps (alias reftest-list-repo)))
+
+(rule
+ (targets list-repo.out)
+ (deps root-7371c1d9)
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:list-repo.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-list)
  (action
   (diff list.test list.out)))
@@ -952,7 +970,7 @@
 
 (rule
  (targets list.out)
- (deps root-7371c1d9)
+ (deps root-N0REP0)
  (package opam)
  (action
   (with-stdout-to
