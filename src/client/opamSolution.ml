@@ -824,15 +824,32 @@ let parallel_apply t
 
   (* 2/ Display errors and finalize *)
 
+  let new_cache =
+    let successfull_nvs =
+      let filter =
+        List.filter_map (function `Install nv -> Some nv | _ -> None)
+      in
+      match action_results with
+      | `Successful actions
+      | `Error (Partial_error { actions_successes = actions; _}) ->
+        filter actions
+      | `Exception _ | `Error (Aborted | Nothing_to_do | OK _) ->
+        []
+    in
+    OpamPackage.Set.fold (fun nv opams ->
+        let opam =
+          if List.mem nv successfull_nvs then
+            OpamSwitchState.opam t nv
+          else
+            OpamPackage.Map.find nv t.installed_opams
+        in
+        let opam = OpamFile.OPAM.with_metadata_dir None opam in
+        OpamPackage.Map.add nv opam opams)
+      t.installed OpamPackage.Map.empty
+  in
   OpamSwitchState.Installed_cache.save
     (OpamPath.Switch.installed_opams_cache t.switch_global.root t.switch)
-    (OpamPackage.Set.fold (fun nv opams ->
-         let opam =
-           OpamSwitchState.opam t nv |>
-           OpamFile.OPAM.with_metadata_dir None
-         in
-         OpamPackage.Map.add nv opam opams)
-        t.installed OpamPackage.Map.empty);
+    new_cache;
 
   let cleanup_artefacts graph =
     PackageActionGraph.iter_vertex (function

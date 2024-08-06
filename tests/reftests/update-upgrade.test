@@ -542,8 +542,22 @@ The following actions will be performed:
 ### : Running opam upgrade a second time should do the same thing - the same
 ### : failure with the same return code 31.
 ### opam upgrade
-Already up-to-date.
-Nothing to do.
+The following actions will be performed:
+=== recompile 1 package
+  - recompile upg-two 1 [upstream or system changes]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+[ERROR] The compilation of upg-two.1 failed at "false".
+
+
+
+
+<><> Error report <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
++- The following actions failed
+| - build upg-two 1
++- 
+- No changes have been performed
+# Return code 31 #
 ### ::With cache removal ::
 ### opam remove upg-two.1
 The following actions will be performed:
