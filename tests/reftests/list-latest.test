@@ -42,8 +42,8 @@ adipiscing 2         1  2
 amet       2         1  2
 elit       2         1  2
 sit        2         1  2
-### opam list --latest --depends-on sit --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-depends-on(sit) & (installed | available)
+### opam list --latests-only --depends-on sit --recursive --columns name,version,all-versions
+# Packages matching: rec-depends-on(sit) & latest-only
 # Name     # Version # Versions
 adipiscing 2         1  2
 amet       2         1  2
@@ -56,18 +56,19 @@ adipiscing 2         1  2
 amet       2         1  2
 elit       2         1  2
 sit        1         1  2
-### opam list --latest --depends-on sit.1 --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-depends-on(sit.1) & (installed | available)
+### opam list --latests-only --depends-on sit.1 --recursive --columns name,version,all-versions
+# Packages matching: rec-depends-on(sit.1) & latest-only
 # Name     # Version # Versions
 adipiscing 2         1  2
 amet       2         1  2
 elit       2         1  2
+sit        1         1  2
 ### opam list --depends-on sit.2 --recursive --columns name,version,all-versions
 # Packages matching: rec-depends-on(sit.2) & (installed | available)
 # Name # Version # Versions
 sit    2         1  2
-### opam list --latest --depends-on sit.2 --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-depends-on(sit.2) & (installed | available)
+### opam list --latests-only --depends-on sit.2 --recursive --columns name,version,all-versions
+# Packages matching: rec-depends-on(sit.2) & latest-only
 # Name # Version # Versions
 sit    2         1  2
 ### opam list --required-by elit --recursive --columns name,version,all-versions
@@ -79,23 +80,25 @@ consectetur 2         1  2
 dolor       2         1  2
 elit        2         1  2
 sit         1         1  2
-### opam list --latest --required-by elit --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-required-by(elit) & (installed | available)
+### opam list --latests-only --required-by elit --recursive --columns name,version,all-versions
+# Packages matching: rec-required-by(elit) & latest-only
 # Name      # Version # Versions
 adipiscing  2         1  2
 amet        2         1  2
 consectetur 2         1  2
 dolor       2         1  2
 elit        2         1  2
+sit         1         1  2
 ### opam list --required-by elit.1 --recursive --columns name,version,all-versions
 # Packages matching: rec-required-by(elit.1) & (installed | available)
 # Name      # Version # Versions
 consectetur 2         1  2
 elit        1         1  2
-### opam list --latest --required-by elit.1 --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-required-by(elit.1) & (installed | available)
+### opam list --latests-only --required-by elit.1 --recursive --columns name,version,all-versions
+# Packages matching: rec-required-by(elit.1) & latest-only
 # Name      # Version # Versions
 consectetur 2         1  2
+elit        1         1  2
 ### opam list --required-by elit.2 --recursive --columns name,version,all-versions
 # Packages matching: rec-required-by(elit.2) & (installed | available)
 # Name     # Version # Versions
@@ -104,10 +107,11 @@ amet       2         1  2
 dolor      2         1  2
 elit       2         1  2
 sit        1         1  2
-### opam list --latest --required-by elit.2 --recursive --columns name,version,all-versions
-# Packages matching: latest-only & rec-required-by(elit.2) & (installed | available)
+### opam list --latests-only --required-by elit.2 --recursive --columns name,version,all-versions
+# Packages matching: rec-required-by(elit.2) & latest-only
 # Name     # Version # Versions
 adipiscing 2         1  2
 amet       2         1  2
 dolor      2         1  2
 elit       2         1  2
+sit        1         1  2
