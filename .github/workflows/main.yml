@@ -72,8 +72,8 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ steps.keys.outputs.archives }}
-        check-only: true
-        force-gzip: true
+        lookup-only: true
+        enableCrossOsArchive: true
     - name: Create src_ext/archives and opam-repository cache
       if: steps.archives.outputs.cache-hit != 'true'
       run: bash -exu .github/scripts/main/archives-cache.sh
@@ -88,8 +88,8 @@ jobs:
       with:
         path: D:\Cache\cygwin\x86_64-pc-cygwin
         key: cygwin64-${{ needs.Analyse.outputs.cygwin }}
-        check-only: true
-        force-gzip: true
+        lookup-only: true
+        enableCrossOsArchive: true
     - name: Checkout tree
       if: steps.cygwin64.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
@@ -121,7 +121,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -164,7 +164,7 @@ jobs:
       with:
         path: D:\Cache\cygwin\x86_64-pc-cygwin
         key: cygwin64-${{ needs.Analyse.outputs.cygwin }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: src_ext/archives and opam-repository Cache
       id: archives
       uses: actions/cache@v4
@@ -173,14 +173,14 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
       with:
         path: D:\Cache\ocaml-local.tar
         key: ${{ runner.os }}-${{ matrix.host }}-ocaml-${{ matrix.ocamlv }}-${{ needs.Analyse.outputs.ocaml-cache }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: Unpack Cygwin
       shell: cmd
       run: .github\scripts\cygwin.cmd ${{ matrix.build }} D:\Cache\cygwin ${{ matrix.host }}
@@ -239,7 +239,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -279,7 +279,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -333,7 +333,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -386,7 +386,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: Cold
       run: |
         make compiler
@@ -421,7 +421,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -467,7 +467,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: OCaml ${{ matrix.ocamlv }} Cache
       id: ocaml-cache
       uses: actions/cache@v4
@@ -577,7 +577,7 @@ jobs:
           src_ext/archives
           ~/opam-repository
         key: ${{ needs.Analyse.outputs.archives }}
-        force-gzip: true
+        enableCrossOsArchive: true
     - name: Get changed files
       id: files
       uses: Ana06/get-changed-files@v2.2.0

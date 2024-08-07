@@ -173,12 +173,12 @@ let cache ?cond ?(key_prefix="needs.Analyse") ?(check_only=false) name =
     let action = "actions/cache@v4" in
     let withs =
       if cache.force_gzip then
-        [("force-gzip", Literal ["true"])]
+        [("enableCrossOsArchive", Literal ["true"])]
       else
         [] in
     let withs =
       if check_only then
-        ("check-only", Literal ["true"]) :: withs
+        ("lookup-only", Literal ["true"]) :: withs
       else
         withs in
     let withs =
