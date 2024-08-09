@@ -90,8 +90,28 @@ if [ "$OPAM_DOC" = "1" ]; then
     doc/html/opam-solver/index.html
     doc/html/opam-state/index.html
 
+    doc/pages/About.html
+    doc/pages/About.md
+    doc/pages/Distribution.html
+    doc/pages/Distribution.md
+    doc/pages/External_solvers.html
+    doc/pages/External_solvers.md
+    doc/pages/FAQ.html
+    doc/pages/FAQ.md
     doc/pages/Install.html
     doc/pages/Install.md
+    doc/pages/Manual.html
+    doc/pages/Manual.md
+    doc/pages/Packaging.html
+    doc/pages/Packaging.md
+    doc/pages/Specifying_Solver_Preferences.html
+    doc/pages/Specifying_Solver_Preferences.md
+    doc/pages/Tricks.html
+    doc/pages/Tricks.md
+    doc/pages/Upgrade_guide.html
+    doc/pages/Upgrade_guide.md
+    doc/pages/Usage.html
+    doc/pages/Usage.md
     doc/man-html/opam-init.html"
 
   echo '::group::checking generated files'
