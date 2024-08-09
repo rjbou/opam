@@ -90,6 +90,8 @@ if [ "$OPAM_DOC" = "1" ]; then
     doc/html/opam-solver/index.html
     doc/html/opam-state/index.html
 
+    nonexistent.ml
+
     doc/pages/Install.html
     doc/pages/Install.md
     doc/man-html/opam-init.html"
