@@ -73,6 +73,40 @@ if [ "$OPAM_DOC" = "1" ]; then
     else
       echo 'No new module added'
     fi
+
+    echo '::group::checking generated files'
+    files="
+    doc/index.html
+    doc/html/index.html
+    doc/man-html/index.html
+
+    doc/html/opam-admin/index.html
+    doc/html/opam-core/index.html
+    doc/html/opam-devel/index.html
+    doc/html/opam-format/index.html
+    doc/html/opam/index.html
+    doc/html/opam-installer/index.html
+    doc/html/opam-repository/index.html
+    doc/html/opam-solver/index.html
+    doc/html/opam-state/index.html
+
+    doc/pages/Install.html
+    doc/pages/Install.md
+    doc/man-html/opam-init.html"
+
+    set +e
+    missing=""
+    for file in $files; do
+      if ! test -f $file ; then
+        missing="$missing $file"
+      fi
+    done
+    set -e
+    if [ "x$missing" != "x" ]; then
+      echo "::error missing generated doc files: $missing"
+      exit 4
+    fi
+    echo '::engroup::'
   fi
 fi
 
