@@ -74,46 +74,13 @@ if [[ $OPAM_DOC -eq 1 ]]; then
     fi
   fi
 
-  files="
-    doc/index.html
-    doc/html/index.html
-    doc/man-html/index.html
-
-    doc/html/opam-admin/index.html
-    doc/html/opam-core/index.html
-    doc/html/opam-devel/index.html
-    doc/html/opam-format/index.html
-    doc/html/opam/index.html
-    doc/html/opam-installer/index.html
-    doc/html/opam-repository/index.html
-    doc/html/opam-solver/index.html
-    doc/html/opam-state/index.html
-
-    doc/pages/About.html
-    doc/pages/About.md
-    doc/pages/Distribution.html
-    doc/pages/Distribution.md
-    doc/pages/External_solvers.html
-    doc/pages/External_solvers.md
-    doc/pages/FAQ.html
-    doc/pages/FAQ.md
-    doc/pages/Install.html
-    doc/pages/Install.md
-    doc/pages/Manual.html
-    doc/pages/Manual.md
-    doc/pages/Packaging.html
-    doc/pages/Packaging.md
-    doc/pages/Specifying_Solver_Preferences.html
-    doc/pages/Specifying_Solver_Preferences.md
-    doc/pages/Tricks.html
-    doc/pages/Tricks.md
-    doc/pages/Upgrade_guide.html
-    doc/pages/Upgrade_guide.md
-    doc/pages/Usage.html
-    doc/pages/Usage.md
-    doc/man-html/opam-init.html"
+  htmlfiles=$(ls doc/pages/*.md | sed -e 's/\.md/.html/')
+  manfiles=$(opam --help=groff | grep '^\\fB\w' | sed 's/\\fB\(.*\)\\fR .*/\1/')
 
   echo '::group::checking for generated files'
+  echo "htmlfiles: $htmlfiles"
+  echo "manfiles: $manfiles"
+  files="$htmlfiles $manfiles"
   missing=""
   for file in $files; do
     if ! test -f $file ; then
