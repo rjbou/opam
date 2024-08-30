@@ -52,26 +52,25 @@ make install
 export PATH="$PREFIX/bin:$PATH"
 opam --version
 
-if [ "$OPAM_DOC" = "1" ]; then
-  rm -rf src_ext/
+if [[ $OPAM_DOC -eq 1 ]]; then
   make -C doc html man-html pages
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
     diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
     set +e
-    files="`$diff --name-only --diff-filter=A | grep 'src/.*mli'`"
+    files="$($diff --name-only --diff-filter=A -- src/**/*.mli)"
     set -e
     if [ -n "$files" ]; then
-      echo '::group::new module added - checking it'
+      echo '::group::new module(s) added - check index updated too'
       if $diff --name-only --exit-code -- doc/index.html ; then
-        echo '::error new module added but index not updates'
+        echo '::error new module(s) added but doc/index.html not updated'
         echo "$files"
         exit 3
       fi
       echo '::endgroup::new module added - checking it'
     else
-      echo 'No new module added'
+      echo 'No new modules added'
     fi
   fi
 
@@ -114,7 +113,7 @@ if [ "$OPAM_DOC" = "1" ]; then
     doc/pages/Usage.md
     doc/man-html/opam-init.html"
 
-  echo '::group::checking generated files'
+  echo '::group::checking for generated files'
   missing=""
   for file in $files; do
     if ! test -f $file ; then
