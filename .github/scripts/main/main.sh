@@ -75,7 +75,7 @@ if [[ $OPAM_DOC -eq 1 ]]; then
   fi
 
   htmlfiles=$(ls doc/pages/*.md | sed -e 's/\.md/.html/')
-  manfiles=$(opam --help=groff | grep '^\\fB\w' | sed 's/\\fB\(.*\)\\fR .*/doc\/man-html\/opam-\1.html/')
+  manfiles=$(opam --help=groff | grep '^\\fB\w' | sed 's/\\fB\(.*\)\\fR .*/doc\/man-html\/opam-\1.html/' | grep -v 'opam-opam')
 
   echo '::group::checking for generated files'
   echo "htmlfiles: $htmlfiles"
