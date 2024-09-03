@@ -722,3 +722,70 @@ This package uses opam 5.0 file format which opam CURRENTMAJOR cannot read.
 
 In order to install or view information on this package, please upgrade your opam installation to at least version 5.0."""
 available: opam-version >= "5.0"
+### :: Parse errors
+### <VRS/packages/two-zero/two-zero.1/opam>
+opam-version: "2.0"
+GARBAGE
+### opam update versions
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[versions] synchronised from file://${BASEDIR}/VRS
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam:3:0-3:0::
+          Parse error
+### opam show two-zero --raw
+[ERROR] No package matching two-zero found
+# Return code 5 #
+### rm -r VRS/packages
+### <VRS/packages/two-one/two-one.1/opam>
+opam-version: "2.1"
+GARBAGE
+### opam update versions
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[versions] synchronised from file://${BASEDIR}/VRS
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam:3:0-3:0::
+          Parse error
+Now run 'opam upgrade' to apply any package updates.
+### opam show two-one --raw
+[ERROR] No package matching two-one found
+# Return code 5 #
+### rm -r VRS/packages
+### <VRS/packages/two-two/two-two.1/opam>
+opam-version: "2.2"
+GARBAGE
+### opam update versions
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[versions] synchronised from file://${BASEDIR}/VRS
+Now run 'opam upgrade' to apply any package updates.
+### opam show two-two --raw
+opam-version: "2.0"
+name: "two-two"
+version: "1"
+synopsis: ""
+description: """\
+This package uses opam 2.2 file format which opam 2.3 cannot read.
+
+In order to install or view information on this package, please upgrade your opam installation to at least version 2.2."""
+available: opam-version >= "2.2"
+### rm -r VRS/packages
+### <VRS/packages/two-three/two-three.1/opam>
+opam-version: "2.3"
+GARBAGE
+### opam update versions
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[versions] synchronised from file://${BASEDIR}/VRS
+Now run 'opam upgrade' to apply any package updates.
+### opam show two-three --raw
+opam-version: "2.0"
+name: "two-three"
+version: "1"
+synopsis: ""
+description: """\
+This package uses opam 2.3 file format which opam 2.3 cannot read.
+
+In order to install or view information on this package, please upgrade your opam installation to at least version 2.3."""
+available: opam-version >= "2.3"
