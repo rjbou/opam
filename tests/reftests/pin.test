@@ -344,8 +344,8 @@ echo GARBAGE>>"$1"
 # Return code 5 #
 ### sh junk.sh pin-at-two-two/pin-at-two-two.opam
 ### opam install ./pin-at-two-two
-[ERROR] In ${BASEDIR}/pin-at-two-two/pin-at-two-two.opam:
-        unsupported or missing file format version; should be 2.0 or older
+[ERROR] At ${BASEDIR}/pin-at-two-two/pin-at-two-two.opam:11:0-11:0::
+        Parse error
 [ERROR] Strict mode: aborting
 # Return code 30 #
 ### OPAMSTRICT=0 opam install ./pin-at-two-two
@@ -358,8 +358,8 @@ echo GARBAGE>>"$1"
 # Return code 5 #
 ### sh junk.sh pin-at-two-three/pin-at-two-three.opam
 ### opam install ./pin-at-two-three
-[ERROR] In ${BASEDIR}/pin-at-two-three/pin-at-two-three.opam:
-        unsupported or missing file format version; should be 2.0 or older
+[ERROR] At ${BASEDIR}/pin-at-two-three/pin-at-two-three.opam:11:0-11:0::
+        Parse error
 [ERROR] Strict mode: aborting
 # Return code 30 #
 ### OPAMSTRICT=0 opam install ./pin-at-two-three
