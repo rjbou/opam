@@ -759,17 +759,12 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
-Now run 'opam upgrade' to apply any package updates.
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam:3:0-3:0::
+          Parse error
 ### opam show two-two --raw
-opam-version: "2.0"
-name: "two-two"
-version: "1"
-synopsis: ""
-description: """\
-This package uses opam 2.2 file format which opam 2.3 cannot read.
-
-In order to install or view information on this package, please upgrade your opam installation to at least version 2.2."""
-available: opam-version >= "2.2"
+[ERROR] No package matching two-two found
+# Return code 5 #
 ### rm -r VRS/packages
 ### <VRS/packages/two-three/two-three.1/opam>
 opam-version: "2.3"
@@ -778,14 +773,9 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
-Now run 'opam upgrade' to apply any package updates.
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam:3:0-3:0::
+          Parse error
 ### opam show two-three --raw
-opam-version: "2.0"
-name: "two-three"
-version: "1"
-synopsis: ""
-description: """\
-This package uses opam 2.3 file format which opam 2.3 cannot read.
-
-In order to install or view information on this package, please upgrade your opam installation to at least version 2.3."""
-available: opam-version >= "2.3"
+[ERROR] No package matching two-three found
+# Return code 5 #
