@@ -263,6 +263,8 @@ Could not retrieve some package sources, they will not be pinned nor installed:
 
 Continue anyway? [y/n] y
 ### opam pin
+### : Parse error with future opam version field on pin
+### :: just the opam version that is a future
 ### <pin:pin-at-two-one/pin-at-two-one.opam>
 opam-version: "2.1"
 ### opam install ./pin-at-two-one
@@ -291,6 +293,7 @@ opam-version: "50.0"
         unsupported or missing file format version; should be 2.0 or older
 [ERROR] Strict mode: aborting
 # Return code 30 #
+### :: opam version is a future and there is a parse error
 ### <junk.sh>
 echo GARBAGE>>"$1"
 ### sh junk.sh pin-at-two-one/pin-at-two-one.opam
