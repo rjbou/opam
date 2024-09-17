@@ -875,9 +875,12 @@ module Syntax = struct
     lexbuf.Lexing.lex_curr_p <- { lexbuf.Lexing.lex_curr_p with
                                   Lexing.pos_fname = filename };
     match OpamParser.main OpamLexer.token lexbuf filename with
-    | {file_contents = [{pelem = Variable({pelem = "opam-version"; _}, {pelem = String ver; _}); _ };
-                        {pelem = Section {section_kind = {pelem = "#"; _}; _}; _}]; _}
-      when OpamVersion.(compare (nopatch (of_string ver)) (nopatch OpamVersion.current)) <= 0 ->
+    | {file_contents =
+         [{pelem = Variable({pelem = "opam-version"; _},
+                            {pelem = String ver; _}); _ };
+          {pelem = Section {section_kind = {pelem = "#"; _}; _}; _}]; _}
+      when OpamVersion.(compare (nopatch (of_string ver))
+                          (nopatch OpamVersion.current)) <= 0 ->
       error "Parse error"
     | opamfile -> opamfile
     | exception OpamLexer.Error msg -> error msg
