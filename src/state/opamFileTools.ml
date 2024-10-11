@@ -399,7 +399,7 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
   let url_archive =
     let open OpamStd.Option.Op in
     t.url >>| OpamFile.URL.url >>| (fun u ->
-        OpamSystem.is_archive u.OpamUrl.path)
+        OpamSystem.is_archive_from_string u.OpamUrl.path)
   in
   let is_url_archive =
     not (OpamFile.OPAM.has_flag Pkgflag_Conf t)
