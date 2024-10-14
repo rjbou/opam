@@ -658,27 +658,26 @@ opam-version: "2.0"
 ### :VII: Filter :
 ### ::::::::::::::
 ### rm -rf packages
-### <pkg:lorem.1>
+### <packages/lorem/lorem.1/opam>
 opam-version: "2.0"
 available: [ os = "linux" ]
-### <pkg:ipsum.1>
+### <packages/ipsum/ipsum.1/opam>
 opam-version: "2.0"
-### <pkg:dolor.1>
+### <packages/dolor/dolor.1/opam>
 opam-version: "2.0"
-### <pkg:sit.1>
+### <packages/sit/sit.1/opam>
 opam-version: "2.0"
 depends: [ "lorem" | "adipscing" ]
-### <pkg:amet.1>
+### <packages/amet/amet.1/opam>
 opam-version: "2.0"
-### <pkg:consectetur.1>
+### <packages/consectetur/consectetur.1/opam>
 opam-version: "2.0"
-### <pkg:adipscing.1>
+### <packages/adipscing/adipscing.1/opam>
 opam-version: "2.0"
 available: [ os = "win32" ]
-### <pkg:elit.1>
+### <packages/elit/elit.1/opam>
 opam-version: "2.0"
 available: false
-### mv REPO/packages .
 ### opam admin list
 # Packages matching: available
 # Name      # Installed # Synopsis
