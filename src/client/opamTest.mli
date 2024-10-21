@@ -1,1 +1,0 @@
-val toto : unit -> string
