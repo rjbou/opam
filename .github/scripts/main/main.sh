@@ -51,9 +51,9 @@ opam --version
 if [[ "$OPAM_DOC" -eq 1 ]]; then
   make -C doc html man-html pages
 
-  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+#  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
-    diff="git diff $BASE_REF_SHA..$PR_REF_SHA"
+    diff="git diff HEAD~4..HEAD"
     set +e
     files=$($diff --name-only --diff-filter=A -- src/**/*.mli)
     set -e
@@ -68,7 +68,7 @@ if [[ "$OPAM_DOC" -eq 1 ]]; then
     else
       echo 'No new modules added'
     fi
-  fi
+#  fi
 
   mapfile -t htmlfiles < <(ls doc/pages/*.md | sed -e 's/\.md$/.html/')
   mapfile -t manfiles < <(opam help topics | sed -e 's|.*|doc/man-html/opam-&.html|')
