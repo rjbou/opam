@@ -151,12 +151,12 @@ val rec_files: string -> string list
 (** Return the list of files in the current directory. *)
 val files: string -> string list
 
-(** Return the list of files in the current directory, inclduing any
+(** Return the list of files in the current directory, including any
     dangling symlinks. *)
 val files_all_not_dir: string -> string list
 
 (** [rec_dirs dir] return the list list of all directories recursively
-    (going through symbolink links). *)
+    (going through symbolic links). *)
 val rec_dirs: string -> string list
 
 (** Return the list of directories in the current directory. *)
@@ -168,7 +168,7 @@ val dir_is_empty: string -> bool
     Links pointing to directory are also returned. *)
 val directories_with_links: string -> string list
 
-(** Make a comman suitable for {!OpamProcess.Job}. if [verbose], is set,
+(** Make a command suitable for {!OpamProcess.Job}. if [verbose], is set,
     command and output will be displayed (at command end for the
     latter, if concurrent commands are running). [name] is used for
     naming log files. [text] is what is displayed in the status line
@@ -227,7 +227,7 @@ val commands: ?verbose:bool -> ?env:string array -> ?name:string ->
     correct OPAM environment and return the lines from output if the command
     exists normally. If the command does not exist or if the command exited
     with a non-empty exit-code, throw an error.
-    It returns stdout and stder combiend, unless [ignore_stderr] is st to true.
+    It returns stdout and stder combined, unless [ignore_stderr] is st to true.
     *)
 val read_command_output: ?verbose:bool -> ?env:string array ->
   ?metadata:(string * string) list ->  ?allow_stdin:bool ->

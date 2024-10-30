@@ -16,7 +16,7 @@ include OpamStd.ABSTRACT
 (** System switch name *)
 val unset: t
 
-(** Determines wether this switch is internal (bound to a prefix within the opam
+(** Determines whether this switch is internal (bound to a prefix within the opam
     root) or living somewhere else, in which case its prefix dir is inferred
     from its name using [get_root] *)
 val is_external: t -> bool

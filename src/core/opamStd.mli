@@ -686,7 +686,7 @@ module Config : sig
   type answer = [ `unsafe_yes | `all_yes | `all_no | `ask ]
   type yes_answer = [ `unsafe_yes | `all_yes ]
 
-  (* Parse a envrionement variable boolean value *)
+  (* Parse a envrionment variable boolean value *)
   val bool_of_string: string -> bool option
 
   val env: (string -> 'a) -> string -> 'a option

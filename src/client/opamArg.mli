@@ -206,7 +206,7 @@ val assume_built:
 val recurse: ?section:string -> OpamCLIVersion.Sourced.t -> bool Term.t
 val subpath: ?section:string -> OpamCLIVersion.Sourced.t -> subpath option Term.t
 
-(** Applly build options *)
+(** Apply build options *)
 val apply_build_options: OpamCLIVersion.Sourced.t -> build_options -> unit
 
 (** Lock options *)
@@ -252,7 +252,7 @@ val filename: filename Arg.conv
 (** Filename converter also accepting "-" for stdin/stdout *)
 val existing_filename_or_dash: filename option Arg.conv
 
-(** Dirnam converter *)
+(** Dirname converter *)
 val dirname: dirname Arg.conv
 
 val existing_filename_dirname_or_dash:

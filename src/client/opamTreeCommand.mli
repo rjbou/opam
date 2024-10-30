@@ -13,7 +13,7 @@
 
 open OpamStateTypes
 
-(** Speficy the type of the forest to build *)
+(** Specify the type of the forest to build *)
 type mode =
   | Deps        (** Dependency forest (roots -> leaves)  *)
   | ReverseDeps (** Reverse-dependency forest (leaves -> roots) *)

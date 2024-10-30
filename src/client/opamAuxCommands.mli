@@ -41,7 +41,7 @@ val opams_of_dir:
 
 (** Like {!opams_of_dir}, but changes the pinning_url if needed. If given [url]
     is local dir with vcs backend, and opam files not versioned, its pinning url
-    is changed to rsync path-pin. If [ame_kind the_new_url] returns true,
+    is changed to rsync path-pin. If [same_kind the_new_url] returns true,
     package information (name, opam file, new_url, subpath) are added to the
     returned list, otherwise it is discarded. *)
 val opams_of_dir_w_target:

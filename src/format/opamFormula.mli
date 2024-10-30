@@ -93,7 +93,7 @@ type 'a formula =
 
 val compare_formula: ('a -> 'a -> int) -> 'a formula -> 'a formula -> int
 
-(** Eval a formula *)
+(** Evaluate a formula *)
 val eval: ('a -> bool) -> 'a formula -> bool
 
 val partial_eval:

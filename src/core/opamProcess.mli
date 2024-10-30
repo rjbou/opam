@@ -162,7 +162,7 @@ module Job: sig
       | Done of 'a
       | Run of command * (result -> 'a job)
 
-    (** Stage a shell command with its continuation, eg:
+    (** Stage a shell command with its continuation, e.g.:
         {[
           command "ls" ["-a"] @@> fun result ->
           if OpamProcess.is_success result then Done result.r_stdout
@@ -232,7 +232,7 @@ val default_env : unit -> string array
 val resolve_command: ?env:string array -> ?dir:string -> string -> string option
 
 (** Like Unix.create_process_env, but with correct escaping of arguments when
-    invoking a cygwin executable from a native Windows executable. *)
+    invoking a Cygwin executable from a native Windows executable. *)
 val create_process_env :
   string -> string array -> string array ->
   Unix.file_descr -> Unix.file_descr -> Unix.file_descr ->

@@ -48,15 +48,15 @@ type t = private {
   color : OpamStd.Config.when_;
   (** Console ANSI color control *)
   utf8 : OpamStd.Config.when_ext;
-  (** Controls usage of UTF8 in OPAM-generated messages. Extended adds camel
+  (** Controls usage of UTF8 in opam generated messages. Extended adds camel
       emojis *)
   disp_status_line: OpamStd.Config.when_;
   (** Controls on-line display of parallel commands being run, using ANSI
       escapes *)
   confirm_level : [ OpamStd.Config.answer | `undefined ];
   yes: bool option;
-  (** Affects interactive questions in OpamConsole: used to compute the
-      automatic ansering level *)
+  (** Affects interactive questions in {!OpamConsole}: used to compute the
+      automatic answering level *)
   safe_mode : bool;
   (** Fail on writes or delays, don't ask questions (for quick queries, e.g.
       for shell completion) *)
@@ -69,7 +69,7 @@ type t = private {
   merged_output : bool;
   (** If set, stderr of commands is merged into their stdout *)
   precise_tracking : bool;
-  (** If set, will take full md5 of all files when checking diffs (to track
+  (** If set, will take full MD5 of all files when checking diffs (to track
       installations), rather than rely on just file size and mtime *)
   cygbin: string option;
   (** Windows specific: the path of binary directory (bin/) of currently used

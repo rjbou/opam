@@ -115,7 +115,7 @@ val get_switch_opt: unit -> switch option
     configured with a different root *)
 val get_current_switch_from_cwd: OpamFilename.Dir.t -> switch option
 
-(** Checks if a local switch exists and is configurade for the given root *)
+(** Checks if a local switch exists and is configured for the given root *)
 val local_switch_exists: OpamFilename.Dir.t -> switch -> bool
 
 (** Resolves the switch if it is a link to a global switch in the given root

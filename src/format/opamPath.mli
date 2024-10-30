@@ -256,7 +256,7 @@ module Switch: sig
     val sbin: t -> switch -> dirname
   end
 
-  (** Fuctorised version of Default, for replicating
+  (** Functorised version of Default, for replicating
       a switch's layout in non-switch contexts *)
   module DefaultF : functor (L:LAYOUT) -> sig
     val lib: t -> L.ctx -> name -> dirname
@@ -318,7 +318,7 @@ module Switch: sig
       [num] argument will add a {i manN } suffix if specified *)
   val man_dir: ?num:string -> t -> switch -> OpamFile.Switch_config.t -> dirname
 
-  (** Man pages pathes: {i $prefix/man/manN/} *)
+  (** Man pages paths: {i $prefix/man/manN/} *)
   val man_dirs: t -> switch -> OpamFile.Switch_config.t -> dirname list
 
   (** Installed binaries: {i $prefix/bin} *)
