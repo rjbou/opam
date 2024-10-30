@@ -446,13 +446,13 @@ type _ separator_path_format =
 type euok_writeable = [ `writeable ]
 type euok_internal = [ `internal | `writeable ]
 
-(* Type _ env_update_ok_kind includes the constructors of
-   OpamParserTypes.env_update_op (the "writeable" constructors) but permits
+(* Type {!_ env_update_ok_kind} includes the constructors of
+   {!OpamParserTypes.env_update_op} (the "writeable" constructors) but permits
    additional "internal" constructors to be added. The GADT type parameter is
    then used in type env_update to ensure that "internal" updates must be
    filtered out before writing. *)
 type _ env_update_op_kind =
-  (* Initial constructors _must_ match OpamParserTypes.env_update_op *)
+  (* Initial constructors _must_ match {!OpamParserTypes.env_update_op} *)
 | Eq : [> euok_writeable] env_update_op_kind
 | PlusEq : [> euok_writeable] env_update_op_kind
 | EqPlus : [> euok_writeable] env_update_op_kind

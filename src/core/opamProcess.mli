@@ -108,7 +108,7 @@ val run_background: command -> t
 val dry_run_background: command -> t
 
 (** [wait p] waits for the processus [p] to end and returns its results. Be
-    careful to handle Sys.Break *)
+    careful to handle {!Sys.Break} *)
 val wait: t -> result
 
 (** Like {!wait}, but returns None immediately if the process hasn't ended *)
@@ -132,7 +132,7 @@ val is_success : result -> bool
 val is_failure : result -> bool
 
 (** Should be called after process termination, to cleanup temporary files.
-    Leaves artefacts in case OpamGlobals.debug is on and on failure, unless
+    Leaves artefacts in case {!OpamConsole.debug} is on and on failure, unless
     force has been set. *)
 val cleanup : ?force:bool -> result -> unit
 

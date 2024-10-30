@@ -168,7 +168,7 @@ val dir_is_empty: string -> bool
     Links pointing to directory are also returned. *)
 val directories_with_links: string -> string list
 
-(** Make a comman suitable for OpamProcess.Job. if [verbose], is set,
+(** Make a comman suitable for {!OpamProcess.Job}. if [verbose], is set,
     command and output will be displayed (at command end for the
     latter, if concurrent commands are running). [name] is used for
     naming log files. [text] is what is displayed in the status line

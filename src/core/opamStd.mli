@@ -356,8 +356,8 @@ module Format : sig
     ?start_column:int -> ?indent:int -> ?width:int -> string -> string
 
   (** Convert a list of items to string as a dashed list (already reformats
-      supposes no additional left margin: don't use within OpamConsole.error or
-      similar) *)
+      supposes no additional left margin: don't use within {!OpamConsole.error}
+      or similar) *)
   val itemize: ?bullet:string -> ('a -> string) -> 'a list -> string
 
   (** Display a pretty list: ["x";"y";"z"] -> "x, y and z".
@@ -439,7 +439,7 @@ module Env : sig
       by case only and implements Posix semantics on top of this. The problem is
       constantly with us thanks to the use of PATH on Unix, and Path on Windows!
       opam tries to ensure that environment variables are looked up according to
-      the OS semantics (so case insensitively on Windows) and OpamEnv goes to
+      the OS semantics (so case insensitively on Windows) and {!OpamEnv} goes to
       some trouble to ensure that updates to environment variables are case
       preserving (i.e. PATH+=foo gets transformed to Path+=foo if Path exists
       in the environment block).

@@ -123,7 +123,7 @@ val initk: 'a -> 'a options_fun
     * [`all_yes]: answer yes to all opam questions
     * [`unsafe_yes]: answer yes to all opam question and launch system package
                      command wit non interactive options
-    If confirm-level is set (from cli or environment variable), its value is
+    If [confirm-level] is set (from cli or environment variable), its value is
     returned. Otherwise, is takes last yes/no cli flag. For environment
     variables, if [OPAMYES] is set to true, it has priority over [OPAMNO]. As
     other environment variables, cli flags content is taken if given.
