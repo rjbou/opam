@@ -2426,19 +2426,10 @@ let repository cli =
       `Ok ()
     | Some `remove, names ->
       let names = List.map OpamRepositoryName.of_string names in
-      let rm =
-        List.filter (fun n ->
-            not (List.exists (OpamRepositoryName.equal n) names))
-      in
       let full_wipe = List.mem `All scope in
       let global = global || full_wipe in
-      let update_gt () =
-        OpamRepositoryCommand.update_selection gt
-          ~global ~switches:switches rm
-      in
+      OpamRepositoryState.with_ `Lock_write gt @@ fun rt ->
       if full_wipe then
-        let gt = update_gt () in
-        OpamRepositoryState.with_ `Lock_write gt @@ fun rt ->
         let repos =
           OpamRepositoryName.Map.keys rt.OpamStateTypes.repositories
         in
@@ -2449,7 +2440,6 @@ let repository cli =
         List.fold_left OpamRepositoryCommand.remove rt names
       else begin
         let has_known_repos =
-          OpamRepositoryState.with_ `Lock_none gt @@ fun rt ->
           List.fold_left (fun has_known_repos switch ->
               let repos = OpamRepositoryCommand.switch_repos rt switch in
               check_for_repos' repos names
@@ -2464,9 +2454,14 @@ let repository cli =
           OpamConsole.msg
             "Repositories removed from the selections of switch %s. \
              Use '--all' to forget about them altogether.\n"
-            (OpamSwitch.to_string (OpamStateConfig.get_switch ()));
-        OpamGlobalState.drop (update_gt ())
+            (OpamSwitch.to_string (OpamStateConfig.get_switch ()))
       end;
+      let rm =
+        List.filter (fun n ->
+            not (List.exists (OpamRepositoryName.equal n) names))
+      in
+      ignore @@ OpamRepositoryCommand.update_selection gt
+        ~global ~switches:switches rm;
       `Ok ()
     | Some `add, [name] ->
       let name = OpamRepositoryName.of_string name in
