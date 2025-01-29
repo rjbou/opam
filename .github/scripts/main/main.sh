@@ -153,3 +153,38 @@ if [ "$OPAM_TEST" = "1" ]; then
   make || { opam reinstall opam-client -y; make; }
   (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
+
+if [ "OPAM_DEPENDS" = "1" ]; then
+  (set +x; echo -en "::group::depends\r") 2>/dev/null
+  opam_admin_url="https://github.com/ocamlpro/opam-bundle"
+  if [ ! -d $CACHE/opam-admin ]; then
+    git clone $opam_admin_url  $CACHE/opam-admin
+  fi
+  cd $CACHE/opam-admin
+  git fetch origin
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote --exit-code origin "$GITHUB_PR_USER/$BRANCH" ; then
+    BRANCH=$GITHUB_PR_USER/$BRANCH
+  fi
+  if git ls-remote --exit-code origin "$BRANCH"; then
+    OPAM_ADMIN_BRANCH=$BRANCH
+  elif [ "$GITHUB_EVENT_NAME" = pull_request ] && git ls-remote --exit-code origin "$GITHUB_BASE_REF"; then
+    OPAM_ADMIN_BRANCH=$GITHUB_BASE_REF
+  else
+    OPAM_ADMIN_BRANCH=master
+  fi
+  if git branch | grep -q "$OPAM_ADMIN_BRANCH"; then
+    git checkout "$OPAM_ADMIN_BRANCH"
+    git reset --hard "origin/$OPAM_ADMIN_BRANCH"
+  else
+    git checkout -b "$OPAM_ADMIN_BRANCH" "origin/$OPAM_ADMIN_BRANCH"
+  fi
+
+  test -d _opam || opam switch create . --no-install --formula '"ocaml-system"'
+  eval $(opam env)
+  opam pin $GITHUB_WORKSPACE -yn --with-version to-test
+  opam pin . -yn
+  opam install opam-publish --deps-only opam-client.to-test
+  make || { opam reinstall opam-client -y; make; }
+  (set +x ; echo -en "::endgroup::opam-admin\r") 2>/dev/null
+
+fi

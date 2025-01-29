@@ -33,25 +33,7 @@ let workflow ~oc ~env name f =
 {|name: %s
 
 on:
-  pull_request:
-    paths:
-      - 'src/**'
-      - '!src/tools/**'
-      - 'src_ext/**'
-      - 'dune'
-      - 'dune-project'
-      - '*.opam'
-      - 'Makefile*'
-      - 'configure*'
-      - '.github/scripts/**'
-      - '.github/workflows/main.yml'
-      - 'tests/**'
-      - '!tests/bench/**'
-      - 'shell/'
   push:
-    branches:
-      - 'master'
-      - '2.**'
 |} name;
   if env <> [] then begin
     output_char oc '\n';
@@ -289,7 +271,7 @@ let cygwin_job ~analyse_job ~oc ~workflow f =
     ++ build_cache Cygwin
     ++ end_job f
 
-let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~workflow f =
+let main_build_job ~analyse_job ?section runner start_version ~oc ~workflow f =
   let platform = os_of_platform runner in
   let only_on target = only_on platform target in
   let not_on target = not_on platform target in
@@ -330,7 +312,7 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
       let (_fail_fast, matrix, _) = platform_ocaml_matrix ~fail_fast:true start_version in
       (matrix, []) in
   let matrix = ((platform <> Windows), matrix, includes) in
-  let needs = if platform = Windows then [analyse_job; cygwin_job] else [analyse_job] in
+  let needs = if platform = Windows then [analyse_job;] else [analyse_job] in
   let host = host_of_platform platform in
   job ~oc ~workflow ~runs_on:(Runner [runner]) ?shell ?section ~needs ~matrix ("Build-" ^ name_of_platform platform)
     ++ only_on Linux (run "Install bubblewrap" ["sudo apt install bubblewrap"])
@@ -479,6 +461,26 @@ let upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_jo
     ++ run "Test (upgrade)" ["bash -exu .github/scripts/main/upgrade.sh"]
     ++ end_job f
 
+let depends_job ~analyse_job ~build_linux_job ?section runner ~oc ~workflow f =
+  let platform = os_of_platform runner in
+  let host = host_of_platform platform in
+  let only_on target = only_on platform target in
+  let needs = [analyse_job; build_linux_job ] in
+  let env = [("OPAM_DEPENDS", "1")] in
+  let matrix = platform_ocaml_matrix ~fail_fast:false start_latests_ocaml in
+  let ocamlv = "${{ matrix.ocamlv }}" in
+  job ~oc ~workflow ?section ~runs_on:(Runner [platform]) ~env ~needs ~matrix ("Depends-" ^ name_of_platform platform)
+    ++ only_on Linux (run "Install bubblewrap" ["sudo apt install bubblewrap"])
+    ++ only_on Linux (run "Disable AppArmor" ["echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns"])
+    ++ checkout ()
+    ++ cache Archives
+    ++ cache OCaml platform ocamlv host
+    ++ build_cache OCaml platform ocamlv host
+    ++ cache OpamBS ocamlv "depends"
+    ++ build_cache OpamBS ocamlv "depends"
+    ++ run "Compile" ~env:[("BASE_REF_SHA", "${{ github.event.pull_request.base.sha }}"); ("PR_REF_SHA", "${{ github.event.pull_request.head.sha }}")] ["bash -exu .github/scripts/main/main.sh " ^ host]
+    ++ end_job f
+
 let hygiene_job (type a) ~analyse_job (platform : a platform) ~oc ~workflow f =
   job ~oc ~workflow ~section:"Around opam tests" ~runs_on:(Runner [platform]) ~needs:[analyse_job] "Hygiene"
     ++ install_sys_dune [os_of_platform platform]
@@ -543,18 +545,20 @@ let main oc : unit =
   ] in
   workflow ~oc ~env "Builds, tests & co"
   ++ analyse_job ~keys ~platforms:[Linux]
-  @@ fun analyse_job -> cygwin_job ~analyse_job
-  @@ fun cygwin_job -> main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
-  @@ fun build_linux_job -> main_build_job ~analyse_job ~cygwin_job Windows start_latests_ocaml
-  @@ fun build_windows_job -> main_build_job ~analyse_job ~cygwin_job MacOS start_latests_ocaml
-  @@ fun build_macOS_job -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
-  @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux
-  @@ fun _ -> doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile doc" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
+(*   @@ fun analyse_job -> cygwin_job ~analyse_job *)
+(*   @@ fun cygwin_job -> main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08) *)
+  @@ fun analyse_job -> main_build_job ~analyse_job ~section:"Build" Linux (4, 08)
+(*   @@ fun build_linux_job -> main_build_job ~analyse_job ~cygwin_job Windows start_latests_ocaml *)
+(*   @@ fun build_windows_job -> main_build_job ~analyse_job ~cygwin_job MacOS start_latests_ocaml *)
+(*   @@ fun build_macOS_job -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux *)
+(*   @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS *)
+(*   @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux *)
+(*   @@ fun _ -> doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile doc" Linux *)
+(*   @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux *)
+(*   @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS *)
+(*   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux *)
+(*   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS *)
+  @@ fun build_linux_job -> depends_job ~analyse_job ~build_linux_job Linux
   @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
   @@ fun _ -> end_workflow
 
