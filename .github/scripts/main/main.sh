@@ -154,7 +154,7 @@ if [ "$OPAM_TEST" = "1" ]; then
   (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
 
-if [ "OPAM_DEPENDS" = "1" ]; then
+if [ "$OPAM_DEPENDS" = "1" ]; then
   (set +x; echo -en "::group::depends\r") 2>/dev/null
   opam_admin_url="https://github.com/ocamlpro/opam-bundle"
   if [ ! -d $CACHE/opam-admin ]; then
