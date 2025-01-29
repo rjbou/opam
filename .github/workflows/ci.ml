@@ -558,7 +558,7 @@ let main oc : unit =
 (*   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux *)
 (*   @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS *)
   @@ fun build_linux_job -> depends_job ~analyse_job ~build_linux_job Linux
-  @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
+(*   @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04")) *)
   @@ fun _ -> end_workflow
 
 let () =
