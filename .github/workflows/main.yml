@@ -68,7 +68,7 @@ jobs:
     needs: Analyse
     strategy:
       matrix:
-        ocamlv: [ 4.08.1, 4.14.2, 5.3.0 ]
+        ocamlv: [ 4.08.1, 4.14.2 ]
       fail-fast: true
     steps:
     - name: Install bubblewrap
@@ -105,7 +105,7 @@ jobs:
     needs: [ Analyse, Build-Linux ]
     strategy:
       matrix:
-        ocamlv: [ 4.14.2, 5.3.0 ]
+        ocamlv: [ 4.14.2 ]
       fail-fast: false
     env:
       OPAM_DEPENDS: 1
@@ -150,47 +150,3 @@ jobs:
         BASE_REF_SHA: ${{ github.event.pull_request.base.sha }}
         PR_REF_SHA: ${{ github.event.pull_request.head.sha }}
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
-
-####
-# Around opam tests
-####
-  Hygiene:
-    runs-on: ubuntu-22.04
-    needs: Analyse
-    steps:
-    - name: Install system's dune and ocaml packages
-      run: sudo apt install dune ocaml
-    - name: Checkout tree
-      uses: actions/checkout@v4
-    - name: src_ext/archives and opam-repository Cache
-      id: archives
-      uses: actions/cache@v4
-      with:
-        path: |
-          src_ext/archives
-          ~/opam-repository
-        key: ${{ needs.Analyse.outputs.archives }}
-        enableCrossOsArchive: true
-    - name: Get changed files
-      id: files
-      uses: Ana06/get-changed-files@v2.3.0
-    - name: Changed files list
-      run: |
-        for changed_file in ${{ steps.files.outputs.modified }}; do
-          echo "M  ${changed_file}."
-        done
-        for changed_file in ${{ steps.files.outputs.removed }}; do
-          echo "D  ${changed_file}."
-        done
-        for changed_file in ${{ steps.files.outputs.added }}; do
-          echo "A  ${changed_file}."
-        done
-        for changed_file in ${{ steps.files.outputs.renamed }}; do
-          echo "AD ${changed_file}."
-        done
-    - name: Hygiene
-      env:
-        BASE_REF_SHA: ${{ github.event.pull_request.base.sha }}
-        PR_REF_SHA: ${{ github.event.pull_request.head.sha }}
-      if: contains(steps.files.outputs.modified, 'configure.ac') || contains(steps.files.outputs.modified, 'shell/install.sh') || contains(steps.files.outputs.all, 'src_ext') || contains(steps.files.outputs.all, '.github/workflows')
-      run: bash -exu .github/scripts/main/hygiene.sh

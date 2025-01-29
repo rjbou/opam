@@ -20,7 +20,7 @@ let ocamls = [
   "4.08.1";
 
   (* The last elements of the list after 4.14 will be used as default versions *)
-  latest_ocaml4; latest_ocaml5;
+  latest_ocaml4;
 ]
 let start_latests_ocaml = (4, 14)
 

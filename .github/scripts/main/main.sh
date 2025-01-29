@@ -156,7 +156,7 @@ fi
 
 if [ "$OPAM_DEPENDS" = "1" ]; then
   (set +x; echo -en "::group::depends\r") 2>/dev/null
-  opam_admin_url="https://github.com/ocamlpro/opam-bundle"
+  opam_admin_url="https://github.com/ocaml-opam/opam-publish"
   if [ ! -d $CACHE/opam-admin ]; then
     git clone $opam_admin_url  $CACHE/opam-admin
   fi
