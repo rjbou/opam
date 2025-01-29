@@ -12,7 +12,7 @@ unset-dev-version () {
 export OCAMLRUNPARAM=b
 
 (set +x ; echo -en "::group::build opam\r") 2>/dev/null
-if [[ "$OPAM_TEST" -eq 1 ]] || [[ "$OPAM_DOC" -eq 1 ]] ; then
+if [[ "$OPAM_TEST" -eq 1 ]] || [[ "$OPAM_DOC" -eq 1 ]] || [[ "$OPAM_DEPENDS" -eq 1 ]] ; then
   export OPAMROOT=$OPAMBSROOT
   # If the cached root is newer, regenerate a binary compatible root
   opam env || { rm -rf $OPAMBSROOT; init-bootstrap; }
