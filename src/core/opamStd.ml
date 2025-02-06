@@ -262,9 +262,11 @@ module Set = struct
       fold (fun x acc -> f x :: acc) set []
 
     let to_string s =
+(*
       if S.cardinal s > max_print then
         Printf.sprintf "%d elements" (S.cardinal s)
       else
+*)
         let l = S.fold (fun nv l -> O.to_string nv :: l) s [] in
         OpamList.to_string (fun x -> x) (List.rev l)
 
@@ -383,9 +385,11 @@ module Map = struct
       fst (min_binding s) == fst (max_binding s)
 
     let to_string string_of_value m =
+(*
       if M.cardinal m > max_print then
         Printf.sprintf "%d elements" (M.cardinal m)
       else
+*)
         let s (k,v) = Printf.sprintf "%s:%s" (O.to_string k) (string_of_value v) in
         let l = fold (fun k v l -> s (k,v)::l) m [] in
         OpamList.to_string (fun x -> x) l

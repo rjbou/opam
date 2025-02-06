@@ -2211,6 +2211,9 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
               then {t with installed = OpamPackage.Set.add dnv t.installed}
               else t
             in
+            OpamConsole.note "adding %s with deps : %s"
+            (OpamPackage.to_string dnv)
+            (OpamFilter.string_of_filtered_formula depends);
             OpamSwitchState.update_package_metadata dnv dopam t,
             OpamPackage.Set.add dnv deps_of_packages)
           nvs (t, deps_of_packages))
@@ -2299,6 +2302,9 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
       assume_built_restrictions ~available_packages t atoms
     else t, atoms
   in
+  OpamConsole.error "atoms: %s" (OpamFormula.string_of_atoms atoms);
+  OpamConsole.error "deps of atoms: %s" (OpamFormula.string_of_atoms deps_atoms);
+  OpamConsole.error "dmap atoms: %s" (OpamPackage.Name.Map.to_string OpamPackage.Name.to_string dname_map);
   let request =
     OpamSolver.request ()
       ~install:(atoms @ deps_atoms)
@@ -2308,6 +2314,7 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
     OpamPackage.Name.Set.of_list (List.rev_map fst (atoms @ deps_atoms))
   in
   let packages = OpamFormula.packages_of_atoms t.packages (atoms @ deps_atoms) in
+  OpamConsole.error "packages: %s" (OpamPackage.Set.to_string packages);
   let solution =
     let reinstall = if assume_built then Some pkg_reinstall else None in
     OpamSolution.resolve t Install
@@ -2358,6 +2365,7 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
             | None -> map)
           dname_map OpamPackage.Map.empty
       in
+      OpamConsole.error "skip %s" (OpamPackage.Map.to_string OpamPackage.to_string  skip);
       if depext_only then
         (OpamSolution.install_depexts ~force_depext:true ~confirm:false t
            (OpamSolver.all_packages solution)), None

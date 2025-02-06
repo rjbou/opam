@@ -1416,6 +1416,7 @@ let apply ?ask t ~requested ?print_requested ?add_roots
         ~skip
         solution0;
     );
+        let _ =  assert false in
     if OpamClientConfig.(!r.show) then
       let _ = get_depexts t new_state0.installed in
       (* Prints the msg about additional depexts to install *)
