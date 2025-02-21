@@ -155,7 +155,7 @@ if [ "$OPAM_TEST" = "1" ]; then
 
   # Compile and run opam-rt
   (set +x ; echo -en "::group::opam-rt\r") 2>/dev/null
-  fetch_branch "opam-rt" "ocaml-opam"
+  prepare_project "opam-rt" "ocaml-opam"
 
   # opam lib pins defined in opam-rt are ignored as there is a local pin
   opam pin . -yn --ignore-pin-depends
@@ -168,7 +168,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
 
   # opam-publish
   (set +x; echo -en "::group::depends-opam-publish\r") 2>/dev/null
-  fetch_branch "ocaml-opam/opam-publish"
+  prepare_project "ocaml-opam/opam-publish"
   opam pin . -yn
   opam install opam-publish --deps-only opam-client.to-test
   make || { opam reinstall opam-client -y; make; }
@@ -176,7 +176,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
 
   # opam-bundle
   (set +x; echo -en "::group::depends-opam-bundle\r") 2>/dev/null
-  fetch_branch "AltGr/opam-bundle"
+  prepare_project "AltGr/opam-bundle"
   opam pin . -yn
   opam install opam-bundle --deps-only opam-client.to-test
   make || { opam reinstall opam-client -y; make; }
@@ -184,7 +184,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
 
   # opam-custom-install
   (set +x; echo -en "::group::depends-opam-custom-install\r") 2>/dev/null
-  fetch_branch "AltGr/opam-custom-install"
+  prepare_project "AltGr/opam-custom-install"
   opam pin . -yn --ignore-pin-depends
   opam install opam-custom-install --deps-only opam-client.to-test
   dune build || { opam reinstall opam-client -y; dune build; }
