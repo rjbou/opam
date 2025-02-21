@@ -226,6 +226,7 @@ users)
   * Show Cygwin version info after loading it from the cache [#6383 @kit-ty-kate]
   * Upgrade the opam version used to setup the depexts workflows to 2.3.0 [#6444 @kit-ty-kate]
   * Enable the depexts workflow on master and when the opam description change [#6447 @kit-ty-kate]
+  * Add a job that test plugins compilation in order to keep them synchroniser [#6394 @rjbou]
 
 ## Doc
   * Update the command to install opam to point to the new simplified url on opam.ocaml.org [#6226 @kit-ty-kate]
