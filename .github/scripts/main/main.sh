@@ -93,11 +93,12 @@ fi
 
 prepare_project () {
   # warning, perform a cd
-  gh_project=$1
-  url="https://github.com/$gh_project"
-  project=${gh_project##*/}
+  org=$1
+  project=$2
 
+  url="https://github.com/$org/$project"
   dir="$CACHE/$project"
+
   if [ ! -d "$CACHE/$project" ]; then
     git clone "$url" "$dir"
   fi
@@ -155,7 +156,7 @@ if [ "$OPAM_TEST" = "1" ]; then
 
   # Compile and run opam-rt
   (set +x ; echo -en "::group::opam-rt\r") 2>/dev/null
-  prepare_project "opam-rt" "ocaml-opam"
+  prepare_project "ocaml-opam" "opam-rt"
 
   # opam lib pins defined in opam-rt are ignored as there is a local pin
   opam pin . -yn --ignore-pin-depends
@@ -164,49 +165,39 @@ if [ "$OPAM_TEST" = "1" ]; then
   (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
 
+depends_test () {
+  org=$1
+  project=$2
+  ignore_depends=$3
+  make_cmd=$4
+
+  ignore=""
+  if [ $ignore_depends -eq 1 ]; then
+    ignore="--ignore-depends"
+  fi
+
+  (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
+  prepare_project "$org" "$project"
+  set +e
+  opam pin . -yn $ignore
+  opam install "$project" --deps-only opam-client.to-test
+  $make_cmd || { opam reinstall opam-client -y; $make_cmd; }
+  code=$?
+  if [ $code -ne 0 ]; then
+    DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
+  fi
+  set -e
+  (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
+}
+
 if [ "$OPAM_DEPENDS" = "1" ]; then
 
   DEPENDS_ERRORS=""
   (set +x; echo -en "::group::depends\r") 2>/dev/null
 
-  # opam-publish
-  (set +x; echo -en "::group::depends-opam-publish\r") 2>/dev/null
-  prepare_project "ocaml-opam/opam-publish"
-  set +e
-  opam pin . -yn
-  opam install opam-publish --deps-only opam-client.to-test
-  make || { opam reinstall opam-client -y; make; }
-  if [ $? -ne 0 ]; then
-    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
-  fi
-  set -e
-  (set +x ; echo -en "::endgroup::depends-opam-publish\r") 2>/dev/null
-
-  # opam-bundle
-  (set +x; echo -en "::group::depends-opam-bundle\r") 2>/dev/null
-  prepare_project "AltGr/opam-bundle"
-  set +e
-  opam pin . -yn
-  opam install opam-bundle --deps-only opam-client.to-test
-  make || { opam reinstall opam-client -y; make; }
-  if [ $? -ne 0 ]; then
-    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
-  fi
-  set -e
-  (set +x ; echo -en "::endgroup::depends-opam-bundle\r") 2>/dev/null
-
-  # opam-custom-install
-  (set +x; echo -en "::group::depends-opam-custom-install\r") 2>/dev/null
-  prepare_project "AltGr/opam-custom-install"
-  set +e
-  opam pin . -yn --ignore-pin-depends
-  opam install opam-custom-install --deps-only opam-client.to-test
-  dune build || { opam reinstall opam-client -y; dune build; }
-  if [ $? -ne 0 ]; then
-    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
-  fi
-  set -e
-  (set +x ; echo -en "::endgroup::depends-opam-custom-install\r") 2>/dev/null
+  test_project "ocaml-opam" "opam-publish" 0 "make"
+  test_project "AltGr" "opam-bundle" 0 "make"
+  test_project "ocamlpro" "opam-custom-install" 1 "dune build"
 
   if [ -n "$DEPENDS_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $DEPENDS_ERRORS\e[0m";
@@ -214,3 +205,42 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   fi
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
 fi
+
+#  # opam-publish
+#  (set +x; echo -en "::group::depends-opam-publish\r") 2>/dev/null
+#  prepare_project "ocaml-opam/opam-publish"
+#  set +e
+#  opam pin . -yn
+#  opam install opam-publish --deps-only opam-client.to-test
+#  make || { opam reinstall opam-client -y; make; }
+#  if [ $? -ne 0 ]; then
+#    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
+#  fi
+#  set -e
+#  (set +x ; echo -en "::endgroup::depends-opam-publish\r") 2>/dev/null
+#
+#  # opam-bundle
+#  (set +x; echo -en "::group::depends-opam-bundle\r") 2>/dev/null
+#  prepare_project "AltGr/opam-bundle"
+#  set +e
+#  opam pin . -yn
+#  opam install opam-bundle --deps-only opam-client.to-test
+#  make || { opam reinstall opam-client -y; make; }
+#  if [ $? -ne 0 ]; then
+#    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-bundle"
+#  fi
+#  set -e
+#  (set +x ; echo -en "::endgroup::depends-opam-bundle\r") 2>/dev/null
+#
+#  # opam-custom-install
+#  (set +x; echo -en "::group::depends-opam-custom-install\r") 2>/dev/null
+#  prepare_project "AltGr/opam-custom-install"
+#  set +e
+#  opam pin . -yn --ignore-pin-depends
+#  opam install opam-custom-install --deps-only opam-client.to-test
+#  dune build || { opam reinstall opam-client -y; dune build; }
+#  if [ $? -ne 0 ]; then
+#    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
+#  fi
+#  set -e
+#  (set +x ; echo -en "::endgroup::depends-opam-custom-install\r") 2>/dev/null
