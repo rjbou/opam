@@ -166,28 +166,51 @@ fi
 
 if [ "$OPAM_DEPENDS" = "1" ]; then
 
+  DEPENDS_ERRORS=""
+  (set +x; echo -en "::group::depends\r") 2>/dev/null
+
   # opam-publish
   (set +x; echo -en "::group::depends-opam-publish\r") 2>/dev/null
   prepare_project "ocaml-opam/opam-publish"
+  set +e
   opam pin . -yn
   opam install opam-publish --deps-only opam-client.to-test
   make || { opam reinstall opam-client -y; make; }
+  if [ $? -ne 0 ]; then
+    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
+  fi
+  set -e
   (set +x ; echo -en "::endgroup::depends-opam-publish\r") 2>/dev/null
 
   # opam-bundle
   (set +x; echo -en "::group::depends-opam-bundle\r") 2>/dev/null
   prepare_project "AltGr/opam-bundle"
+  set +e
   opam pin . -yn
   opam install opam-bundle --deps-only opam-client.to-test
   make || { opam reinstall opam-client -y; make; }
+  if [ $? -ne 0 ]; then
+    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
+  fi
+  set -e
   (set +x ; echo -en "::endgroup::depends-opam-bundle\r") 2>/dev/null
 
   # opam-custom-install
   (set +x; echo -en "::group::depends-opam-custom-install\r") 2>/dev/null
   prepare_project "AltGr/opam-custom-install"
+  set +e
   opam pin . -yn --ignore-pin-depends
   opam install opam-custom-install --deps-only opam-client.to-test
   dune build || { opam reinstall opam-client -y; dune build; }
+  if [ $? -ne 0 ]; then
+    DEPENDS_ERRORS="$DEPENDS_ERRORS opam-publish"
+  fi
+  set -e
   (set +x ; echo -en "::endgroup::depends-opam-custom-install\r") 2>/dev/null
 
+  if [ -n "$DEPENDS_ERRORS" ]; then
+    echo -e "\e[31mErrors detected in plugins $DEPENDS_ERRORS\e[0m";
+    echo 1
+  fi
+  (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
 fi
