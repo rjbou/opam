@@ -165,7 +165,7 @@ if [ "$OPAM_TEST" = "1" ]; then
   (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
 
-depends_test () {
+test_project () {
   org=$1
   project=$2
   ignore_depends=$3
