@@ -494,6 +494,15 @@ let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
     else
       OpamUpdate.dev_packages st ~working_dir:OpamPackage.Set.empty already_pinned
   in
+  let atoms =
+    List.map (function
+        | (_name, Some _) as a -> a
+        | (name, None) as a ->
+          match OpamPackage.package_of_name_opt pins name with
+          | Some pkg -> (OpamPackage.name pkg, Some (`Eq, OpamPackage.version pkg))
+          | None -> a)
+      atoms
+  in
   st, atoms
 
 let check_and_revert_sandboxing root config =
