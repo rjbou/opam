@@ -109,7 +109,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  2/6: [i-am-a-repo-pkg.1: rsync]
 Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre building...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -135,10 +135,10 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre building...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post building...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -164,11 +164,11 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post building...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  3/6: [i-am-a-repo-pkg.1: rsync]
 Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre installing...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -194,10 +194,10 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre installing...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post installing...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -223,7 +223,7 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post installing...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 -> installed dep.1
 Processing  4/6: [i-am-a-repo-pkg.1: rsync]
@@ -234,7 +234,7 @@ Processing  4/6: [i-am-a-repo-pkg.1: extract]
 + /usr/bin/tar "xfz" "${OPAMTMP}/archive.tgz" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (file://${BASEDIR}/archive.tgz)
 Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -260,10 +260,10 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  5/6: [i-am-a-repo-pkg: a-build-command]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:global-wrappers
@@ -288,11 +288,11 @@ Processing  5/6: [i-am-a-repo-pkg: a-build-command]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 - a-build-command
 Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -318,11 +318,11 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -348,10 +348,10 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  6/6: [i-am-a-repo-pkg: a-install-command]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:global-wrappers
@@ -376,11 +376,11 @@ Processing  6/6: [i-am-a-repo-pkg: a-install-command]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 - a-install-command
 Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
-+ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ /usr/bin/bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -406,7 +406,7 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:etc
 - etc/i-am-a-repo-pkg
 - etc/i-am-a-repo-pkg/printer
@@ -545,7 +545,7 @@ Processing  3/6: [i-am-a-repo-pkg.1: extract] [dep: bash ...pre building...]
 + /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  3/6: [dep: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -571,10 +571,10 @@ Processing  3/6: [dep: bash ...pre building...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  3/6: [dep: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -600,10 +600,10 @@ Processing  3/6: [dep: bash ...post building...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [dep: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -629,10 +629,10 @@ Processing  4/6: [dep: bash ...pre installing...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [dep: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam" "installed-files:" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -658,12 +658,12 @@ Processing  4/6: [dep: bash ...post installing...]
 - hash:
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/dep/dep.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 - installed-files:
 -> installed dep.1
 Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -689,10 +689,10 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  5/6: [i-am-a-repo-pkg: a-build-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:switch-wrappers
@@ -717,11 +717,11 @@ Processing  5/6: [i-am-a-repo-pkg: a-build-command]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 - a-build-command
 Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -747,11 +747,11 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -777,10 +777,10 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  6/6: [i-am-a-repo-pkg: a-install-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:switch-wrappers
@@ -805,11 +805,11 @@ Processing  6/6: [i-am-a-repo-pkg: a-install-command]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 - a-install-command
 Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -835,7 +835,7 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:etc
 - etc/i-am-a-repo-pkg
 - etc/i-am-a-repo-pkg/printer
@@ -1015,7 +1015,7 @@ Processing  4/6: [i-am-a-repo-pkg.1: extract]
 + /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  5/6: [i-am-a-repo-pkg: bash printer.sh]
-+ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:pkg-from-repo
@@ -1040,11 +1040,11 @@ Processing  5/6: [i-am-a-repo-pkg: bash printer.sh]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash printer.sh]
-+ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:pkg-from-repo
@@ -1069,7 +1069,7 @@ Processing  6/6: [i-am-a-repo-pkg: bash printer.sh]
 - hash:md5=+archive-hash+
 - dev:false
 - build-id:+hash+
-- opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+- opamfile:${OPAMTMP}/opam
 - installed-files:
 -> installed i-am-a-repo-pkg.1
 Done.
@@ -1099,7 +1099,7 @@ Done.
    hash:md5=+archive-hash+
    dev:false
    build-id:+hash+
-   opamfile:${BASEDIR}/OPAM/repo/default/packages/i-am-a-repo-pkg/i-am-a-repo-pkg.1/opam
+   opamfile:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/packages/i-am-a-repo-pkg.1/opam
    with-dev-setup:false
    success:true
    failure:false
@@ -1292,7 +1292,7 @@ Done.
    hash:
    dev:true
    build-id:
-   opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/overlay/i-am-a-pin-pkg/opam
+   opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/packages/i-am-a-pin-pkg.6.28/opam
    with-dev-setup:false
    success:true
    failure:false
