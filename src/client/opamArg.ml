@@ -1765,7 +1765,26 @@ let package_selection  ?(admin=false) cli =
                  OpamListCommand.Coinstallable_with (dependency_toggles, pkgs) ))
         , [ "coinstallable-with" ]
         , "Only list packages that are compatible with all of $(b,PACKAGES)."
-        , Some "PACKAGES" )
+        , Some "PACKAGES" );
+        (let conv_flag =
+           ((fun s -> match pkg_flag_of_string s with
+               | Pkgflag_Unknown s ->
+                 `Error ("Invalid package flag "^s^", must be one of "^
+                         OpamStd.List.concat_map " " string_of_pkg_flag
+                           all_package_flags)
+               | f -> `Ok f),
+            fun fmt flag ->
+              Format.pp_print_string fmt (string_of_pkg_flag flag))
+         in
+         cli_original, Opt (Conv (conv_flag, None,
+                            fun flag _ ->  OpamListCommand.Flag flag)),
+         ["has-flag"],
+         ("Only include packages which have the given flag set. \
+           Package flags are one of: "^
+          (OpamStd.List.concat_map " "
+             (Printf.sprintf "$(b,%s)" @* string_of_pkg_flag)
+             all_package_flags)),
+         Some "FLAG");
       ]
   in
   let recursive =
@@ -1785,7 +1804,8 @@ let package_selection  ?(admin=false) cli =
       "Filter packages with a match for $(i,PATTERN) on the given $(i,FIELD)"
       Arg.(pair ~sep:':' string string)
   in
-  let has_flag =
+  let has_flag = mk_opt_all ~cli cli_original ["xxx"] "XXX" ~section "XXX" Arg.string in
+(*
     mk_opt_all ~cli cli_original ["has-flag"] "FLAG" ~section
       ("Only include packages which have the given flag set. \
         Package flags are one of: "^
@@ -1801,6 +1821,7 @@ let package_selection  ?(admin=false) cli =
        fun fmt flag ->
          Format.pp_print_string fmt (string_of_pkg_flag flag))
   in
+*)
   let has_tag =
     mk_opt_all ~cli cli_original ["has-tag"] "TAG" ~section
       "Only includes packages which have the given tag set"
@@ -1816,7 +1837,7 @@ let package_selection  ?(admin=false) cli =
       recursive; depopts; build = not nobuild; post; test; dev_setup;
       doc = doc_flag; dev
     } in
-    List.map (fun flag -> OpamListCommand.Flag flag) has_flag @
+(*     List.map (fun flag -> OpamListCommand.Flag flag) has_flag @ *)
     List.map (fun tag -> OpamListCommand.Tag tag) has_tag @
     List.map (fun (field,patt) ->
         OpamListCommand.Pattern

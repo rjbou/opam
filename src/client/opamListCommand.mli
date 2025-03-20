@@ -162,3 +162,6 @@ val info:
 val mini_field_printer: ?prettify:bool -> ?normalise:bool -> value -> string
 
 val string_of_formula: selector OpamFormula.formula -> string
+
+(** TODO remove, only here for test *)
+val string_of_selector : selector -> string

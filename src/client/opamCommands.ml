@@ -644,6 +644,9 @@ let list ?(force_search=false) cli =
       global_options selection   no_switch depexts vars repos
       owns_file disjunction search silent no_depexts format packages () =
     apply_global_options cli global_options;
+    OpamConsole.error "selection %s"
+    (OpamStd.List.to_string OpamListCommand.string_of_selector selection);
+    exit 0;
     let no_switch =
       no_switch || OpamStateConfig.get_switch_opt () = None
     in
