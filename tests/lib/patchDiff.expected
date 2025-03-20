@@ -1,0 +1,82 @@
+*** SETUP ***
++ first
++ first/diff-dir-plus-fst
++ first/diff-dir-plus-fst/fst
++ first/diff-dir-plus-snd
++ first/diff-dir-plus-snd/fst
++ first/diff-file
++ first/diff-file-plus-fst
++ first/diff-file-plus-snd
++ first/dir-fst-file-snd
++ first/dir-fst-file-snd/fst
++ first/dir-only-fst
++ first/dir-only-fst/fst
++ first/file-fst-dir-snd
++ first/file-only-fst
++ first/same-file
++ second
++ second/diff-dir-plus-fst
++ second/diff-dir-plus-fst/fst
++ second/diff-dir-plus-snd
++ second/diff-dir-plus-snd/fst
++ second/diff-file
++ second/diff-file-plus-fst
++ second/diff-file-plus-snd
++ second/dir-fst-file-snd
++ second/file-fst-dir-snd
++ second/file-fst-dir-snd/fst
++ second/file-only-snd
++ second/same-file
+
+*** DIFF ***
+--- first/diff-dir-plus-fst/fst
++++ second/diff-dir-plus-fst/fst
+@@ -2,0 +2,1 @@
++bar
+--- first/diff-dir-plus-snd/fst
++++ second/diff-dir-plus-snd/fst
+@@ -2,1 +2,0 @@
+-bar
+--- first/diff-file
++++ second/diff-file
+@@ -1,1 +1,1 @@
+-foo
++bar
+--- first/diff-file-plus-fst
++++ second/diff-file-plus-fst
+@@ -2,1 +2,0 @@
+-bar
+--- first/diff-file-plus-snd
++++ second/diff-file-plus-snd
+@@ -2,0 +2,1 @@
++bar
+--- first/dir-fst-file-snd/fst
++++ /dev/null
+@@ -1,1 +0,0 @@
+-foo
+--- first/dir-fst-file-snd
++++ second/dir-fst-file-snd
+@@ -0,0 +1,1 @@
++foo
+--- first/dir-only-fst/fst
++++ /dev/null
+@@ -1,1 +0,0 @@
+-foo
+--- first/file-fst-dir-snd
++++ second/file-fst-dir-snd
+@@ -1,1 +0,0 @@
+-foo
+--- /dev/null
++++ second/file-fst-dir-snd/fst
+@@ -0,0 +1,1 @@
++foo
+--- first/file-only-fst
++++ /dev/null
+@@ -1,1 +0,0 @@
+-foo
+--- /dev/null
++++ second/file-only-snd
+@@ -0,0 +1,1 @@
++foo
+
+Fatal error: exception Sys_error("Is a directory")
