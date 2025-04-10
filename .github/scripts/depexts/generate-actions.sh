@@ -146,7 +146,7 @@ git config --global --add safe.directory /github/workspace
 #cd /github/workspace
 
 ## LOCAL TESTING
-git clone https://github.com/RyanGibb/opam --single-branch --branch nixos-depexts --depth 1 local-opam
+git clone https://github.com/rjbou/opam --single-branch --branch nixos-depexts --depth 1 local-opam
 cd local-opam
 
 /usr/bin/opam install . --deps
