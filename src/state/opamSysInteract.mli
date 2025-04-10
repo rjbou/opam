@@ -22,16 +22,21 @@ val packages_status:
   ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
   required:OpamSysPkg.Set.t -> OpamSysPkg.status
 
+type syspkg_to_install = {
+  si_new : OpamSysPkg.Set.t;
+  si_required : OpamSysPkg.Set.t
+}
+
 (* Return the commands to run to install given system packages.
    [env] is used to determine host specification. *)
 val install_packages_commands:
-  ?env:gt_variables -> _ switch_state option -> OpamFile.Config.t -> OpamSysPkg.status ->
+  ?env:gt_variables -> _ switch_state option -> OpamFile.Config.t -> syspkg_to_install ->
   ([`AsAdmin of string | `AsUser of string] * string list) list
 
 (* Install given system packages, by calling local system package manager.
    [env] is used to determine host specification. *)
 val install: ?env:gt_variables -> _ switch_state option -> OpamFile.Config.t ->
-  OpamSysPkg.status -> unit
+  syspkg_to_install -> unit
 
 val update: ?env:gt_variables -> OpamFile.Config.t -> unit
 

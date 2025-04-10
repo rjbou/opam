@@ -1033,14 +1033,19 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages ~required =
 
 (* Install *)
 
-let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config (depexts : OpamSysPkg.status) =
+type syspkg_to_install = {
+  si_new : OpamSysPkg.Set.t;
+  si_required : OpamSysPkg.Set.t
+}
+
+let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
   let unsafe_yes = OpamCoreConfig.answer_is `unsafe_yes in
   let yes ?(no=[]) yes r =
     if unsafe_yes then
       yes @ r else no @ r
   in
   let packages =
-    List.map OpamSysPkg.to_string (OpamSysPkg.Set.elements depexts.s_available)
+    List.map OpamSysPkg.to_string (OpamSysPkg.Set.elements si.si_new)
   in
   match family ~env () with
   | Alpine -> [`AsAdmin "apk", "add"::yes ~no:["-i"] [] packages], None
@@ -1137,7 +1142,7 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config (depexts
        let packages =
          String.concat " "
            (OpamSysPkg.Set.fold (fun p l -> OpamSysPkg.to_string p :: l)
-              OpamSysPkg.Set.Op.(depexts.s_available ++ depexts.s_required) [])
+              OpamSysPkg.Set.Op.(si.si_new ++ si.si_required) [])
        in
        (* We exclude variables from
             https://github.com/NixOS/nix/blob/e4bda20918ad2af690c2e938211a7d362548e403/src/nix/develop.cc#L308-L325
@@ -1199,16 +1204,14 @@ echo "XDG_DATA_DIRS	+=	$XDG_DATA_DIRS	Nix" >> "$out"
   | Openbsd -> [`AsAdmin "pkg_add", yes ~no:["-i"] ["-I"] packages], None
   | Suse -> [`AsAdmin "zypper", yes ["--non-interactive"] ("install"::packages)], None
 
-let install_packages_commands ?env st config depexts =
-  fst (install_packages_commands_t ?env st config depexts)
+let install_packages_commands ?env st config si =
+  fst (install_packages_commands_t ?env st config si)
 
 let package_manager_name ?env st config =
   match
-    install_packages_commands ?env st config {
-        OpamSysPkg.s_available = OpamSysPkg.Set.empty;
-        OpamSysPkg.s_required = OpamSysPkg.Set.empty;
-        OpamSysPkg.s_not_found = OpamSysPkg.Set.empty;
-      }
+    install_packages_commands ?env st config
+      { si_new = OpamSysPkg.Set.empty;
+      si_required = OpamSysPkg.Set.empty;}
   with
   | ((`AsAdmin pkgman | `AsUser pkgman), _) :: _ -> pkgman
   | [] -> assert false
@@ -1234,11 +1237,11 @@ let sudo_run_command ?(env=OpamVariable.Map.empty) ?vars cmd args =
       "failed with exit code %d at command:\n    %s"
       code (String.concat " " (cmd::args))
 
-let install ?env st config (depexts : OpamSysPkg.status) =
-  if OpamSysPkg.Set.is_empty depexts.s_available && OpamSysPkg.Set.is_empty depexts.s_required then
+let install ?env st config si =
+  if OpamSysPkg.Set.is_empty si.si_new && OpamSysPkg.Set.is_empty si.si_required then
     log "Nothing to install"
   else
-    let commands, vars = install_packages_commands_t ?env st config depexts in
+    let commands, vars = install_packages_commands_t ?env st config si in
     let vars = OpamStd.Option.map (List.map (fun x -> `add, x)) vars in
     List.iter
       (fun (cmd, args) ->

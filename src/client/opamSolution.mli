@@ -82,7 +82,7 @@ val print_depext_msg : OpamSysPkg.status -> unit
 
 (** As {!install_depexts}, but supplied with a set of system packages to be
     installed. *)
-val install_sys_packages: confirm:bool -> OpamSysPkg.status -> OpamStateTypes.gt_variables ->
+val install_sys_packages: confirm:bool -> OpamSysInteract.syspkg_to_install -> OpamStateTypes.gt_variables ->
   OpamFile.Config.t -> rw switch_state option -> rw switch_state option
 
 (* Install external dependencies of the given package set, according the depext

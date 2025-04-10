@@ -1145,10 +1145,9 @@ let print_depext_msg (status : OpamSysPkg.status) =
    true. *)
 let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
   if not force && OpamStateConfig.(!r.no_depexts) then
-    {
-      OpamSysPkg.s_available = OpamSysPkg.Set.empty;
-      OpamSysPkg.s_required = OpamSysPkg.Set.empty;
-      OpamSysPkg.s_not_found = OpamSysPkg.Set.empty;
+    { OpamSysInteract.
+      si_new =  OpamSysPkg.Set.empty;
+      si_required = OpamSysPkg.Set.empty;
     }
   else
     let sys_packages =
@@ -1189,20 +1188,21 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
         }
     in
     print_depext_msg depexts;
-    depexts
+    { si_new = depexts.s_available;
+    si_required = depexts.s_required; }
 
-let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.status) env config t =
-  let rec entry_point t (depexts : OpamSysPkg.status) =
+let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
+  let rec entry_point t si =
     if OpamClientConfig.(!r.fake) then
-      (print_command depexts; t)
+      (print_command si; t)
     else if OpamFile.Config.depext_run_installs config then
       if confirm then
-        menu t depexts
+        menu t si
       else
-        auto_install t depexts
+        auto_install t si
     else
-      manual_install t depexts
-  and menu t depexts =
+      manual_install t si
+  and menu t si =
     let answer =
       let pkgman =
         OpamConsole.colorise `yellow
@@ -1225,24 +1225,24 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
     in
     OpamConsole.msg "\n";
     match answer with
-    | `Yes -> auto_install t depexts
+    | `Yes -> auto_install t si
     | `No ->
       OpamConsole.note "Use 'opam option depext-run-installs=false' \
                         if you don't want to be prompted again.";
       OpamConsole.msg "\n";
-      print_command depexts;
+      print_command si;
       OpamConsole.pause "Standing by, press enter to continue when done.";
-      check_again t depexts
+      check_again t si
     | `Ignore -> bypass t
     | `Quit -> give_up_msg (); OpamStd.Sys.exit_because `Aborted
-  and print_command depexts =
+  and print_command si =
     (* Ensure that setup-x86_64.exe exists, so that an invalid command is not
        displayed to the user. *)
     if OpamSysPoll.os_distribution env = Some "cygwin" then
       OpamSysInteract.Cygwin.check_setup ~update:false;
     let commands =
       OpamSysInteract.install_packages_commands ~env
-        (st_conv t) config depexts
+        (st_conv t) config si
       |> List.map (fun ((`AsAdmin c | `AsUser c), a) -> c::a)
     in
     OpamConsole.formatted_msg
@@ -1252,8 +1252,8 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
     OpamConsole.msg "\n    %s\n\n"
       (OpamConsole.colorise `bold
          (OpamStd.List.concat_map "\n    " (String.concat " ") commands))
-  and manual_install t depexts =
-    print_command depexts;
+  and manual_install t si =
+    print_command si;
     let answer =
       OpamConsole.menu ~default:`Continue ~no:`Quit "Would you like opam to:"
         ~options:[
@@ -1266,27 +1266,27 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
     in
     OpamConsole.msg "\n";
     match answer with
-    | `Continue -> check_again t depexts
+    | `Continue -> check_again t si
     | `Ignore -> bypass t
     | `Quit -> give_up ()
-  and auto_install t depexts =
+  and auto_install t si =
     try
       if OpamSysPoll.os_distribution env = Some "cygwin" then
         OpamSysInteract.Cygwin.check_setup ~update:true;
       OpamSysInteract.install ~env
-        (st_conv t) config depexts; (* handles dry_run *)
+        (st_conv t) config si; (* handles dry_run *)
       map_sysmap (fun _ -> OpamSysPkg.Set.empty) t
     with Failure msg ->
       OpamConsole.error "%s" msg;
-      check_again t depexts
-  and check_again t (depexts : OpamSysPkg.status) =
+      check_again t si
+  and check_again t si =
     let open OpamSysPkg.Set.Op in
     let status =
-      OpamSysInteract.packages_status ~env config depexts.s_available
-        ~required:depexts.s_required
+      OpamSysInteract.packages_status ~env config si.si_new
+        ~required:si.si_required
     in
     let still_missing = status.s_available ++ status.s_not_found in
-    let installed = depexts.s_available -- still_missing in
+    let installed = si.si_new -- still_missing in
     let t =
       map_sysmap (fun sysp -> OpamSysPkg.Set.diff sysp installed) t
     in
@@ -1296,11 +1296,11 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
          "These packages are still missing and not found via \
           your system package manager: %s\n"
          (syspkgs_to_string status.s_not_found);
-       manual_install t { depexts with s_available = still_missing })
+       manual_install t { si with si_new = still_missing })
     else
       (OpamConsole.error "These packages are still missing: %s\n"
-         (syspkgs_to_string depexts.s_available);
-       if OpamStd.Sys.tty_in then entry_point t depexts
+         (syspkgs_to_string si.si_new);
+       if OpamStd.Sys.tty_in then entry_point t si
        else give_up ())
   and bypass t =
     OpamConsole.note
@@ -1319,7 +1319,7 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
     give_up_msg ();
     OpamStd.Sys.exit_because `Aborted
   in
-  if (OpamSysPkg.Set.is_empty depexts.s_available && OpamSysPkg.Set.is_empty depexts.s_required) ||
+  if (OpamSysPkg.Set.is_empty si.OpamSysInteract.si_new && OpamSysPkg.Set.is_empty si.si_required) ||
      OpamClientConfig.(!r.show) ||
      OpamClientConfig.(!r.assume_depexts) then
     t
@@ -1327,7 +1327,7 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm (depexts : OpamSysPkg.sta
   try
     OpamConsole.header_msg "Handling external dependencies";
     OpamConsole.msg "\n";
-    entry_point t depexts
+    entry_point t si
   with Sys.Break as e -> OpamStd.Exn.finalise e give_up_msg
 
 let install_depexts ?(force_depext=false) ?(confirm=true) t
@@ -1350,13 +1350,13 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t
   let confirm =
     confirm && not (OpamSysInteract.Cygwin.is_internal t.switch_global.config)
   in
-  let depexts =
+  let si =
     get_depexts ~force:force_depext ~recover:force_depext t
       ~new_packages ~all_packages
   in
   let env = t.switch_global.global_variables in
   let config = t.switch_global.config in
-  install_sys_packages ~st_conv:OpamStd.Option.some ~map_sysmap ~confirm depexts
+  install_sys_packages ~st_conv:OpamStd.Option.some ~map_sysmap ~confirm si
     env config t
 
 let install_sys_packages ~confirm =
@@ -1383,7 +1383,7 @@ let apply ?ask t ~requested ?print_requested ?add_roots
     in
     let t =
       if OpamClientConfig.(!r.show) then
-        let _ : OpamSysPkg.status =
+        let _ =
           get_depexts t ~new_packages:virt_inst ~all_packages:t.installed
         in
         t
@@ -1442,7 +1442,7 @@ let apply ?ask t ~requested ?print_requested ?add_roots
         solution0;
     );
     if OpamClientConfig.(!r.show) then
-      let _ : OpamSysPkg.status =
+      let _ =
         get_depexts t
           ~new_packages:new_state0.installed
           ~all_packages:new_state0.installed
