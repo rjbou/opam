@@ -203,9 +203,12 @@ let depexts_status_of_packages_raw
   let ret =
     match
       OpamSysInteract.packages_status ?env global_config syspkg_set
-        ~required:old_syspkg_set
     with
     | status ->
+      let status = { status with
+                     s_available = status.s_available -- old_syspkg_set ;
+                     s_required = old_syspkg_set;
+                   } in
       let status =
         if OpamStateConfig.(!r.no_depexts) then
           (* Mark all as available. This is necessary to store the exceptions

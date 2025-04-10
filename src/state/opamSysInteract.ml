@@ -473,7 +473,7 @@ let yum_cmd = lazy begin
     raise (OpamSystem.Command_not_found "yum or dnf")
 end
 
-let packages_status ?(env=OpamVariable.Map.empty) config packages ~required =
+let packages_status ?(env=OpamVariable.Map.empty) config packages =
   let (+++) pkg set = OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) set in
   (* Some package managers don't permit to request on available packages. In
      this case, we consider all non installed packages as [available]. *)
@@ -993,8 +993,8 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages ~required =
          be found.' But omitting them will mean that they won't be
          added to the Nix derivation.
       *)
-      let s_available = OpamSysPkg.Set.diff packages required in
-      let s_required = required in
+      let s_available = packages in
+      let s_required = OpamSysPkg.Set.empty in
       let s_not_found = OpamSysPkg.Set.empty in
       let open OpamSysPkg in
       { s_available; s_required; s_not_found }
@@ -1292,8 +1292,7 @@ let repo_enablers ?(env=OpamVariable.Map.empty) config =
   let status =
     packages_status ~env config (OpamSysPkg.raw_set
                                    (OpamStd.String.Set.singleton "epel-release"))
-      ~required:OpamSysPkg.Set.empty
-  in
+        in
   (* s_available packages are packages that are required but not installed *)
   if OpamSysPkg.Set.is_empty status.s_available then None
   else

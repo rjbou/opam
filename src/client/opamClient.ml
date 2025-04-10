@@ -1605,7 +1605,6 @@ let check_for_sys_packages config system_packages =
     let status =
       OpamSysInteract.packages_status config
         (OpamSysPkg.Set.of_list system_packages)
-        ~required:OpamSysPkg.Set.empty
     in
     if not (OpamSysPkg.Set.is_empty status.s_available) then
       let vars = OpamFile.Config.global_variables config in

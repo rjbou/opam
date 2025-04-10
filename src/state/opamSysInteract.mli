@@ -20,7 +20,7 @@ open OpamStateTypes
    [env] is used to determine host specification. *)
 val packages_status:
   ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
-  required:OpamSysPkg.Set.t -> OpamSysPkg.status
+  OpamSysPkg.status
 
 type syspkg_to_install = {
   si_new : OpamSysPkg.Set.t;

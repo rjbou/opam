@@ -1283,8 +1283,11 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
     let open OpamSysPkg.Set.Op in
     let status =
       OpamSysInteract.packages_status ~env config si.si_new
-        ~required:si.si_required
     in
+    let status = { status with
+                   s_available = status.s_available -- si.si_required ;
+                   s_required = si.si_required;
+                 } in
     let still_missing = status.s_available ++ status.s_not_found in
     let installed = si.si_new -- still_missing in
     let t =
