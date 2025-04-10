@@ -111,9 +111,18 @@ prepare_project () {
     PR_BRANCH=$BRANCH
   elif [ "$GITHUB_EVENT_NAME" = pull_request ] && git ls-remote --exit-code origin "$GITHUB_BASE_REF"; then
     PR_BRANCH=$GITHUB_BASE_REF
-  else
+  elif git ls-remote --exit-code origin main; then
+    PR_BRANCH=main
+  elif git ls-remote --exit-code origin master; then
     PR_BRANCH=master
+  elif git ls-remote --exit-code origin trunk; then
+    PR_BRANCH=trunk
+  else
+    echo "No valid default branch found for $project on $url"
+    return 1
   fi
+
+  # Checkout or create tracking branch
   if git branch | grep -q "$PR_BRANCH"; then
     git checkout "$PR_BRANCH"
     git reset --hard "origin/$PR_BRANCH"
@@ -187,11 +196,17 @@ test_project () {
     make_cmd="dune build"
   fi
 
-  opam exec -- $make_cmd || {
+  opam exec -- $make_cmd
+  rcode=$?
+  if [ $rcode -ne 0 ]; then
+    echo "First build failed for $project, attempting opam-client reinstall and rebuild"
     opam reinstall opam-client -y
     opam exec -- $make_cmd
-  }
-  if [ $code -ne 0 ]; then
+    rcode=$?
+  fi
+
+  if [ $rcode -ne 0 ]; then
+    echo "Still failing: $project"
     DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
   fi
   set -e
@@ -206,7 +221,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   sed 's/$/.2.3.0/' | paste -sd, -)" --columns name | tail -n +3)
 
   for pkg in $packages; do
-  
+
     dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1 | sed -E 's/^"//;s/"$//;s/\.git$//')
 
     if [[ "$dev_repo" =~ github\.com ]]; then
@@ -223,5 +238,4 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   fi
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
 fi
-  
-fi
+ 
