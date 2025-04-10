@@ -143,11 +143,11 @@ set -eux
 git config --global --add safe.directory /github/workspace
 
 # Workdir is /github/workpaces
-cd /github/workspace
+#cd /github/workspace
 
-### LOCAL TESTING
-#git clone https://github.com/ocaml/opam --single-branch --branch 2.2 --depth 1 local-opam
-#cd local-opam
+## LOCAL TESTING
+git clone https://github.com/RyanGibb/opam --single-branch --branch nixos-depexts --depth 1 local-opam
+cd local-opam
 
 /usr/bin/opam install . --deps
 eval \$(/usr/bin/opam env)

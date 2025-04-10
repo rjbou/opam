@@ -1132,20 +1132,20 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config (depexts
        let dir = OpamPath.Switch.meta st.switch_global.root st.switch in
        let drvFile =
          OpamFilename.create dir
-           (OpamFilename.basename (OpamFilename.raw "env.nix"))
+           (OpamFilename.Base.of_string "env.nix")
        in
-       let packages = String.concat " "
+       let packages =
+         String.concat " "
            (OpamSysPkg.Set.fold (fun p l -> OpamSysPkg.to_string p :: l)
               OpamSysPkg.Set.Op.(depexts.s_available ++ depexts.s_required) [])
        in
-
-  (* We exclude variables from
-       https://github.com/NixOS/nix/blob/e4bda20918ad2af690c2e938211a7d362548e403/src/nix/develop.cc#L308-L325
-    append to variables from
-       https://github.com/NixOS/nix/blob/e4bda20918ad2af690c2e938211a7d362548e403/src/nix/develop.cc#L347-L353
-    and exclude some other regarding the Nix derivation *)
+       (* We exclude variables from
+            https://github.com/NixOS/nix/blob/e4bda20918ad2af690c2e938211a7d362548e403/src/nix/develop.cc#L308-L325
+          append to variables from
+            https://github.com/NixOS/nix/blob/e4bda20918ad2af690c2e938211a7d362548e403/src/nix/develop.cc#L347-L353
+          and exclude some other regarding the Nix derivation *)
        let contents =
-{|{ pkgs ? import <nixpkgs> {} }:
+         {|{ pkgs ? import <nixpkgs> {} }:
 with pkgs;
 stdenv.mkDerivation {
   name = "opam-nix-env";

@@ -1154,7 +1154,7 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
     let sys_packages =
       if recover then
         OpamSwitchState.depexts_status_of_packages t new_packages
-          ~old_packages:(OpamPackage.Set.diff all_packages new_packages)
+          ~old_packages:(all_packages -- new_packages)
       else
         let base = Lazy.force t.sys_packages in
         (* workaround: st.sys_packages is not always updated with added
