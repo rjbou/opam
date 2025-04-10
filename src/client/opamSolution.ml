@@ -1144,6 +1144,7 @@ let print_depext_msg (status : OpamSysPkg.status) =
 (* Gets depexts from the state, without checking again, unless [recover] is
    true. *)
 let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
+(* all_packages = installed *)
   if not force && OpamStateConfig.(!r.no_depexts) then
     { OpamSysInteract.
       si_new =  OpamSysPkg.Set.empty;
@@ -1285,7 +1286,7 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
       OpamSysInteract.packages_status ~env config si.si_new
     in
     let status = { status with
-                   s_available = status.s_available -- si.si_required ;
+                   s_available = status.s_available;
                    s_required = si.si_required;
                  } in
     let still_missing = status.s_available ++ status.s_not_found in
