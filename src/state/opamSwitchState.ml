@@ -179,7 +179,7 @@ module Installed_cache = OpamCached.Make(struct
   end)
 
 let depexts_status_of_packages_raw
-    ~depexts ?env global_config switch_config packages ~old_packages =
+    ~depexts ?env global_config switch_config packages =
     (* depexts is the function that retrieves from an opam file the depexts list *)
     (* old_packages = installed *)
   if OpamPackage.Set.is_empty packages then OpamPackage.Map.empty else
@@ -191,10 +191,6 @@ let depexts_status_of_packages_raw
         if OpamSysPkg.Set.is_empty s then map
         else OpamPackage.Map.add nv s map)
       packages (OpamSysPkg.Set.empty, OpamPackage.Map.empty)
-  in
-  let old_syspkg_set =
-    OpamPackage.Set.fold (fun nv set -> depexts nv ++ set)
-      old_packages OpamSysPkg.Set.empty
   in
   let chronos = OpamConsole.timer () in
   let bypass =
@@ -209,20 +205,17 @@ let depexts_status_of_packages_raw
     | status ->
       let status = { status with
                      s_available = status.s_available;
-                     s_required = old_syspkg_set;
                    } in
       let status =
         if OpamStateConfig.(!r.no_depexts) then
           (* Mark all as available. This is necessary to store the exceptions
              afterwards *)
-          {
-            status with
+          { OpamSysPkg.
             s_available = status.s_available ++ status.s_not_found;
             s_not_found = OpamSysPkg.Set.empty
           }
         else if OpamFile.Config.depext_cannot_install global_config then
           {
-            status with
             s_available = OpamSysPkg.Set.empty;
             s_not_found = status.s_available ++ status.s_not_found;
           }
@@ -231,7 +224,6 @@ let depexts_status_of_packages_raw
       in
       OpamPackage.Map.map (fun set ->
           { OpamSysPkg.s_available = set %% status.s_available;
-            OpamSysPkg.s_required = set %% status.s_required;
             OpamSysPkg.s_not_found = set %% status.s_not_found}
         ) syspkg_map
     | exception (Failure msg) ->
@@ -538,7 +530,6 @@ let load lock_kind gt rt switch =
       depexts_status_of_packages_raw gt.config switch_config
         ~env:gt.global_variables
         (Lazy.force available_packages)
-        ~old_packages:installed
         ~depexts:(fun package ->
             let env =
               OpamPackageVar.resolve_switch_raw ~package gt switch switch_config
@@ -1284,10 +1275,9 @@ let update_pin nv opam st =
   then st else
   let sys_packages = lazy (
     let snv = OpamPackage.Set.singleton nv in
-    let old_packages = OpamPackage.Set.empty in
     OpamPackage.Map.union (fun _ n -> n)
       (Lazy.force st.sys_packages)
-      (depexts_status_of_packages st snv ~old_packages)
+      (depexts_status_of_packages st snv)
   ) in
   let available_packages = lazy (
     OpamPackage.Set.filter (fun nv -> depexts_unavailable st nv = None)

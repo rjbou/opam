@@ -486,14 +486,12 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages =
       let not_found = packages -- installed -- available in
       {
         OpamSysPkg.s_available = available;
-        OpamSysPkg.s_required = OpamSysPkg.Set.empty;
         OpamSysPkg.s_not_found = not_found;
       }
     | None ->
       let available = packages -- installed in
       {
         OpamSysPkg.s_available = available;
-        OpamSysPkg.s_required = OpamSysPkg.Set.empty;
         OpamSysPkg.s_not_found = OpamSysPkg.Set.empty;
       }
   in
@@ -994,10 +992,9 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages =
          added to the Nix derivation.
       *)
       let s_available = packages in
-      let s_required = OpamSysPkg.Set.empty in
       let s_not_found = OpamSysPkg.Set.empty in
       let open OpamSysPkg in
-      { s_available; s_required; s_not_found }
+      { s_available; s_not_found }
   | Openbsd ->
     let sys_installed =
       run_query_command "pkg_info" ["-qP"]

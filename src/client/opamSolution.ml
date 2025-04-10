@@ -1154,7 +1154,6 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
     let sys_packages =
       if recover then
         OpamSwitchState.depexts_status_of_packages t new_packages
-          ~old_packages:(OpamPackage.Set.diff all_packages new_packages)
       else
         let base = Lazy.force t.sys_packages in
         (* workaround: st.sys_packages is not always updated with added
@@ -1168,8 +1167,7 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
         in
         if OpamPackage.Set.is_empty more_pkgs then base else
           OpamPackage.Map.union (fun _ x -> x) base
-            (OpamSwitchState.depexts_status_of_packages t more_pkgs
-               ~old_packages:(OpamPackage.Set.diff all_packages more_pkgs))
+            (OpamSwitchState.depexts_status_of_packages t more_pkgs)
     in
     let already_installed = OpamPackage.Set.diff all_packages new_packages in
     let depexts =
@@ -1178,14 +1176,12 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
           | Some sys ->
             { OpamSysPkg.
               s_available = OpamSysPkg.Set.union acc.s_available sys.s_available;
-              s_required = OpamSysPkg.Set.union acc.s_required sys.s_required;
               s_not_found = OpamSysPkg.Set.union acc.s_not_found sys.s_not_found;
             }
           | None -> acc)
         new_packages
         { OpamSysPkg.
           s_available = OpamSysPkg.Set.empty;
-          s_required = OpamSysPkg.Set.empty;
           s_not_found = OpamSysPkg.Set.empty;
         }
     in
@@ -1293,7 +1289,6 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
     in
     let status = { status with
                    s_available = status.s_available;
-                   s_required = si.si_required;
                  } in
     let still_missing = status.s_available ++ status.s_not_found in
     let installed = si.si_new -- still_missing in

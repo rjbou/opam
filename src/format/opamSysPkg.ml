@@ -49,9 +49,6 @@ type status =
     s_available : Set.t;
     (** Package available but not installed *)
 
-    s_required : Set.t;
-    (** Package installed but also needs to be passed to the installation *)
-
     s_not_found : Set.t;
     (** Package unavailable on this system *)
   }
@@ -60,12 +57,10 @@ type status =
 let status_empty =
   {
     s_available  = Set.empty;
-    s_required  = Set.empty;
     s_not_found  = Set.empty;
   }
 
 let string_of_status sp =
-  Printf.sprintf "available: %s; required: %s, not_found: %s"
+  Printf.sprintf "available: %s; not_found: %s"
     (Set.to_string sp.s_available)
-    (Set.to_string sp.s_required)
     (Set.to_string sp.s_not_found)
