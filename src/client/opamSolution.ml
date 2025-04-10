@@ -1171,6 +1171,7 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
             (OpamSwitchState.depexts_status_of_packages t more_pkgs
                ~old_packages:(OpamPackage.Set.diff all_packages more_pkgs))
     in
+    let already_installed = OpamPackage.Set.diff all_packages new_packages in
     let depexts =
       OpamPackage.Set.fold (fun pkg (acc : OpamSysPkg.status) ->
           match OpamPackage.Map.find_opt pkg sys_packages with
@@ -1188,9 +1189,14 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
           s_not_found = OpamSysPkg.Set.empty;
         }
     in
+    let si_required =
+      OpamPackage.Set.fold OpamSysPkg.Set.Op.(fun nv req ->
+          OpamSwitchState.depexts t nv ++ req)
+        already_installed OpamSysPkg.Set.empty
+    in
     print_depext_msg depexts;
     { si_new = depexts.s_available;
-    si_required = depexts.s_required; }
+    si_required  }
 
 let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
   let rec entry_point t si =
