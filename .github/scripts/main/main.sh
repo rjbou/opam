@@ -168,7 +168,6 @@ test_project () {
   org=$1
   project=$2
   ignore_depends=$3
-  make_cmd=$4
 
   ignore=""
   if [ $ignore_depends -eq 1 ]; then
@@ -180,8 +179,18 @@ test_project () {
   set +e
   opam pin . -yn $ignore
   opam install "$project" --deps-only opam-client.to-test
-  opam exec -- $make_cmd || { opam reinstall opam-client -y; opam exec -- $make_cmd; }
-  code=$?
+
+  # 👇 Build logic based on presence of Makefile
+  if [ -f Makefile ]; then
+    make_cmd="make"
+  else
+    make_cmd="dune build"
+  fi
+
+  opam exec -- $make_cmd || {
+    opam reinstall opam-client -y
+    opam exec -- $make_cmd
+  }
   if [ $code -ne 0 ]; then
     DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
   fi
@@ -190,17 +199,29 @@ test_project () {
 }
 
 if [ "$OPAM_DEPENDS" = "1" ]; then
-
   DEPENDS_ERRORS=""
-  (set +x; echo -en "::group::depends\r") 2>/dev/null
 
-  test_project "ocaml-opam" "opam-publish" 0 "make"
-  test_project "AltGr" "opam-bundle" 0 "make"
-  test_project "ocamlpro" "opam-custom-install" 1 "dune build"
+  (set +x; echo -en "::group::depends\r") 2>/dev/null
+  packages=$(opam list --or --depends-on "$(opam show . -f name 2>/dev/null | \
+  sed 's/$/.2.3.0/' | paste -sd, -)" --columns name | tail -n +3)
+
+  for pkg in $packages; do
+  
+    dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1 | sed -E 's/^"//;s/"$//;s/\.git$//')
+
+    if [[ "$dev_repo" =~ github\.com ]]; then
+      org=$(echo "$dev_repo" | awk -F '/' '{print $(NF-1)}')
+      repo=$(echo "$dev_repo" | awk -F '/' '{print $NF}')
+      test_project "$org" "$repo" 0
+    fi
+
+  done
 
   if [ -n "$DEPENDS_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $DEPENDS_ERRORS\e[0m";
     exit 1
   fi
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
+fi
+  
 fi
