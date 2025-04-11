@@ -1209,7 +1209,7 @@ let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
     let answer =
       let pkgman =
         OpamConsole.colorise `yellow
-          (OpamSysInteract.package_manager_name ~env (st_conv t) config)
+          (OpamSysInteract.package_manager_name ~env config)
       in
       OpamConsole.menu ~unsafe_yes:`Yes ~default:`Yes ~no:`Quit
         "opam believes some required external dependencies are missing. opam \

@@ -43,7 +43,7 @@ val install: ?env:gt_variables -> _ switch_state option -> OpamFile.Config.t ->
 
 val update: ?env:gt_variables -> OpamFile.Config.t -> unit
 
-val package_manager_name: ?env:gt_variables -> _ switch_state option -> OpamFile.Config.t -> string
+val package_manager_name: ?env:gt_variables -> OpamFile.Config.t -> string
 
 (* Determine if special packages may need installing to enable other
    repositories.

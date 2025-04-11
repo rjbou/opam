@@ -1055,6 +1055,30 @@ type syspkg_to_install = {
   si_required : OpamSysPkg.Set.t
 }
 
+let package_manager_name_t ?(env=OpamVariable.Map.empty) config =
+  match family ~env () with
+  | Alpine -> `AsAdmin "apk"
+  | Altlinux -> `AsAdmin "apt-get"
+  | Arch -> `AsAdmin "pacman"
+  | Centos -> `AsAdmin (Lazy.force yum_cmd)
+  | Cygwin -> `AsUser (OpamFilename.to_string (Cygwin.cygsetup ()))
+  | Debian -> `AsAdmin "apt-get"
+  | Dummy test ->
+    if test.install then
+      `AsUser "echo"
+    else
+      `AsUser "false"
+  | Freebsd -> `AsAdmin "pkg"
+  | Gentoo -> `AsAdmin "emerge"
+  | Homebrew -> `AsUser "brew"
+  | Macports -> `AsAdmin "port"
+  | Msys2 -> `AsUser (Commands.msys2 config)
+  | Netbsd -> `AsAdmin "pkgin"
+  | Nix -> `AsUser "nix-build"
+  | Openbsd -> `AsAdmin "pkg_add"
+  | Suse -> `AsAdmin "zypper"
+
+(* Perform some action for Nix and Cygwin *)
 let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
   let unsafe_yes = OpamCoreConfig.answer_is `unsafe_yes in
   let yes ?(no=[]) yes r =
@@ -1064,11 +1088,12 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
   let packages =
     List.map OpamSysPkg.to_string (OpamSysPkg.Set.elements si.si_new)
   in
+  let pm = package_manager_name_t ~env config in
   match family ~env () with
-  | Alpine -> [`AsAdmin "apk", "add"::yes ~no:["-i"] [] packages], None
+  | Alpine -> [pm, "add"::yes ~no:["-i"] [] packages], None
   | Altlinux ->
-    [`AsAdmin "apt-get", "install"::yes ["-qq"; "-yy"] packages], None
-  | Arch -> [`AsAdmin "pacman", "-Su"::yes ["--noconfirm"] packages], None
+    [pm, "install"::yes ["-qq"; "-yy"] packages], None
+  | Arch -> [pm, "-Su"::yes ["--noconfirm"] packages], None
   | Centos ->
     (* TODO: check if they all declare "rhel" as primary family *)
     (* Kate's answer: no they don't :( (e.g. Fedora, Oraclelinux define Nothing and "fedora" respectively)  *)
@@ -1078,11 +1103,11 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
     let epel_release = "epel-release" in
     let install_epel rest =
       if List.mem epel_release packages then
-        [`AsAdmin (Lazy.force yum_cmd), "install"::yes ["-y"] [epel_release]] @ rest
+        [pm, "install"::yes ["-y"] [epel_release]] @ rest
       else rest
     in
     install_epel
-      [`AsAdmin (Lazy.force yum_cmd), "install"::yes ["-y"]
+      [pm, "install"::yes ["-y"]
                 (OpamStd.String.Set.of_list packages
                  |> OpamStd.String.Set.remove epel_release
                  |> OpamStd.String.Set.elements);
@@ -1119,24 +1144,24 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
     ],
     None
   | Debian ->
-    [`AsAdmin "apt-get", "install"::yes ["-qq"; "-yy"] packages],
+    [pm, "install"::yes ["-qq"; "-yy"] packages],
     (if unsafe_yes then Some ["DEBIAN_FRONTEND", "noninteractive"] else None)
   | Dummy test ->
     if test.install then
-      [`AsUser "echo", packages], None
+      [pm, packages], None
     else
-      [`AsUser "false", []], None
-  | Freebsd -> [`AsAdmin "pkg", "install"::yes ["-y"] packages], None
-  | Gentoo -> [`AsAdmin "emerge", yes ~no:["-a"] [] packages], None
+      [pm, []], None
+  | Freebsd -> [pm, "install"::yes ["-y"] packages], None
+  | Gentoo -> [pm, yes ~no:["-a"] [] packages], None
   | Homebrew ->
-    [`AsUser "brew", "install"::packages], (* NOTE: Does not have any interactive mode *)
+    [pm, "install"::packages], (* NOTE: Does not have any interactive mode *)
     Some (["HOMEBREW_NO_AUTO_UPDATE","yes"])
   | Macports ->
     let packages = (* Separate variants from their packages *)
       List.map (fun p -> OpamStd.String.split p ' ')  packages
       |> List.flatten
     in
-    [`AsAdmin "port", yes ["-N"] ("install"::packages)],
+    [pm, yes ["-N"] ("install"::packages)],
     None
   | Msys2 ->
     (* NOTE: MSYS2 interactive mode may break (not show output until key pressed)
@@ -1144,7 +1169,7 @@ let install_packages_commands_t ?(env=OpamVariable.Map.empty) st config si =
        https://www.msys2.org/wiki/Terminals/#mixing-msys2-and-windows. *)
     [`AsUser (Commands.msys2 config),
      "-Su"::"--noconfirm"::packages], None
-  | Netbsd -> [`AsAdmin "pkgin", yes ["-y"] ("install" :: packages)], None
+  | Netbsd -> [pm, yes ["-y"] ("install" :: packages)], None
   | Nix ->
     (match st with
      | None ->
@@ -1214,16 +1239,17 @@ echo "XDG_DATA_DIRS	+=	$XDG_DATA_DIRS	Nix" >> "$out"
 |} in
        OpamFilename.write drvFile contents;
        let envFile = OpamPath.Switch.nix_env st.switch_global.root st.switch in
-       [`AsUser "nix-build",
+       [pm,
         [ OpamFilename.to_string drvFile;
           "--out-link"; OpamFile.to_string envFile ] ],
        None)
-  | Openbsd -> [`AsAdmin "pkg_add", yes ~no:["-i"] ["-I"] packages], None
-  | Suse -> [`AsAdmin "zypper", yes ["--non-interactive"] ("install"::packages)], None
+  | Openbsd -> [pm, yes ~no:["-i"] ["-I"] packages], None
+  | Suse -> [pm, yes ["--non-interactive"] ("install"::packages)], None
 
 let install_packages_commands ?env st config si =
   fst (install_packages_commands_t ?env st config si)
 
+(*
 let package_manager_name ?env st config =
   match
     install_packages_commands ?env st config
@@ -1232,6 +1258,11 @@ let package_manager_name ?env st config =
   with
   | ((`AsAdmin pkgman | `AsUser pkgman), _) :: _ -> pkgman
   | [] -> assert false
+*)
+
+let package_manager_name ?env config =
+  match package_manager_name_t ?env config with
+  | (`AsAdmin pkgman | `AsUser pkgman) -> pkgman
 
 let sudo_run_command ?(env=OpamVariable.Map.empty) ?vars cmd args =
   let cmd, args =
