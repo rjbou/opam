@@ -1186,8 +1186,11 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
         }
     in
     let si_required =
+      let bypass = t.switch_config.OpamFile.Switch_config.depext_bypass in
       OpamPackage.Set.fold OpamSysPkg.Set.Op.(fun nv req ->
-          OpamSwitchState.depexts t nv ++ req)
+          let syspkgs = OpamSwitchState.depexts t nv in
+          let syspkgs = syspkgs -- bypass in
+          syspkgs ++ req)
         already_installed OpamSysPkg.Set.empty
     in
     print_depext_msg depexts;
