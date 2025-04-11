@@ -130,7 +130,7 @@ prepare_project () {
   fi
 
   test -d _opam || opam switch create . --no-install --formula '"ocaml-system"'
-  opam pin "$GITHUB_WORKSPACE" -yn --with-version to-test
+  opam pin "$GITHUB_WORKSPACE" -yn  
 }
 
 if [ "$OPAM_TEST" = "1" ]; then
@@ -167,7 +167,7 @@ if [ "$OPAM_TEST" = "1" ]; then
 
   # opam lib pins defined in opam-rt are ignored as there is a local pin
   opam pin . -yn --ignore-pin-depends
-  opam install opam-rt --deps-only opam-devel.to-test
+  opam install opam-rt --deps-only opam-devel
   opam exec -- make || { opam reinstall opam-client -y; opam exec -- make; }
   (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
@@ -181,20 +181,16 @@ test_project () {
   if [ $ignore_depends -eq 1 ]; then
     ignore="--ignore-pin-depends"
   fi
-
+  pkg_name=$(opam show . -f name)
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
   prepare_project "$url" "$project"
   set +e
-  opam pin . -yn $ignore
-  opam install $(opam show . -f name) --deps-only opam-client.to-test
+  opam pin $url -yn $ignore
+ 
+  opam install $pkg_name --deps-only
+  opam install opam-client
+  opam install $pkg_name
 
-   if [ -f Makefile ]; then
-    make_cmd="make"
-  else
-    make_cmd="dune build"
-  fi
-
-  opam exec -- $make_cmd || { opam reinstall opam-client -y; opam exec -- $make_cmd; }
   code=$?
   if [ $code -ne 0 ]; then
     DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
