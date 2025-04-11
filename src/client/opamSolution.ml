@@ -1198,6 +1198,7 @@ let get_depexts ?(force=false) ?(recover=false) t ~new_packages ~all_packages =
     si_required  }
 
 let install_sys_packages ~st_conv ~map_sysmap ~confirm si env config t =
+let confirm = confirm && OpamSysInteract.check_for_installed ~env () in
   let rec entry_point t si =
     if OpamClientConfig.(!r.fake) then
       (print_command si; t)
