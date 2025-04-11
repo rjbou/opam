@@ -1365,7 +1365,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t
     env config t
 
 let install_sys_packages ~confirm =
-  install_sys_packages ~st_conv:Fun.id ~map_sysmap:(fun _ t -> t) ~confirm
+  install_sys_packages ~st_conv:(fun () -> None) ~map_sysmap:(fun _ () -> ()) ~confirm
 
 (* Apply a solution *)
 let apply ?ask t ~requested ?print_requested ?add_roots

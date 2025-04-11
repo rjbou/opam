@@ -1614,14 +1614,11 @@ let check_for_sys_packages config system_packages =
       in
       (*Lazy.force header;*)
       OpamSolution.print_depext_msg status;
-      let _ : _ option =
         let si = { OpamSysInteract.
                    si_new = status.s_available;
                    si_required = OpamSysPkg.Set.empty
                  } in
-        OpamSolution.install_sys_packages ~confirm:true si env config None
-      in
-      ()
+        OpamSolution.install_sys_packages ~confirm:true si env config ()
 
 let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace
