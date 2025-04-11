@@ -188,6 +188,14 @@ test_project () {
   opam pin "$url.git" -yn $ignore
  
   opam install $pkg_name --deps-only
+  deps_code=$?
+  if [ $deps_code -ne 0 ]; then
+    echo "Dependency installation failed for $pkg_name"
+    DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
+    set -e
+    (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
+    return
+  fi
   opam install opam-client
   opam install $pkg_name
 
