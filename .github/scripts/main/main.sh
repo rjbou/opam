@@ -189,24 +189,15 @@ test_project () {
   opam pin . -yn $ignore
   opam install "$project" --deps-only opam-client.to-test
 
-  # 👇 Build logic based on presence of Makefile
-  if [ -f Makefile ]; then
+   if [ -f Makefile ]; then
     make_cmd="make"
   else
     make_cmd="dune build"
   fi
 
-  opam exec -- $make_cmd
-  rcode=$?
-  if [ $rcode -ne 0 ]; then
-    echo "First build failed for $project, attempting opam-client reinstall and rebuild"
-    opam reinstall opam-client -y
-    opam exec -- $make_cmd
-    rcode=$?
-  fi
-
-  if [ $rcode -ne 0 ]; then
-    echo "Still failing: $project"
+  opam exec -- $make_cmd || { opam reinstall opam-client -y; opam exec -- $make_cmd; }
+  code=$?
+  if [ $code -ne 0 ]; then
     DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
   fi
   set -e
