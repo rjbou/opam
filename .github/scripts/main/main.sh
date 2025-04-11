@@ -185,7 +185,7 @@ test_project () {
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
   prepare_project "$url" "$project"
   set +e
-  opam pin $url -yn $ignore
+  opam pin "$url.git" -yn $ignore
  
   opam install $pkg_name --deps-only
   opam install opam-client
