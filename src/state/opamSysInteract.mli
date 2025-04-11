@@ -22,6 +22,9 @@ val packages_status:
   ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
   OpamSysPkg.status
 
+val check_for_installed:
+  ?env:gt_variables -> unit -> bool
+
 type syspkg_to_install = {
   si_new : OpamSysPkg.Set.t;
   si_required : OpamSysPkg.Set.t

@@ -1028,6 +1028,26 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages =
     in
     compute_sets sys_installed ~sys_available
 
+let check_for_installed ?(env=OpamVariable.Map.empty) () =
+  match family ~env () with
+  | Nix -> false
+  | Alpine
+  | Altlinux
+  | Arch
+  | Centos
+  | Cygwin
+  | Debian
+  | Dummy _
+  | Freebsd
+  | Gentoo
+  | Homebrew
+  | Macports
+  | Msys2
+  | Netbsd
+  | Openbsd
+  | Suse
+    -> true
+
 (* Install *)
 
 type syspkg_to_install = {

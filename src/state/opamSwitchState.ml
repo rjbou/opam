@@ -554,7 +554,9 @@ let load lock_kind gt rt switch =
                   && OpamSysPkg.Set.is_empty spkg.OpamSysPkg.s_not_found))
         (Lazy.force sys_packages)
     in
-    if OpamPackage.Map.is_empty sys_packages then
+    if not (OpamSysInteract.check_for_installed
+        ~env:gt.global_variables ()) ||
+    OpamPackage.Map.is_empty sys_packages then
       OpamPackage.Set.empty
     else
     let lchanged = OpamPackage.Map.keys sys_packages in
