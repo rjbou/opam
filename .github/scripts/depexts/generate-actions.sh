@@ -117,6 +117,9 @@ OCAML_INVARIANT="\"ocaml\" {>= \"4.09.0\"$OCAML_CONSTRAINT}"
 # Copy 2.1 opam binary from cache
 cp binary/opam "$dir/opam"
 
+LOCAL_REPO=/opam/repo
+CONF_BRANCH=confs
+
 cat >> "$dir/Dockerfile" << EOF
 RUN test -d /opam || mkdir /opam
 ENV OPAMROOTISOK=1
@@ -126,10 +129,21 @@ ENV OPAMCONFIRMLEVEL=unsafe-yes
 ENV OPAMPRECISETRACKING=1
 COPY opam /usr/bin/opam
 RUN echo 'default-invariant: [ $OCAML_INVARIANT ]' > /opam/opamrc
-RUN /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc git+$OPAM_REPO#$OPAM_REPO_SHA
+RUN git clone $OPAM_REPO --single-branch --branch master $LOCAL_REPO
+RUN git config --global user.email "you@example.com"
+RUN git config --global user.name "Your Name"
+RUN git -C $LOCAL_REPO reset --hard $OPAM_REPO_SHA
+RUN git -C $LOCAL_REPO reset --soft \$(git -C $LOCAL_REPO rev-list --all | tail -1)
+RUN ls $LOCAL_REPO/packages/
+RUN git -C $LOCAL_REPO commit -qm "all packages"
+RUN git -C $LOCAL_REPO checkout -b $CONF_BRANCH
+RUN git -C $LOCAL_REPO rm -q \$(git -C $LOCAL_REPO ls-files packages | grep -v "^packages/conf-")
+RUN git -C $LOCAL_REPO commit -qm "keep only confs"
+RUN /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc git+file://$LOCAL_REPO#master
 RUN echo 'archive-mirrors: "https://opam.ocaml.org/cache"' >> \$OPAMROOT/config
 RUN /usr/bin/opam switch create this-opam --formula='$OCAML_INVARIANT'
 RUN /usr/bin/opam install opam-core opam-state opam-solver opam-repository opam-format opam-client --deps
+RUN /usr/bin/opam install patch.3.0.0~alpha1
 RUN /usr/bin/opam clean -as --logs
 COPY entrypoint.sh /opam/entrypoint.sh
 ENTRYPOINT ["/opam/entrypoint.sh"]
@@ -146,10 +160,10 @@ git config --global --add safe.directory /github/workspace
 #cd /github/workspace
 
 ## LOCAL TESTING
-git clone https://github.com/rjbou/opam --single-branch --branch nixos-depexts --depth 1 local-opam
+git clone /opam/local-git --single-branch --branch nixos-depexts --depth 1 local-opam
 cd local-opam
 
-/usr/bin/opam install . --deps
+#/usr/bin/opam install . --deps
 eval \$(/usr/bin/opam env)
 ./configure
 make
@@ -167,7 +181,8 @@ fi
 
 cat >> "$dir/entrypoint.sh" << EOF
 ./opam config report
-./opam switch create confs --empty
+./opam switch create confs --empty --repo rconf=git+file://$LOCAL_REPO#$CONF_BRANCH
+./opam repo --all
 EOF
 
 # Test depexts
@@ -226,6 +241,9 @@ ERRORS=""
 test_depexts () {
   for pkg in \$@ ; do
     ./opam install \$pkg || ERRORS="\$ERRORS \$pkg"
+    ## "[35**************[0m"
+    grep nativeBuildInputs /opam/root/confs/.opam-switch/env.nix
+    ## "[35**************[0m"
   done
 }
 
