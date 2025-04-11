@@ -187,7 +187,7 @@ test_project () {
   prepare_project "$org" "$project"
   set +e
   opam pin . -yn $ignore
-  opam install "$project" --deps-only opam-client.to-test
+  opam install $(opam show . -f name) --deps-only opam-client.to-test
 
    if [ -f Makefile ]; then
     make_cmd="make"
