@@ -93,10 +93,9 @@ fi
 
 prepare_project () {
   # warning, perform a cd
-  org=$1
+  url=$1
   project=$2
 
-  url="https://github.com/$org/$project"
   dir="$CACHE/$project"
 
   if [ ! -d "$CACHE/$project" ]; then
@@ -164,7 +163,7 @@ if [ "$OPAM_TEST" = "1" ]; then
 
   # Compile and run opam-rt
   (set +x ; echo -en "::group::opam-rt\r") 2>/dev/null
-  prepare_project "ocaml-opam" "opam-rt"
+  prepare_project "https://github.com/ocaml-opam/opam-rt" "opam-rt"
 
   # opam lib pins defined in opam-rt are ignored as there is a local pin
   opam pin . -yn --ignore-pin-depends
@@ -174,7 +173,7 @@ if [ "$OPAM_TEST" = "1" ]; then
 fi
 
 test_project () {
-  org=$1
+  url=$1
   project=$2
   ignore_depends=$3
 
@@ -184,7 +183,7 @@ test_project () {
   fi
 
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
-  prepare_project "$org" "$project"
+  prepare_project "$url" "$project"
   set +e
   opam pin . -yn $ignore
   opam install $(opam show . -f name) --deps-only opam-client.to-test
@@ -216,14 +215,8 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
 
     dev_repo=$(echo "$dev_repo" | sed -E 's/^"//;s/"$//;s/^git\+//;s/\.git$//')
 
-    if [[ "$dev_repo" =~ github\.com ]]; then
-      path_part=$(echo "$dev_repo" | sed -E 's#^https?://github.com/##')
-      org=$(echo "$path_part" | cut -d/ -f1)
-      repo=$(echo "$path_part" | cut -d/ -f2)
-
-      if [[ -n "$org" && -n "$repo" ]]; then
-        test_project "$org" "$repo" 0
-      fi
+    if [[ -n "$dev_repo" ]]; then
+      test_project "$dev_repo" "$pkg" 0
     fi
   done
 
