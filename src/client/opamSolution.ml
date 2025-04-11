@@ -1328,7 +1328,7 @@ let confirm = confirm && OpamSysInteract.check_for_installed ~env () in
     give_up_msg ();
     OpamStd.Sys.exit_because `Aborted
   in
-  if (OpamSysPkg.Set.is_empty si.OpamSysInteract.si_new && OpamSysPkg.Set.is_empty si.si_required) ||
+  if (OpamSysPkg.Set.is_empty si.OpamSysInteract.si_new) ||
      OpamClientConfig.(!r.show) ||
      OpamClientConfig.(!r.assume_depexts) then
     t
