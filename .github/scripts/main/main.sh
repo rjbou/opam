@@ -212,15 +212,19 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   sed 's/$/.2.3.0/' | paste -sd, -)" --columns name | tail -n +3)
 
   for pkg in $packages; do
+    dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1)
 
-    dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1 | sed -E 's/^"//;s/"$//;s/\.git$//')
+    dev_repo=$(echo "$dev_repo" | sed -E 's/^"//;s/"$//;s/^git\+//;s/\.git$//')
 
     if [[ "$dev_repo" =~ github\.com ]]; then
-      org=$(echo "$dev_repo" | awk -F '/' '{print $(NF-1)}')
-      repo=$(echo "$dev_repo" | awk -F '/' '{print $NF}')
-      test_project "$org" "$repo" 0
-    fi
+      path_part=$(echo "$dev_repo" | sed -E 's#^https?://github.com/##')
+      org=$(echo "$path_part" | cut -d/ -f1)
+      repo=$(echo "$path_part" | cut -d/ -f2)
 
+      if [[ -n "$org" && -n "$repo" ]]; then
+        test_project "$org" "$repo" 0
+      fi
+    fi
   done
 
   if [ -n "$DEPENDS_ERRORS" ]; then
