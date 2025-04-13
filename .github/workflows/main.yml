@@ -83,7 +83,7 @@ jobs:
     needs: [ Analyse ]
     strategy:
       matrix:
-        ocamlv: [ 4.14.2 ]
+        ocamlv: [ 4.14.2, 5.3.0 ]
       fail-fast: false
     env:
       OPAM_DEPENDS: 1
