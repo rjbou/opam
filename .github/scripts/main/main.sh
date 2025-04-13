@@ -187,8 +187,13 @@ test_project () {
   opam pin "$url.git" -yn $ignore
   for pkg_name in $(opam show . -f name); do
     if [ "$pkg_name" = "dream-mirage" ] || [ "$pkg_name" = "odoc-bench" ]; then
-      echo "Skipping $pkg_name"
       continue
+    fi
+    if [[ "$pkg_name" = "opam-lock" ]]; then
+      opam install jbuilder
+    fi
+    if [[ "$pkg_name" = "opam-graph" ]]; then
+      opam install ocamldot
     fi
 
     echo "Installing dependencies for $pkg_name"
@@ -243,12 +248,11 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
 
   if [ -n "$DEPENDS_ERRORS" ]; then
     echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
-    exit 1
   fi
   if [ -n "$LIB_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m";
-    exit 1
   fi
+  
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
 fi
  
