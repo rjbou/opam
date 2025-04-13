@@ -181,38 +181,50 @@ test_project () {
   if [ $ignore_depends -eq 1 ]; then
     ignore="--ignore-pin-depends"
   fi
-  pkg_name=$(opam show . -f name)
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
   prepare_project "$url" "$project"
   set +e
   opam pin "$url.git" -yn $ignore
- 
-  opam install $pkg_name --deps-only
-  deps_code=$?
-  if [ $deps_code -ne 0 ]; then
-    echo "Dependency installation failed for $pkg_name"
-    DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
-    set -e
-    (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
-    return
-  fi
-  opam install opam-client
-  opam install $pkg_name
+  for pkg_name in $(opam show . -f name); do
+    if [ "$pkg_name" = "dream-mirage" ] || [ "$pkg_name" = "odoc-bench" ]; then
+      echo "Skipping $pkg_name"
+      continue
+    fi
 
-  code=$?
-  if [ $code -ne 0 ]; then
-    DEPENDS_ERRORS="$DEPENDS_ERRORS $project"
-  fi
+    echo "Installing dependencies for $pkg_name"
+    opam install "$pkg_name" --deps-only
+    deps_code=$?
+    if [ $deps_code -ne 0 ]; then
+      echo "Dependency installation failed for $pkg_name"
+      DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name"
+      set -e
+      (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
+      return
+    fi
+
+    echo "Installing opam-client and $pkg_name"
+    opam install opam-client
+    opam install "$pkg_name"
+    code=$?
+    if [ $code -ne 0 ]; then
+      LIB_ERRORS="$LIB_ERRORS $project"
+    fi
+  done
+
+
   set -e
   (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
 }
 
 if [ "$OPAM_DEPENDS" = "1" ]; then
   DEPENDS_ERRORS=""
+  LIB_ERRORS=""
 
   (set +x; echo -en "::group::depends\r") 2>/dev/null
-  packages=$(opam list --or --depends-on "$(opam show . -f name 2>/dev/null | \
-  sed 's/$/.2.3.0/' | paste -sd, -)" --columns name | tail -n +3)
+  opam_libs=$(opam show . -f name 2>/dev/null)
+
+  packages=$(opam list --or --depends-on "$(echo "$opam_libs.2.3.0")" --columns name | \
+    tail -n +3 | grep -v -x "$exclude_pkg")
 
   for pkg in $packages; do
     dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1)
@@ -225,7 +237,11 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   done
 
   if [ -n "$DEPENDS_ERRORS" ]; then
-    echo -e "\e[31mErrors detected in plugins $DEPENDS_ERRORS\e[0m";
+    echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
+    exit 1
+  fi
+  if [ -n "$LIB_ERRORS" ]; then
+    echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m";
     exit 1
   fi
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
