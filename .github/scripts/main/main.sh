@@ -184,37 +184,29 @@ test_project () {
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
   prepare_project "$url" "$project"
   set +e
-  opam pin "$url.git" -yn $ignore
-  for pkg_name in $(opam show . -f name); do
-    if [ "$pkg_name" = "dream-mirage" ] || [ "$pkg_name" = "odoc-bench" ]; then
-      continue
-    fi
-    if [[ "$pkg_name" = "opam-lock" ]]; then
-      opam install jbuilder
-    fi
-    if [[ "$pkg_name" = "opam-graph" ]]; then
-      opam install ocamldot
-    fi
+  opam pin . -yn $ignore
+  pkg_name=$project
 
-    echo "Installing dependencies for $pkg_name"
-    opam install "$pkg_name" --deps-only -y
-    deps_code=$?
-    if [ $deps_code -ne 0 ]; then
-      echo "Dependency installation failed for $pkg_name"
-      DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name:$deps_code"
-      set -e
-      (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
-      return
-    fi
+  echo "Installing dependencies for $pkg_name"
+  opam install "$pkg_name" --deps-only -y
+  deps_code=$?
+  if [ $deps_code -ne 0 ]; then
+    echo "Dependency installation failed for $pkg_name"
+    DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name:$deps_code"
+    set -e
+    (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
+    return
+  fi
 
-    echo "Installing opam-client and $pkg_name"
-#    opam install opam-client
-    opam install "$pkg_name" -y
-    code=$?
-    if [ $code -ne 0 ]; then
-      PKG_ERRORS="$PKG_ERRORS $project"
-    fi
-  done
+  echo "Installing opam-client and $pkg_name"
+#  opam install opam-client
+  opam install "$pkg_name" -y
+  code=$?
+  if [ $code -ne 0 ]; then
+    PKG_ERRORS="$PKG_ERRORS $project"
+  else
+    opam remove $project
+  fi
 
 
   set -e
