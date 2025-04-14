@@ -212,7 +212,7 @@ test_project () {
     opam install "$pkg_name"
     code=$?
     if [ $code -ne 0 ]; then
-      LIB_ERRORS="$LIB_ERRORS $project"
+      PKG_ERRORS="$PKG_ERRORS $project"
     fi
   done
 
@@ -223,7 +223,7 @@ test_project () {
 
 if [ "$OPAM_DEPENDS" = "1" ]; then
   DEPENDS_ERRORS=""
-  LIB_ERRORS=""
+  PKG_ERRORS=""
 
   (set +x; echo -en "::group::depends\r") 2>/dev/null
   opam_libs=$(opam show . -f name 2>/dev/null)
@@ -247,10 +247,10 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   done
 
   if [ -n "$DEPENDS_ERRORS" ]; then
-    echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
+    echo -e "\e[31mErrors detected while installing dependencies of opam dependencies $DEPENDS_ERRORS\e[0m";
   fi
-  if [ -n "$LIB_ERRORS" ]; then
-    echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m";
+  if [ -n "$PKG_ERRORS" ]; then
+    echo -e "\e[31mErrors detected in opam dependency $PKG_ERRORS\e[0m";
   fi
   
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
