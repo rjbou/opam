@@ -208,7 +208,7 @@ test_project () {
     fi
 
     echo "Installing opam-client and $pkg_name"
-    opam install opam-client
+#    opam install opam-client
     opam install "$pkg_name"
     code=$?
     if [ $code -ne 0 ]; then
