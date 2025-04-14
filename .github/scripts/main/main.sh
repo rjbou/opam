@@ -257,6 +257,22 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     echo -e "\e[31mErrors detected in opam dependency $PKG_ERRORS\e[0m";
   fi
   
+
+  maintained="opam-publish"
+  maintained="$maintained opam-build"
+  maintained="$maintained opam-test"
+
+  ERROR=0
+  for pkg in $maintained; do
+    if echo "$PKG_ERRORS" | grep -q $pkg ; then
+    ERROR=1
+    fi
+  done
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
+
+  if [ $ERROR -eq 1 ]; then
+    exit 4
+  fi
+
 fi
  
