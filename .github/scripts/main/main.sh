@@ -177,18 +177,14 @@ test_project () {
   project=$2
   ignore_depends=$3
 
-  ignore=""
-  if [ $ignore_depends -eq 1 ]; then
-    ignore="--ignore-pin-depends"
-  fi
-  (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
+    (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
   prepare_project "$url" "$project"
   set +e
-  opam pin . -yn $ignore
+  opam pin . -yn
   pkg_name=$project
 
   echo "Installing dependencies for $pkg_name"
-  opam install "$pkg_name" --deps-only -y
+  opam install "$pkg_name" --deps-only -y --ignore-constraints-on $ignore_depends
   deps_code=$?
   if [ $deps_code -ne 0 ]; then
     echo "Dependency installation failed for $pkg_name"
@@ -200,7 +196,7 @@ test_project () {
 
   echo "Installing opam-client and $pkg_name"
 #  opam install opam-client
-  opam install "$pkg_name" -y
+  opam install "$pkg_name" -y --ignore-constraints-on $ignore_depends
   code=$?
   if [ $code -ne 0 ]; then
     PKG_ERRORS="$PKG_ERRORS $project"
@@ -246,7 +242,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     dev_repo=$(echo "$dev_repo" | sed -E 's/^"//;s/"$//;s/^git\+//;s/\.git$//')
 
     if [[ -n "$dev_repo" ]]; then
-      test_project "$dev_repo" "$pkg" 0
+      test_project "$dev_repo" "$pkg" "$(echo "$opam_libs" | sed 's/ /,/g')"
     fi
   done
 
