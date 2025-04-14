@@ -114,7 +114,7 @@ esac
 
 OCAML_INVARIANT="\"ocaml\" {>= \"4.09.0\"$OCAML_CONSTRAINT}"
 
-# Copy 2.1 opam binary from cache
+# Copy released opam binary from cache
 cp binary/opam "$dir/opam"
 
 LOCAL_REPO=/opam/repo
@@ -129,25 +129,27 @@ ENV OPAMCONFIRMLEVEL=unsafe-yes
 ENV OPAMPRECISETRACKING=1
 COPY opam /usr/bin/opam
 RUN echo 'default-invariant: [ $OCAML_INVARIANT ]' > /opam/opamrc
+# Retrieve opam repo
 RUN git clone $OPAM_REPO --single-branch --branch master $LOCAL_REPO
-RUN git config --global user.email "you@example.com"
-RUN git config --global user.name "Your Name"
+RUN git config --global user.email "gha@op.am"
+RUN git config --global user.name "OPAM GHA"
 RUN git -C $LOCAL_REPO reset --hard $OPAM_REPO_SHA
 RUN git -C $LOCAL_REPO reset --soft \$(git -C $LOCAL_REPO rev-list --all | tail -1)
-RUN ls $LOCAL_REPO/packages/
 RUN git -C $LOCAL_REPO commit -qm "all packages"
+# Build a branch that contains only confs packages
 RUN git -C $LOCAL_REPO checkout -b $CONF_BRANCH
 RUN git -C $LOCAL_REPO rm -q \$(git -C $LOCAL_REPO ls-files packages | grep -v "^packages/conf-")
 RUN git -C $LOCAL_REPO commit -qm "keep only confs"
+# Setup opam
 RUN /usr/bin/opam init --no-setup --disable-sandboxing --bare --config /opam/opamrc git+file://$LOCAL_REPO#master
 RUN echo 'archive-mirrors: "https://opam.ocaml.org/cache"' >> \$OPAMROOT/config
 RUN /usr/bin/opam switch create this-opam --formula='$OCAML_INVARIANT'
 RUN /usr/bin/opam install opam-core opam-state opam-solver opam-repository opam-format opam-client --deps
-RUN /usr/bin/opam install patch.3.0.0~alpha1
 RUN /usr/bin/opam clean -as --logs
 COPY entrypoint.sh /opam/entrypoint.sh
 ENTRYPOINT ["/opam/entrypoint.sh"]
 EOF
+
 
 ### Generate the entrypoint
 cat > "$dir/entrypoint.sh" << EOF
@@ -156,14 +158,18 @@ set -eux
 
 git config --global --add safe.directory /github/workspace
 
+## CI WORKING DIR
 # Workdir is /github/workpaces
-#cd /github/workspace
+cd /github/workspace
 
-## LOCAL TESTING
-git clone /opam/local-git --single-branch --branch nixos-depexts --depth 1 local-opam
-cd local-opam
+## LOCAL TESTING WORKING DIR
+# with docker run -v local/path/opam:/opam/local-git:ro
+#git clone /opam/local-git --single-branch --branch branch-name --depth 1 local-opam
+# with a distant branch
+#git clone https://github.com/ocaml/opam --single-branch --branch branch-name --depth 1 local-opam
+#cd local-opam
 
-#/usr/bin/opam install . --deps
+/usr/bin/opam install . --deps
 eval \$(/usr/bin/opam env)
 ./configure
 make
@@ -203,8 +209,8 @@ if [ "$target" != centos ] && [ "$target" != gentoo ] && [ "$target" != opensuse
   test_depext conf-automake.1
 fi
 
-# additionna
-if [ "$target" != oraclelinux ] && [ "$target" != xxx ]; then
+# additional
+if [ "$target" != oraclelinux ]; then
   test_depext conf-dpkg.1 # gentoo
 fi
 
