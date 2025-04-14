@@ -247,9 +247,6 @@ ERRORS=""
 test_depexts () {
   for pkg in \$@ ; do
     ./opam install \$pkg || ERRORS="\$ERRORS \$pkg"
-    ## "[35**************[0m"
-    grep nativeBuildInputs /opam/root/confs/.opam-switch/env.nix
-    ## "[35**************[0m"
   done
 }
 
