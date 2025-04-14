@@ -218,12 +218,25 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   PKG_ERRORS=""
 
   (set +x; echo -en "::group::depends\r") 2>/dev/null
-  opam_libs=$(opam show . -f name 2>/dev/null)
-  depends_on=$(echo "$opam_libs" | sed 's/$/.2.3.0/' | paste -sd, -)
+  # last release
+  version=$(grep "^VERSION=" $GITHUB_WORKSPACE/shell/install.sh | sed "s/VERSION='\(.*\)'/\1/")
+  opam_libs="opam-core"
+  opam_libs="$opam_libs opam-state"
+  opam_libs="$opam_libs opam-solver"
+  opam_libs="$opam_libs opam-repository"
+  opam_libs="$opam_libs opam-format"
+  opam_libs="$opam_libs opam-client"
+  opam_libs_exclude="opam-devel"
+  opam_libs_exclude="$opam_libs_exclude opam-installer"
 
+  maintained_pkgs="opam-publish opam-build opam-test"
+
+  #opam_libs=$(opam show . -f name 2>/dev/null | grep -v devel | grep -v installer)
+  depends_on=$(echo "$opam_libs" | sed "s/\( \|$\)/.$version\1/g" | sed 's/ /,/g')
+  
   packages=$(opam list --or --depends-on "$depends_on" --columns name -s)
 
-  for exclude in $opam_libs; do
+  for exclude in $opam_libs_exclude $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
   done
 
