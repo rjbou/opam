@@ -201,7 +201,7 @@ test_project () {
     deps_code=$?
     if [ $deps_code -ne 0 ]; then
       echo "Dependency installation failed for $pkg_name"
-      DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name"
+      DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name:$deps_code"
       set -e
       (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
       return
