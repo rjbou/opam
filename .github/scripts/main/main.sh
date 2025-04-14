@@ -229,8 +229,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   opam_libs=$(opam show . -f name 2>/dev/null)
   depends_on=$(echo "$opam_libs" | sed 's/$/.2.3.0/' | paste -sd, -)
 
-  packages=$(opam list --or --depends-on "$depends_on" --columns name | \
-    tail -n +3)
+  packages=$(opam list --or --depends-on "$depends_on" --columns name -s)
 
   for exclude in $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
