@@ -197,7 +197,7 @@ test_project () {
     fi
 
     echo "Installing dependencies for $pkg_name"
-    opam install "$pkg_name" --deps-only
+    opam install "$pkg_name" --deps-only -y
     deps_code=$?
     if [ $deps_code -ne 0 ]; then
       echo "Dependency installation failed for $pkg_name"
@@ -209,7 +209,7 @@ test_project () {
 
     echo "Installing opam-client and $pkg_name"
 #    opam install opam-client
-    opam install "$pkg_name"
+    opam install "$pkg_name" -y
     code=$?
     if [ $code -ne 0 ]; then
       PKG_ERRORS="$PKG_ERRORS $project"
