@@ -321,7 +321,7 @@ let autopin_aux st ?quiet ?recurse ?subpath ?locked
                      opam
                  | Some _ -> opam
                in
-               OpamStd.Option.equal String.equal
+               Stdlib.Option.equal String.equal
                  locked (OpamFile.OPAM.locked opam)
                && OpamFile.OPAM.effectively_equal opam0 opam
              | None -> false)
