@@ -1030,6 +1030,7 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages =
 
 let check_for_installed ?(env=OpamVariable.Map.empty) () =
   match family ~env () with
+  | exception Failure _ -> false (* no depexts *)
   | Nix -> false
   | Alpine
   | Altlinux
