@@ -105,10 +105,17 @@ RUN apt install -y g++
 EOF
     ;;
   nix)
+  mainlibs=${mainlibs/m4/gnum4}
+  mainlibs=${mainlibs/make/gnumake}
+  mainlibs=${mainlibs/tar/}
+  mainlibs=$(echo "$mainlibs" | sed 's/\([[:alnum:]]\+\)/nixpkgs.\1/g')
+  additionallibs="gcc diffutils getconf gnused gawk"
+  additionallibs=$(echo "$additionallibs" | sed 's/\([[:alnum:]]\+\)/nixpkgs.\1/g')
+  # We don't use $ocaml as nix compiler lib is not main ocaml compiler
     cat > "$dir/Dockerfile" << EOF
 FROM nixos/nix
 RUN nix-channel --update
-RUN nix-env -iA nixpkgs.gnum4 nixpkgs.git nixpkgs.rsync nixpkgs.patch nixpkgs.bzip2 nixpkgs.gnumake nixpkgs.wget nixpkgs.ocaml nixpkgs.unzip nixpkgs.gcc nixpkgs.diffutils nixpkgs.patch nixpkgs.getconf nixpkgs.gnused nixpkgs.gawk
+RUN nix-env -iA $mainlibs $additionallibs nixpkgs.ocaml
 EOF
 esac
 
