@@ -2,8 +2,8 @@
 
 set -eu
 
-#for target in alpine archlinux centos debian fedora gentoo opensuse oraclelinux ubuntu nix; do
-target=$1
+for target in alpine archlinux centos debian fedora gentoo opensuse oraclelinux ubuntu nix; do
+#target=$1
 dir=.github/actions/$target
 
 mkdir -p "$dir"
@@ -167,14 +167,14 @@ git config --global --add safe.directory /github/workspace
 
 ## CI WORKING DIR
 # Workdir is /github/workpaces
-cd /github/workspace
+#cd /github/workspace
 
 ## LOCAL TESTING WORKING DIR
 # with docker run -v local/path/opam:/opam/local-git:ro
-#git clone /opam/local-git --single-branch --branch branch-name --depth 1 local-opam
+git clone /opam/local-git --single-branch --branch nixos-depexts --depth 1 local-opam
 # with a distant branch
 #git clone https://github.com/ocaml/opam --single-branch --branch branch-name --depth 1 local-opam
-#cd local-opam
+cd local-opam
 
 /usr/bin/opam install . --deps
 eval \$(/usr/bin/opam env)
@@ -277,4 +277,4 @@ EOF
 
 chmod +x "$dir/entrypoint.sh"
 
-#done
+done
