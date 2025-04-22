@@ -990,9 +990,12 @@ let set_var_global gt svar value =
             in gt.config);
         stv_remove_elem = (fun rest config ->
             OpamFile.Config.with_global_variables rest config
+(*
             |> OpamFile.Config.with_eval_variables
               (List.filter (fun (k,_,_) -> k <> var)
-                 (OpamFile.Config.eval_variables config)));
+                 (OpamFile.Config.eval_variables config))
+*)
+                 );
         stv_write = (fun config -> OpamGlobalState.write { gt with config });
         stv_doc = global_doc;
       } in

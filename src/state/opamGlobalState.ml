@@ -118,9 +118,15 @@ let load lock_kind =
           ~git_location:OpamCoreConfig.(!r.git_location)
       | None -> env) in
     List.fold_left (fun acc (v, cmd, doc) ->
+    match OpamVariable.Map.find_opt v acc with
+    | Some _previous_value -> acc
+(*
         OpamVariable.Map.update v
           (fun previous_value ->
-             (lazy
+*)
+             | None ->
+             OpamVariable.Map.add v
+             ((lazy
                (try
                   let ret =
                     OpamSystem.read_command_output
@@ -134,10 +140,13 @@ let load lock_kind =
                   log "Failed to evaluate global variable %a: %a"
                     (slog OpamVariable.to_string) v
                     (slog Printexc.to_string) e;
-                  Lazy.force (fst previous_value))),
+                  None)),
              doc)
+(*
           (lazy None, "")
-          acc)
+*)
+          acc
+          )
       global_variables eval_variables
   in
   { global_lock = config_lock;
