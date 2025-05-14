@@ -1281,6 +1281,27 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:lock.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-namespaces)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (action
+  (diff namespaces.test namespaces.out)))
+
+(alias
+ (name reftest)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (deps (alias reftest-namespaces)))
+
+(rule
+ (targets namespaces.out)
+ (deps root-N0REP0)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:namespaces.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-opam-pkgvar-with-plus)
  (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action

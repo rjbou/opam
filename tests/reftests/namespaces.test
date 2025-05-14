@@ -1,0 +1,231 @@
+N0REP0
+### <ONE/repo>
+opam-version: "2.0"
+### <ONE/packages/foo/foo.1/opam>
+opam-version: "2.0"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <ONE/packages/bar/bar.1/opam>
+opam-version: "2.0"
+depends: "one%baz"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <ONE/packages/baz/baz.1/opam>
+opam-version: "2.0"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <ONE/packages/qux/qux.1/opam>
+opam-version: "2.0"
+depends: "two%foo"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <TWO/repo>
+opam-version: "2.0"
+### <TWO/packages/foo/foo.1/opam>
+opam-version: "2.0"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <TWO/packages/bar/bar.1/opam>
+opam-version: "2.0"
+depends: "two%baz"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <TWO/packages/baz/baz.1/opam>
+opam-version: "2.0"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### <TWO/packages/qux/qux.1/opam>
+opam-version: "2.0"
+depends: "one%foo"
+build: [ "touch" "built.%{name}%" ]
+install: [ "cp" "built.%{name}%" "%{lib}%/" ]
+### #OCAMLRUNPARAM=b OPAMDEBUG=1
+### OPAMYES=1 OPAMSTRICT=0
+### opam switch create namespaces --empty
+### opam repo add one ./ONE --this-switch
+[one] Initialised
+[ERROR] from qux.1 to one%qux.1
+[ERROR] from baz.1 to one%baz.1
+[ERROR] from bar.1 to one%bar.1
+[ERROR] from foo.1 to one%foo.1
+### opam repo add two ./TWO --this-switch
+[two] Initialised
+[ERROR] from qux.1 to two%qux.1
+[ERROR] from baz.1 to two%baz.1
+[ERROR] from bar.1 to two%bar.1
+[ERROR] from foo.1 to two%foo.1
+### opam list -A
+# Packages matching: any
+# Name  # Installed # Synopsis
+one%bar --
+one%baz --
+one%foo --
+one%qux --
+two%bar --
+two%baz --
+two%foo --
+two%qux --
+### opam show one%foo
+
+<><> one%foo: information on all versions <><><><><><><><><><><><><><><><><><><>
+name         one%foo
+all-versions 1
+
+<><> Version-specific details <><><><><><><><><><><><><><><><><><><><><><><><><>
+version    1
+repository one
+### opam install one%foo two%foo | unordered
+The following actions will be performed:
+=== install 2 packages
+  - install one%foo 1
+  - install two%foo 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed two%foo.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (foo.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/two%foo.1/opam
+-> installed one%foo.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (foo.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/one%foo.1/opam
+Done.
+### opam install bar
+[ERROR] No package named bar found.
+# Return code 5 #
+### opam install one%bar
+The following actions will be performed:
+=== install 2 packages
+  - install one%bar 1
+  - install one%baz 1 [required by one%bar]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed one%baz.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (baz.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/one%baz.1/opam
+-> installed one%bar.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (bar.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/one%bar.1/opam
+Done.
+### opam install two%bar
+The following actions will be performed:
+=== install 2 packages
+  - install two%bar 1
+  - install two%baz 1 [required by two%bar]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed two%baz.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (baz.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/two%baz.1/opam
+-> installed two%bar.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (bar.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/two%bar.1/opam
+Done.
+### opam remove one%foo two%foo
+The following actions will be performed:
+=== remove 2 packages
+  - remove one%foo 1
+  - remove two%foo 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   one%foo.1
+-> removed   two%foo.1
+Done.
+### opam install one%qux
+The following actions will be performed:
+=== install 2 packages
+  - install one%qux 1
+  - install two%foo 1 [required by one%qux]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed two%foo.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (foo.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/two%foo.1/opam
+-> installed one%qux.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (qux.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/one%qux.1/opam
+Done.
+### opam install two%qux
+The following actions will be performed:
+=== install 2 packages
+  - install one%foo 1 [required by two%qux]
+  - install two%qux 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed one%foo.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (foo.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/one%foo.1/opam
+-> installed two%qux.1
+[WARNING] Skipping inconsistent 'name:' or 'version:' fields (qux.1) while saving ${BASEDIR}/OPAM/namespaces/.opam-switch/packages/two%qux.1/opam
+Done.
+### opam list
+# Packages matching: installed
+# Name  # Installed # Synopsis
+one%bar 1
+one%baz 1
+one%foo 1
+one%qux 1
+two%bar 1
+two%baz 1
+two%foo 1
+two%qux 1
+### opam tree
+one%bar.1
+'-- one%baz.1
+
+one%qux.1
+'-- two%foo.1
+
+two%bar.1
+'-- two%baz.1
+
+two%qux.1
+'-- one%foo.1
+### find OPAM/namespaces/lib/ | sort
+OPAM/namespaces/lib/
+OPAM/namespaces/lib/built.one%bar
+OPAM/namespaces/lib/built.one%baz
+OPAM/namespaces/lib/built.one%foo
+OPAM/namespaces/lib/built.one%qux
+OPAM/namespaces/lib/built.two%bar
+OPAM/namespaces/lib/built.two%baz
+OPAM/namespaces/lib/built.two%foo
+OPAM/namespaces/lib/built.two%qux
+OPAM/namespaces/lib/stublibs
+OPAM/namespaces/lib/toplevel
+### find OPAM/repo | sort | grep -v state
+OPAM/repo
+OPAM/repo/default
+OPAM/repo/default/packages
+OPAM/repo/default/repo
+OPAM/repo/lock
+OPAM/repo/one
+OPAM/repo/one/packages
+OPAM/repo/one/packages/bar
+OPAM/repo/one/packages/bar/bar.1
+OPAM/repo/one/packages/bar/bar.1/opam
+OPAM/repo/one/packages/baz
+OPAM/repo/one/packages/baz/baz.1
+OPAM/repo/one/packages/baz/baz.1/opam
+OPAM/repo/one/packages/foo
+OPAM/repo/one/packages/foo/foo.1
+OPAM/repo/one/packages/foo/foo.1/opam
+OPAM/repo/one/packages/qux
+OPAM/repo/one/packages/qux/qux.1
+OPAM/repo/one/packages/qux/qux.1/opam
+OPAM/repo/one/repo
+OPAM/repo/repos-config
+OPAM/repo/two
+OPAM/repo/two/packages
+OPAM/repo/two/packages/bar
+OPAM/repo/two/packages/bar/bar.1
+OPAM/repo/two/packages/bar/bar.1/opam
+OPAM/repo/two/packages/baz
+OPAM/repo/two/packages/baz/baz.1
+OPAM/repo/two/packages/baz/baz.1/opam
+OPAM/repo/two/packages/foo
+OPAM/repo/two/packages/foo/foo.1
+OPAM/repo/two/packages/foo/foo.1/opam
+OPAM/repo/two/packages/qux
+OPAM/repo/two/packages/qux/qux.1
+OPAM/repo/two/packages/qux/qux.1/opam
+OPAM/repo/two/repo
+### opam-cat OPAM/repo/one/packages/foo/foo.1/opam OPAM/repo/two/packages/qux/qux.1/opam
+=> OPAM/repo/one/packages/foo/foo.1/opam <=
+build: ["touch" "built.%{name}%"]
+install: ["cp" "built.%{name}%" "%{lib}%/"]
+opam-version: "2.0"
+=> OPAM/repo/two/packages/qux/qux.1/opam <=
+build: ["touch" "built.%{name}%"]
+depends: "one%foo"
+install: ["cp" "built.%{name}%" "%{lib}%/"]
+opam-version: "2.0"

@@ -2670,6 +2670,33 @@ module OPAMSyntax = struct
     let version = Some (nv.OpamPackage.version) in
     { empty with name; version }
 
+  let check_name t name = function
+    | None ->
+      let pos =
+        OpamStd.Option.Op.(>>|) t.metadata_dir @@ function
+        | Some r, rel ->
+          { pos_null with
+            filename =
+              Printf.sprintf "<%s>/%s/opam" (OpamRepositoryName.to_string r) rel }
+        | None, d ->
+          pos_file OpamFilename.Op.(OpamFilename.Dir.of_string d // "opam")
+      in
+      Pp.bad_format ?pos "Field '%s:' is required" name
+    | Some n ->
+      let is_namespaced =
+        OpamStd.String.contains_char (OpamPackage.Name.to_string n)
+          OpamPackage.Name.nsp_sep
+      in
+      if is_namespaced then n else
+        match t.metadata_dir with
+        | Some (Some r,_) ->
+          Printf.sprintf "%s%c%s"
+            (OpamRepositoryName.to_string r)
+            OpamPackage.Name.nsp_sep
+            (OpamPackage.Name.to_string n)
+          |> OpamPackage.Name.of_string
+        | _ -> n
+
   let check t name = function
     | None ->
       let pos =
@@ -2690,7 +2717,7 @@ module OPAMSyntax = struct
   (* Getters *)
 
   let opam_version t = t.opam_version
-  let name (t:t) = check t "name" t.name
+  let name (t:t) = check_name t "name" t.name
   let name_opt (t:t) = t.name
   let version (t:t) = check t "version" t.version
   let version_opt (t:t) = t.version

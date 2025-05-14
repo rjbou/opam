@@ -93,7 +93,21 @@ let load_opams_from_dir repo_name repo_root =
                OpamPackage.of_string
                  OpamFilename.(Base.to_string (basename_dir dir))
              in
-             OpamPackage.Map.add nv opam r
+             let nv' =
+               let name =
+                 Printf.sprintf "%s%c%s"
+                   (OpamRepositoryName.to_string repo_name)
+                   OpamPackage.Name.nsp_sep
+                   (OpamPackage.name_to_string nv)
+                 |> OpamPackage.Name.of_string
+               in
+               let version = OpamPackage.version nv in
+               OpamPackage.create name version
+             in
+             OpamConsole.error  "from %s to %s"
+               (OpamPackage.to_string nv)
+               (OpamPackage.to_string nv');
+             OpamPackage.Map.add nv' opam r
            with Failure _ ->
              log "ERR: directory name not a valid package: ignored %s"
                OpamFilename.(to_string Op.(dir // "opam"));

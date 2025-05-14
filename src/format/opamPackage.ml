@@ -65,12 +65,14 @@ module Name = struct
 
   let to_string x = x
 
+  let nsp_sep = '%'
   let of_string x =
     match
       OpamStd.String.fold_left (fun acc c ->
           if acc = Some false then acc else match c with
             | 'a'..'z' | 'A'..'Z' -> Some true
             | '0'..'9' | '-' | '_' | '+' -> acc
+            | c when Char.equal c nsp_sep -> acc
             | _ -> Some false)
         None x
     with

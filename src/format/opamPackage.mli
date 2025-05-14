@@ -33,6 +33,8 @@ end
 module Name: sig
   include OpamStd.ABSTRACT
 
+  val nsp_sep : char
+
   (** Compare two package names *)
   val compare: t -> t -> int
 
