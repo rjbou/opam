@@ -329,11 +329,14 @@ The following actions will be performed:
 Done.
 ### opam install --deps-only lorem dolor
 The following actions will be performed:
-=== install 1 package
+=== install 2 packages
   - install ipsum 1 [required by dolor]
+  - install sit   1 [required by lorem]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   deps-of-lorem.1
 -> installed ipsum.1
+-> installed sit.1
 Done.
 ### : deps of same packages, good version specified, already installed package
 ### opam switch create deps-conflictssssssssssssssssssssss --empty
@@ -392,13 +395,15 @@ The following actions will be performed:
 -> installed lorem.1
 Done.
 ### opam install --deps-only lorem.2 dolor.1
-[ERROR] Package conflict!
-  * Incompatible packages:
-    - deps-of-dolor -> ipsum -> lorem < 2
-    - deps-of-lorem
+The following actions will be performed:
+=== install 2 packages
+  - install ipsum 1 [required by dolor]
+  - install sit   1 [required by lorem]
 
-No solution found, exiting
-# Return code 20 #
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed ipsum.1
+-> installed sit.1
+Done.
 ### : other :
 ### <pkg:lorem.1>
 opam-version: "2.0"
@@ -488,13 +493,10 @@ Done.
 ### # it takes lorem.2
 ### opam install --deps-only dolor.1 lorem
 The following actions will be performed:
-=== remove 1 package
-  - remove  lorem 1 [conflicts with lorem]
 === install 1 package
-  - install sit   2 [required by lorem]
+  - install sit 2 [required by lorem]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> removed   deps-of-lorem.1
--> removed   lorem.1
 -> installed sit.2
 Done.
