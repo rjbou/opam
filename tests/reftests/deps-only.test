@@ -36,10 +36,9 @@ The following actions would be performed:
 Nothing to do.
 ### opam install --deps-only foo baz
 The following actions would be performed:
-=== install 3 packages
-  - install bar  1 [required by baz]
-  - install foo  1 [required by bar, truc]
-  - install truc 1 [required by foo]
+=== install 2 packages
+  - install bar 1 [required by baz]
+  - install foo 1 [required by bar]
 ### opam install --deps-only bar baz
 The following actions would be performed:
 === install 1 package
@@ -246,15 +245,13 @@ opam-version: "2.0"
 depopts: "lorem" { < "2" }
 ### opam install --deps-only lorem dolor
 The following actions will be performed:
-=== install 3 packages
+=== install 2 packages
   - install ipsum 1 [required by dolor]
-  - install lorem 1 [required by ipsum, sit]
-  - install sit   1 [required by lorem]
+  - install lorem 1 [required by ipsum]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed lorem.1
 -> installed ipsum.1
--> installed sit.1
 Done.
 ### : deps of same packages, good version specified
 ### opam switch create deps-conflictsssssssssssssssssss --empty
@@ -491,10 +488,13 @@ Done.
 ### # it takes lorem.2
 ### opam install --deps-only dolor.1 lorem
 The following actions will be performed:
+=== remove 1 package
+  - remove  lorem 1 [conflicts with lorem]
 === install 1 package
-  - install sit 2 [required by lorem]
+  - install sit   2 [required by lorem]
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> removed   deps-of-lorem.1
+-> removed   lorem.1
 -> installed sit.2
 Done.
