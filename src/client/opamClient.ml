@@ -2160,6 +2160,16 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
   in
   let t, deps_of_packages =
     (* add deps-of-xxx packages to replace each atom *)
+    if not deps_only then t, OpamPackage.Set.empty else
+      let coinstability_check =
+        let pkgs = OpamFormula.packages_of_atoms t.packages atoms in
+        let reinstall = None in
+        let requested = pkgs in
+        let universe =
+          OpamSwitchState.universe t ~requested ?reinstall Install
+        in
+        (OpamSolver.atom_coinstallability_check universe atoms)
+      in
     OpamPackage.Name.Map.fold (fun name dname (t, deps_of_packages) ->
         let ats = List.filter (fun (n,_) -> n = name) atoms in
         let nvs = OpamSwitchState.packages_of_atoms t ats in
@@ -2174,10 +2184,14 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
                 (O.depends opam)
             in
             let conflicts =
-              let vstring = OpamPackage.Version.to_string nv.version in
-              OpamFormula.ors
-                (Atom (nv.name, Atom (Constraint (`Neq, FString vstring))) ::
-                 if ignore_conflicts then [] else [ O.conflicts opam ])
+                 if ignore_conflicts then Empty else O.conflicts opam
+            in
+            let conflicts =
+              if coinstability_check && OpamSwitchState.is_name_installed t (OpamPackage.name nv) then conflicts else
+                let vstring = OpamPackage.Version.to_string nv.version in
+                OpamFormula.ors
+                  (Atom (nv.name, Atom (Constraint (`Neq, FString vstring))) ::
+                   if ignore_conflicts then [] else [ O.conflicts opam ])
             in
             let url =
               if OpamSwitchState.is_dev_package t nv then
