@@ -616,6 +616,7 @@ let load lock_kind gt rt switch =
     installed; pinned; installed_roots;
     opams; conf_files;
     packages; available_packages; sys_packages; reinstall; invalidated;
+    overwrote = OpamPackage.Map.empty;
   } in
   log "Switch state loaded in %.3fs" (chrono ());
   st
@@ -660,6 +661,7 @@ let load_virtual ?repos_list ?(avail_default=true) gt rt =
     available_packages;
     reinstall = lazy OpamPackage.Set.empty;
     invalidated = lazy (OpamPackage.Set.empty);
+    overwrote = OpamPackage.Map.empty;
   }
 
 let selections st =
@@ -973,6 +975,7 @@ let universe st
       ~force_dev_deps ~test ~doc ~dev_setup
       ~requested_allpkgs
   in
+  let opams = OpamPackage.Map.union (fun _ o -> o) st.opams st.overwrote in
   let u_depends =
     let depend =
       let ignored = OpamStateConfig.(!r.ignore_constraints_on) in
@@ -989,10 +992,10 @@ let universe st
             else Atom atom)
           (OpamFile.OPAM.depends opam)
     in
-    get_deps depend st.opams
+    get_deps depend opams
   in
-  let u_depopts = get_deps OpamFile.OPAM.depopts st.opams in
-  let u_conflicts = get_conflicts st st.packages st.opams in
+  let u_depopts = get_deps OpamFile.OPAM.depopts opams in
+  let u_conflicts = get_conflicts st st.packages opams in
   let u_invariant =
     if OpamStateConfig.(!r.unlock_base) then OpamFormula.Empty
     else st.switch_invariant
@@ -1047,7 +1050,7 @@ let universe st
   u_depopts;
   u_conflicts;
   u_installed_roots = st.installed_roots;
-  u_pinned    = OpamPinned.packages st;
+  u_pinned    = OpamPinned.packages st -- (OpamPackage.Set.of_list (OpamPackage.Map.keys st.overwrote));
   u_invariant;
   u_reinstall;
   u_attrs     = ["opam-query", lazy requested;
