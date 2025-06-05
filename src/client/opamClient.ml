@@ -2158,6 +2158,55 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
         names OpamPackage.Name.Map.empty
     else OpamPackage.Name.Map.empty
   in
+  let dnv_inst_map, deps_of_installed_packages, t =
+    if deps_only then
+      let installed =
+      let names_of_atoms =
+        OpamPackage.names_of_packages @@ OpamFormula.packages_of_atoms t.packages atoms in
+        OpamPackage.packages_of_names t.installed names_of_atoms
+(*
+        OpamPackage.Name.Set.inter
+        (OpamPackage.names_of_packages @@ OpamFormula.packages_of_atoms t.packages atoms)
+        (OpamPackage.names_of_packages t.installed)
+*)
+      in
+(*
+      OpamConsole.error "name of package of atoms %s" @@ OpamPackage.Name.Set.to_string
+        (OpamPackage.names_of_packages @@ OpamFormula.packages_of_atoms t.packages atoms);
+      OpamConsole.error "name of installed packages %s" @@ OpamPackage.Name.Set.to_string
+        (OpamPackage.names_of_packages t.installed);
+      OpamConsole.error "t.installed %s" (OpamPackage.Set.to_string t.installed);
+      OpamConsole.error "atoms %s" (OpamFormula.string_of_atoms atoms);
+      OpamConsole.error "installed ? %s" (OpamPackage.Name.Set.to_string installed);
+*)
+      OpamPackage.Name.Map.fold (fun n vset (map, set, t) ->
+          let open OpamPackage.Name in
+          let rec nodup i name =
+            if OpamPackage.has_name t.packages name then
+              nodup (i+1) @@
+              of_string (Printf.sprintf "deps-of-installed-%d-%s" i (to_string name))
+            else name
+          in
+          let name = n in
+          let dniname = nodup 2 @@ of_string ("deps-of-installed-" ^ to_string name) in
+          OpamPackage.Version.Set.fold (fun v (map, set, t) ->
+              let dinv = OpamPackage.create dniname v in
+              let nv = OpamPackage.create n v in
+              let map = OpamPackage.Map.add dinv nv map in
+              let set = OpamPackage.Set.add dinv set in
+              let opam = OpamSwitchState.opam t nv in
+              let t = OpamSwitchState.update_package_metadata dinv opam t in
+              let t = { t with installed = OpamPackage.Set.add dinv t.installed } in
+              map, set, t
+            )  vset (map, set, t)
+        )
+        ((*OpamPackage.packages_of_names t.packages*) installed |> OpamPackage.to_map)
+        (OpamPackage.Map.empty, OpamPackage.Set.empty, t)
+    else OpamPackage.Map.empty, OpamPackage.Set.empty, t
+  in
+  if deps_only then
+    OpamConsole.error "deps of installed packages %s" (OpamPackage.Set.to_string deps_of_installed_packages);
+
   let t, deps_of_packages =
     (* add deps-of-xxx packages to replace each atom *)
     OpamPackage.Name.Map.fold (fun name dname (t, deps_of_packages) ->
@@ -2334,6 +2383,51 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
         extra_message;
       t, if depext_only then None else Some (Conflicts cs)
     | Success solution ->
+  if deps_only then
+      OpamConsole.error "BEF packages of solution %s" (OpamPackage.Set.to_string @@ OpamSolver.all_packages solution);
+      let solution, t =
+      let open OpamPackage.Set.Op in
+        if not deps_only then solution, t else
+          let remove_packages = OpamSolver.removed_packages solution in
+          let install_packages = OpamSolver.new_packages solution in
+          let reinstall_packages = remove_packages %% install_packages in
+          let remove_packages = remove_packages -- reinstall_packages in
+          let remove_deps = remove_packages %% deps_of_installed_packages in
+          OpamConsole.error "I have %s as removed_package -> diff %s"
+            (OpamPackage.Set.to_string remove_packages)
+            (OpamPackage.Set.to_string remove_deps);
+          OpamConsole.error "reinstall packages %s"
+            (OpamPackage.Set.to_string reinstall_packages);
+          let packages_to_remove_removal =
+            OpamPackage.Map.fold (fun dinv nv set ->
+                if OpamPackage.Set.mem dinv remove_deps then
+                  set
+                else
+                  OpamPackage.Set.add nv set
+              )
+              dnv_inst_map OpamPackage.Set.empty
+          in
+          let cleanup = remove_deps ++ reinstall_packages in
+            OpamConsole.error "Vertex to delete %s" (OpamPackage.Set.to_string packages_to_remove_removal);
+          let solution = OpamSolver.triture_graph ~keep_reinstall:true packages_to_remove_removal solution in
+          let solution = OpamSolver.triture_graph ~keep_reinstall:false cleanup solution in
+          let t =
+            let t =
+              OpamPackage.Set.fold (fun nv t ->
+                  OpamSwitchState.remove_package_metadata nv t)
+                deps_of_installed_packages t
+            in
+            let installed =
+              OpamPackage.Set.diff t.installed deps_of_installed_packages
+            in
+            { t with installed }
+          in
+          solution, t
+      in
+      if deps_only then
+        OpamConsole.error "requested %s" (OpamPackage.Set.to_string packages);
+      if deps_only then
+        OpamConsole.error "AFT packages of solution %s" (OpamPackage.Set.to_string @@ OpamSolver.all_packages solution);
       let skip =
         let inst = OpamSolver.new_packages solution in
         OpamPackage.Name.Map.fold (fun n dn map ->

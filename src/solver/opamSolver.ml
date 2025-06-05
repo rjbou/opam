@@ -822,3 +822,35 @@ let request ?(criteria=`Default)
   in
   { wish_install; wish_upgrade; wish_remove = remove; wish_all = all;
     criteria; extra_attributes = []; }
+
+let triture_graph ~keep_reinstall nvs solution =
+  let sol = OpamCudf.ActionGraph.copy solution in
+  let remov, instal =
+    OpamCudf.ActionGraph.fold_vertex (fun v (remov, instal) ->
+        match v with
+        | `Remove cnv ->
+          let nv = OpamCudf.cudf2opam cnv in
+          if OpamPackage.Set.mem nv nvs then
+            OpamPackage.Map.add nv v remov, instal
+          else
+            remov, instal
+        | `Install cnv ->
+          let nv = OpamCudf.cudf2opam cnv in
+          if OpamPackage.Set.mem nv nvs then
+            remov, OpamPackage.Map.add nv v instal
+          else
+            remov, instal
+        | _ -> remov, instal)
+      solution OpamPackage.Map.(empty, empty)
+  in
+  (if keep_reinstall then
+    OpamPackage.Map.iter (fun nv v ->
+        if OpamPackage.Map.mem nv instal then
+         ()
+        else OpamCudf.ActionGraph.remove_vertex sol v
+      ) remov
+  else
+    let vertex = OpamPackage.Map.values remov @ OpamPackage.Map.values instal in
+    List.iter (OpamCudf.ActionGraph.remove_vertex sol) vertex
+    );
+    sol

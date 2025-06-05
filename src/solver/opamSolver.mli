@@ -144,3 +144,5 @@ val dump_universe: universe -> out_channel -> unit
     to keep consistency unless [recursive] is set to false *)
 val filter_solution:
   ?recursive:bool -> (package -> bool) -> solution -> solution
+
+val triture_graph: keep_reinstall:bool -> package_set -> solution -> solution
