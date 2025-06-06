@@ -1259,6 +1259,7 @@ let remove_package_metadata nv st =
   }
 
 let update_pin nv opam st =
+OpamConsole.error "+++++++++++++update_pin";
   let version =
     OpamStd.Option.default nv.version (OpamFile.OPAM.version_opt opam)
   in

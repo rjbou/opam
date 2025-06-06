@@ -224,6 +224,7 @@ let edit_raw name temp_file =
     Some new_opam
 
 let edit st ?version name =
+OpamConsole.error "edit pin";
   log "pin-edit %a" (slog OpamPackage.Name.to_string) name;
   let nv =
     try OpamPinned.package st name
@@ -450,6 +451,7 @@ and source_pin
     ?subpath ?locked
     target_url
   =
+  OpamConsole.error "source pin";
   log "pin %a to %a %a"
     (slog OpamPackage.Name.to_string) name
     (slog (OpamStd.Option.to_string OpamPackage.Version.to_string)) version
@@ -637,6 +639,7 @@ and source_pin
     st
 
 let pin_current st nv =
+OpamConsole.error "pin current";
   let root = st.switch_global.root in
   let opam =
     try OpamPackage.Map.find nv st.installed_opams

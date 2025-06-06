@@ -489,6 +489,7 @@ let simulate_autopin st ?quiet ?(for_view=false) ?locked ?recurse ?subpath
 
 let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
     atom_or_local_list =
+OpamConsole.error "autopin";
   if OpamStateConfig.(!r.dryrun) || OpamClientConfig.(!r.show) then
     simulate_autopin st ?quiet ?locked ~for_view:true atom_or_local_list
   else
