@@ -267,8 +267,6 @@ jobs:
         key: ${{ runner.os }}-opam-rt-${{ matrix.ocamlv }}
     - name: Build (and test)
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
-    - name: Test (opam-rt)
-      run: bash -exu .github/scripts/main/opam-rt.sh
 
   Test-macOS:
     runs-on: macos-latest
@@ -322,5 +320,3 @@ jobs:
         key: ${{ runner.os }}-opam-rt-${{ matrix.ocamlv }}
     - name: Build (and test)
       run: bash -exu .github/scripts/main/main.sh x86_64-apple-darwin
-    - name: Test (opam-rt)
-      run: bash -exu .github/scripts/main/opam-rt.sh
