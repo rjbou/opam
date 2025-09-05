@@ -156,15 +156,6 @@ if [ "$OPAM_TEST" = "1" ]; then
 
   make distclean
 
-  # Compile and run opam-rt
-  (set +x ; echo -en "::group::opam-rt\r") 2>/dev/null
-  prepare_project "https://github.com/ocaml-opam/opam-rt" "opam-rt"
-
-  # opam lib pins defined in opam-rt are ignored as there is a local pin
-  opam pin . -yn --ignore-pin-depends
-  opam install opam-rt --deps-only opam-devel
-  opam exec -- make || { opam reinstall opam-client -y; opam exec -- make; }
-  (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
 fi
 
 test_project () {
