@@ -1504,7 +1504,7 @@ SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => none)
 SYSTEM                          LOCK ${BASEDIR}/OPAM/config.lock (write => none)
 '${OPAM} switch create install-from-git-pin-combined--empty' failed.
 # Return code 5 #
-### opam install ./main-gpin | sed-cmd git cp touch mkdir | grep -v "(mkdir|copy|copydir|rm) .*\\.git." | grep -v "HEAD is now"
+### opam install ./main-gpin | sed-cmd git cp touch mkdir | grep -v "(mkdir|copy|copydir|rm) .*\\.git." | grep -v "HEAD is now" | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 SYSTEM                          LOCK ${BASEDIR}/OPAM/lock (none => read)
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
