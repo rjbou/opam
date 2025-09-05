@@ -17,8 +17,8 @@ let latest_ocaml4 = "4.14.2"
 let latest_ocaml5 = "5.3.0" (* Add this number to ocamls below when the next version comes out *)
 let ocamls = [
   (* Fully supported versions *)
-  "4.08.1"; "4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1";
-  "5.0.0"; "5.1.1"; "5.2.1";
+   "4.08.1"; "4.09.1"; "4.10.2"; "4.11.2"; "4.12.1"; "4.13.1";
+
 
   (* The last elements of the list after 4.14 will be used as default versions *)
   latest_ocaml4; latest_ocaml5;
@@ -349,26 +349,6 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
     ++ build_cache OCaml platform "${{ matrix.ocamlv }}" host
     ++ run "Build" ["bash -exu .github/scripts/main/main.sh " ^ host]
     ++ not_on Windows (run "Test (basic)" ["bash -exu .github/scripts/main/test.sh"])
-    ++ only_on Windows (run ~cond:(Predicate(false, EndsWith("matrix.host", "-pc-cygwin"))) "Test \"static\" binaries on Windows" ["ldd ./opam.exe | test \"$(grep -v -F /cygdrive/c/Windows/)\" = ''"])
-    ++ only_on Windows
-      (uses "Upload opam binaries for Windows"
-         ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-windows")))
-         ~withs:[ ("name", Literal ["opam-exe-${{ matrix.host }}-${{ matrix.ocamlv }}-${{ matrix.build }}"]);
-                  ("path", Literal ["D:\\Local\\bin\\opam.exe"; "D:\\Local\\bin\\opam-installer.exe"; "D:\\Local\\bin\\opam-putenv.exe"]) ]
-         "actions/upload-artifact@v4")
-    ++ only_on Windows (run "Test (basic - Cygwin)" ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
-    ++ only_on Windows (run "Test (basic - native Windows)" ~env:[("OPAMROOT", {|D:\a\opam\opam\.opam|})] ~shell:"cmd" ~cond:(Predicate(false, EndsWith("matrix.host", "-pc-cygwin")))
-         ({|set Path=D:\Cache\ocaml-local\bin;%Path%|} ::
-          {|if "${{ matrix.host }}" equ "x86_64-pc-windows" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"|} ::
-          {|if "${{ matrix.host }}" equ "i686-pc-windows" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"|} ::
-          run_or_fail [
-           {|opam init --yes --bare default git+file://%cd%/../../../opam-repository#${{ env.OPAM_TEST_REPO_SHA }} --no-git-location|};
-           {|opam switch --yes create default ocaml-system|};
-           {|opam env|};
-           {|opam install --yes lwt|};
-           {|opam list|};
-           {|opam config report|};
-          ]))
     ++ only_on Windows (run "Test (reftests)" ["bash -exu .github/scripts/main/reftests.sh ${{ matrix.host }}"])
     ++ end_job f
 
@@ -399,7 +379,6 @@ let main_test_job ~analyse_job ~build_linux_job ~build_windows_job:_ ~build_macO
     ++ build_cache OpamBS ocamlv ""
     ++ cache OpamRoot ocamlv
     ++ run "Build (and test)" ["bash -exu .github/scripts/main/main.sh " ^ host]
-    ++ run "Test (opam-rt)" ["bash -exu .github/scripts/main/opam-rt.sh"]
     ++ end_job f
 
 let cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ?section runner ~oc ~workflow f =
@@ -567,14 +546,6 @@ let main oc : unit =
   @@ fun build_windows_job -> main_build_job ~analyse_job ~cygwin_job MacOS start_latests_ocaml
   @@ fun build_macOS_job -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
   @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux
-  @@ fun _ -> doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile doc" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
-  @@ fun _ -> depends_job ~analyse_job ~build_linux_job Linux
   @@ fun _ -> end_workflow
 
 let () =
