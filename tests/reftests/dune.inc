@@ -1344,6 +1344,27 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:opam-repo-ci.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-opamfile-internal-variables)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (action
+  (diff opamfile-internal-variables.test opamfile-internal-variables.out)))
+
+(alias
+ (name reftest)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (deps (alias reftest-opamfile-internal-variables)))
+
+(rule
+ (targets opamfile-internal-variables.out)
+ (deps root-N0REP0)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:opamfile-internal-variables.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-opamroot-versions)
  (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action
