@@ -5,7 +5,6 @@ N0REP0
 ### #   jobs         The number of parallel jobs set up in opam configuration
 ### #   root         The current opam root directory
 ### #   make         The 'make' command to use
-### #   exe          Suffix needed for executable filenames (Windows)
 ### #
 ### ## package_variable_names
 ### #   name      Name of the package
@@ -82,26 +81,26 @@ Now run 'opam upgrade' to apply any package updates.
 ### mkdir -p OPAM/opam-init/hooks
 ### cp printer.sh OPAM/opam-init/hooks/printer.sh
 ### cp OPAM/config OPAM/config.bak
-### opam option --global 'pre-build-commands=[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-build-commands in global configuration
-### opam option --global 'pre-install-commands=[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-install-commands in global configuration
-### opam option --global 'pre-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-remove-commands in global configuration
-### opam option --global 'wrap-build-commands=[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-build-commands in global configuration
-### opam option --global 'wrap-install-commands=[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-install-commands in global configuration
-### opam option --global 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-remove-commands in global configuration
-### opam option --global 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-build-commands in global configuration
-### opam option --global 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-install-commands in global configuration
-### opam option --global 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-remove-commands in global configuration
+### opam option --global 'pre-build-commands=[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-build-commands in global configuration
+### opam option --global 'pre-install-commands=[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-install-commands in global configuration
+### opam option --global 'pre-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-remove-commands in global configuration
+### opam option --global 'wrap-build-commands=[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-build-commands in global configuration
+### opam option --global 'wrap-install-commands=[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-install-commands in global configuration
+### opam option --global 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-remove-commands in global configuration
+### opam option --global 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-build-commands in global configuration
+### opam option --global 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-install-commands in global configuration
+### opam option --global 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-remove-commands in global configuration
 ### opam switch create global-wrappers --empty
-### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | sed-cmd bash tar
+### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | sed-cmd bash tar rsync
 The following actions will be performed:
 === install 2 packages
   - install dep             1 [required by i-am-a-repo-pkg]
@@ -110,7 +109,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  2/6: [i-am-a-repo-pkg.1: rsync]
 Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -118,7 +117,6 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -139,7 +137,7 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre building...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -147,7 +145,6 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -169,7 +166,7 @@ Processing  3/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post building...]
 - installed-files:
 Processing  3/6: [i-am-a-repo-pkg.1: rsync]
 Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -177,7 +174,6 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -198,7 +194,7 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...pre installing...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/dep.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -206,7 +202,6 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -228,14 +223,14 @@ Processing  4/6: [i-am-a-repo-pkg.1: rsync] [dep: bash ...post installing...]
 - installed-files:
 -> installed dep.1
 Processing  4/6: [i-am-a-repo-pkg.1: rsync]
-+ /usr/bin/rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive.tgz" "${OPAMTMP}"
++ rsync "-rLptgoDvc" "--exclude" ".git" "--exclude" "_darcs" "--exclude" ".hg" "--exclude" ".#*" "--exclude" "_opam*" "--exclude" "_build" "--delete" "--delete-excluded" "${BASEDIR}/archive.tgz" "${OPAMTMP}"
 - archive.tgz
 - 
 Processing  4/6: [i-am-a-repo-pkg.1: extract]
 + tar "xfz" "${OPAMTMP}/archive.tgz" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (file://${BASEDIR}/archive.tgz)
 Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -243,7 +238,6 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -264,14 +258,13 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  5/6: [i-am-a-repo-pkg: a-build-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:global-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -293,7 +286,7 @@ Processing  5/6: [i-am-a-repo-pkg: a-build-command]
 - installed-files:
 - a-build-command
 Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -301,7 +294,6 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -323,7 +315,7 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -331,7 +323,6 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -352,14 +343,13 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  6/6: [i-am-a-repo-pkg: a-install-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:global-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -381,7 +371,7 @@ Processing  6/6: [i-am-a-repo-pkg: a-install-command]
 - installed-files:
 - a-install-command
 Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -389,7 +379,6 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -423,7 +412,7 @@ Processing  1/2: [i-am-a-repo-pkg.1: extract]
 + tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...pre
 - removing...
 - opam-version:++current++
@@ -431,7 +420,6 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -452,14 +440,13 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
 - opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam
 - installed-files:
 Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" "a-remove-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" "a-remove-command" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...removing...
 - opam-version:++current++
 - switch:global-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -481,7 +468,7 @@ Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
 - installed-files:
 - a-remove-command
 Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "opam-version:++current++" "switch:global-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/global-wrappers/bin" "sbin:${BASEDIR}/OPAM/global-wrappers/sbin" "lib:${BASEDIR}/OPAM/global-wrappers/lib" "man:${BASEDIR}/OPAM/global-wrappers/man" "doc:${BASEDIR}/OPAM/global-wrappers/doc" "share:${BASEDIR}/OPAM/global-wrappers/share" "etc:${BASEDIR}/OPAM/global-wrappers/etc" "build:${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/global-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...post
 - removing...
 - opam-version:++current++
@@ -489,7 +476,6 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -516,25 +502,25 @@ Done.
 ### :: Switch wrappers
 ### ::::::::::::::::::
 ### opam switch create switch-wrappers --empty
-### opam option --switch switch-wrappers 'pre-build-commands=[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-build-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'pre-install-commands=[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-install-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'pre-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-remove-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'wrap-build-commands=[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-build-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'wrap-install-commands=[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-install-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-remove-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-build-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" "installed-files:%{installed-files}%" ]' the field post-install-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-remove-commands in switch switch-wrappers
-### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash
+### opam option --switch switch-wrappers 'pre-build-commands=[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-build-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'pre-install-commands=[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-install-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'pre-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...pre removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field pre-remove-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'wrap-build-commands=[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-build-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'wrap-install-commands=[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-install-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field wrap-remove-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-build-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" "installed-files:%{installed-files}%" ]' the field post-install-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]' the field post-remove-commands in switch switch-wrappers
+### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar
 The following actions will be performed:
 === install 2 packages
   - install dep             1 [required by i-am-a-repo-pkg]
@@ -543,10 +529,10 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  2/6: [i-am-a-repo-pkg.1: extract]
 Processing  3/6: [i-am-a-repo-pkg.1: extract] [dep: bash ...pre building...]
-+ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
++ tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  3/6: [dep: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -554,7 +540,6 @@ Processing  3/6: [dep: bash ...pre building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -575,7 +560,7 @@ Processing  3/6: [dep: bash ...pre building...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  3/6: [dep: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -583,7 +568,6 @@ Processing  3/6: [dep: bash ...post building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -604,7 +588,7 @@ Processing  3/6: [dep: bash ...post building...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [dep: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -612,7 +596,6 @@ Processing  4/6: [dep: bash ...pre installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -633,7 +616,7 @@ Processing  4/6: [dep: bash ...pre installing...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  4/6: [dep: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:dep" "version:1" "depends:" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1" "hash:" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/dep.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -641,7 +624,6 @@ Processing  4/6: [dep: bash ...post installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:dep
 - version:1
 - depends:
@@ -664,7 +646,7 @@ Processing  4/6: [dep: bash ...post installing...]
 - installed-files:
 -> installed dep.1
 Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - building...
 - opam-version:++current++
@@ -672,7 +654,6 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -693,14 +674,13 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...pre building...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  5/6: [i-am-a-repo-pkg: a-build-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-build-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:switch-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -722,7 +702,7 @@ Processing  5/6: [i-am-a-repo-pkg: a-build-command]
 - installed-files:
 - a-build-command
 Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - building...
 - opam-version:++current++
@@ -730,7 +710,6 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -752,7 +731,7 @@ Processing  5/6: [i-am-a-repo-pkg: bash ...post building...]
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...pre
 - installing...
 - opam-version:++current++
@@ -760,7 +739,6 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -781,14 +759,13 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...pre installing...]
 - opamfile:${OPAMTMP}/opam
 - installed-files:
 Processing  6/6: [i-am-a-repo-pkg: a-install-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" "a-install-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:switch-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -810,7 +787,7 @@ Processing  6/6: [i-am-a-repo-pkg: a-install-command]
 - installed-files:
 - a-install-command
 Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" "installed-files:etc etc/i-am-a-repo-pkg etc/i-am-a-repo-pkg/printer" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...post
 - installing...
 - opam-version:++current++
@@ -818,7 +795,6 @@ Processing  6/6: [i-am-a-repo-pkg: bash ...post installing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -855,7 +831,7 @@ Processing  1/2: [i-am-a-repo-pkg.1: extract]
 + tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...pre removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...pre
 - removing...
 - opam-version:++current++
@@ -863,7 +839,6 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -884,14 +859,13 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...pre removing...]
 - opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam
 - installed-files:
 Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" "a-remove-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" "a-remove-command" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...removing...
 - opam-version:++current++
 - switch:switch-wrappers
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -913,7 +887,7 @@ Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
 - installed-files:
 - a-remove-command
 Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "opam-version:++current++" "switch:switch-wrappers" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/switch-wrappers/bin" "sbin:${BASEDIR}/OPAM/switch-wrappers/sbin" "lib:${BASEDIR}/OPAM/switch-wrappers/lib" "man:${BASEDIR}/OPAM/switch-wrappers/man" "doc:${BASEDIR}/OPAM/switch-wrappers/doc" "share:${BASEDIR}/OPAM/switch-wrappers/share" "etc:${BASEDIR}/OPAM/switch-wrappers/etc" "build:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/switch-wrappers/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...post
 - removing...
 - opam-version:++current++
@@ -921,7 +895,6 @@ Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -950,9 +923,9 @@ Done.
 ### <pkg:i-am-a-repo-pkg.1>
 opam-version: "2.0"
 depends: "dep"
-build: [ "bash" "printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
-install: [ "bash" "printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
-remove: [ "bash" "printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+build: [ "bash" "printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+install: [ "bash" "printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+remove: [ "bash" "printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
 post-messages:
 """...A last message...
 opam-version:%{opam-version}%
@@ -960,7 +933,6 @@ switch:%{switch}%
 jobs:%{jobs}%
 root:%{root}%
 make:%{make}%
-exe:%{exe}%
 name:%{name}%
 version:%{version}%
 depends:%{depends}%
@@ -983,8 +955,6 @@ with-dev-setup:%{with-dev-setup}%
 success:%{success}%
 failure:%{failure}%
 installed-files:%{installed-files}%
-bin:%{bin}%
-bin:%{bin}%
 """
 ### <add-url.sh>
 basedir=$(printf '%s' "$BASEDIR" | sed 's/\\/\\\\/g')
@@ -1016,14 +986,13 @@ Processing  4/6: [i-am-a-repo-pkg.1: extract]
 + tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  5/6: [i-am-a-repo-pkg: bash printer.sh]
-+ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...building...
 - opam-version:++current++
 - switch:pkg-from-repo
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -1045,14 +1014,13 @@ Processing  5/6: [i-am-a-repo-pkg: bash printer.sh]
 - installed-files:
 -> compiled  i-am-a-repo-pkg.1
 Processing  6/6: [i-am-a-repo-pkg: bash printer.sh]
-+ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
++ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:false" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${OPAMTMP}/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1)
 - ...installing...
 - opam-version:++current++
 - switch:pkg-from-repo
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -1082,7 +1050,6 @@ Done.
    jobs:2
    root:${BASEDIR}/OPAM
    make:make
-   exe:
    name:i-am-a-repo-pkg
    version:1
    depends:dep.1
@@ -1105,8 +1072,6 @@ Done.
    success:true
    failure:false
    installed-files:
-   bin:${BASEDIR}/OPAM/pkg-from-repo/bin
-   bin:${BASEDIR}/OPAM/pkg-from-repo/bin
 ### opam remove i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar
 The following actions will be performed:
 === remove 1 package
@@ -1117,14 +1082,13 @@ Processing  1/2: [i-am-a-repo-pkg.1: extract]
 + tar "xfz" "${BASEDIR}/OPAM/download-cache/md5/pre/+archive-hash+" "-C" "${OPAMTMP}"
 -> retrieved i-am-a-repo-pkg.1  (cached)
 Processing  2/2: [i-am-a-repo-pkg: bash printer.sh]
-+ bash "printer.sh" "...removing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/remove/i-am-a-repo-pkg.1)
++ bash "printer.sh" "...removing..." "opam-version:++current++" "switch:pkg-from-repo" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-repo-pkg" "version:1" "depends:dep.1" "installed:true" "enable:" "pinned:false" "bin:${BASEDIR}/OPAM/pkg-from-repo/bin" "sbin:${BASEDIR}/OPAM/pkg-from-repo/sbin" "lib:${BASEDIR}/OPAM/pkg-from-repo/lib" "man:${BASEDIR}/OPAM/pkg-from-repo/man" "doc:${BASEDIR}/OPAM/pkg-from-repo/doc" "share:${BASEDIR}/OPAM/pkg-from-repo/share" "etc:${BASEDIR}/OPAM/pkg-from-repo/etc" "build:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/build/i-am-a-repo-pkg.1" "hash:md5=+archive-hash+" "dev:false" "build-id:+hash+" "opamfile:${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/packages/i-am-a-repo-pkg.1/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-repo/.opam-switch/remove/i-am-a-repo-pkg.1)
 - ...removing...
 - opam-version:++current++
 - switch:pkg-from-repo
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-repo-pkg
 - version:1
 - depends:dep.1
@@ -1153,9 +1117,9 @@ Done.
 opam-version: "2.0"
 version: "6.28"
 depends: "dep"
-build: [ "bash" "printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
-install: [ "bash" "printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
-remove: [ "bash" "printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "exe:%{exe}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+build: [ "bash" "printer.sh" "...building..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+install: [ "bash" "printer.sh" "...installing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
+remove: [ "bash" "printer.sh" "...removing..." "opam-version:%{opam-version}%" "switch:%{switch}%" "jobs:%{jobs}%" "root:%{root}%" "make:%{make}%" "name:%{name}%" "version:%{version}%" "depends:%{depends}%" "installed:%{installed}%" "enable:%{enable}%" "pinned:%{pinned}%" "bin:%{bin}%" "sbin:%{sbin}%" "lib:%{lib}%" "man:%{man}%" "doc:%{doc}%" "share:%{share}%" "etc:%{etc}%" "build:%{build}%" "hash:%{hash}%" "dev:%{dev}%" "build-id:%{build-id}%" "opamfile:%{opamfile}%" "installed-files:%{installed-files}%" ]
 post-messages:
 """...A last message...
 opam-version:%{opam-version}%
@@ -1163,7 +1127,6 @@ switch:%{switch}%
 jobs:%{jobs}%
 root:%{root}%
 make:%{make}%
-exe:%{exe}%
 name:%{name}%
 version:%{version}%
 depends:%{depends}%
@@ -1209,14 +1172,13 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed dep.1
 Processing  5/6: [i-am-a-pin-pkg: bash printer.sh]
-+ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:false" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/overlay/i-am-a-pin-pkg/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28)
++ bash "printer.sh" "...building..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:false" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/overlay/i-am-a-pin-pkg/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28)
 - ...building...
 - opam-version:++current++
 - switch:pkg-from-pin
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-pin-pkg
 - version:6.28
 - depends:dep.1
@@ -1238,14 +1200,13 @@ Processing  5/6: [i-am-a-pin-pkg: bash printer.sh]
 - installed-files:
 -> compiled  i-am-a-pin-pkg.6.28
 Processing  6/6: [i-am-a-pin-pkg: bash printer.sh]
-+ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:false" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/overlay/i-am-a-pin-pkg/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28)
++ bash "printer.sh" "...installing..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:false" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/overlay/i-am-a-pin-pkg/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28)
 - ...installing...
 - opam-version:++current++
 - switch:pkg-from-pin
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-pin-pkg
 - version:6.28
 - depends:dep.1
@@ -1275,7 +1236,6 @@ Done.
    jobs:2
    root:${BASEDIR}/OPAM
    make:make
-   exe:
    name:i-am-a-pin-pkg
    version:6.28
    depends:dep.1
@@ -1305,14 +1265,13 @@ The following actions will be performed:
 
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 Processing  2/2: [i-am-a-pin-pkg: bash printer.sh]
-+ bash "printer.sh" "...removing..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "exe:" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:true" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/packages/i-am-a-pin-pkg.6.28/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/remove/i-am-a-pin-pkg.6.28)
++ bash "printer.sh" "...removing..." "opam-version:++current++" "switch:pkg-from-pin" "jobs:2" "root:${BASEDIR}/OPAM" "make:make" "name:i-am-a-pin-pkg" "version:6.28" "depends:dep.1" "installed:true" "enable:" "pinned:true" "bin:${BASEDIR}/OPAM/pkg-from-pin/bin" "sbin:${BASEDIR}/OPAM/pkg-from-pin/sbin" "lib:${BASEDIR}/OPAM/pkg-from-pin/lib" "man:${BASEDIR}/OPAM/pkg-from-pin/man" "doc:${BASEDIR}/OPAM/pkg-from-pin/doc" "share:${BASEDIR}/OPAM/pkg-from-pin/share" "etc:${BASEDIR}/OPAM/pkg-from-pin/etc" "build:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/build/i-am-a-pin-pkg.6.28" "hash:" "dev:true" "build-id:" "opamfile:${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/packages/i-am-a-pin-pkg.6.28/opam" "installed-files:" (CWD=${BASEDIR}/OPAM/pkg-from-pin/.opam-switch/remove/i-am-a-pin-pkg.6.28)
 - ...removing...
 - opam-version:++current++
 - switch:pkg-from-pin
 - jobs:2
 - root:${BASEDIR}/OPAM
 - make:make
-- exe:
 - name:i-am-a-pin-pkg
 - version:6.28
 - depends:dep.1
