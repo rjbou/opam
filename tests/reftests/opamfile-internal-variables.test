@@ -107,7 +107,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed dep.1
 Done.
-### opam install i-am-a-repo-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | sed-cmd bash tar rsync
+### opam install i-am-a-repo-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | sed-cmd bash tar rsync | etc -> etc
 The following actions will be performed:
 === install 1 package
   - install i-am-a-repo-pkg 1
@@ -416,7 +416,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed dep.1
 Done.
-### opam install i-am-a-repo-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar
+### opam install i-am-a-repo-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar | etc -> etc
 The following actions will be performed:
 === install 1 package
   - install i-am-a-repo-pkg 1
@@ -756,7 +756,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed dep.1
 Done.
-### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar
+### opam install i-am-a-repo-pkg | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar | etc -> etc
 The following actions will be performed:
 === install 1 package
   - install i-am-a-repo-pkg 1
@@ -887,7 +887,7 @@ The following actions will be performed:
 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 -> installed dep.1
 Done.
-### opam install i-am-a-pin-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | grep -v "total size" | sed-cmd bash rsync
+### opam install i-am-a-pin-pkg -vv | "${OPAMVERSION}" -> "++current++" | '[0-9a-z]{64}' -> '+hash+' | grep -v "total size" | sed-cmd bash rsync | etc -> etc
 
 <><> Synchronising pinned packages ><><><><><><><><><><><><><><><><><><><><><><>
 Processing  1/1: [i-am-a-pin-pkg.6.28: rsync]
