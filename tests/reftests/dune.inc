@@ -1386,6 +1386,27 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:opamfile-internal-variables.unix.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-opamfile-internal-variables.win32)
+ (enabled_if (and (= %{os_type} "Win32") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (action
+  (diff opamfile-internal-variables.win32.test opamfile-internal-variables.win32.out)))
+
+(alias
+ (name reftest)
+ (enabled_if (and (= %{os_type} "Win32") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (deps (alias reftest-opamfile-internal-variables.win32)))
+
+(rule
+ (targets opamfile-internal-variables.win32.out)
+ (deps root-N0REP0)
+ (enabled_if (and (= %{os_type} "Win32") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:opamfile-internal-variables.win32.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-opamroot-versions)
  (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action
