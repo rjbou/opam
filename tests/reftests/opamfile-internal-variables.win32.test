@@ -50,12 +50,12 @@ Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "exe:%{exe}%" ]' the fi
 Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "exe:%{exe}%" ]' the field wrap-install-commands in global configuration
 ### opam option --global 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "exe:%{exe}%" ]'
 Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "exe:%{exe}%" ]' the field wrap-remove-commands in global configuration
-### opam option --global 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "exe:%{exe}%" ]' the field post-build-commands in global configuration
-### opam option --global 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "exe:%{exe}%" ]' the field post-install-commands in global configuration
-### opam option --global 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "exe:%{exe}%" ]' the field post-remove-commands in global configuration
+### opam option --global 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post-building..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-building..." "exe:%{exe}%" ]' the field post-build-commands in global configuration
+### opam option --global 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post-installing..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-installing..." "exe:%{exe}%" ]' the field post-install-commands in global configuration
+### opam option --global 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post-removing..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-removing..." "exe:%{exe}%" ]' the field post-remove-commands in global configuration
 ### opam switch create global-wrappers --empty
 ### opam install i-am-a-repo-pkg | $MD5 -> +archive-hash+ | sed-cmd bash tar rsync
 The following actions will be performed:
@@ -80,10 +80,9 @@ Processing  2/3: [i-am-a-repo-pkg: a-build-command]
 - ...building...
 - exe:exe
 - a-build-command
-Processing  2/3: [i-am-a-repo-pkg: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
-- ...post
-- building...
+Processing  2/3: [i-am-a-repo-pkg: bash ...post-building...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-building..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
+- ...post-building...
 - exe:exe
 -> compiled  i-am-a-repo-pkg.1
 Processing  3/3: [i-am-a-repo-pkg: bash ...pre installing...]
@@ -96,10 +95,9 @@ Processing  3/3: [i-am-a-repo-pkg: a-install-command]
 - ...installing...
 - exe:exe
 - a-install-command
-Processing  3/3: [i-am-a-repo-pkg: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
-- ...post
-- installing...
+Processing  3/3: [i-am-a-repo-pkg: bash ...post-installing...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-installing..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
+- ...post-installing...
 - exe:exe
 -> installed i-am-a-repo-pkg.1
 Done.
@@ -122,10 +120,9 @@ Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
 - ...removing...
 - exe:exe
 - a-remove-command
-Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
-- ...post
-- removing...
+Processing  2/2: [i-am-a-repo-pkg: bash ...post-removing...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-removing..." "exe:exe" (CWD=${BASEDIR}/OPAM/global-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
+- ...post-removing...
 - exe:exe
 -> removed   i-am-a-repo-pkg.1
 Done.
@@ -146,12 +143,12 @@ Set to '[ "bash" "%{hooks}%/printer.sh" "...building..." "exe:%{exe}%" ]' the fi
 Set to '[ "bash" "%{hooks}%/printer.sh" "...installing..." "exe:%{exe}%" ]' the field wrap-install-commands in switch switch-wrappers
 ### opam option --switch switch-wrappers 'wrap-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...removing..." "exe:%{exe}%" ]'
 Set to '[ "bash" "%{hooks}%/printer.sh" "...removing..." "exe:%{exe}%" ]' the field wrap-remove-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post building..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post building..." "exe:%{exe}%" ]' the field post-build-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post installing..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post installing..." "exe:%{exe}%" ]' the field post-install-commands in switch switch-wrappers
-### opam option --switch switch-wrappers 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post removing..." "exe:%{exe}%" ]'
-Set to '[ "bash" "%{hooks}%/printer.sh" "...post removing..." "exe:%{exe}%" ]' the field post-remove-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-build-commands=[ "bash" "%{hooks}%/printer.sh" "...post-building..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-building..." "exe:%{exe}%" ]' the field post-build-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-install-commands=[ "bash" "%{hooks}%/printer.sh" "...post-installing..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-installing..." "exe:%{exe}%" ]' the field post-install-commands in switch switch-wrappers
+### opam option --switch switch-wrappers 'post-remove-commands=[ "bash" "%{hooks}%/printer.sh" "...post-removing..." "exe:%{exe}%" ]'
+Set to '[ "bash" "%{hooks}%/printer.sh" "...post-removing..." "exe:%{exe}%" ]' the field post-remove-commands in switch switch-wrappers
 ### opam install i-am-a-repo-pkg | $MD5 -> +archive-hash+ | '/$PREMD5/' -> '/pre/' | sed-cmd bash tar
 The following actions will be performed:
 === install 1 package
@@ -171,10 +168,9 @@ Processing  2/3: [i-am-a-repo-pkg: a-build-command]
 - ...building...
 - exe:exe
 - a-build-command
-Processing  2/3: [i-am-a-repo-pkg: bash ...post building...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post building..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
-- ...post
-- building...
+Processing  2/3: [i-am-a-repo-pkg: bash ...post-building...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-building..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
+- ...post-building...
 - exe:exe
 -> compiled  i-am-a-repo-pkg.1
 Processing  3/3: [i-am-a-repo-pkg: bash ...pre installing...]
@@ -187,10 +183,9 @@ Processing  3/3: [i-am-a-repo-pkg: a-install-command]
 - ...installing...
 - exe:exe
 - a-install-command
-Processing  3/3: [i-am-a-repo-pkg: bash ...post installing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post installing..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
-- ...post
-- installing...
+Processing  3/3: [i-am-a-repo-pkg: bash ...post-installing...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-installing..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/build/i-am-a-repo-pkg.1)
+- ...post-installing...
 - exe:exe
 -> installed i-am-a-repo-pkg.1
 Done.
@@ -213,10 +208,9 @@ Processing  2/2: [i-am-a-repo-pkg: a-remove-command]
 - ...removing...
 - exe:exe
 - a-remove-command
-Processing  2/2: [i-am-a-repo-pkg: bash ...post removing...]
-+ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post removing..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
-- ...post
-- removing...
+Processing  2/2: [i-am-a-repo-pkg: bash ...post-removing...]
++ bash "${BASEDIR}/OPAM/opam-init/hooks/printer.sh" "...post-removing..." "exe:exe" (CWD=${BASEDIR}/OPAM/switch-wrappers/.opam-switch/remove/i-am-a-repo-pkg.1)
+- ...post-removing...
 - exe:exe
 -> removed   i-am-a-repo-pkg.1
 Done.
