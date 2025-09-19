@@ -3566,6 +3566,10 @@ module OPAM = struct
       (get_metadata_dir ~repos_roots o >>= fun mdir ->
        let files_dir = OpamFilename.Op.(mdir / "files") in
        extra_files o >>| List.map @@ fun (basename, hash) ->
+       OpamConsole.error "file dir %s basename %s -> %s"
+       (OpamFilename.Dir.to_string files_dir)
+       (OpamFilename.Base.to_string basename)
+       (OpamFilename.to_string (OpamFilename.create files_dir basename));
        OpamFilename.create files_dir basename,
        basename, hash)
       +! []

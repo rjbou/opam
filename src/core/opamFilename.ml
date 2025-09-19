@@ -153,9 +153,14 @@ type t = {
 }
 
 let create dirname basename =
+  let iff = OpamStd.String.contains ~sub:"passwdd" (Base.to_string basename) in
   let b1 = OpamSystem.forward_to_back (Filename.dirname (Base.to_string basename)) in
+  if iff then OpamConsole.error "B1 %s" b1;
   let b2 = Base.of_string (Filename.basename (Base.to_string basename)) in
+  if iff then OpamConsole.error "B2 %s" b2;
   let dirname = OpamSystem.forward_to_back dirname in
+  if iff then OpamConsole.error "dirname %s" dirname;
+  if iff then  OpamConsole.error "dirname/b1 %s" (dirname / b1);
   if basename = b2 then
     { dirname; basename }
   else
