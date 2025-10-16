@@ -40,11 +40,6 @@ type availability_mode =
 
 val string_of_availability_mode : availability_mode -> string
 
-(** Combine two availability_modes. If it is not the same variant, the result is
-    the smallest one. *)
-val combine_availability_mode : availability_mode -> availability_mode ->
-  availability_mode
-
 (** Returns [true] if both values are [Suppose_available] or both are
     [Available] with equal sets, [false] otherwise. *)
 val equal_availability_mode : availability_mode -> availability_mode -> bool
