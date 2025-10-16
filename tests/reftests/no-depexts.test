@@ -1,0 +1,100 @@
+N0REP0
+### opam switch create no-dpx --empty
+### :IX: No depext enable/disable
+### OPAMNODEPEXTS=0 OPAMCONFIRMLEVEL=unsafe-yes
+### opam option depext=true
+No modification in global configuration
+### opam-set-os dummy-success:0:*
+Added '[os-family "dummy-success:0:*" "Set through 'opam var'"]' to field global-variables in global configuration
+### <pkg:no-dpx.1>
+opam-version: "2.0"
+depexts: [ "dont-check-me" ]
+### : check
+### opam install no-dpx
+The following actions will be performed:
+=== install 1 package
+  - install no-dpx 1
+
+The following system packages will first need to be installed:
+    dont-check-me
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Continue anyway, and, upon success, permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
+
+[1/2/3/4] 1
+
++ /usr/bin/echo "dont-check-me"
+- dont-check-me
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed no-dpx.1
+Done.
+### opam remove no-dpx
+[WARNING] Opam package no-dpx.1 depends on the following system package that can no longer be found: dont-check-me
+The following actions will be performed:
+=== remove 1 package
+  - remove no-dpx 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   no-dpx.1
+Done.
+### : disable depexts
+### opam option depext=false
+Set to 'false' the field depext in global configuration
+### opam install no-dpx
+The following actions will be performed:
+=== install 1 package
+  - install no-dpx 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed no-dpx.1
+Done.
+### opam remove no-dpx
+The following actions will be performed:
+=== remove 1 package
+  - remove no-dpx 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   no-dpx.1
+Done.
+### : re enable via config
+### opam option depext=true
+Set to 'true' the field depext in global configuration
+### opam install no-dpx
+The following actions will be performed:
+=== install 1 package
+  - install no-dpx 1
+
+The following system packages will first need to be installed:
+    dont-check-me
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
+opam believes some required external dependencies are missing. opam can:
+> 1. Run echo to install them (may need root/sudo access)
+  2. Display the recommended echo command and wait while you run it manually (e.g. in another terminal)
+  3. Continue anyway, and, upon success, permanently register that this external dependency is present, but not detectable
+  4. Abort the installation
+
+[1/2/3/4] 1
+
++ /usr/bin/echo "dont-check-me"
+- dont-check-me
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed no-dpx.1
+Done.
+### opam remove no-dpx
+[WARNING] Opam package no-dpx.1 depends on the following system package that can no longer be found: dont-check-me
+The following actions will be performed:
+=== remove 1 package
+  - remove no-dpx 1
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> removed   no-dpx.1
+Done.
