@@ -60,12 +60,18 @@ module Cache = struct
   let file rt =
     OpamPath.state_cache rt.repos_global.root
 
-  let save rt =
-    remove ();
+  let save_new rt =
+    let rt = 
+    { rt with repos_sys_available_pkgs = 
+    match rt.repos_sys_available_pkgs with
+    | No_depexts -> Empty
+    | r -> r
+    } in
     C.save (file rt) (marshall rt)
 
-  let save_new rt =
-    C.save (file rt) (marshall rt)
+  let save rt =
+    remove ();
+    save_new rt
 
   let load root =
     let file = OpamPath.state_cache root in
@@ -282,7 +288,11 @@ let load lock_kind gt =
   match Cache.load gt.root with
   | Some (repofiles, opams, sys_available_pkgs) ->
     log "Cache found";
+    let rt =
     make_rt repofiles opams sys_available_pkgs
+    in
+    OpamConsole.error "stored %s" (OpamSysPkg.string_of_availability_mode rt.repos_sys_available_pkgs);
+    rt
   | None ->
     log "No cache found";
     OpamFilename.with_flock_upgrade `Lock_read lock @@ fun _ ->

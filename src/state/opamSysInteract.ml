@@ -1219,8 +1219,8 @@ let packages_status ?(env=OpamVariable.Map.empty) ?sys_available config syspkg_s
   let installed = installed_packages ~env config syspkg_set in
   let sys_available =
     match sys_available with
+    | None | Some OpamSysPkg.Empty -> available_packages ~env config syspkg_set
     | Some sys_available -> sys_available
-    | None -> available_packages ~env config syspkg_set
   in
   match sys_available with
   | OpamSysPkg.Available sys_pkgs ->
@@ -1231,6 +1231,7 @@ let packages_status ?(env=OpamVariable.Map.empty) ?sys_available config syspkg_s
     let s_available = syspkg_set -- installed in
     { OpamSysPkg.status_empty with s_available }
   | OpamSysPkg.No_depexts -> OpamSysPkg.status_empty
+  | OpamSysPkg.Empty -> assert false
 
 let stateless_install ?(env=OpamVariable.Map.empty) () =
   match family ~env () with
@@ -1529,7 +1530,7 @@ let repo_enablers ?(env=OpamVariable.Map.empty) config =
        Please see https://fedoraproject.org/wiki/EPEL for more information"
     in
     match available_packages ~env config epel_release_pkg with
-    | Suppose_available -> Some msg
+    | Suppose_available | Empty -> Some msg
     | Available av ->
       if OpamSysPkg.Set.equal av epel_release_pkg then
         Some msg

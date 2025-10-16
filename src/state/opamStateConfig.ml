@@ -438,3 +438,6 @@ let get_switch () =
     OpamConsole.error_and_exit `Configuration_error
       "No switch is currently set. Please use 'opam switch' to set or install \
        a switch"
+
+let depext_disabled config =
+  !r.no_depexts || not (OpamFile.Config.depext config)

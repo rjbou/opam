@@ -44,6 +44,7 @@ The following actions will be performed:
 -> removed   no-dpx.1
 Done.
 ### : disable depexts
+### opam clean -r
 ### opam option depext=false
 Set to 'false' the field depext in global configuration
 ### opam install no-dpx

@@ -171,19 +171,23 @@ module Installed_cache = OpamCached.Make(struct
 let resolve_depext_availability ?env global_config repos_sys_available_pkgs
     syspkg_set =
   let open OpamSysPkg.Set.Op in
-  let installed =
+  let installed () =
     OpamSysInteract.installed_packages ?env global_config syspkg_set
   in
   match repos_sys_available_pkgs with
   | OpamSysPkg.Available sys_pkgs ->
+  let installed = installed () in
     let s_available = (syspkg_set -- installed) %% sys_pkgs in
     let s_not_found = syspkg_set -- installed -- s_available in
     { OpamSysPkg.s_available; s_not_found }
   | OpamSysPkg.Suppose_available ->
+  let installed = installed () in
     (* Some package managers don't permit to request on available packages.
        In this case, we consider all non installed packages as [available]. *)
     let s_available = syspkg_set -- installed in
     { OpamSysPkg.status_empty with s_available }
+  | OpamSysPkg.Empty ->
+  OpamSysInteract.packages_status ?env global_config syspkg_set
   | No_depexts -> OpamSysPkg.status_empty
 
 let depexts_status_of_packages_raw
@@ -590,8 +594,13 @@ let load lock_kind gt rt switch =
                   && OpamSysPkg.Set.is_empty spkg.OpamSysPkg.s_not_found))
         (Lazy.force sys_packages)
     in
-    if OpamSysInteract.stateless_install ~env:gt.global_variables ()
-       || OpamPackage.Map.is_empty sys_packages then
+    let noop =
+    if OpamStateConfig.(!r.no_depexts) || not (OpamFile.Config.depext gt.config) then true
+    else 
+    (OpamSysInteract.stateless_install ~env:gt.global_variables ()
+       || OpamPackage.Map.is_empty sys_packages)
+       in
+       if noop then
       OpamPackage.Set.empty
     else
     let lchanged = OpamPackage.Map.keys sys_packages in
@@ -1316,6 +1325,7 @@ let update_pin nv opam st =
   { st with sys_packages; available_packages }
 
 let update_sys_packages pkgs st =
+  if OpamStateConfig.(!r.no_depexts) || not (OpamFile.Config.depext st.switch_global.config) then st else
   let depexts_s =
     OpamPackage.Set.fold (fun p acc ->
         OpamSysPkg.Set.Op.(depexts st p ++ acc))
@@ -1324,20 +1334,24 @@ let update_sys_packages pkgs st =
   if OpamSysPkg.Set.is_empty depexts_s then
     st
   else
+    let update () =
+      let sys_packages = lazy (
+        OpamPackage.Map.union (fun _ x -> x)
+          (Lazy.force st.sys_packages)
+          (depexts_status_of_packages st pkgs)
+      ) in
+      {st with sys_packages}
+    in
     (* Check if an update is to be made *)
     match st.switch_repos.repos_sys_available_pkgs with
     | Available available_pkgs ->
       if OpamSysPkg.Set.is_empty available_pkgs
       || not (OpamSysPkg.Set.subset depexts_s available_pkgs)
       then
-        let sys_packages = lazy (
-          OpamPackage.Map.union (fun _ x -> x)
-            (Lazy.force st.sys_packages)
-            (depexts_status_of_packages st pkgs)
-        ) in
-        {st with sys_packages}
+        update ()
       else
         st
+    | Empty -> update ()
     | Suppose_available | No_depexts -> st
 
 let do_backup lock st = match lock with

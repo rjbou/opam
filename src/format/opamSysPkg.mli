@@ -37,6 +37,7 @@ type availability_mode =
   | Suppose_available (** In this system, all packages are considered
                           available *)
   | No_depexts (** Depext system disabled *)
+  | Empty
 
 val string_of_availability_mode : availability_mode -> string
 

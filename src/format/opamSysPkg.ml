@@ -78,27 +78,34 @@ type availability_mode =
   | Available of Set.t
   | Suppose_available
   | No_depexts
+  | Empty
 
 let string_of_availability_mode = function
   | Available av -> Set.to_string av
   | Suppose_available -> "Suppose available"
+  | Empty -> "Empty"
   | No_depexts -> "No depexts"
 
 let equal_availability_mode a b =
   match a, b with
   | Available os, Available ns -> Set.equal os ns
   | Suppose_available, Suppose_available
+  | Empty, Empty
   | No_depexts, No_depexts -> true
   | Available _, _
   | Suppose_available, _
+  | Empty, _
   | No_depexts, _ -> false
 
 let combine_availability_mode a a' =
   match a, a' with
   | Available s, Available s' -> Available (Set.union s s')
-  | Suppose_available, Suppose_available -> Suppose_available
+  | Suppose_available, Suppose_available
+  | Suppose_available, Empty
+  | Empty, Suppose_available -> Suppose_available
   | Available s, Suppose_available | Suppose_available, Available s ->
     Available s
+  | Empty, _ | _, Empty -> Empty
   | No_depexts, _  |  _, No_depexts -> No_depexts
 
 
