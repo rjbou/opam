@@ -822,3 +822,4 @@ let request ?(criteria=`Default)
   in
   { wish_install; wish_upgrade; wish_remove = remove; wish_all = all;
     criteria; extra_attributes = []; }
+
