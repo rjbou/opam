@@ -1170,12 +1170,8 @@ let rec flock_update
     if kind <> flag then
       (try
          (* Locks can't be promoted (or demoted) on Windows - see PR#7264 *)
-         if Sys.win32 then
-          (try Unix.(lockf fd F_ULOCK 0)
-           with e ->
-             if Filename.basename lock.file = "lock"
-             && Filename.(basename (dirname lock.file)) = "OPAM"
-             then OpamConsole.error "unlocking failed %s" (Printexc.to_string e));
+         if Sys.win32 && kind <> `Lock_none then
+           Unix.(lockf fd F_ULOCK 0);
          Unix.lockf fd (unix_lock_op ~dontblock:true flag) 0
        with Unix.Unix_error (Unix.EAGAIN,_,_)
           | Unix.Unix_error (Unix.EACCES,_,_) ->
