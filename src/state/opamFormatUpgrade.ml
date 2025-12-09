@@ -1447,7 +1447,7 @@ let as_necessary_repo_switch_t updates read_f lock_kind gt =
         (OpamVersion.to_string written_root_version)
         (OpamVersion.to_string (OpamFile.Config.opam_root_version config));
       if OpamConsole.confirm "Continue?" then
-        flock_root `Lock_write ~global_lock:gt.global_lock root @@ fun _ ->
+        flock_root `Lock_write ~global_lock:gt.lock root @@ fun _ ->
         (* we keep only light upgrades as hard upgrade is already handled by
            global state loading, so we must not have to handle hard upgrades
            as this point. *)

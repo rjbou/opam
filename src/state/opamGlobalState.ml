@@ -140,6 +140,7 @@ let load lock_kind =
       global_variables eval_variables
   in
   { global_lock = config_lock;
+    lock = global_lock;
     root;
     config;
     global_variables;
