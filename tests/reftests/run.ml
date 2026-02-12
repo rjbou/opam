@@ -88,6 +88,16 @@ let base_env =
     "OPAMDOWNLOADJOBS", "1";
   ]
 
+let err_file =
+  let flags = [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_APPEND ] in
+  let fd = Unix.openfile "/tmp/run-test-out" flags 0o644 in
+  let oc = Unix.out_channel_of_descr fd in
+  Printf.fprintf oc "\n   >>>> NEW RUN <<<<\n%!";
+  oc
+
+let eprintf fmt =
+  Printf.fprintf err_file ("\n>>> "^^fmt^^"\n%!")
+
 (* See [opamprocess.safe_wait] *)
 let rec waitpid pid =
   match Unix.waitpid [] pid with
@@ -96,6 +106,27 @@ let rec waitpid pid =
   | _, Unix.WSTOPPED _ -> waitpid pid
   | _, Unix.WEXITED n -> n
   | _, Unix.WSIGNALED _ -> failwith "signal"
+
+let nowaitpid pid =
+  match Unix.waitpid [Unix.WNOHANG] pid with
+  | exception Unix.Unix_error (Unix.EINTR,_,_) -> eprintf "EINTR"; None
+  | exception Unix.Unix_error (Unix.ECHILD,_,_) -> eprintf "ECHILD"; Some 256
+  | _, Unix.WSTOPPED _ -> eprintf "WSTOPPED"; None
+  | _, Unix.WEXITED 0 -> eprintf "WEXITED 00" ; None
+  | _, Unix.WEXITED n -> eprintf "WEXITED %d" n; Some n
+  | _, Unix.WSIGNALED _ -> eprintf "SWIGNALED"; failwith "signal"
+
+let background_pids : (int, string) Hashtbl.t = Hashtbl.create 4
+
+let clean_background_processes () =
+  Hashtbl.iter (fun pid cmd ->
+(*       Printf.printf "[[[Killing [%d] %s]]]\n" pid cmd; *)
+      Printf.printf "[[[Killing %s]]]\n" cmd;
+      try Unix.kill Sys.sigterm pid
+      with Unix.Unix_error (ESRCH, "kill", _) ->
+(*       Printf.printf "ERROROR\n"; *)
+      ()
+    ) background_pids
 
 exception Command_failure of int * string * string
 
@@ -150,6 +181,7 @@ let filters_of_var =
 
 let command
     ?(allowed_codes = [0]) ?(vars=[]) ?(silent=false) ?(filter=[]) ?(sort=false)
+    ?(pidshow=false) ?(background=false)
     cmd args =
   let env =
     Array.of_list @@
@@ -177,6 +209,7 @@ let command
       List.map (Lazy.force (OpamSystem.get_cygpath_function ~command:cmd)) args
     else args
   in
+  if pidshow then eprintf "BEFORE";
   let pid =
     OpamProcess.create_process_env cmd (Array.of_list (cmd::args)) env
       Unix.stdin stdout stdout
@@ -196,8 +229,22 @@ let command
          filter_output out_buf ic)
     | exception End_of_file -> out_buf
   in
-  let out_buf = filter_output [] ic in
-  let ret = waitpid pid in
+  if pidshow then eprintf "AFTER";
+  let out_buf = if background then [] else filter_output [] ic in
+  if pidshow then eprintf "AFTER2";
+  if pidshow then
+    eprintf "PID %d\n" pid;
+  let ret =
+    if pidshow then
+      eprintf "BACKGROUDNE ? %B\n%!" background;
+    if background then
+      match nowaitpid pid with
+      | None -> Hashtbl.add background_pids pid cmd; 0
+      | Some 0 -> -1
+      | Some n -> n
+    else
+      waitpid pid
+  in
   close_in ic;
   let out =
     if sort then List.sort String.compare out_buf
@@ -284,6 +331,7 @@ type command =
              output: string option;
              unordered: bool;
              sort: bool;}
+  | Http_server
   | Export of (string * [`eq | `pluseq | `eqplus] * string) list
   | Unset of string list
   | Comment of string
@@ -514,6 +562,7 @@ module Parse = struct
                  (String.concat " " args))
         in
         Cache { kind; switch; nvs; filter = rewr; }
+      | Some "http-server" -> Http_server
       | Some cmd ->
         let env, plus =
           List.fold_left (fun (env,plus) (v,op,value) ->
@@ -668,6 +717,28 @@ let rec list_remove x = function
   | [] -> []
   | y :: r -> if x = y then r else y :: list_remove x r
 
+let run_http_server () =
+  let port =
+    let rec aux p =
+      if p < 1025 then Random.int 49000
+      else p
+    in
+    aux (Random.int 49000)
+  in
+(*   let port = 12345 in *)
+  let cmd = "busybox" in
+  let args = ["httpd"; "-p"; string_of_int port] in
+  let args = args @ ["-f"] in
+  (try
+    let out = command ~pidshow:true ~background:true cmd args in
+(*     Printf.printf "HTTP SERVER launched on port %d\n%s" port out; *)
+    Printf.printf "HTTP SERVER launched\n%s" out;
+    ()
+  with Command_failure (rcode, cmd, out) ->
+    Printf.printf ">> %s\n" cmd;
+    Printf.printf "# Return code %d #\n%s" rcode out
+    );
+    port
 
 let print_opamfile file =
   try
@@ -1171,9 +1242,13 @@ let run_test ?(vars=[]) ~opam t =
              in
              diffl [] (String.split_on_char '\n' r) out);
           Option.iter (Printf.printf "# Return code %d #\n") errcode;
-          match output with
+          (match output with
           | None -> vars
           | Some v -> (v, r) :: List.filter (fun (w,_) -> v <> w) vars)
+        | Http_server ->
+          let port = run_http_server () in
+          ("HTTPSERVERPORT", string_of_int port)::vars
+          )
       vars
       t.commands
   in
@@ -1197,6 +1272,7 @@ let () =
           | None -> failwith "Bad 'var=value' argument")
         env
     in
-    load_test input |> run_test ~opam ~vars
+    load_test input |> run_test ~opam ~vars;
+    clean_background_processes ();
   | _ ->
     failwith "Expected arguments: opam.exe opam file.test [env-bindings]"
