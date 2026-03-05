@@ -146,6 +146,8 @@ let load_repo_from_tar_gz repo_name tar =
         (* TODO: Do like OpamFileTools.read_repo_opam and also merge the metadata files as they come up *)
         let opam =
           opam
+          |> OpamFile.OPAM.with_name (OpamPackage.name pkg)
+          |> OpamFile.OPAM.with_version (OpamPackage.version pkg)
           |> OpamFile.OPAM.with_metadata_dir
             (Some (Some
                      repo_name,
