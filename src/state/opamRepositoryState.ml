@@ -91,7 +91,18 @@ let get_repo_root rt repo =
 
 let get_repo_files rt name dir =
   match get_root rt name with
-  | OpamRepositoryRoot.Tar _ -> assert false (* TODO *)
+  | OpamRepositoryRoot.Tar tar ->
+    let xfiles_dir =
+      let open OpamFilename.Op in
+      OpamFilename.raw_dir (OpamRepositoryName.to_string name)
+      / dir
+    in
+    OpamTar.fold_reg_files (fun acc filename content ->
+        let filename = OpamFilename.raw filename in
+        if OpamFilename.starts_with xfiles_dir filename then
+          (OpamFilename.basename filename, lazy content)::acc
+        else acc)
+        [] (OpamRepositoryRoot.Tar.to_file tar)
   | OpamRepositoryRoot.Dir repo_root ->
     let dir = OpamRepositoryRoot.Dir.Op.(repo_root / dir) in
     let files = OpamFilename.rec_files dir in
@@ -119,7 +130,7 @@ let read_package_opam ~repo_name ~repo_root package_dir =
       (OpamFilename.to_string OpamFilename.Op.(package_dir // "opam"));
     None
 
-let load_repo_from_tar_gz tar =
+let load_repo_from_tar_gz repo_name tar =
   OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
       if filename = "repo" then
         match OpamFile.Repo.read_from_string content with
@@ -133,14 +144,26 @@ let load_repo_from_tar_gz tar =
           OpamPackage.of_string (List.nth list 1)
         in
         (* TODO: Do like OpamFileTools.read_repo_opam and also merge the metadata files as they come up *)
+        let opam =
+          opam
+          |> OpamFile.OPAM.with_metadata_dir
+            (Some (Some
+                     repo_name,
+                   (OpamFilename.raw filename
+                    |> OpamFilename.dirname
+                    |> OpamFilename.remove_prefix_dir
+                      (OpamFilename.raw_dir
+                         (OpamRepositoryName.to_string repo_name))
+                   )))
+        in
         (repo, OpamPackage.Map.add pkg opam opams)
       else
         acc)
     (OpamFile.Repo.empty, OpamPackage.Map.empty)
     (OpamRepositoryRoot.Tar.to_file tar)
 
-let load_opams_from_tar_gz tar =
-  snd (load_repo_from_tar_gz tar)
+let load_opams_from_tar_gz repo_name tar =
+  snd (load_repo_from_tar_gz repo_name tar)
 
 let load_opams_from_dir repo_name repo_root =
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
@@ -255,7 +278,7 @@ let load_repo repo repo_root =
   let loaded_repo =
     match repo_root with
     | OpamRepositoryRoot.Tar tar ->
-      load_repo_from_tar_gz tar
+      load_repo_from_tar_gz repo.repo_name tar
     | OpamRepositoryRoot.Dir dir ->
       load_repo_from_dir repo dir
   in

@@ -139,7 +139,7 @@ let repository rt repo =
       let opams =
         match repo_root with
         | OpamRepositoryRoot.Tar tar ->
-          OpamRepositoryState.load_opams_from_tar_gz tar
+          OpamRepositoryState.load_opams_from_tar_gz repo.repo_name tar
         | OpamRepositoryRoot.Dir dir ->
           match diffs with
           | [] ->
