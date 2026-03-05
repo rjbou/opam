@@ -123,12 +123,17 @@ let repository rt repo =
             msg)
       (OpamFile.Repo.announce repo_file);
     let tarred_repo = OpamRepositoryPath.tar gt.root repo.repo_name in
-    (if OpamRepositoryConfig.(!r.repo_tarring) &&
-        repo.repo_url.backend <> `http then
-       match repo_root with
-       | Tar _ -> Done None
-       | Dir dir -> OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
-     else Done None)
+    let repo_root, res =
+      (if OpamRepositoryConfig.(!r.repo_tarring) &&
+          repo.repo_url.backend <> `http then
+         match repo_root with
+         | Tar _ ->
+           repo_root, Done None
+         | Dir dir ->
+           Tar tarred_repo, OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
+       else repo_root, Done None)
+    in
+    res
     @@+ function
     | Some e ->
       OpamStd.Exn.fatal e;
