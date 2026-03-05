@@ -3368,8 +3368,11 @@ module OPAMSyntax = struct
       (fun ~pos:_ (filename, t) ->
          filename,
          let metadata_dir =
-           if filename <> dummy_file
-           then Some (None, OpamFilename.(Dir.to_string (dirname filename)))
+           if not (OpamFilename.Base.equal
+                     (OpamFilename.basename filename)
+                     (OpamFilename.basename dummy_file))
+           then
+             Some (None, OpamFilename.(Dir.to_string (dirname filename)))
            else None
          in
          let t = { t with metadata_dir } in
