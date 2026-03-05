@@ -8,7 +8,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* TAR TODO : documentation *)
+(* TAR TODO : change fname to tar when accurate *)
+
 open Tar.Syntax
+open OpamTypes
+
+type tar = filename
 
 let rec safe_read fd buf off len =
   try Unix.read fd buf off len

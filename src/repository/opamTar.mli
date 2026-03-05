@@ -8,14 +8,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* TAR TODO : documentation *)
+(* TAR TODO : use filename instead of string to navigate in archive *)
+open OpamTypes
+
+type tar = filename
+
 val fold_reg_files :
-  ('acc -> string -> string -> 'acc) ->
-  'acc -> OpamFilename.t -> 'acc
+  ('acc -> string -> string -> 'acc) -> 'acc -> tar -> 'acc
 
 module Inplace : sig
   type t
 
-  val with_open_out : OpamFilename.t -> (t -> 'a) -> 'a
+  val with_open_out : tar -> (t -> 'a) -> 'a
   val fold_reg_files :
     ('acc -> string -> string -> 'acc) ->
     'acc -> t -> 'acc
