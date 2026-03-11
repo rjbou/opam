@@ -137,26 +137,45 @@ let load_repo_from_tar_gz repo_name tar =
         | repo -> (repo, opams)
         | exception _ -> acc
       else if OpamCompat.String.ends_with ~suffix:"/opam" filename then
-        let opam = OpamFile.OPAM.read_from_string content in
+        let inner_filename =
+          OpamFilename.raw filename
+          |> OpamFilename.remove_prefix
+            (OpamFilename.raw_dir
+               (OpamRepositoryName.to_string repo_name))
+        in
+        let inner_dir =
+          OpamFilename.raw filename
+          |> OpamFilename.dirname
+          |> OpamFilename.remove_prefix_dir
+            (OpamFilename.raw_dir
+               (OpamRepositoryName.to_string repo_name))
+        in
+        let opam =
+          let filename =
+            let open OpamFilename.Op in
+            OpamFile.make
+              (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string repo_name^"]")
+               // inner_filename)
+          in
+          OpamFile.OPAM.read_from_string ~filename content
+        in
         let pkg =
           let list = String.split_on_char '/' filename |> List.rev in
           (* TODO: handle errors *)
           OpamPackage.of_string (List.nth list 1)
         in
         (* TODO: Do like OpamFileTools.read_repo_opam and also merge the metadata files as they come up *)
+        let iff opt with_ elem opam =
+          match opt opam with
+          | Some _ -> opam
+          | None -> with_ elem opam
+        in
         let opam =
           opam
-          |> OpamFile.OPAM.with_name (OpamPackage.name pkg)
-          |> OpamFile.OPAM.with_version (OpamPackage.version pkg)
+          |> iff OpamFile.OPAM.name_opt OpamFile.OPAM.with_name (OpamPackage.name pkg)
+          |> iff OpamFile.OPAM.version_opt OpamFile.OPAM.with_version (OpamPackage.version pkg)
           |> OpamFile.OPAM.with_metadata_dir
-            (Some (Some
-                     repo_name,
-                   (OpamFilename.raw filename
-                    |> OpamFilename.dirname
-                    |> OpamFilename.remove_prefix_dir
-                      (OpamFilename.raw_dir
-                         (OpamRepositoryName.to_string repo_name))
-                   )))
+            (Some (Some repo_name, inner_dir))
         in
         (repo, OpamPackage.Map.add pkg opam opams)
       else
