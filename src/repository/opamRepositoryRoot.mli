@@ -55,6 +55,7 @@ module Tar : sig
   val to_file : t -> OpamFilename.t
   val to_string : t -> string
 
+  val quarantine : t -> t
   val backup : tmp_dir:OpamFilename.Dir.t -> t -> t
 
   val exists : t -> bool
@@ -69,6 +70,11 @@ module Tar : sig
     OpamUrl.t -> t -> unit OpamProcess.job
   val copy : src:t -> dst:t -> unit
   val move : src:t -> dst:t -> unit
+
+  (* TAR TODO: for debug purpose *)
+  val files : t -> string list
+  val ls : t -> string
+  val change_root_dir: old:OpamFilename.Dir.t -> new_:string -> t -> unit
 end
 
 val make_tar_gz_job : Tar.t -> Dir.t -> exn option OpamProcess.job

@@ -51,6 +51,7 @@ module Tar = struct
   let to_file = Fun.id
   let to_string = OpamFilename.to_string
 
+  let quarantine tar = OpamFilename.raw (to_string tar ^ ".new")
   let backup ~tmp_dir tar =
     OpamFilename.create tmp_dir (OpamFilename.basename tar)
 
@@ -61,6 +62,56 @@ module Tar = struct
   let copy = OpamFilename.copy
   let move = OpamFilename.move
   let is_symlink = OpamFilename.is_symlink
+
+  let files t =
+    OpamTar.fold_reg_files (fun files file _ -> file::files) [] t
+  let ls t =
+    OpamStd.Format.itemize Fun.id (files t)
+  let patch ~allow_unclean patch tar =
+    (* TAR TODO update when we have tar patch *)
+    let job =
+      let open OpamProcess.Job.Op in
+      OpamFilename.with_tmp_dir_job @@ fun dir ->
+      (* TAR TODO there is in several places an issue wit the
+         tarring/untarrings place, there eis a root to add or remove *)
+      extract_in tar dir;
+      match OpamFilename.dirs dir with
+      | [root] ->
+        ( let diffs =
+            OpamFilename.patch ~allow_unclean patch root
+          in
+          OpamFilename.make_tar_gz_job tar root
+          @@+ function
+          | None ->
+            Done (diffs)
+          | Some _exn -> failwith "make job failure")
+      | ([] | _::_::_) as dirs ->
+        failwith
+          (Printf.sprintf "internal error, shouldn't happen %s"
+             (OpamStd.List.to_string OpamFilename.Dir.to_string dirs))
+    in
+    OpamProcess.Job.run job
+
+  let change_root_dir ~old:_ ~new_:_ t =
+    let open OpamTar.Inplace in
+    with_open_out t (fun ttar ->
+    write ttar);
+(*
+    with_open_out t (fun ttar ->
+        let newtar = ttar in
+        fold_reg_files (fun newtar file content ->
+            let filename = OpamFilename.raw file in
+            let new_file =
+              OpamFilename.swap_prefix ~old ~new_ filename
+              |> OpamFilename.to_string
+            in
+            remove file newtar
+            |> add ~fname:new_file ~content)
+          newtar ttar
+        |> write
+      )
+*)
+
 end
 
 let make_tar_gz_job = OpamFilename.make_tar_gz_job
@@ -72,7 +123,7 @@ type t =
 
 let quarantine = function
   | Dir dir -> Dir (Dir.quarantine dir)
-  | Tar tar -> Tar (OpamFilename.raw (Tar.to_string tar ^ ".new"))
+  | Tar tar -> Tar (Tar.quarantine tar)
 
 let remove = function
   | Dir dir -> Dir.remove dir
@@ -123,7 +174,7 @@ let is_symlink = function
 
 let patch ~allow_unclean patch = function
   | Dir dir -> Dir.patch ~allow_unclean patch dir
-  | Tar _ -> assert false (* TODO *)
+  | Tar tar -> Tar.patch ~allow_unclean patch tar
 
 let delayed_read_repo = function
   | Dir dir ->
