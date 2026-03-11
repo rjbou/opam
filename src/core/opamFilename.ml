@@ -361,6 +361,15 @@ let remove_prefix_dir prefix dir =
     OpamStd.String.remove_prefix ~prefix dirname |>
     OpamStd.String.remove_prefix ~prefix:Filename.dir_sep
 
+let root_dir filename =
+  match OpamStd.String.cut_at filename.dirname Filename.dir_sep.[0] with
+  | Some (root, _rest) -> Some root
+  | None -> None
+
+let swap_prefix ~old ~new_ filename =
+  let without_root = remove_prefix old filename in
+  raw (Filename.concat new_ without_root)
+
 let process_in ?root fn src dst =
   let basename = match root with
     | None   -> basename src

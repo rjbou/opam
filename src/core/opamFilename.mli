@@ -276,6 +276,10 @@ val remove_prefix_dir: Dir.t -> Dir.t -> string
 (** Remove a suffix from a filename *)
 val remove_suffix: Base.t -> t -> string
 
+(* Swap prefix for a file name *)
+val swap_prefix: old:Dir.t -> new_:string -> t -> t
+val root_dir: t -> string option
+
 (** [patch ~allow_unclean patch_source dir] applies a patch to directory [dir].
     The patch source can be either [`Patch_file filename] for a patch file, or
     [`Patch_diffs diffs] for a list of file-level changes.
