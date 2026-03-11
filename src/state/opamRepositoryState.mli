@@ -71,6 +71,8 @@ val load_opams_from_diff:
 (* TODO 6625 doc *)
 val load_opams_from_tar_gz: repository_name -> OpamRepositoryRoot.Tar.t -> OpamFile.OPAM.t OpamPackage.Map.t
 
+val load_opams: repository_name -> OpamRepositoryRoot.t -> OpamFile.OPAM.t package_map
+
 (** Load all the metadata within the local mirror of the given repository,
     without cache *)
 val load_repo:
