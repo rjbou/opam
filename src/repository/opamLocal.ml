@@ -147,7 +147,72 @@ module B = struct
   let fetch_repo_update repo_name ?cache_dir:_ repo_root url =
     log "pull-repo-update";
     match repo_root with
-    | OpamRepositoryRoot.Tar _ -> assert false (* TODO *)
+    | OpamRepositoryRoot.Tar tar ->
+      (let quarantine = OpamRepositoryRoot.Tar.quarantine tar in
+       let finalise () = OpamRepositoryRoot.Tar.remove quarantine in
+       OpamProcess.Job.catch (fun e ->
+           finalise ();
+           Done (OpamRepositoryBackend.Update_err e))
+       @@ fun () ->
+       OpamRepositoryBackend.job_text repo_name "sync"
+         (match OpamUrl.local_dir url with
+          | Some dir ->
+            (OpamFilename.with_tmp_dir_job (fun tmpdir ->
+                let external_dir = dir in
+                let internal_dir =
+                  OpamFilename.(Op.(tmpdir / OpamRepositoryName.to_string repo_name))
+                in
+                OpamFilename.copy_dir_except_vcs ~src:external_dir ~dst:internal_dir;
+                (OpamRepositoryRoot.make_tar_gz_job quarantine
+                   (OpamRepositoryRoot.Dir.of_dir internal_dir)))
+            @@+ function
+            | None ->
+              Done (Result ())
+(*
+             @@+ function
+             | None ->
+               let old =
+                 OpamFilename.basename_dir dir
+                 |> OpamFilename.Base.to_string
+                 |> OpamFilename.raw_dir
+               in
+               OpamRepositoryRoot.Tar.change_root_dir
+                 ~old ~new_:(OpamRepositoryName.to_string repo_name) quarantine;
+               Done (Result ())
+             (* TAR TODO : better error msg *)
+*)
+            | Some exn -> Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
+          | None ->
+            OpamFilename.with_tmp_dir_job (fun dir ->
+                pull_dir_quiet dir url
+                @@+ function
+                | Result () ->
+                  (OpamRepositoryRoot.make_tar_gz_job quarantine
+                     (OpamRepositoryRoot.Dir.of_dir dir)
+                   @@+ function
+                   | None ->
+                     Done (Result ())
+                   | Some exn ->
+                     Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
+                | exn -> Done exn)
+         )
+       @@+ function
+       | Not_available (_, msg) ->
+         finalise ();
+         Done (OpamRepositoryBackend.Update_err (Failure ("rsync error: " ^ msg)))
+       | Up_to_date () ->
+         finalise (); Done OpamRepositoryBackend.Update_empty
+       | Result () ->
+         if not (OpamRepositoryRoot.Tar.exists tar) then
+           Done (OpamRepositoryBackend.Update_full (OpamRepositoryRoot.Tar quarantine))
+         else
+           OpamStd.Exn.finally finalise @@ fun () ->
+           OpamRepositoryBackend.get_diff_tars (OpamRepositoryRoot.Tar.to_file tar)
+             (OpamRepositoryRoot.Tar.to_file quarantine)
+           |> function
+           | None -> Done OpamRepositoryBackend.Update_empty
+           | Some p -> Done (OpamRepositoryBackend.Update_patch p)
+      )
     | OpamRepositoryRoot.Dir repo_root ->
       let quarantine = OpamRepositoryRoot.Dir.quarantine repo_root in
       let finalise () = OpamRepositoryRoot.Dir.remove quarantine in
@@ -169,7 +234,8 @@ module B = struct
              OpamRepositoryRoot.Dir.copy_except_vcs ~src:repo_root ~dst:quarantine
            else
              OpamRepositoryRoot.Dir.make_empty quarantine;
-           pull_dir_quiet (OpamRepositoryRoot.Dir.to_dir quarantine) url) @@+ function
+           pull_dir_quiet (OpamRepositoryRoot.Dir.to_dir quarantine) url)
+      @@+ function
       | Not_available (_, msg) ->
         finalise ();
         Done (OpamRepositoryBackend.Update_err (Failure ("rsync error: " ^ msg)))
