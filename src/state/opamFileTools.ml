@@ -1308,12 +1308,18 @@ let try_read rd f =
     Some (OpamFilename.(Base.to_string (basename f)), bf)
 
 let add_aux_files ?dir ?(files_subdir_hashes=false) opam =
+  let tdebug = false in
   let dir = match dir with
     | None ->
       (match OpamFile.OPAM.metadata_dir opam with
        | None -> None
-       | Some (None, dir) -> Some (OpamFilename.Dir.of_string dir)
+       | Some (None, dir) ->
+         if tdebug then
+           OpamConsole.error "ADD AUX FILES absolute dir %s" (dir);
+         Some (OpamFilename.Dir.of_string dir)
        | Some (Some r, _) ->
+         if tdebug then
+           OpamConsole.error "ADD AUX FILES relative dir";
          failwith ("Repository "^OpamRepositoryName.to_string r^
                    " not registered for add_aux_files!"))
     | some -> some
@@ -1467,6 +1473,13 @@ let read_opam dir =
 
 let read_repo_opam ~repo_name ~repo_root dir =
   let open OpamStd.Option.Op in
+  let tdebug = false in
+  if tdebug then
+  (OpamConsole.error "FT:RROD: read_repo_opam dir --> %s"
+     (OpamFilename.Dir.to_string dir);
+   OpamConsole.error "FT:RROD: read_repo_opam rel --> %s"
+     ( (OpamFilename.remove_prefix_dir
+          (OpamRepositoryRoot.Dir.to_dir repo_root) dir)));
   read_opam dir >>|
   OpamFile.OPAM.with_metadata_dir
     (Some (Some repo_name,

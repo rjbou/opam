@@ -52,6 +52,7 @@ module Dir = struct
           (OpamStd.String.remove_prefix ~prefix:("~"^Filename.dir_sep) dirname)
       else dirname
     in
+(*     OpamConsole.error "******************** DIR OF STRING %s -> %s" dirname (   OpamSystem.real_path (OpamSystem.forward_to_back dirname)); *)
     OpamSystem.real_path (OpamSystem.forward_to_back dirname)
 
   let to_string dirname = dirname
@@ -153,6 +154,10 @@ type t = {
 }
 
 let create dirname basename =
+(*
+if basename  = "<none>" then
+OpamConsole.error "++++++ CREATE %s %s"  (dirname) (basename);
+*)
   let b1 = OpamSystem.forward_to_back (Filename.dirname (Base.to_string basename)) in
   let b2 = Base.of_string (Filename.basename (Base.to_string basename)) in
   let dirname = OpamSystem.forward_to_back dirname in
@@ -168,6 +173,10 @@ let create dirname basename =
 
 let of_basename basename =
   let dirname = Dir.of_string Filename.current_dir_name in
+(*
+if basename  = "<none>" then
+OpamConsole.error "++++++ OF BASENAME %s %s"  (dirname) (basename);
+*)
   { dirname; basename }
 
 let raw str =
@@ -176,6 +185,10 @@ let raw str =
   create dirname basename
 
 let to_string t =
+(*
+if Base.to_string t.basename  = "<none>" then
+OpamConsole.error "++++++TO STRING %s %s"  (Dir.to_string t.dirname) (Base.to_string t.basename);
+*)
   Filename.concat (Dir.to_string t.dirname) (Base.to_string t.basename)
 
 let touch t =
@@ -193,6 +206,10 @@ let written_since file =
 let of_string s =
   let dirname = Filename.dirname s in
   let basename = Filename.basename s in
+(*
+if basename  = "<none>" then
+OpamConsole.error "++++++OF STRING %s %s"  (dirname) (basename);
+*)
   {
     dirname  = Dir.of_string dirname;
     basename = Base.of_string basename;

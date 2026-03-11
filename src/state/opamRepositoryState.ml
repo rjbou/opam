@@ -90,20 +90,25 @@ let get_repo_root rt repo =
   get_root_raw rt.repos_global.root repo.repo_name
 
 let get_repo_files rt name dir =
+  let tdebug = false in
   match get_root rt name with
   | OpamRepositoryRoot.Tar tar ->
+(*     OpamConsole.error "RS: GET REPO FIULES Tar"; *)
     let xfiles_dir =
       let open OpamFilename.Op in
       OpamFilename.raw_dir (OpamRepositoryName.to_string name)
       / dir
     in
+(*     OpamConsole.error "dir %s" (OpamFilename.Dir.to_string xfiles_dir); *)
     OpamTar.fold_reg_files (fun acc filename content ->
         let filename = OpamFilename.raw filename in
+(*         OpamConsole.error "lookup %B %s" (OpamFilename.starts_with xfiles_dir filename) (OpamFilename.to_string filename); *)
         if OpamFilename.starts_with xfiles_dir filename then
           (OpamFilename.basename filename, lazy content)::acc
         else acc)
         [] (OpamRepositoryRoot.Tar.to_file tar)
   | OpamRepositoryRoot.Dir repo_root ->
+(*     OpamConsole.error "GET REPO FIULES DIR"; *)
     let dir = OpamRepositoryRoot.Dir.Op.(repo_root / dir) in
     let files = OpamFilename.rec_files dir in
     List.map (fun file ->
@@ -131,6 +136,7 @@ let read_package_opam ~repo_name ~repo_root package_dir =
     None
 
 let load_repo_from_tar_gz repo_name tar =
+(*   OpamConsole.error "loading repo from tar"; *)
   OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
       if filename = "repo" then
         match OpamFile.Repo.read_from_string content with
@@ -159,6 +165,10 @@ let load_repo_from_tar_gz repo_name tar =
           in
           OpamFile.OPAM.read_from_string ~filename content
         in
+(*
+        OpamConsole.error "_____________%s" filename;
+        OpamConsole.error "_______%s" (OpamFilename.raw filename |> OpamFilename.dirname |> OpamFilename.remove_prefix_dir (OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name)));
+*)
         let pkg =
           let list = String.split_on_char '/' filename |> List.rev in
           (* TODO: handle errors *)

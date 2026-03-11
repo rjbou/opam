@@ -81,6 +81,7 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
+    (* TAR TODO : see how to have a function that give that. Not possible in opam repo root *)
     if OpamRepositoryRoot.Dir.exists (OpamRepositoryPath.root root name) ||
        OpamRepositoryRoot.Tar.exists (OpamRepositoryPath.tar root name)
     then
@@ -232,6 +233,7 @@ let update_with_auto_upgrade rt repo_names =
     failed, rt
   else
   let rt, done_upgrade =
+    let tdebug = false in
     List.fold_left (fun (rt, done_upgrade) r ->
         if OpamStd.List.mem OpamRepositoryName.equal r.repo_name failed then
           rt, done_upgrade
@@ -249,6 +251,11 @@ let update_with_auto_upgrade rt repo_names =
                 OpamVersion.compare v OpamAdminRepoUpgrade.upgradeto_version < 0
               -> true
             | _ -> false
+          in
+          let _ = if tdebug then
+              OpamConsole.error "RPC:UWAU:need upgrade ? %s %B"
+                (OpamUrl.to_string r.repo_url)
+                (need_upgrade)
           in
           if need_upgrade then
             (if not done_upgrade then
@@ -289,6 +296,23 @@ let update_with_auto_upgrade rt repo_names =
                           (Printexc.to_string e)
                       | None -> ())
                );
+             let _ = if tdebug then
+                 OpamConsole.error "RPC:UWAU: %s"
+                   (OpamRepositoryRoot.to_string repo_root)
+             in
+                    if tdebug then
+                      (OpamConsole.error "dirs %s"
+                         (OpamStd.List.to_string OpamFilename.Dir.to_string
+                            (OpamFilename.dirs dir));
+                       OpamConsole.error "XXXXXXXX dir is %s"
+                         (OpamStd.String.split 
+                            ( OpamFilename.Dir.to_string dir) '/'
+                          |> OpamStd.List.to_string Fun.id);
+                       OpamConsole.error "repo name %s"
+                         (OpamRepositoryName.to_string r.repo_name));
+                         if tdebug then
+                           OpamConsole.error "After Archive\n%s"
+                             (OpamRepositoryRoot.Tar.ls tar);
              let def, opams =
                OpamRepositoryState.load_repo r repo_root
              in

@@ -70,10 +70,14 @@ module Tar = struct
   let patch ~allow_unclean patch tar =
     (* TAR TODO update when we have tar patch *)
     let job =
+      let tdebug = false in
       let open OpamProcess.Job.Op in
       OpamFilename.with_tmp_dir_job @@ fun dir ->
       (* TAR TODO there is in several places an issue wit the
          tarring/untarrings place, there eis a root to add or remove *)
+      if tdebug then
+        OpamConsole.error "RRT:PATCH: bef TAR CONTENT %s\n%s"
+          (to_string tar) (ls tar);
       extract_in tar dir;
       match OpamFilename.dirs dir with
       | [root] ->
@@ -89,6 +93,19 @@ module Tar = struct
         failwith
           (Printf.sprintf "internal error, shouldn't happen %s"
              (OpamStd.List.to_string OpamFilename.Dir.to_string dirs))
+      if tdebug then
+        OpamConsole.error "RRT:PATCH: extracted in %s\n%s"
+          ((OpamFilename.Dir.to_string dir))
+          ((OpamStd.Format.itemize Fun.id
+              (OpamSystem.ls (OpamFilename.Dir.to_string dir))));
+      if tdebug then
+        OpamConsole.error "RRT:PATCH: after patch %s\n%s"
+          ((OpamFilename.Dir.to_string dir))
+          ((OpamStd.Format.itemize Fun.id
+              (OpamSystem.ls (OpamFilename.Dir.to_string dir))));
+        if tdebug then
+          OpamConsole.error "RRT:PATCH: aft TAR CONTENT %s\n%s"
+            (to_string tar) (ls tar);
     in
     OpamProcess.Job.run job
 

@@ -145,11 +145,16 @@ module B = struct
     rsync_dirs url local_dirname
 
   let fetch_repo_update repo_name ?cache_dir:_ repo_root url =
+    let tdebug = false in
     log "pull-repo-update";
     match repo_root with
     | OpamRepositoryRoot.Tar tar ->
       (let quarantine = OpamRepositoryRoot.Tar.quarantine tar in
        let finalise () = OpamRepositoryRoot.Tar.remove quarantine in
+       if tdebug then
+         (OpamConsole.error "TAR %s" (OpamRepositoryRoot.Tar.to_string tar);
+          OpamConsole.error "QUAR %s" (OpamRepositoryRoot.Tar.to_string quarantine);
+          OpamConsole.error "URL %s" (OpamUrl.to_string url));
        OpamProcess.Job.catch (fun e ->
            finalise ();
            Done (OpamRepositoryBackend.Update_err e))
@@ -168,7 +173,13 @@ module B = struct
             @@+ function
             | None ->
               Done (Result ())
+                 if tdebug then
+                   OpamConsole.error "Temporary hack : copyign %s -> %s"
+                     (OpamFilename.Dir.to_string external_dir)
+                     (OpamFilename.Dir.to_string internal_dir);
 (*
+                   OpamConsole.error "DIR %s" (OpamFilename.Dir.to_string dir);
+            (OpamRepositoryRoot.make_tar_gz_job quarantine (OpamRepositoryRoot.Dir.of_dir dir)
              @@+ function
              | None ->
                let old =
@@ -203,6 +214,15 @@ module B = struct
        | Up_to_date () ->
          finalise (); Done OpamRepositoryBackend.Update_empty
        | Result () ->
+         if tdebug then
+           (OpamConsole.error "LOC QUR CONTENT %s\n%s"
+              (OpamRepositoryRoot.Tar.to_string quarantine)
+              (OpamRepositoryRoot.Tar.ls quarantine);
+            OpamConsole.error "LOC TAR CONTENT %s\n%s"
+              (OpamRepositoryRoot.Tar.to_string tar)
+              (if (OpamRepositoryRoot.Tar.exists tar) then
+                 OpamRepositoryRoot.Tar.ls tar
+               else "ABSENT"));
          if not (OpamRepositoryRoot.Tar.exists tar) then
            Done (OpamRepositoryBackend.Update_full (OpamRepositoryRoot.Tar quarantine))
          else
@@ -214,6 +234,8 @@ module B = struct
            | Some p -> Done (OpamRepositoryBackend.Update_patch p)
       )
     | OpamRepositoryRoot.Dir repo_root ->
+      if tdebug then
+        OpamConsole.error "LOC:DIR:%s" (OpamRepositoryRoot.Dir.to_string repo_root);
       let quarantine = OpamRepositoryRoot.Dir.quarantine repo_root in
       let finalise () = OpamRepositoryRoot.Dir.remove quarantine in
       OpamProcess.Job.catch (fun e ->

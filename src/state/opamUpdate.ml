@@ -51,6 +51,7 @@ let repository rt repo =
   let gt = rt.repos_global in
   if repo.repo_url = OpamUrl.empty then Done None else
   let _repo_root = OpamRepositoryState.get_repo_root rt repo in
+  let tdebug = false in
   let repo_root =
     let root = rt.repos_global.root in
     let name = repo.repo_name in
@@ -71,6 +72,14 @@ let repository rt repo =
       | true, true, `rsync when OpamRepositoryConfig.(!r.repo_tarring) -> tar
       | true, true, `rsync -> dir
     in
+    if tdebug then
+      OpamConsole.error
+        "UPD:REPO: repo root %s\n∃ tar %B - ∃ dir %B - backend %s - repo tarring %B"
+        (OpamRepositoryRoot.to_string r)
+        (OpamRepositoryRoot.Tar.exists ttar)
+        (OpamRepositoryRoot.Dir.exists ddir)
+        (OpamUrl.string_of_backend repo.repo_url.backend)
+        OpamRepositoryConfig.(!r.repo_tarring);
     r
   in
   (* Recursively traverse redirection links, but stop after 10 steps or if
@@ -146,11 +155,21 @@ let repository rt repo =
       (OpamFile.Repo.announce repo_file);
     let tarred_repo = OpamRepositoryPath.tar gt.root repo.repo_name in
     let repo_root, res =
+      if tdebug then
+        OpamConsole.error "UPD:REPO:%s - tarring %B - backend %s [%s]"
+          (match repo_root with Tar _ -> "TAR" | Dir _ -> "DIR")
+          OpamRepositoryConfig.(!r.repo_tarring)
+          (OpamUrl.string_of_backend repo.repo_url.backend)
+          (OpamUrl.to_string repo.repo_url);
       match repo_root, OpamRepositoryConfig.(!r.repo_tarring), repo.repo_url.backend with
       | Tar _, true, _
       | Tar _, _ , `http ->
+        if tdebug then
+          OpamConsole.error "UPD:FRU: change of format ? keep tarred";
         repo_root, Done None
       | Tar tar, false, `rsync -> (* we are not in repo tarring mode *)
+        if tdebug then
+          OpamConsole.error "UPD:FRU: change of format ? move from tarred to dir";
         let dir = OpamRepositoryPath.root gt.root repo.repo_name in
         Dir dir,
         OpamProcess.Job.finally (fun () ->
@@ -161,14 +180,20 @@ let repository rt repo =
              (OpamFilename.dirname_dir
                 (OpamRepositoryRoot.Dir.to_dir dir)))
       | Tar tar, _, #OpamUrl.version_control ->
+        if tdebug then
+          OpamConsole.error "UPD:FRU: change of format ? shouldn't happen";
         assert false (* TAR TODO *)
       | Dir dir, true , (`rsync | `http) ->
+        if tdebug then
+          OpamConsole.error "UPD:FRU: change of format ? from dir to tar";
         Tar tarred_repo,
         OpamProcess.Job.finally (fun () ->
             OpamRepositoryRoot.Dir.remove dir) @@ fun () ->
         OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
       | Dir _, true, #OpamUrl.version_control
       | Dir _, false , _ ->
+        if tdebug then
+          OpamConsole.error "UPD:FRU: change of format ? keep dir";
         repo_root, Done None
 (*
       if OpamRepositoryConfig.(!r.repo_tarring) &&
@@ -192,8 +217,16 @@ let repository rt repo =
       let opams =
         match repo_root with
         | OpamRepositoryRoot.Tar tar ->
+          if tdebug then
+            OpamConsole.error "UPD: TAR %s"
+              (OpamRepositoryRoot.Tar.to_string tar);
           OpamRepositoryState.load_opams_from_tar_gz repo.repo_name tar
         | OpamRepositoryRoot.Dir dir ->
+          if tdebug then
+            OpamConsole.error "UPD: DIR %s DIRS %s"
+              (OpamRepositoryRoot.Dir.to_string dir)
+              (OpamStd.List.to_string (OpamFilename.Dir.to_string)
+                 (OpamFilename.dirs (OpamRepositoryRoot.Dir.to_dir dir)));
           match diffs with
           | [] ->
             OpamRepositoryState.load_opams_from_dir repo.repo_name dir
