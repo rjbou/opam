@@ -186,8 +186,16 @@ let delayed_read_repo = function
       let exception Found of string in
       try
         OpamTar.fold_reg_files (fun () fname content ->
+        (* TAR TODO :  here we need to have the inner repo file bc root of
+           archive is the directory of the repo. Maybe it need to be changed,
+           it will have an impact in a lot of stuff *)
+(*
             if fname = "repo" then
-              raise (Found content))
+              raise (Found content)
+*)
+            match String.split_on_char Filename.dir_sep.[0] fname with
+            | [_; "repo"] -> raise (Found content)
+            | _ -> ())
           () (Tar.to_file tar);
         None
       with Found content -> Some content
