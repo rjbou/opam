@@ -22,26 +22,26 @@ let rec safe_read fd buf off len =
 
 let rec run : type a. Unix.file_descr -> (a, _, _) Tar.t -> a = fun fd -> function
   | Tar.Read len ->
-      let b = Bytes.create len in
-      let read = safe_read fd b 0 len in
-      if read = 0 then
-        failwith "unexpected end of file"
-      else if len = (read : int) then
-        Bytes.unsafe_to_string b
-      else
-        Bytes.sub_string b 0 read
+    let b = Bytes.create len in
+    let read = safe_read fd b 0 len in
+    if read = 0 then
+      failwith "unexpected end of file"
+    else if len = (read : int) then
+      Bytes.unsafe_to_string b
+    else
+      Bytes.sub_string b 0 read
   | Tar.Really_read len ->
-      let rec loop fd buf offset len =
-        if offset < (len : int) then
-          let n = safe_read fd buf offset (len - offset) in
-          if n = 0 then
-            failwith "unexpected end of file"
-          else
-            loop fd buf (offset + n) len
-      in
-      let buf = Bytes.create len in
-      loop fd buf 0 len;
-      Bytes.unsafe_to_string buf
+    let rec loop fd buf offset len =
+      if offset < (len : int) then
+        let n = safe_read fd buf offset (len - offset) in
+        if n = 0 then
+          failwith "unexpected end of file"
+        else
+          loop fd buf (offset + n) len
+    in
+    let buf = Bytes.create len in
+    loop fd buf 0 len;
+    Bytes.unsafe_to_string buf
   | Tar.Return (Ok x) -> x
   | Tar.Return (Error _) -> failwith "something's gone wrong"
   | Tar.High _ | Tar.Write _ | Tar.Seek _ -> assert false
@@ -89,13 +89,18 @@ module Inplace = struct
   let remove fname (fd, t) = (fd, Map.remove fname t)
 
   let write (fd, t) =
-    let to_buffer buf t =
+    let to_buffer (buf:Buffer.t) t =
       let rec run : type a. Buffer.t -> (a, 'err, _) Tar.t -> a = fun buf -> function
-        | Tar.Write str -> Buffer.add_string buf str
-        | Tar.Read _ | Tar.Really_read _ | Tar.Seek _ | Tar.High _ -> assert false
-        | Tar.Return (Ok value) -> value
-        | Tar.Return (Error _) -> failwith "something went wrong"
-        | Tar.Bind (x, f) -> run buf (f (run buf x))
+        | Tar.Write str ->
+          Buffer.add_string buf str
+        | Tar.Read _ | Tar.Really_read _ | Tar.Seek _ | Tar.High _ ->
+          assert false
+        | Tar.Return (Ok value) ->
+          value
+        | Tar.Return (Error _) ->
+          failwith "something went wrong"
+        | Tar.Bind (x, f) ->
+          run buf (f (run buf x))
       in
       run buf t
     in
