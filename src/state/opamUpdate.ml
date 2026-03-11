@@ -50,7 +50,29 @@ let repository rt repo =
   let max_loop = 10 in
   let gt = rt.repos_global in
   if repo.repo_url = OpamUrl.empty then Done None else
-  let repo_root = OpamRepositoryState.get_repo_root rt repo in
+  let _repo_root = OpamRepositoryState.get_repo_root rt repo in
+  let repo_root =
+    let root = rt.repos_global.root in
+    let name = repo.repo_name in
+    let ttar = OpamRepositoryPath.tar root name in
+    let ddir = OpamRepositoryPath.root root name in
+    let tar = OpamRepositoryRoot.Tar ttar in
+    let dir = OpamRepositoryRoot.Dir ddir in
+    let r =
+      match OpamRepositoryRoot.Tar.exists ttar, OpamRepositoryRoot.Dir.exists ddir, repo.repo_url.backend with
+      | false, false, #OpamUrl.version_control -> dir
+      | false, false, `http -> tar
+      | false, false, `rsync when OpamRepositoryConfig.(!r.repo_tarring) -> tar
+      | false, false, `rsync -> dir
+      | true, false, _ -> tar
+      | false, true, _ -> dir
+      | true, true, #OpamUrl.version_control -> dir
+      | true, true, `http -> tar
+      | true, true, `rsync when OpamRepositoryConfig.(!r.repo_tarring) -> tar
+      | true, true, `rsync -> dir
+    in
+    r
+  in
   (* Recursively traverse redirection links, but stop after 10 steps or if
      we cycle back to the initial repo. *)
   let rec job r redirect n =
@@ -124,14 +146,40 @@ let repository rt repo =
       (OpamFile.Repo.announce repo_file);
     let tarred_repo = OpamRepositoryPath.tar gt.root repo.repo_name in
     let repo_root, res =
-      (if OpamRepositoryConfig.(!r.repo_tarring) &&
-          repo.repo_url.backend <> `http then
-         match repo_root with
-         | Tar _ ->
-           repo_root, Done None
-         | Dir dir ->
-           Tar tarred_repo, OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
-       else repo_root, Done None)
+      match repo_root, OpamRepositoryConfig.(!r.repo_tarring), repo.repo_url.backend with
+      | Tar _, true, _
+      | Tar _, _ , `http ->
+        repo_root, Done None
+      | Tar tar, false, `rsync -> (* we are not in repo tarring mode *)
+        let dir = OpamRepositoryPath.root gt.root repo.repo_name in
+        Dir dir,
+        OpamProcess.Job.finally (fun () ->
+            OpamRepositoryRoot.Tar.remove tar) @@ fun () ->
+        (* TAR TODO too much verbose *)
+        OpamRepositoryRoot.extract_in_job tar
+          (OpamRepositoryRoot.Dir.of_dir
+             (OpamFilename.dirname_dir
+                (OpamRepositoryRoot.Dir.to_dir dir)))
+      | Tar tar, _, #OpamUrl.version_control ->
+        assert false (* TAR TODO *)
+      | Dir dir, true , (`rsync | `http) ->
+        Tar tarred_repo,
+        OpamProcess.Job.finally (fun () ->
+            OpamRepositoryRoot.Dir.remove dir) @@ fun () ->
+        OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
+      | Dir _, true, #OpamUrl.version_control
+      | Dir _, false , _ ->
+        repo_root, Done None
+(*
+      if OpamRepositoryConfig.(!r.repo_tarring) &&
+         repo.repo_url.backend <> `http then
+        match repo_root with
+        | Tar _ ->
+          repo_root, Done None
+        | Dir dir ->
+          Tar tarred_repo, OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
+      else repo_root, Done None
+*)
     in
     res
     @@+ function
@@ -151,12 +199,14 @@ let repository rt repo =
             OpamRepositoryState.load_opams_from_dir repo.repo_name dir
           | diffs -> OpamRepositoryState.load_opams_from_diff repo diffs rt
       in
-      let local_dir = OpamRepositoryPath.root gt.root repo.repo_name in
-      if OpamRepositoryConfig.(!r.repo_tarring) ||
-         repo.repo_url.backend = `http then
-        OpamRepositoryRoot.Dir.remove local_dir
-      else
-        OpamRepositoryRoot.Tar.remove tarred_repo;
+      (* TAR TODO moved into finalise
+            if OpamRepositoryConfig.(!r.repo_tarring) ||
+               repo.repo_url.backend = `http then
+              let local_dir = OpamRepositoryPath.root gt.root repo.repo_name in
+              OpamRepositoryRoot.Dir.remove local_dir
+            else
+              OpamRepositoryRoot.Tar.remove tarred_repo;
+      *)
       Done (Some (
           (* Return an update function to make parallel execution possible *)
           fun rt ->
