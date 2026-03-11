@@ -24,7 +24,7 @@ RSTATE                          Cache found
 REPOSITORY                      repository-set-url
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.new
+REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
 [default] Initialised
 Processing: [default: loading data]
 ### unset OPAMDEBUGSECTIONS
@@ -59,10 +59,8 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
-REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
-[default] synchronised from http://localhost:port
-REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
+[default] Initialised
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
@@ -93,12 +91,9 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
-REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
-[default] synchronised from http://localhost:port
-REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
+[default] Initialised
 Processing: [default: loading data]
-RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/packages/tujuh/tujuh.7/opam, ignored
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
@@ -129,10 +124,8 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
-REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
-[default] synchronised from http://localhost:port
-REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
+[default] Initialised
 Processing: [default: loading data]
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
