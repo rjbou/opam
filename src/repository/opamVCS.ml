@@ -42,7 +42,7 @@ module Make (VCS: VCS) = struct
 
   let fetch_repo_update repo_name ?cache_dir repo_root repo_url =
     match repo_root with
-    | OpamRepositoryRoot.Tar _ -> assert false (* TODO *)
+    | OpamRepositoryRoot.Tar _ -> assert false (* TAR TODO we shouldn't have an archive if we have a vcs repo *)
     | OpamRepositoryRoot.Dir repo_root ->
       let full_fetch = false in
       let repo_root_dir = OpamRepositoryRoot.Dir.to_dir repo_root in
