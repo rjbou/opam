@@ -12,7 +12,7 @@
 open OpamTypes
 open OpamStateTypes
 
-let log fmt = OpamConsole.log "RSTATE" fmt
+let log ?level fmt = OpamConsole.log ?level "RSTATE" fmt
 let slog = OpamConsole.slog
 
 module Cache = struct
@@ -100,11 +100,18 @@ let get_repo_files rt name dir =
       / dir
     in
 (*     OpamConsole.error "dir %s" (OpamFilename.Dir.to_string xfiles_dir); *)
-    OpamTar.fold_reg_files (fun acc filename content ->
-        let filename = OpamFilename.raw filename in
+    OpamTar.fold_reg_files (fun acc filename_s content ->
+        let filename = OpamFilename.raw filename_s in
 (*         OpamConsole.error "lookup %B %s" (OpamFilename.starts_with xfiles_dir filename) (OpamFilename.to_string filename); *)
         if OpamFilename.starts_with xfiles_dir filename then
-          (OpamFilename.basename filename, lazy content)::acc
+          let content = lazy (
+            log ~level:5 "read %s"
+              OpamFilename.Op.(OpamFilename.to_string
+                 (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string name^"]")
+                  // filename_s));
+               content)
+          in
+          (OpamFilename.basename filename, content)::acc
         else acc)
         [] (OpamRepositoryRoot.Tar.to_file tar)
   | OpamRepositoryRoot.Dir repo_root ->
@@ -139,7 +146,14 @@ let load_repo_from_tar_gz repo_name tar =
 (*   OpamConsole.error "loading repo from tar"; *)
   OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
       if filename = "repo" then
-        match OpamFile.Repo.read_from_string content with
+        let filename =
+          let open OpamFilename.Op in
+          OpamFile.make
+            (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string repo_name^"]")
+             // filename)
+        in
+        let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
+        match OpamFile.Repo.read_from_string ~filename content with
         | repo -> (repo, opams)
         | exception _ -> acc
       else if OpamCompat.String.ends_with ~suffix:"/opam" filename then
@@ -163,6 +177,7 @@ let load_repo_from_tar_gz repo_name tar =
               (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string repo_name^"]")
                // inner_filename)
           in
+          let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
           OpamFile.OPAM.read_from_string ~filename content
         in
 (*
