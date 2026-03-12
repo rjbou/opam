@@ -323,6 +323,7 @@ let load_opams_from_diff repo diffs rt =
 
 let load_repo_from_dir repo repo_root =
   let repo_def =
+    (* Have a non repo_root dependant version for this ? *)
     OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root)
     |> OpamFile.Repo.with_root_url repo.repo_url
   in
