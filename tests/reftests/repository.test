@@ -43,7 +43,6 @@ lock
 plain
 repos-config
 ### opam install foo.2 -vv | grep '^\+' | sed-cmd test tar
-+ tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.2)
 ### opam repository remove default --all
 ### : Add tarred repo (tarred)
@@ -62,7 +61,6 @@ plain
 repos-config
 tarred.tar.gz
 ### opam install foo.3 -vv | grep '^\+' | sed-cmd test tar
-+ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.3)
 ### opam repository remove plain --all
 ### : Update tarred repo (tarred)
@@ -73,10 +71,10 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.4
 ### opam update -vv | grep '^\+' | sed-cmd tar
++ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${OPAMTMP}" "tarred"
 + tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 + tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.tmp" "-C" "${OPAMTMP}" "tarred"
 ### opam install foo.4 -vv | grep '^\+' | sed-cmd test tar
-+ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.4)
 ### mkdir tarred-ext
 ### tar xf OPAM/repo/tarred.tar.gz
@@ -94,7 +92,10 @@ build: ["test" "-f" "quux"]
 some content
 ### sh hash.sh REPO foo.5
 ### opam update -vv | grep '^\+' | sed-cmd tar
++ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${OPAMTMP}" "tarred"
 + tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
++ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.tmp" "-C" "${OPAMTMP}" "tarred"
++ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${BASEDIR}/OPAM/repo"
 ### opam install foo.5 -vv | grep '^\+' | sed-cmd test
 + test "-f" "quux" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.5)
 ### ls $OPAMROOT/repo | grep -v "cache"
@@ -549,7 +550,7 @@ first  --
  1 oper file://${BASEDIR}/OPER
 ### opam repository --this-switch add oper2 ./OPER2 --strict
 [oper2] Initialised
-[ERROR] In ${BASEDIR}/OPAM/repo/oper2/packages/second/second.2/opam:
+[ERROR] In [oper2]/packages/second/second.2/opam:
         This file is for package 'second.2' but has mismatching fields 'version:2.2.
 [ERROR] Strict mode: aborting
 [ERROR] Could not update repository "oper2": OpamStd.OpamSys.Exit(30)
@@ -561,7 +562,7 @@ first  --
  1 oper file://${BASEDIR}/OPER
 ### opam repository --this-switch set-url oper ./OPER2 --strict
 [oper] Initialised
-[ERROR] In ${BASEDIR}/OPAM/repo/oper/packages/second/second.2/opam:
+[ERROR] In [oper]/packages/second/second.2/opam:
         This file is for package 'second.2' but has mismatching fields 'version:2.2.
 [ERROR] Strict mode: aborting
 [ERROR] Could not update repository "oper": OpamStd.OpamSys.Exit(30)
@@ -745,6 +746,9 @@ GARBAGE
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam:3:0-3:0::
           Parse error
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam:3:0-3:0::
+          Parse error
 ### opam show two-zero --raw
 [ERROR] No package matching two-zero found
 # Return code 5 #
@@ -756,6 +760,9 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam:3:0-3:0::
+          Parse error
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam:3:0-3:0::
           Parse error
@@ -774,6 +781,9 @@ GARBAGE
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam:3:0-3:0::
           Parse error
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam:3:0-3:0::
+          Parse error
 ### opam show two-two --raw
 [ERROR] No package matching two-two found
 # Return code 5 #
@@ -785,6 +795,9 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
+[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam. skipping:
+          At ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam:3:0-3:0::
+          Parse error
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam:3:0-3:0::
           Parse error
