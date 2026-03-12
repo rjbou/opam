@@ -144,6 +144,9 @@ let read_package_opam ~repo_name ~repo_root package_dir =
 
 let load_repo_from_tar_gz repo_name tar =
 (*   OpamConsole.error "loading repo from tar"; *)
+  if OpamConsole.disp_status_line () || OpamConsole.verbose () then
+    OpamConsole.status_line "Processing: [%s: loading data]"
+      (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
   OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
       if filename = "repo" then
         let filename =

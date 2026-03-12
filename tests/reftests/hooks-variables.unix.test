@@ -29,7 +29,11 @@ EOF
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [default: rsync]
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}" "default"
 [default] synchronised from file://${BASEDIR}/REPO
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${OPAMTMP}" "default"
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### ::::::::::::::::::
@@ -233,7 +237,11 @@ EOF
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+Processing  1/1: [default: rsync]
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}" "default"
 [default] synchronised from file://${BASEDIR}/REPO
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${OPAMTMP}" "default"
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### opam switch create pkg-from-repo --empty
