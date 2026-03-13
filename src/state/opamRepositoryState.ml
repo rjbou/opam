@@ -147,6 +147,7 @@ let load_repo_from_tar_gz repo_name tar =
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
       (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
+  let aux () =
   OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
       if filename = "repo" then
         let filename =
@@ -210,6 +211,8 @@ let load_repo_from_tar_gz repo_name tar =
         acc)
     (OpamFile.Repo.empty, OpamPackage.Map.empty)
     (OpamRepositoryRoot.Tar.to_file tar)
+  in
+  Fun.protect (fun () -> aux ()) ~finally:OpamConsole.clear_status
 
 let load_opams_from_tar_gz repo_name tar =
   snd (load_repo_from_tar_gz repo_name tar)
