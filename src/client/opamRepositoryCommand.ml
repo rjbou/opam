@@ -266,40 +266,29 @@ let update_with_auto_upgrade rt repo_names =
                (OpamRepositoryName.to_string r.repo_name);
              let open OpamProcess.Job.Op in
              let repo_root = OpamRepositoryState.get_repo_root rt r in
-             OpamFilename.with_tmp_dir (fun dir ->
-                 match repo_root with
-                 | OpamRepositoryRoot.Dir repo_dir ->
-                   OpamAdminRepoUpgrade.do_upgrade repo_dir;
-                   if OpamRepositoryConfig.(!r.repo_tarring) &&
-                      r.repo_url.backend <> `http then
-                     OpamProcess.Job.run
-                       (OpamRepositoryRoot.make_tar_gz_job
-                          (OpamRepositoryPath.tar rt.repos_global.root r.repo_name)
-                          repo_dir
-                        @@| function
-                        | Some e ->
-                          Printf.ksprintf failwith
-                            "Failed to regenerate local repository archive: %s"
-                            (Printexc.to_string e)
-                        | None -> ())
-                 | OpamRepositoryRoot.Tar tar ->
-                   (* TAR TODO unnefective, better upgrade in place *)
-                   OpamRepositoryRoot.Tar.extract_in tar dir;
-                   OpamProcess.Job.run
-                     (OpamRepositoryRoot.make_tar_gz_job tar
-                        (OpamRepositoryRoot.Dir.of_dir
-                           OpamFilename.Op.(dir / OpamRepositoryName.to_string r.repo_name))
-                      @@| function
-                      | Some e ->
-                        Printf.ksprintf failwith
-                          "Failed to regenerate local repository archive: %s"
-                          (Printexc.to_string e)
-                      | None -> ())
-               );
              let _ = if tdebug then
                  OpamConsole.error "RPC:UWAU: %s"
                    (OpamRepositoryRoot.to_string repo_root)
              in
+             (match repo_root with
+              | OpamRepositoryRoot.Dir repo_dir ->
+                OpamAdminRepoUpgrade.do_upgrade repo_dir;
+                if OpamRepositoryConfig.(!r.repo_tarring) &&
+                   r.repo_url.backend <> `http then
+                  OpamProcess.Job.run
+                    (OpamRepositoryRoot.make_tar_gz_job
+                       (OpamRepositoryPath.tar rt.repos_global.root r.repo_name)
+                       repo_dir
+                     @@| function
+                     | Some e ->
+                       Printf.ksprintf failwith
+                         "Failed to regenerate local repository archive: %s"
+                         (Printexc.to_string e)
+                     | None -> ())
+              | OpamRepositoryRoot.Tar tar ->
+                (* TAR TODO unnefective, better upgrade in place *)
+                OpamFilename.with_tmp_dir (fun dir ->
+                    OpamRepositoryRoot.Tar.extract_in tar dir;
                     if tdebug then
                       (OpamConsole.error "dirs %s"
                          (OpamStd.List.to_string OpamFilename.Dir.to_string
@@ -310,9 +299,21 @@ let update_with_auto_upgrade rt repo_names =
                           |> OpamStd.List.to_string Fun.id);
                        OpamConsole.error "repo name %s"
                          (OpamRepositoryName.to_string r.repo_name));
+                    OpamAdminRepoUpgrade.do_upgrade (OpamRepositoryRoot.Dir.of_dir dir);
+                    OpamProcess.Job.run
+                      (OpamRepositoryRoot.make_tar_gz_job tar
+                         (OpamRepositoryRoot.Dir.of_dir dir)
+                       @@| function
+                       | Some e ->
+                         Printf.ksprintf failwith
+                           "Failed to regenerate local repository archive: %s"
+                           (Printexc.to_string e)
+                       | None ->
                          if tdebug then
                            OpamConsole.error "After Archive\n%s"
                              (OpamRepositoryRoot.Tar.ls tar);
+                         ())
+                  ));
              let def, opams =
                OpamRepositoryState.load_repo r repo_root
              in
