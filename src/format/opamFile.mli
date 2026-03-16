@@ -55,6 +55,8 @@ module type IO_FILE = sig
 
   val read_from_string: ?filename:t typed_file -> string -> t
 
+  val safe_read_from_string: ?filename:t typed_file -> string -> t
+
   val write_to_channel: ?filename:t typed_file -> out_channel -> t -> unit
 
   val write_to_string: ?filename:t typed_file -> t -> string
@@ -69,6 +71,7 @@ module type BestEffortRead = sig
   val safe_read: t typed_file -> t
   val read_from_channel: ?filename:t typed_file -> in_channel -> t
   val read_from_string: ?filename:t typed_file -> string -> t
+  val safe_read_from_string: ?filename:t typed_file -> string -> t
 end
 
 (** Lines of space-separated words. *)
@@ -806,6 +809,7 @@ module Environment : sig
   val safe_read: t typed_file -> (spf_resolved, [> euok_writeable ]) env_update list
   val read_from_channel: ?filename:t typed_file -> in_channel -> (spf_resolved, [> euok_writeable ]) env_update list
   val read_from_string: ?filename:t typed_file -> string -> (spf_resolved, [> euok_writeable ]) env_update list
+  val safe_read_from_string: ?filename:t typed_file -> string -> (spf_resolved, [> euok_writeable ]) env_update list
 end
 
 (** Compiler version [$opam/compilers/]. Deprecated, only used to upgrade old
