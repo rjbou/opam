@@ -163,20 +163,20 @@ module B = struct
          (match OpamUrl.local_dir url with
           | Some dir ->
             (OpamFilename.with_tmp_dir_job (fun tmpdir ->
-                let external_dir = dir in
-                let internal_dir =
-                  OpamFilename.(Op.(tmpdir / OpamRepositoryName.to_string repo_name))
-                in
-                OpamFilename.copy_dir_except_vcs ~src:external_dir ~dst:internal_dir;
-                (OpamRepositoryRoot.make_tar_gz_job quarantine
-                   (OpamRepositoryRoot.Dir.of_dir internal_dir)))
-            @@+ function
-            | None ->
-              Done (Result ())
+                 let external_dir = dir in
+                 let internal_dir =
+                   OpamFilename.(Op.(tmpdir / OpamRepositoryName.to_string repo_name))
+                 in
                  if tdebug then
                    OpamConsole.error "Temporary hack : copyign %s -> %s"
                      (OpamFilename.Dir.to_string external_dir)
                      (OpamFilename.Dir.to_string internal_dir);
+                 OpamFilename.copy_dir_except_vcs ~src:external_dir ~dst:internal_dir;
+                 (OpamRepositoryRoot.make_tar_gz_job quarantine
+                    (OpamRepositoryRoot.Dir.of_dir internal_dir)))
+             @@+ function
+             | None ->
+               Done (Result ())
 (*
                    OpamConsole.error "DIR %s" (OpamFilename.Dir.to_string dir);
             (OpamRepositoryRoot.make_tar_gz_job quarantine (OpamRepositoryRoot.Dir.of_dir dir)
@@ -192,7 +192,7 @@ module B = struct
                Done (Result ())
              (* TAR TODO : better error msg *)
 *)
-            | Some exn -> Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
+             | Some exn -> Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
           | None ->
             OpamFilename.with_tmp_dir_job (fun dir ->
                 pull_dir_quiet dir url
