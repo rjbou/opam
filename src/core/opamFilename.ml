@@ -414,8 +414,9 @@ let extract_in filename dirname =
 let extract_in_job filename dirname =
   OpamSystem.extract_in_job (to_string filename) ~dir:(Dir.to_string dirname)
 
-let make_tar_gz_job filename dirname =
-  OpamSystem.make_tar_gz_job (to_string filename) ~dir:(Dir.to_string dirname)
+let make_tar_gz_job ?root filename dirname =
+  OpamSystem.make_tar_gz_job ?root
+    (to_string filename) ~dir:(Dir.to_string dirname)
 
 type generic_file =
   | D of Dir.t

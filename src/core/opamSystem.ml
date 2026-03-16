@@ -954,14 +954,27 @@ module Tar = struct
         command (extract_option typ))
 
   let compress_command =
-    fun file dir ->
-      let f = Lazy.force cygpath_tar in
-      let tar_cmd = Lazy.force tar_cmd in
-      make_command tar_cmd [
-        "cfz"; f file;
-        "-C" ; f (Filename.dirname dir);
-        f (Filename.basename dir)
-      ]
+    fun ?(root=false) file dir ->
+    let f = Lazy.force cygpath_tar in
+    let tar_cmd = Lazy.force tar_cmd in
+    let args =
+      [
+        "cfz";
+        f file;
+      ] @
+      (if root then
+         [ "-C"; f dir ]
+         @
+         (let ls = Array.to_list (Sys.readdir dir) in
+         match ls with
+         | [] -> [ "--files-from";  "/dev/null" ]
+         | _ -> ls)
+       else
+         [ "-C" ; f (Filename.dirname dir);
+           f (Filename.basename dir)
+         ])
+    in
+    make_command tar_cmd args
 
 end
 
@@ -1003,10 +1016,10 @@ let extract_command file =
   if Zip.is_archive file then Zip.extract_command file
   else Tar.extract_command file
 
-let make_tar_gz_job ~dir file =
+let make_tar_gz_job ?root ~dir file =
   let tmpfile = file ^ ".tmp" in
   remove_file tmpfile;
-  Tar.compress_command tmpfile dir @@> fun r ->
+  Tar.compress_command ?root tmpfile dir @@> fun r ->
   OpamProcess.cleanup r;
   if OpamProcess.is_success r then
     (mv tmpfile file; Done None)
