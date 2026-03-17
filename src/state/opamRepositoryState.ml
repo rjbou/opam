@@ -140,8 +140,27 @@ let get_repo_files rt name dir =
         lazy (OpamFilename.read file))
       files
 
-let read_package_opam ~repo_name ~repo_root package_dir =
-  match OpamFileTools.read_repo_opam ~repo_name ~repo_root package_dir with
+let read_package_opam_dir ~repo_name ~repo_root package_dir =
+  match OpamFileTools.read_repo_opam_dir ~repo_name ~repo_root package_dir with
+  | Some opam ->
+    (try
+       let nv =
+         OpamPackage.of_string
+           (OpamFilename.Base.to_string (OpamFilename.basename_dir package_dir))
+       in
+       Some (nv, opam)
+     with Failure _ ->
+       log "ERR: directory name not a valid package: ignored %s"
+         (OpamFilename.to_string OpamFilename.Op.(package_dir // "opam"));
+       None)
+  | None ->
+    log "ERR: Could not load %s, ignored"
+      (OpamFilename.to_string OpamFilename.Op.(package_dir // "opam"));
+    None
+
+let read_package_opam_tar ~repo_name ~repo_root package_dir filename content extrafiles =
+  match OpamFileTools.read_repo_opam_tar ~repo_name ~repo_root
+          package_dir filename content extrafiles with
   | Some opam ->
     (try
        let nv =
@@ -162,9 +181,18 @@ let load_repo_from_tar_gz repo_name tar =
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
       (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
+  let repo_root = tar in
   let aux () =
-  OpamTar.fold_reg_files (fun ((repo, opams) as acc) filename content ->
-      if filename = "repo" then
+    let raw_repository =
+      OpamTar.fold_reg_files (fun acc filename content ->
+          (filename, content) :: acc) []
+        (OpamRepositoryRoot.Tar.to_file tar)
+    in
+    let repo_def =
+      (* TAR TODO with root url ? *)
+      let filename = "repo" in
+      match List.assoc_opt filename raw_repository with
+      | Some content ->
         let filename =
           let open OpamFilename.Op in
           OpamFile.make
@@ -172,56 +200,42 @@ let load_repo_from_tar_gz repo_name tar =
              // filename)
         in
         let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
-        match OpamFile.Repo.read_from_string ~filename content with
-        | repo -> (repo, opams)
-        | exception _ -> acc
-      else if OpamCompat.String.ends_with ~suffix:"/opam" filename then
-        let inner_filename =
-          OpamFilename.raw filename
-          |> OpamFilename.remove_prefix
-            (OpamFilename.raw_dir
-               (OpamRepositoryName.to_string repo_name))
-        in
-        let inner_dir =
-          OpamFilename.raw filename
-          |> OpamFilename.dirname
-          |> OpamFilename.remove_prefix_dir
-            (OpamFilename.raw_dir
-               (OpamRepositoryName.to_string repo_name))
-        in
-        let opam =
-          let filename =
-            let open OpamFilename.Op in
-            OpamFile.make
-              (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string repo_name^"]")
-               // inner_filename)
-          in
-          let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
-          OpamFile.OPAM.read_from_string ~filename content
-        in
-        let pkg =
-          let list = String.split_on_char '/' filename |> List.rev in
-          (* TODO: handle errors *)
-          OpamPackage.of_string (List.nth list 1)
-        in
-        (* TODO: Do like OpamFileTools.read_repo_opam and also merge the metadata files as they come up *)
-        let iff opt with_ elem opam =
-          match opt opam with
-          | Some _ -> opam
-          | None -> with_ elem opam
-        in
-        let opam =
-          opam
-          |> iff OpamFile.OPAM.name_opt OpamFile.OPAM.with_name (OpamPackage.name pkg)
-          |> iff OpamFile.OPAM.version_opt OpamFile.OPAM.with_version (OpamPackage.version pkg)
-          |> OpamFile.OPAM.with_metadata_dir
-            (Some (Some repo_name, inner_dir))
-        in
-        (repo, OpamPackage.Map.add pkg opam opams)
-      else
-        acc)
-    (OpamFile.Repo.empty, OpamPackage.Map.empty)
-    (OpamRepositoryRoot.Tar.to_file tar)
+        OpamFile.Repo.safe_read_from_string ~filename content
+      | None -> OpamFile.Repo.empty
+    in
+    let raw_repository = List.map (fun (f,c) -> OpamFilename.raw f, c) raw_repository in
+    let opams_map =
+      List.fold_left (fun acc (filename, content) ->
+          if OpamFilename.basename filename = OpamFilename.Base.of_string "opam" then
+            let key = OpamFilename.dirname filename in
+            let value = filename, content, OpamFilename.Map.empty in
+            OpamFilename.Dir.Map.add key value acc
+          else acc)
+        OpamFilename.Dir.Map.empty raw_repository
+    in
+    let opams_map =
+      List.fold_left (fun acc (filename, content) ->
+          match
+            OpamFilename.Dir.Map.find_first_opt (fun dir ->
+                OpamFilename.starts_with dir filename) acc
+          with
+          | Some (key, value) ->
+            let fo, co, map = value in
+            let map = OpamFilename.Map.add filename content map in
+            OpamFilename.Dir.Map.add key (fo, co, map) acc
+          | None ->
+            (* TAR TODO skipping msg ? *)
+            acc)
+        opams_map raw_repository
+    in
+    let opams =
+      OpamFilename.Dir.Map.fold (fun pkgdir (filename, content, otherfiles) opams ->
+          match read_package_opam_tar ~repo_name ~repo_root pkgdir filename content otherfiles with
+          | Some (nv, opam) -> OpamPackage.Map.add nv opam opams
+          | None -> opams
+        ) opams_map OpamPackage.Map.empty
+    in
+    repo_def, opams
   in
   Fun.protect (fun () -> aux ()) ~finally:OpamConsole.clear_status
 
@@ -237,7 +251,7 @@ let load_opams_from_dir repo_name repo_root =
     if OpamFilename.exists_dir dir then
       let fnames = Sys.readdir (OpamFilename.Dir.to_string dir) in
       if Array.exists (fun f -> f = "opam") fnames then
-        match read_package_opam ~repo_name ~repo_root dir with
+        match read_package_opam_dir ~repo_name ~repo_root dir with
         | Some (nv, opam) -> OpamPackage.Map.add nv opam r
         | None -> r
       else
@@ -286,7 +300,7 @@ let load_opams_from_diff repo diffs rt =
           opams, processed_dirs
         else
           let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-          match read_package_opam ~repo_name:repo.repo_name ~repo_root pkg_dir with
+          match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
           | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
           | None ->
             if is_removal then
@@ -299,7 +313,7 @@ let load_opams_from_diff repo diffs rt =
                 OpamPackage.Map.remove nv opams, processed_dirs
             else
               let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-              match read_package_opam ~repo_name:repo.repo_name ~repo_root pkg_dir with
+              match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
               | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
               | None ->
                 if is_removal then
