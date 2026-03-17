@@ -97,14 +97,18 @@ let get_repo_files rt name dir =
       OpamConsole.error "RS: GET REPO FIULES Tar";
     let xfiles_dir =
       let open OpamFilename.Op in
-      OpamFilename.raw_dir (OpamRepositoryName.to_string name)
-      / dir
+      OpamFilename.raw_dir (*(OpamRepositoryName.to_string name)
+                             /  *) dir
     in
     if tdebug then
       OpamConsole.error "RS:GRF: xfiles dir %s"
         (OpamFilename.Dir.to_string xfiles_dir);
     OpamTar.fold_reg_files (fun acc filename_s content ->
-        let filename = OpamFilename.raw filename_s in
+        let filename =
+          let open OpamFilename.Op in
+          (*OpamFilename.raw_dir (OpamRepositoryName.to_string name)
+          //*) OpamFilename.raw filename_s
+        in
         if tdebug then
           OpamConsole.error "RS:GRF: starts with lookup %B %s"
             (OpamFilename.starts_with xfiles_dir filename)
@@ -112,14 +116,15 @@ let get_repo_files rt name dir =
         if OpamFilename.starts_with xfiles_dir filename then
           let content = lazy (
             log ~level:5 "read %s"
-              OpamFilename.Op.(OpamFilename.to_string
-                 (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string name^"]")
-                  // filename_s));
-               content)
+              OpamFilename.Op.(
+                OpamFilename.to_string
+                  (OpamFilename.raw_dir (OpamRepositoryName.to_string name)
+                   // filename_s));
+            content)
           in
           (OpamFilename.basename filename, content)::acc
         else acc)
-        [] (OpamRepositoryRoot.Tar.to_file tar)
+      [] (OpamRepositoryRoot.Tar.to_file tar)
   | OpamRepositoryRoot.Dir repo_root ->
     if tdebug then
       OpamConsole.error "RS:GRF: GET REPO FIULES DIR";
