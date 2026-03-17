@@ -126,7 +126,7 @@ let strip_repo_suffix patch =
   in
   {patch with operation}
 
-let return_patch_diffs diffs kind chrono =
+let return_patch_diffs ?(strip=true) diffs kind chrono =
   match diffs with
   | [] ->
     log "Internal diff (%s, empty) done in %.2fs." kind (chrono ());
@@ -137,7 +137,11 @@ let return_patch_diffs diffs kind chrono =
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
     OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list diffs);
-    Some (patch_file, List.map strip_repo_suffix diffs)
+    let diffs =
+      if strip then List.map strip_repo_suffix diffs
+      else diffs
+    in
+    Some (patch_file, diffs)
 
 let get_diff_dirs parent_dir dir1 dir2 =
   let chrono = OpamConsole.timer () in
@@ -288,7 +292,7 @@ let get_diff_tars tar1 tar2 =
      let diffs =
        get_deletion_diffs contents1 diffs seen
      in
-     return_patch_diffs diffs "tar-tar" chrono)
+     return_patch_diffs ~strip:false diffs "tar-tar" chrono)
 
 let get_diff_tar_dir tar_file dir =
   let chrono = OpamConsole.timer () in
