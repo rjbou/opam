@@ -154,7 +154,6 @@ let read_package_opam ~repo_name ~repo_root package_dir =
     None
 
 let load_repo_from_tar_gz repo_name tar =
-(*   OpamConsole.error "loading repo from tar"; *)
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
       (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
@@ -195,10 +194,6 @@ let load_repo_from_tar_gz repo_name tar =
           let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
           OpamFile.OPAM.read_from_string ~filename content
         in
-(*
-        OpamConsole.error "_____________%s" filename;
-        OpamConsole.error "_______%s" (OpamFilename.raw filename |> OpamFilename.dirname |> OpamFilename.remove_prefix_dir (OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name)));
-*)
         let pkg =
           let list = String.split_on_char '/' filename |> List.rev in
           (* TODO: handle errors *)
