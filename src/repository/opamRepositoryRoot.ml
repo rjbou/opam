@@ -123,6 +123,11 @@ module Tar = struct
       )
 *)
 
+  let extract_files cond t =
+    OpamTar.fold_reg_files (fun acc file content ->
+        if cond file then (file,content)::acc else acc)
+      [] t
+
 end
 
 let make_tar_gz_job = OpamFilename.make_tar_gz_job ~root:true
