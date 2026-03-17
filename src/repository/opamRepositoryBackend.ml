@@ -263,20 +263,32 @@ let get_diff_tars tar1 tar2 =
     (log "Tars identical, no diff needed in %.2fs." (chrono ());
      None)
   else
-    ( log "diff: tar %a vs tar %a"
-        (slog OpamFilename.to_string) tar1
-        (slog OpamFilename.to_string) tar2;
-      let contents1 = get_tar_contents tar1
-      in
-      let diffs, seen = OpamTar.fold_reg_files
-          (fun (diffs, seen) filename content2 ->
-             get_content_diffs filename contents1 content2 diffs seen
-          ) ([],  OpamStd.String.Set.empty) tar2
-      in
-      let diffs =
-        get_deletion_diffs contents1 diffs seen
-      in
-      return_patch_diffs diffs "tar-tar" chrono)
+    (if OpamFilename.Dir.equal
+        (OpamFilename.dirname tar1)
+        (OpamFilename.dirname tar2) then
+       log "diff: %a/{%a,%a}"
+         (slog (fun t ->
+              OpamFilename.Dir.to_string (OpamFilename.dirname t))) tar1
+         (slog (fun t ->
+              OpamFilename.Base.to_string (OpamFilename.basename t))) tar1
+         (slog (fun t ->
+              OpamFilename.Base.to_string (OpamFilename.basename t))) tar2
+     else
+       log "diff: tar %a vs tar %a"
+         (slog OpamFilename.to_string) tar1
+         (slog OpamFilename.to_string) tar2;
+     let contents1 = get_tar_contents tar1
+     in
+     let diffs, seen =
+       OpamTar.fold_reg_files
+         (fun (diffs, seen) filename content2 ->
+            get_content_diffs filename contents1 content2 diffs seen
+         ) ([],  OpamStd.String.Set.empty) tar2
+     in
+     let diffs =
+       get_deletion_diffs contents1 diffs seen
+     in
+     return_patch_diffs diffs "tar-tar" chrono)
 
 let get_diff_tar_dir tar_file dir =
   let chrono = OpamConsole.timer () in
