@@ -79,33 +79,27 @@ module Tar = struct
         OpamConsole.error "RRT:PATCH: bef TAR CONTENT %s\n%s"
           (to_string tar) (ls tar);
       extract_in tar dir;
-      match OpamFilename.dirs dir with
-      | [root] ->
-        ( let diffs =
-            OpamFilename.patch ~allow_unclean patch root
-          in
-          OpamFilename.make_tar_gz_job tar root
-          @@+ function
-          | None ->
-            Done (diffs)
-          | Some _exn -> failwith "make job failure")
-      | ([] | _::_::_) as dirs ->
-        failwith
-          (Printf.sprintf "internal error, shouldn't happen %s"
-             (OpamStd.List.to_string OpamFilename.Dir.to_string dirs))
       if tdebug then
         OpamConsole.error "RRT:PATCH: extracted in %s\n%s"
           ((OpamFilename.Dir.to_string dir))
           ((OpamStd.Format.itemize Fun.id
               (OpamSystem.ls (OpamFilename.Dir.to_string dir))));
+      let diffs =
+        OpamFilename.patch ~allow_unclean patch dir
+      in
       if tdebug then
         OpamConsole.error "RRT:PATCH: after patch %s\n%s"
           ((OpamFilename.Dir.to_string dir))
           ((OpamStd.Format.itemize Fun.id
               (OpamSystem.ls (OpamFilename.Dir.to_string dir))));
+      OpamFilename.make_tar_gz_job ~root:true tar dir
+      @@+ function
+      | None ->
         if tdebug then
           OpamConsole.error "RRT:PATCH: aft TAR CONTENT %s\n%s"
             (to_string tar) (ls tar);
+        Done (diffs)
+      | Some _exn -> failwith "make job failure"
     in
     OpamProcess.Job.run job
 
@@ -131,7 +125,7 @@ module Tar = struct
 
 end
 
-let make_tar_gz_job = OpamFilename.make_tar_gz_job
+let make_tar_gz_job = OpamFilename.make_tar_gz_job ~root:true
 let extract_in_job = OpamFilename.extract_in_job
 
 type t =
@@ -206,13 +200,13 @@ let delayed_read_repo = function
         (* TAR TODO :  here we need to have the inner repo file bc root of
            archive is the directory of the repo. Maybe it need to be changed,
            it will have an impact in a lot of stuff *)
-(*
             if fname = "repo" then
-              raise (Found content)
-*)
+              raise (Found content))
+(*
             match String.split_on_char Filename.dir_sep.[0] fname with
             | [_; "repo"] -> raise (Found content)
             | _ -> ())
+*)
           () (Tar.to_file tar);
         None
       with Found content -> Some content
