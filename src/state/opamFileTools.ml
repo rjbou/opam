@@ -1462,13 +1462,18 @@ let add_aux_files ?dir ?(files_subdir_hashes=false) opam =
     opam
 
 let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFilename.Map.t) =
+  let tdebug = false in
   let dir = match dir with
     | None ->
       (match OpamFile.OPAM.metadata_dir opam with
        | None -> None
        | Some (None, dir) ->
+         if tdebug then
+           OpamConsole.error "ADD AUX FILES TAR absolute dir %s" (dir);
          Some (OpamFilename.Dir.of_string dir)
        | Some (Some r, _) ->
+         if tdebug then
+           OpamConsole.error "ADD AUX FILES TAR relative dir";
          failwith ("Repository "^OpamRepositoryName.to_string r^
                    " not registered for add_aux_files!"))
     | some -> some
@@ -1685,11 +1690,16 @@ let read_repo_opam_dir ~repo_name ~repo_root dir =
 
 let read_repo_opam_tar ~repo_name ~repo_root:_ dir file content xfs =
   let open OpamStd.Option.Op in
+  let tdebug = false in
   let rel =
     OpamFilename.remove_prefix_dir
       (OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name))
       dir
   in
+  if tdebug then
+    (OpamConsole.error "FT:RROT: read_repo_opam_tar dir --> %s"
+       (OpamFilename.Dir.to_string dir);
+     OpamConsole.error "FT:RROT: read_repo_opam_tar rel --> %s" (rel));
   read_opam_tar dir file content xfs >>|
   OpamFile.OPAM.with_metadata_dir
     (Some (Some repo_name, rel))
