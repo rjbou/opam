@@ -176,9 +176,12 @@ let repository rt repo =
             OpamRepositoryRoot.Tar.remove tar) @@ fun () ->
         (* TAR TODO too much verbose *)
         OpamRepositoryRoot.extract_in_job tar
+        dir
+(*
           (OpamRepositoryRoot.Dir.of_dir
              (OpamFilename.dirname_dir
                 (OpamRepositoryRoot.Dir.to_dir dir)))
+*)
       | Tar tar, _, #OpamUrl.version_control ->
         if tdebug then
           OpamConsole.error "UPD:FRU: change of format ? shouldn't happen";
