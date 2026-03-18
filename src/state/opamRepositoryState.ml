@@ -219,18 +219,22 @@ let load_repo_from_tar_gz repo_name tar =
         OpamFilename.Dir.Map.empty raw_repository
     in
     let opams_map =
+      let exception Found of
+          OpamFilename.Dir.t
+          * (OpamFilename.t * string * string OpamFilename.Map.t)
+      in
       List.fold_left (fun acc (filename, content) ->
-          match
-            OpamFilename.Dir.Map.find_first_opt (fun dir ->
-                OpamFilename.starts_with dir filename) acc
-          with
-          | Some (key, value) ->
+          try
+            OpamFilename.Dir.Map.iter (fun dir value ->
+                if OpamFilename.starts_with dir filename then
+                  raise (Found (dir, value))
+              ) acc;
+            (* TAR TODO skipping msg ? *)
+            acc
+          with Found (key, value) ->
             let fo, co, map = value in
             let map = OpamFilename.Map.add filename content map in
-            OpamFilename.Dir.Map.add key (fo, co, map) acc
-          | None ->
-            (* TAR TODO skipping msg ? *)
-            acc)
+            OpamFilename.Dir.Map.add key (fo, co, map) acc)
         opams_map raw_repository
     in
     let opams =
