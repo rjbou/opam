@@ -378,10 +378,18 @@ let remove_prefix_dir prefix dir =
     OpamStd.String.remove_prefix ~prefix dirname |>
     OpamStd.String.remove_prefix ~prefix:Filename.dir_sep
 
-let root_dir filename =
-  match OpamStd.String.cut_at filename.dirname Filename.dir_sep.[0] with
-  | Some (root, _rest) -> Some root
-  | None -> None
+(* TAR TODO : hackish... *)
+let rec root_dir filename =
+  if Char.equal filename.dirname.[0] Filename.dir_sep.[0] then
+    let dirname =
+      String.sub filename.dirname 1 (String.length filename.dirname - 2)
+    in
+    Option.map ((^) Filename.dir_sep)
+      (root_dir { filename with dirname })
+  else
+    match OpamStd.String.cut_at filename.dirname Filename.dir_sep.[0] with
+    | Some (root, _rest) -> Some root
+    | None -> None
 
 let swap_prefix ~old ~new_ filename =
   let without_root = remove_prefix old filename in
