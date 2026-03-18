@@ -65,8 +65,8 @@ val load_opams_from_dir:
     and modifications of regular files
 *)
 val load_opams_from_diff:
-  OpamRepositoryRoot.t -> repository_name -> Patch.operation list
-  -> 'a repos_state -> OpamFile.OPAM.t package_map
+  repository -> Patch.operation list -> 'a repos_state
+  -> OpamFile.OPAM.t package_map
 
 (* TODO 6625 doc *)
 val load_opams_from_tar_gz: repository_name -> OpamRepositoryRoot.Tar.t -> OpamFile.OPAM.t OpamPackage.Map.t

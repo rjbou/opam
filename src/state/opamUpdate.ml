@@ -233,9 +233,7 @@ let repository rt repo =
           match diffs with
           | [] ->
             OpamRepositoryState.load_opams_from_dir repo.repo_name dir
-          | diffs ->
-            OpamRepositoryState.load_opams_from_diff
-              repo_root repo.repo_name diffs rt
+          | diffs -> OpamRepositoryState.load_opams_from_diff repo diffs rt
       in
       (* TAR TODO moved into finalise
             if OpamRepositoryConfig.(!r.repo_tarring) ||

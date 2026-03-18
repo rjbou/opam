@@ -279,15 +279,15 @@ let load_opams repo_name repo_root =
   | OpamRepositoryRoot.Tar tar ->
     load_opams_from_tar_gz repo_name tar
 
-let load_opams_from_diff repo_root repo_name diffs rt =
+let load_opams_from_diff repo diffs rt =
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
-      (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
+      (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo.repo_name));
   let existing_opams =
-    OpamRepositoryName.Map.find repo_name rt.repo_opams
+    OpamRepositoryName.Map.find repo.repo_name rt.repo_opams
   in
   let process_file =
-    match repo_root with
+    match get_repo_root rt repo with
     | OpamRepositoryRoot.Tar _ -> assert false (* TODO *)
     | OpamRepositoryRoot.Dir repo_root ->
       fun (opams, processed_dirs) file ~is_removal ->
@@ -309,7 +309,7 @@ let load_opams_from_diff repo_root repo_name diffs rt =
           opams, processed_dirs
         else
           let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-          match read_package_opam_dir ~repo_name ~repo_root pkg_dir with
+          match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
           | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
           | None ->
             if is_removal then
@@ -322,7 +322,7 @@ let load_opams_from_diff repo_root repo_name diffs rt =
                 OpamPackage.Map.remove nv opams, processed_dirs
             else
               let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-              match read_package_opam_dir ~repo_name ~repo_root pkg_dir with
+              match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
               | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
               | None ->
                 if is_removal then
