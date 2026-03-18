@@ -272,23 +272,7 @@ let update_with_auto_upgrade rt repo_names =
              in
              (match repo_root with
               | OpamRepositoryRoot.Dir repo_dir ->
-                OpamAdminRepoUpgrade.do_upgrade repo_dir;
-                if (r.repo_url.backend = `http)
-                || (OpamRepositoryConfig.(!r.repo_tarring)
-                    && (match r.repo_url.backend with
-                        | #OpamUrl.version_control -> false
-                        | _ -> true))
-                then
-                  OpamProcess.Job.run
-                    (OpamRepositoryRoot.make_tar_gz_job
-                       (OpamRepositoryPath.tar rt.repos_global.root r.repo_name)
-                       repo_dir
-                     @@| function
-                     | Some e ->
-                       Printf.ksprintf failwith
-                         "Failed to regenerate local repository archive: %s"
-                         (Printexc.to_string e)
-                     | None -> ())
+                OpamAdminRepoUpgrade.do_upgrade repo_dir
               | OpamRepositoryRoot.Tar tar ->
                 (* TAR TODO unnefective, better upgrade in place *)
                 OpamFilename.with_tmp_dir (fun dir ->
