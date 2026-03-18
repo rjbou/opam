@@ -1585,7 +1585,12 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
         let xfiles =
           OpamFilename.Map.fold (fun file content ef ->
               if OpamFilename.starts_with files_dir file then
-                (file, OpamFilename.basename file, content)::ef
+                let basename =
+                  file
+                  |> OpamFilename.remove_prefix files_dir
+                  |> OpamFilename.Base.of_string
+                in
+                (file, basename, content)::ef
               else ef) xfs []
         in
         match List.rev xfiles with

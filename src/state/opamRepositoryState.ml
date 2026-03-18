@@ -122,7 +122,12 @@ let get_repo_files rt name dir =
                    // filename_s));
             content)
           in
-          (OpamFilename.basename filename, content)::acc
+          let basename =
+            filename
+            |> OpamFilename.remove_prefix xfiles_dir
+            |> OpamFilename.Base.of_string
+          in
+          (basename, content)::acc
         else acc)
       [] (OpamRepositoryRoot.Tar.to_file tar)
   | OpamRepositoryRoot.Dir repo_root ->
