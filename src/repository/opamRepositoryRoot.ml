@@ -106,7 +106,7 @@ module Tar = struct
   let change_root_dir ~old:_ ~new_:_ t =
     let open OpamTar.Inplace in
     with_open_out t (fun ttar ->
-    write ttar);
+        write ttar)
 (*
     with_open_out t (fun ttar ->
         let newtar = ttar in
