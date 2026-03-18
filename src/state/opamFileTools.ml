@@ -1127,7 +1127,7 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
 
 let lint = t_lint ~all:false
 
-let extra_files_default filename =
+let extra_files_default_dir filename =
   let dir =
     OpamFilename.Op.(OpamFilename.dirname
                        (OpamFile.filename filename) / "files")
@@ -1137,6 +1137,34 @@ let extra_files_default filename =
        OpamFilename.Base.of_string (OpamFilename.remove_prefix dir f),
        OpamHash.check_file (OpamFilename.to_string f))
     (OpamFilename.rec_files dir)
+
+let extra_files_default_tar tar filename =
+  (* TAR TODO : very hackish and hardcoded, move somewwhere else ?
+     we need to do that because we retrieve the file from
+     OpamPinned.orig_opam_file that writes it in /tmp*)
+  let filename =
+    let rec aux filename =
+      match OpamFilename.root_dir filename with
+      | Some "packages" | None -> filename
+      | Some dir ->
+        let filename =
+          (OpamFilename.raw
+             (OpamFilename.remove_prefix (OpamFilename.raw_dir dir) filename))
+        in
+        aux filename
+    in
+    aux (OpamFile.filename filename)
+  in
+  let dir =
+    OpamFilename.Op.(OpamFilename.dirname filename / "files")
+  in
+  List.map
+    (fun (f,c) ->
+       OpamFilename.Base.of_string (OpamFilename.remove_prefix dir (OpamFilename.raw f)),
+       OpamHash.check_string c)
+    (OpamRepositoryRoot.Tar.extract_files (fun filename ->
+         OpamFilename.starts_with dir (OpamFilename.raw filename))
+        tar)
 
 let lint_gen ?check_extra_files ?check_upstream ?(handle_dirname=false)
     reader filename =
@@ -1208,7 +1236,7 @@ let lint_gen ?check_extra_files ?check_upstream ?(handle_dirname=false)
     | OpamPp.Bad_format_list bfl -> List.map warn_of_bad_format bfl, None
   in
   let check_extra_files = match check_extra_files with
-    | None -> extra_files_default filename
+    | None -> extra_files_default_dir filename (* TAR TODO : keep it as is ? *)
     | Some f -> f
   in
   warnings @ (match t with Some t -> lint ~check_extra_files ?check_upstream t | None -> []),
@@ -1227,6 +1255,23 @@ let lint_file ?check_extra_files ?check_upstream ?handle_dirname filename =
         (OpamFile.to_string filename)
   in
   lint_gen ?check_extra_files ?check_upstream ?handle_dirname reader filename
+
+let lint_repo_package repo_root ?check_extra_files ?check_upstream ?handle_dirname
+    filename =
+  let check_extra_files =
+    match check_extra_files with
+    | Some cef -> cef
+    | None ->
+      let extra_files =
+        match repo_root with
+        | OpamRepositoryRoot.Dir _ ->
+          extra_files_default_dir
+        | OpamRepositoryRoot.Tar tar ->
+          extra_files_default_tar tar
+      in
+      extra_files filename
+  in
+  lint_file ~check_extra_files ?check_upstream ?handle_dirname filename
 
 let lint_channel ?check_extra_files ?check_upstream ?handle_dirname
     filename ic =

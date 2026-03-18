@@ -3975,19 +3975,26 @@ let lint cli =
              | None -> raise Not_found
            else
              let opam = OpamSwitchState.opam st nv in
-             match OpamPinned.orig_opam_file st (OpamPackage.name nv) opam with
+             match OpamPinned.orig_opam_file st name opam with
              | None -> raise Not_found
              | Some file ->
-               let label =
-                 let reponame =
+               let repo, label =
+                 let repo, reponame =
                    match OpamFile.OPAM.metadata_dir opam with
-                   | None | Some (None, _) -> "repo"
-                   | Some (Some repo, _) -> OpamRepositoryName.to_string repo
+                   | None | Some (None, _) -> None, "repo"
+                   | Some (Some repo, _) ->
+                     Some repo,
+                     OpamRepositoryName.to_string repo
                  in
+                 repo,
                  Printf.sprintf "<%s>/%s"
                    reponame (OpamPackage.to_string nv)
                in
-               [`pkg (file, label)]
+               match repo with
+               | None -> [`pkg (file, label)]
+               | Some repo ->
+                 let repo_root = OpamRepositoryState.get_root st.switch_repos repo in
+                 [`repopkg (repo_root, file, label)]
          with Not_found ->
            OpamConsole.error_and_exit `Not_found "No opam file found for %s%s"
              (OpamPackage.Name.to_string (fst pkg))
@@ -4021,6 +4028,10 @@ let lint cli =
                 OpamFileTools.lint_file ~check_upstream ~handle_dirname:false
                   file,
                 Some label
+              | `repopkg (repo_root, file, label) ->
+                OpamFileTools.lint_repo_package repo_root ~check_upstream ~handle_dirname:false
+                  file,
+                Some label
               | `stdin ->
                 OpamFileTools.lint_channel ~check_upstream ~handle_dirname:false
                   stdin_f stdin,
@@ -4041,11 +4052,11 @@ let lint cli =
             in
             let warnings =
               if warnings_sel = [] then warnings else
-              List.map (fun ((n, _, s) as warn) ->
-                  match OpamStd.IntMap.find_opt n warnings_sel_map with
-                  | Some `EnableError -> (n, `Error, s)
-                  | Some (`Disable | `Enable) | None -> warn)
-                warnings
+                List.map (fun ((n, _, s) as warn) ->
+                    match OpamStd.IntMap.find_opt n warnings_sel_map with
+                    | Some `EnableError -> (n, `Error, s)
+                    | Some (`Disable | `Enable) | None -> warn)
+                  warnings
             in
             if short then
               (if warnings <> [] then

@@ -38,6 +38,18 @@ val lint_file:
   OpamFile.OPAM.t OpamFile.typed_file ->
   (int * [`Warning|`Error] * string) list * OpamFile.OPAM.t option
 
+(** Same as {!lint}, but operates on an registered repository opam file.
+    It allows to retrieve extra files accordingly to the repository nature :
+    archive or directory.
+*)
+val lint_repo_package:
+  OpamRepositoryRoot.t ->
+  ?check_extra_files:(basename * (OpamHash.t -> bool)) list ->
+  ?check_upstream:bool ->
+  ?handle_dirname:bool ->
+  OpamFile.OPAM.t OpamFile.typed_file ->
+  (int * [`Warning|`Error] * string) list * OpamFile.OPAM.t option
+
 (** Same as {!lint_file}, but taking input from a channel. [check_extra_files]
    defaults to a function that will look for a [files/] directory besides
    [filename] *)
