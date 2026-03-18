@@ -273,8 +273,12 @@ let update_with_auto_upgrade rt repo_names =
              (match repo_root with
               | OpamRepositoryRoot.Dir repo_dir ->
                 OpamAdminRepoUpgrade.do_upgrade repo_dir;
-                if OpamRepositoryConfig.(!r.repo_tarring) &&
-                   r.repo_url.backend <> `http then
+                if (r.repo_url.backend = `http)
+                || (OpamRepositoryConfig.(!r.repo_tarring)
+                    && (match r.repo_url.backend with
+                        | #OpamUrl.version_control -> false
+                        | _ -> true))
+                then
                   OpamProcess.Job.run
                     (OpamRepositoryRoot.make_tar_gz_job
                        (OpamRepositoryPath.tar rt.repos_global.root r.repo_name)
