@@ -272,8 +272,10 @@ let update_with_auto_upgrade rt repo_names =
              in
              (match repo_root with
               | OpamRepositoryRoot.Dir repo_dir ->
+                if tdebug then OpamConsole.error "RPC:UWAU: Repo root dir";
                 OpamAdminRepoUpgrade.do_upgrade repo_dir
               | OpamRepositoryRoot.Tar tar ->
+                if tdebug then OpamConsole.error "RPC:UWAU: Repo root tar";
                 (* TAR TODO unnefective, better upgrade in place *)
                 OpamFilename.with_tmp_dir (fun dir ->
                     OpamRepositoryRoot.Tar.extract_in tar dir;

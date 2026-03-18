@@ -186,6 +186,7 @@ let load_repo_from_tar_gz repo_name tar =
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
       (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo_name));
+  let tdebug = false in
   let repo_root = tar in
   let aux () =
     let raw_repository =
@@ -209,6 +210,9 @@ let load_repo_from_tar_gz repo_name tar =
       | None -> OpamFile.Repo.empty
     in
     let raw_repository = List.map (fun (f,c) -> OpamFilename.raw f, c) raw_repository in
+    if tdebug then
+      OpamConsole.error "raw repo\n%s"
+        (OpamStd.Format.itemize (fun (f,_) -> OpamFilename.to_string f) raw_repository);
     let opams_map =
       List.fold_left (fun acc (filename, content) ->
           if OpamFilename.basename filename = OpamFilename.Base.of_string "opam" then
@@ -218,6 +222,10 @@ let load_repo_from_tar_gz repo_name tar =
           else acc)
         OpamFilename.Dir.Map.empty raw_repository
     in
+    if tdebug then
+      OpamConsole.error "RS:LRFTG: fst opams_map\n%s"
+        (OpamStd.Format.itemize OpamFilename.Dir.to_string
+           (OpamFilename.Dir.Map.keys opams_map));
     let opams_map =
       let exception Found of
           OpamFilename.Dir.t
@@ -226,6 +234,10 @@ let load_repo_from_tar_gz repo_name tar =
       List.fold_left (fun acc (filename, content) ->
           try
             OpamFilename.Dir.Map.iter (fun dir value ->
+                if tdebug then
+                  OpamConsole.error "RS:LRFTG: dir %s is prefix ? %B"
+                    (OpamFilename.Dir.to_string dir)
+                    (OpamFilename.starts_with dir filename);
                 if OpamFilename.starts_with dir filename then
                   raise (Found (dir, value))
               ) acc;
@@ -237,6 +249,17 @@ let load_repo_from_tar_gz repo_name tar =
             OpamFilename.Dir.Map.add key (fo, co, map) acc)
         opams_map raw_repository
     in
+    if tdebug then
+      OpamConsole.error "RS:LRFTG: snd opams_map\n%s"
+        (OpamStd.Format.itemize (fun (d,(f,_,map)) ->
+             let map_s =
+               if OpamFilename.Map.is_empty map then "\n" else
+                 "\n" ^
+                 (OpamStd.Format.itemize ~bullet:"  - " OpamFilename.to_string
+                    (OpamFilename.Map.keys map))
+             in
+             OpamFilename.Dir.to_string d ^ "  __  " ^ OpamFilename.to_string f ^ map_s)
+            (OpamFilename.Dir.Map.bindings opams_map));
     let opams =
       OpamFilename.Dir.Map.fold (fun pkgdir (filename, content, otherfiles) opams ->
           match read_package_opam_tar ~repo_name ~repo_root pkgdir filename content otherfiles with

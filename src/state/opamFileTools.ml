@@ -1581,9 +1581,20 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
       | _, (None, None)  -> opam
     in
     let opam =
+      let n = OpamPackage.Name.to_string (OpamFile.OPAM.name opam) in
       let extra_files =
+        let tdebug = false in
+        if tdebug then
+          OpamConsole.error "OFT:AAF:%s: XFS :\n%s" n
+            (OpamStd.Format.itemize OpamFilename.to_string
+               (OpamFilename.Map.keys xfs));
         let xfiles =
           OpamFilename.Map.fold (fun file content ef ->
+              if tdebug then
+                OpamConsole.error "OFT:AAF: pre %s file %s -> %B"
+                  (OpamFilename.Dir.to_string files_dir)
+                  (OpamFilename.to_string file)
+                  (OpamFilename.starts_with files_dir file);
               if OpamFilename.starts_with files_dir file then
                 let basename =
                   file
@@ -1597,6 +1608,16 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
         | [] -> None
         | ef -> Some ef
       in
+      if tdebug then
+        (OpamConsole.error "OFT:AAF:%s: opam ef %s" n
+           (OpamStd.Option.to_string ~none:"XXX"
+              (OpamStd.List.to_string  (fun (f,_) -> OpamFilename.Base.to_string f))
+              (OpamFile.OPAM.extra_files opam));
+         OpamConsole.error "OFT:AAF:%s: arch ef %s" n
+           (OpamStd.Option.to_string ~none:"XXX"
+              (OpamStd.List.to_string  (fun (f,_,_) -> OpamFilename.to_string f))
+              extra_files);
+        );
       match OpamFile.OPAM.extra_files opam, extra_files with
       | None, None -> opam
       | None, Some ef ->
@@ -1633,8 +1654,15 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
               match OpamStd.List.pick_assoc
                       OpamFilename.Base.equal basename rest with
               | None, rest ->
+                if tdebug then
+                  OpamConsole.error "not found hash for %s"
+                    (OpamFilename.Base.to_string basename);
                 wr_check, (basename::nf_opam), rest
               | Some ohash, rest ->
+                if tdebug then
+                  OpamConsole.error "found hash for %s -> %B"
+                    (OpamFilename.Base.to_string basename)
+                    (OpamHash.check_string content ohash);
                 (if OpamHash.check_string content ohash then
                    wr_check
                  else
