@@ -76,6 +76,7 @@ module Tar : sig
   val ls : t -> string
   val change_root_dir: old:OpamFilename.Dir.t -> new_:string -> t -> unit
   val extract_files: (string -> bool) -> t -> (string * string) list
+  val fold: ('a -> string -> string -> 'a) -> 'a -> t -> 'a
 end
 
 val make_tar_gz_job : Tar.t -> Dir.t -> exn option OpamProcess.job

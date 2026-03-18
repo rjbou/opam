@@ -128,6 +128,8 @@ module Tar = struct
         if cond file then (file,content)::acc else acc)
       [] t
 
+  let fold = OpamTar.fold_reg_files
+
 end
 
 let make_tar_gz_job = OpamFilename.make_tar_gz_job ~root:true
