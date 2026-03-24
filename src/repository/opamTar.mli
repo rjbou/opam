@@ -25,6 +25,10 @@ module Inplace : sig
     ('acc -> string -> string -> 'acc) ->
     'acc -> t -> 'acc
   val add : fname:string -> content:string -> t -> t
-  val remove : string -> t -> t
+  val remove : fname:string -> t -> t
+  val remove_dir : dname:string -> t -> t
+  val exists: fname:string -> t -> bool
+  val read: fname:string -> t -> string
+  val mv: src:string -> dst:string -> t -> t
   val write : t -> unit
 end

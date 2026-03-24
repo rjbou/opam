@@ -84,9 +84,32 @@ module Inplace = struct
   let fold_reg_files f acc (_fd, t) =
     Map.fold (fun k x acc -> f acc k x) t acc
 
-  let add ~fname ~content (fd, t) = (fd, Map.add fname content t)
+  let exists ~fname (_, t) =
+    Map.mem fname t
 
-  let remove fname (fd, t) = (fd, Map.remove fname t)
+  let read ~fname (_, t) =
+    Map.find fname t
+
+  let add ~fname ~content (fd, t) =
+    (fd, Map.add fname content t)
+
+  let mv ~src ~dst ((fd,t) as tar) =
+    let content = read ~fname:src tar in
+    let t =
+      Map.remove src t
+      |> Map.add dst content
+    in
+    (fd, t)
+
+  let remove ~fname (fd, t) =
+    (fd, Map.remove fname t)
+
+  let remove_dir ~dname (fd, t) =
+    let t =
+      Map.filter (fun fname _ ->
+          not (OpamStd.String.is_prefix_of ~from:0 ~full:fname dname)) t
+    in
+    (fd, t)
 
   let write (fd, t) =
     let to_buffer (buf:Buffer.t) t =
