@@ -12,6 +12,13 @@ open OpamTypes
 
 let log ?level fmt = OpamConsole.log "REPO_BACKEND" ?level fmt
 let slog = OpamConsole.slog
+let tdebug go =
+  if go then
+    fun fmt ->
+      Printf.ksprintf (fun str ->  OpamConsole.error "RBACK:%s" str) fmt
+  else
+    fun fmt ->
+      Printf.ksprintf (fun _ -> ()) fmt
 
 type update =
   | Update_full of OpamRepositoryRoot.t
@@ -144,6 +151,8 @@ let return_patch_diffs ?(strip=true) diffs kind chrono =
     Some (patch_file, diffs)
 
 let get_diff_dirs parent_dir dir1 dir2 =
+  let tdebug = tdebug false in
+  tdebug "DIFF DIR";
   let chrono = OpamConsole.timer () in
   log "diff: %a/{%a,%a}"
     (slog OpamFilename.Dir.to_string) parent_dir
@@ -260,6 +269,8 @@ let get_deletion_diffs contents diffs seen  =
     ) contents diffs
 
 let get_diff_tars tar1 tar2 =
+  let tdebug = tdebug false in
+  tdebug "DIFF TAR";
   let chrono = OpamConsole.timer () in
   let hash1 = OpamHash.compute (OpamFilename.to_string tar1) in
   let hash2 = OpamHash.compute (OpamFilename.to_string tar2) in
@@ -295,6 +306,8 @@ let get_diff_tars tar1 tar2 =
      return_patch_diffs ~strip:false diffs "tar-tar" chrono)
 
 let get_diff_tar_dir tar_file dir =
+  let tdebug = tdebug false in
+  tdebug "DIFF TAR DIR";
   let chrono = OpamConsole.timer () in
   log "diff: tar %a vs dir %a"
     (slog OpamFilename.to_string) tar_file
@@ -313,6 +326,8 @@ let get_diff_tar_dir tar_file dir =
   return_patch_diffs diffs "tar-dir" chrono
 
 let get_diff_dir_tar dir tar_file =
+  let tdebug = tdebug false in
+  tdebug "DIFF DIR TAR";
   let chrono = OpamConsole.timer () in
   log "diff: dir %a vs tar %a"
     (slog OpamFilename.Dir.to_string) dir

@@ -8,6 +8,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let tdebug go =
+  if go then
+    fun fmt ->
+      Printf.ksprintf (fun str ->  OpamConsole.error "REPROOT:%s" str) fmt
+  else
+    fun fmt ->
+      Printf.ksprintf (fun _ -> ()) fmt
+
 module Dir = struct
   type t = OpamFilename.Dir.t
 
@@ -105,6 +113,10 @@ module Tar = struct
 
   exception Internal_patch_error of string
   let patch_t ~allow_unclean ?patch_filename tar diffs =
+    let tdebug = tdebug false in
+    tdebug
+     "patch_t: patch %s"
+      (Format.asprintf "%a" Patch.pp_list diffs);
     let internal_patch_error fmt =
       Printf.ksprintf (fun str -> raise (Internal_patch_error str)) fmt
     in
@@ -181,6 +193,7 @@ module Tar = struct
         in
         tar
     in
+    tdebug "patch: old tar\n%s" (ls tar);
     Tar.with_open_out tar (fun newtar ->
         let newtar =
           List.fold_left (fun newtar diff ->
@@ -188,6 +201,7 @@ module Tar = struct
             newtar diffs
         in
         Tar.write newtar);
+    tdebug "patch: new tar\n%s" (ls tar);
     ()
 
   let patch ~allow_unclean patch_source tar =
@@ -207,6 +221,7 @@ module Tar = struct
         patch ~patch_filename:(OpamFilename.to_string p) diffs;
         operations_result diffs
     with exn -> Error exn
+
 
   let change_root_dir ~old:_ ~new_:_ t =
     let open OpamTar.Inplace in
