@@ -173,6 +173,12 @@ let repository rt repo =
         let dir = OpamRepositoryPath.root gt.root repo.repo_name in
         Dir dir,
         OpamProcess.Job.finally (fun () ->
+            (if tdebug then
+               let dir = OpamRepositoryRoot.Dir.to_dir dir in
+               OpamConsole.error "UPD:FRU:files in %s:\n%s"
+                 (OpamFilename.Dir.to_string dir)
+                 (OpamStd.Format.itemize (OpamFilename.to_string)
+                    (OpamFilename.rec_files dir)));
             OpamRepositoryRoot.Tar.remove tar) @@ fun () ->
         (* TAR TODO too much verbose *)
         OpamRepositoryRoot.extract_in_job tar
@@ -226,10 +232,11 @@ let repository rt repo =
           OpamRepositoryState.load_opams_from_tar_gz repo.repo_name tar
         | OpamRepositoryRoot.Dir dir ->
           if tdebug then
-            OpamConsole.error "UPD: DIR %s DIRS %s"
+            OpamConsole.error "UPD: DIR %s DIRS %s (diff %B)"
               (OpamRepositoryRoot.Dir.to_string dir)
               (OpamStd.List.to_string (OpamFilename.Dir.to_string)
-                 (OpamFilename.dirs (OpamRepositoryRoot.Dir.to_dir dir)));
+                 (OpamFilename.dirs (OpamRepositoryRoot.Dir.to_dir dir)))
+                 (diffs <> []);
           match diffs with
           | [] ->
             OpamRepositoryState.load_opams_from_dir repo.repo_name dir
