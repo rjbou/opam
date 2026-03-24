@@ -51,6 +51,11 @@ val url: OpamRepositoryRoot.Dir.t -> string option -> package -> OpamFile.URL.t 
 (** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
 val files: OpamRepositoryRoot.Dir.t -> string option -> package -> dirname
 
+(** Returns package and main directory if the path is an install file one:
+    {i $repo/packages/XXX[/...]/$NAME.$VERSION/files/...}
+*)
+val install_nv_dir: filename -> (package * dirname) option
+
 (** Url constructor for parts of remote repositories, when applicable (http and
     rsync). Function take the repo's root url. *)
 module Remote: sig

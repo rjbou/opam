@@ -216,6 +216,7 @@ users)
   * `OpamRepositoryBackend`: add `get_diff_tar_dir` to compute diffs between a tar.gz archive and a directory [#XXX @arozovyk]
   * `OpamRepositoryBackend`: add `get_diff_dir_tar` to compute diffs between a directory and a tar.gz archive [#XXX @arozovyk]
   * `OpamRepositoryBackend`: renamed `get_diff` to `get_diff_dirs` [#XXX @arozovyk]
+  * `OpamRepositoryPath`: add `install_nv_dir` to retrieve information from a path if it is an extra files path [#XXX @rjbou]
 
 ## opam-state
   * `OpamSwitchState.files`: was removed [#6662 @kit-ty-kate]

@@ -54,6 +54,24 @@ let url repo_root prefix nv =
 let files repo_root prefix nv =
   packages repo_root prefix nv / "files"
 
+let install_nv_dir filename =
+  let rec aux (pre, rest) =
+    match rest with
+    | "packages"::n::nv::"files"::_ ->
+      (* We don't check that n = name nv because historically opam permit to
+         have an opam file that is not strictly packages/name/name.version *)
+      (match OpamPackage.of_string_opt nv with
+       | Some p ->
+         let dir =
+           OpamFilename.Dir.of_list (List.rev pre @ "packages"::n::nv::[])
+         in
+         Some (p, dir)
+       | None -> None)
+    | p::r -> aux (p::pre, r)
+    | [] -> None
+  in
+  aux ([], OpamFilename.to_list filename)
+
 module Remote = struct
   (** URL, not FS paths *)
   open OpamUrl.Op
