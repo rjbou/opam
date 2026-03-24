@@ -111,7 +111,12 @@ module Inplace = struct
               Tar.Header.make ~file_mode:0 ~mod_time:0L ~user_id:0 ~group_id:0
                 path (Int64.of_int (String.length content))
             in
-            let data = fun () -> Tar.return (Ok (Some content)) in
+            (*             let data = fun () -> Tar.return (Ok (Some content)) in *)
+            let data =
+              let closed = ref false in
+              fun () -> match !closed with
+                | false -> closed := true; Tar.return (Ok (Some content))
+                | true -> Tar.return (Ok None) in
             let entry = (Some Tar.Header.Ustar, hdr, data) in
             OpamCompat.Seq.cons entry acc)
           t Seq.empty
@@ -127,6 +132,8 @@ module Inplace = struct
     let buf = Buffer.create 10_485_760 in
     to_buffer buf t;
     let str = Buffer.contents buf in
+    let _ : int = Unix.lseek fd 0 Unix.SEEK_SET in
+    Unix.ftruncate fd 0;
     let _ : int = Unix.write_substring fd str 0 (String.length str) in
     ()
 end
