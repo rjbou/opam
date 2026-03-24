@@ -56,6 +56,8 @@ module Dir = struct
     OpamSystem.real_path (OpamSystem.forward_to_back dirname)
 
   let to_string dirname = dirname
+  let of_list dirs =
+    String.concat Filename.dir_sep dirs
 
 end
 
@@ -190,6 +192,10 @@ if Base.to_string t.basename  = "<none>" then
 OpamConsole.error "++++++TO STRING %s %s"  (Dir.to_string t.dirname) (Base.to_string t.basename);
 *)
   Filename.concat (Dir.to_string t.dirname) (Base.to_string t.basename)
+
+let to_list t =
+  (String.split_on_char Filename.dir_sep.[0] t.dirname)
+  @ [ t.basename ]
 
 let touch t =
   OpamSystem.write (to_string t) ""

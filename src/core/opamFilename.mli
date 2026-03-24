@@ -27,7 +27,11 @@ module Base: sig
 end
 
 (** Directory names *)
-module Dir: OpamStd.ABSTRACT
+module Dir: sig
+  include OpamStd.ABSTRACT
+
+  val of_list: string list -> t
+end
 
 (** Return the current working directory *)
 val cwd: unit -> Dir.t
@@ -112,6 +116,9 @@ val mk_tmp_dir: unit -> Dir.t
 val concat_and_resolve: Dir.t -> string -> Dir.t
 
 include OpamStd.ABSTRACT
+
+(** Deconstruct a filename into a list of path elements *)
+val to_list: t -> string list
 
 (** Generic filename *)
 type generic_file =
