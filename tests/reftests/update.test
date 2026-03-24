@@ -520,8 +520,6 @@ synopsis: "Gamma package - UPDATED"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/alpha/alpha.1/opam in 0.000s
-FILE(opam)                      Read packages/beta/beta.1/opam in 0.000s
 FILE(opam)                      Read packages/gamma/gamma.1/opam in 0.000s
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 ### opam show gamma.1 --field synopsis
@@ -536,10 +534,7 @@ synopsis: "Delta package - NEW"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/alpha/alpha.1/opam in 0.000s
-FILE(opam)                      Read packages/beta/beta.1/opam in 0.000s
 FILE(opam)                      Read packages/delta/delta.1/opam in 0.000s
-FILE(opam)                      Read packages/gamma/gamma.1/opam in 0.000s
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all -s --repo=incremental
@@ -555,9 +550,6 @@ gamma
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/alpha/alpha.1/opam in 0.000s
-FILE(opam)                      Read packages/delta/delta.1/opam in 0.000s
-FILE(opam)                      Read packages/gamma/gamma.1/opam in 0.000s
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all -s --repo=incremental
@@ -581,7 +573,6 @@ REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,i
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 4 changed files) done in 0.00s.
 FILE(opam)                      Read packages/alpha/alpha.1/opam in 0.000s
 FILE(opam)                      Read packages/epsilon/epsilon.1/opam in 0.000s
-FILE(opam)                      Read packages/gamma/gamma.1/opam in 0.000s
 FILE(opam)                      Read packages/zeta/zeta.1/opam in 0.000s
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 Now run 'opam upgrade' to apply any package updates.

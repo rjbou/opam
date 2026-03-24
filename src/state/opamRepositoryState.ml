@@ -318,10 +318,57 @@ let load_opams_from_diff repo diffs rt =
   in
   let process_file =
     match get_repo_root rt repo with
-    | OpamRepositoryRoot.Tar _ ->
+    | OpamRepositoryRoot.Tar tar ->
+      let repo_root = tar in
       if tdebug then
         OpamConsole.error "RS:load opams from diff: tar mode";
-      assert false (* TODO *)
+      let _, opams_map =
+        load_raw_opams_and_aux_from_tar repo.repo_name tar
+      in
+      let read pkg_dir =
+      let open OpamStd.Option.Op in
+        OpamFilename.Dir.Map.find_opt pkg_dir opams_map
+        >>=  fun (filename, content, xfiles) ->
+        read_package_opam_tar ~repo_name:repo.repo_name
+          ~repo_root pkg_dir filename content xfiles
+      in
+      if tdebug then
+        OpamConsole.error "RS:load opams from diff: patch ops\n%s"
+          (OpamStd.Format.itemize
+             (Format.asprintf "%a" Patch.pp_operation)
+             diffs);
+      fun (opams, processed_dirs) file ~is_removal ->
+        let pkg_dir =
+          let file = OpamFilename.raw file in
+          let dirname = OpamFilename.dirname file in
+          let basename = OpamFilename.basename_dir dirname in
+          let full_path =
+            (OpamFilename.Dir.to_string dirname)
+          in
+          if OpamFilename.Base.to_string basename = "files" then
+            OpamFilename.raw_dir (Filename.dirname full_path)
+          else
+            OpamFilename.raw_dir full_path
+        in
+        if OpamFilename.Dir.Set.mem pkg_dir processed_dirs then
+          opams, processed_dirs
+        else
+          let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
+          (match read pkg_dir with
+           | Some (nv, opam) ->
+             OpamPackage.Map.add nv opam opams, processed_dirs
+           | None ->
+             if is_removal then
+               match OpamPackage.of_dirname pkg_dir with
+               | None ->
+                 log "ERR: directory name not a valid package: ignored %s"
+                   (OpamFilename.Dir.to_string pkg_dir);
+                 opams, processed_dirs
+               | Some nv ->
+                 OpamPackage.Map.remove nv opams, processed_dirs
+             else
+               opams, processed_dirs
+          )
     | OpamRepositoryRoot.Dir repo_root ->
       if tdebug then
         OpamConsole.error "RS:load opams from diff: dir mode";

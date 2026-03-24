@@ -224,23 +224,26 @@ let repository rt repo =
         (Printexc.to_string e)
     | None ->
       let opams =
-        match repo_root with
-        | OpamRepositoryRoot.Tar tar ->
+        match diffs with
+        | []  ->
+          (match repo_root with
+           | OpamRepositoryRoot.Tar tar ->
+             if tdebug then
+               OpamConsole.error "UPD: TAR %s - no diff"
+                 (OpamRepositoryRoot.Tar.to_string tar);
+             OpamRepositoryState.load_opams_from_tar_gz repo.repo_name tar
+           | OpamRepositoryRoot.Dir dir ->
+             if tdebug then
+               OpamConsole.error "UPD: DIR %s DIRS %s - no diff"
+                 (OpamRepositoryRoot.Dir.to_string dir)
+                 (OpamStd.List.to_string (OpamFilename.Dir.to_string)
+                    (OpamFilename.dirs (OpamRepositoryRoot.Dir.to_dir dir)));
+             OpamRepositoryState.load_opams_from_dir repo.repo_name dir)
+        | diffs ->
           if tdebug then
-            OpamConsole.error "UPD: TAR %s"
-              (OpamRepositoryRoot.Tar.to_string tar);
-          OpamRepositoryState.load_opams_from_tar_gz repo.repo_name tar
-        | OpamRepositoryRoot.Dir dir ->
-          if tdebug then
-            OpamConsole.error "UPD: DIR %s DIRS %s (diff %B)"
-              (OpamRepositoryRoot.Dir.to_string dir)
-              (OpamStd.List.to_string (OpamFilename.Dir.to_string)
-                 (OpamFilename.dirs (OpamRepositoryRoot.Dir.to_dir dir)))
-                 (diffs <> []);
-          match diffs with
-          | [] ->
-            OpamRepositoryState.load_opams_from_dir repo.repo_name dir
-          | diffs -> OpamRepositoryState.load_opams_from_diff repo diffs rt
+            OpamConsole.error "UPD: DIFF %s"
+              (OpamRepositoryRoot.to_string repo_root);
+          OpamRepositoryState.load_opams_from_diff repo diffs rt
       in
       (* TAR TODO moved into finalise
             if OpamRepositoryConfig.(!r.repo_tarring) ||

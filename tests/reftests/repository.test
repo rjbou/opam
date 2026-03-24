@@ -746,9 +746,6 @@ GARBAGE
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam:3:0-3:0::
           Parse error
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/versions/packages/two-zero/two-zero.1/opam:3:0-3:0::
-          Parse error
 ### opam show two-zero --raw
 [ERROR] No package matching two-zero found
 # Return code 5 #
@@ -760,9 +757,6 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam:3:0-3:0::
-          Parse error
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-one/two-one.1/opam:3:0-3:0::
           Parse error
@@ -781,9 +775,6 @@ GARBAGE
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam:3:0-3:0::
           Parse error
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/versions/packages/two-two/two-two.1/opam:3:0-3:0::
-          Parse error
 ### opam show two-two --raw
 [ERROR] No package matching two-two found
 # Return code 5 #
@@ -795,9 +786,6 @@ GARBAGE
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [versions] synchronised from file://${BASEDIR}/VRS
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam:3:0-3:0::
-          Parse error
 [WARNING] Could not read file ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam. skipping:
           At ${BASEDIR}/OPAM/repo/versions/packages/two-three/two-three.1/opam:3:0-3:0::
           Parse error
