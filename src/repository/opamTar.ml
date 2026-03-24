@@ -14,6 +14,15 @@
 open Tar.Syntax
 open OpamTypes
 
+let tdebug go =
+  if go then
+    fun fmt ->
+      Printf.ksprintf (fun str ->  OpamConsole.error "TAR:%s" str) fmt
+  else
+    fun fmt ->
+      Printf.ksprintf (fun _ -> ()) fmt
+
+
 type tar = filename
 
 let rec safe_read fd buf off len =
@@ -76,6 +85,8 @@ module Inplace = struct
   module Map = OpamStd.String.Map
   type t = Unix.file_descr * string Map.t
 
+  let tdebug = tdebug false
+
   let with_open_out fname f =
     let fd = Unix.openfile (OpamFilename.to_string fname) [Unix.O_RDWR] 0o640 in
     Fun.protect ~finally:(fun () -> Unix.close fd) @@ fun () ->
@@ -85,15 +96,19 @@ module Inplace = struct
     Map.fold (fun k x acc -> f acc k x) t acc
 
   let exists ~fname (_, t) =
+    tdebug "exists: %s" fname;
     Map.mem fname t
 
   let read ~fname (_, t) =
+    tdebug "read: %s" fname;
     Map.find fname t
 
   let add ~fname ~content (fd, t) =
+    tdebug "add: %s" fname;
     (fd, Map.add fname content t)
 
   let mv ~src ~dst ((fd,t) as tar) =
+    tdebug "%s" @@ Printf.sprintf "mv: %s -> %s" src dst;
     let content = read ~fname:src tar in
     let t =
       Map.remove src t
@@ -102,9 +117,11 @@ module Inplace = struct
     (fd, t)
 
   let remove ~fname (fd, t) =
+    tdebug "rm: %s" fname;
     (fd, Map.remove fname t)
 
   let remove_dir ~dname (fd, t) =
+    tdebug "rmdir: %s" dname;
     let t =
       Map.filter (fun fname _ ->
           not (OpamStd.String.is_prefix_of ~from:0 ~full:fname dname)) t
