@@ -366,20 +366,7 @@ let load_opams_from_diff repo diffs rt =
               | Some nv ->
                 OpamPackage.Map.remove nv opams, processed_dirs
             else
-              let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-              match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
-              | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
-              | None ->
-                if is_removal then
-                  match OpamPackage.of_dirname pkg_dir with
-                  | None ->
-                    log "ERR: directory name not a valid package: ignored %s"
-                      (OpamFilename.Dir.to_string pkg_dir);
-                    opams, processed_dirs
-                  | Some nv ->
-                    OpamPackage.Map.remove nv opams, processed_dirs
-                else
-                  opams, processed_dirs
+              opams, processed_dirs
   in
   let remove_file file acc = process_file acc file ~is_removal:true in
   let add_file file acc = process_file acc file ~is_removal:false in
