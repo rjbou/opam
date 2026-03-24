@@ -103,6 +103,111 @@ module Tar = struct
     in
     OpamProcess.Job.run job
 
+  exception Internal_patch_error of string
+  let patch_t ~allow_unclean ?patch_filename tar diffs =
+    let internal_patch_error fmt =
+      Printf.ksprintf (fun str -> raise (Internal_patch_error str)) fmt
+    in
+    let patch_info_path =
+      OpamStd.Option.default ("in archive "^to_string tar)
+        patch_filename
+    in
+    let get_path file = file in
+    let module Tar = OpamTar.Inplace in
+    let apply diff tar =
+      let patch ~file content diff =
+        (* NOTE: The None case returned by [Patch.patch] is only returned
+           if [diff = Patch.Delete _]. This sub-function is not called in
+           this case so we [assert false] instead. *)
+        match Patch.patch ~cleanly:true content diff with
+        | Some x -> tar, x
+        | None -> assert false (* See NOTE above *)
+        | exception _ when not allow_unclean ->
+          internal_patch_error "Patch %S does not apply cleanly."
+            patch_info_path
+        | exception _ ->
+          match Patch.patch ~cleanly:false content diff with
+          | Some x ->
+            let tar =
+             OpamStd. Option.map_default (fun content ->
+                  Tar.add ~fname:(file^".orig") ~content tar)
+                 tar content
+            in
+            tar, x
+          | None -> assert false (* See NOTE above *)
+          | exception _ ->
+            (* TAR TODO : write somewhere else ?
+               Option.iter (write (file^".orig")) content;
+               write (file^".rej") (Format.asprintf "%a" Patch.pp diff);
+            *)
+            internal_patch_error "Patch %S does not apply cleanly."
+              patch_info_path
+      in
+      match diff.Patch.operation with
+      | Patch.Edit (file1, file2) ->
+        let file1 = get_path file1 in
+        let file2 = get_path file2 in
+        let file1_exists = Tar.exists ~fname:file1 tar in
+        (* That seems to be the GNU patch behaviour *)
+        let file = if file1_exists then file1 else file2 in
+        let content = Tar.read ~fname:file tar in
+        let tar, content = patch ~file:file (Some content) diff in
+        let tar = Tar.add ~fname:file ~content tar in
+        let tar =
+          if file1_exists && file1 <> (file2 : string) then
+            Tar.remove_dir ~dname:(Filename.dirname file1) tar
+          else
+            tar
+        in
+        tar
+      | Patch.Delete file | Patch.Git_ext (file, _, Patch.Delete_only) ->
+        let file = get_path file in
+        let tar = Tar.remove ~fname:file tar in
+        let tar = Tar.remove_dir ~dname:(Filename.dirname file) tar in
+        tar
+      | Patch.Create file | Patch.Git_ext (_, file, Patch.Create_only) ->
+        let file = get_path file in
+        let tar, content = patch ~file None diff in
+        Tar.add ~fname:file ~content tar
+      | Patch.Git_ext (_, _, Patch.Rename_only (src, dst)) ->
+        let src = get_path src in
+        let dst = get_path dst in
+        let tar = Tar.mv ~src ~dst tar in
+        let dirname_src = Filename.dirname src in
+        let tar =
+          if dirname_src <> (Filename.dirname dst : string) then
+            Tar.remove_dir ~dname:dirname_src tar
+          else tar
+        in
+        tar
+    in
+    Tar.with_open_out tar (fun newtar ->
+        let newtar =
+          List.fold_left (fun newtar diff ->
+              apply diff newtar)
+            newtar diffs
+        in
+        Tar.write newtar);
+    ()
+
+  let patch ~allow_unclean patch_source tar =
+    let operations_result diffs =
+      Ok (List.map (fun d -> d.Patch.operation) diffs)
+    in
+    let patch ?patch_filename diffs =
+      patch_t ~allow_unclean ?patch_filename tar diffs
+    in
+    try
+      match patch_source with
+      | `Patch_diffs diffs ->
+        patch diffs;
+        operations_result diffs
+      | `Patch_file p ->
+        let diffs = OpamSystem.parse_patch ~dir:"" ~file:(OpamFilename.to_string p) in
+        patch ~patch_filename:(OpamFilename.to_string p) diffs;
+        operations_result diffs
+    with exn -> Error exn
+
   let change_root_dir ~old:_ ~new_:_ t =
     let open OpamTar.Inplace in
     with_open_out t (fun ttar ->
