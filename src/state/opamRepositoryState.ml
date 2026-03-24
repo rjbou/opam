@@ -303,6 +303,7 @@ let load_opams repo_name repo_root =
     load_opams_from_tar_gz repo_name tar
 
 let load_opams_from_diff repo diffs rt =
+  let tdebug = false in
   if OpamConsole.disp_status_line () || OpamConsole.verbose () then
     OpamConsole.status_line "Processing: [%s: loading data]"
       (OpamConsole.colorise `blue (OpamRepositoryName.to_string repo.repo_name));
@@ -311,8 +312,23 @@ let load_opams_from_diff repo diffs rt =
   in
   let process_file =
     match get_repo_root rt repo with
-    | OpamRepositoryRoot.Tar _ -> assert false (* TODO *)
+    | OpamRepositoryRoot.Tar _ ->
+      if tdebug then
+        OpamConsole.error "RS:load opams from diff: tar mode";
+      assert false (* TODO *)
     | OpamRepositoryRoot.Dir repo_root ->
+      if tdebug then
+        OpamConsole.error "RS:load opams from diff: dir mode";
+      (if tdebug then
+         let dir = OpamRepositoryRoot.Dir.to_dir repo_root in
+         OpamConsole.error "RD:load_ opamsfrom diff: files in %s:\n%s"
+           (OpamFilename.Dir.to_string dir)
+           (OpamStd.Format.itemize (fun f ->
+                Printf.sprintf "%s [%s]"
+                  (OpamFilename.to_string f)
+                  (try List.hd (String.split_on_char '\n' (OpamFilename.read f))
+                   with _ -> "ERROR"))
+               (OpamFilename.rec_files dir)));
       fun (opams, processed_dirs) file ~is_removal ->
         let pkg_dir =
           let file = OpamFilename.raw file in
