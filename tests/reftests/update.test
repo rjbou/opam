@@ -10,7 +10,7 @@ Processing  1/1: [default: rsync]
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
-### :I: Path repo
+### : Path repo
 ### <install>
 this is an install file
 ### openssl md5 install | '.*= ' -> '' >$ INSTALL_MD5
