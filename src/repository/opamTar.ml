@@ -131,7 +131,7 @@ module Inplace = struct
       let dispenser =
         Map.fold (fun path content acc ->
             let hdr =
-              Tar.Header.make ~file_mode:0 ~mod_time:0L ~user_id:0 ~group_id:0
+              Tar.Header.make ~file_mode:0o640 ~mod_time:0L ~user_id:0 ~group_id:0
                 path (Int64.of_int (String.length content))
             in
             (*             let data = fun () -> Tar.return (Ok (Some content)) in *)
