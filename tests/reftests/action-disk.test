@@ -67,35 +67,9 @@ SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-SYSTEM                          mkdir ${OPAMTMP}
-SYSTEM                          copydir ${BASEDIR}/REPO -> ${OPAMTMP}/default
-SYSTEM                          mkdir ${OPAMTMP}/default
-SYSTEM                          copydir ${BASEDIR}/REPO/packages -> ${OPAMTMP}/default/packages
-SYSTEM                          mkdir ${OPAMTMP}/default/packages
-SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo -> ${OPAMTMP}/default/packages/main-repo
-SYSTEM                          mkdir ${OPAMTMP}/default/packages/main-repo
-SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.1 -> ${OPAMTMP}/default/packages/main-repo/main-repo.1
-SYSTEM                          mkdir ${OPAMTMP}/default/packages/main-repo/main-repo.1
-SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.1/opam -> ${OPAMTMP}/default/packages/main-repo/main-repo.1/opam
-SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files -> ${OPAMTMP}/default/packages/main-repo/main-repo.1/files
-SYSTEM                          mkdir ${OPAMTMP}/default/packages/main-repo/main-repo.1/files
-SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files/x-file.main-repo.1 -> ${OPAMTMP}/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
-SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.2 -> ${OPAMTMP}/default/packages/main-repo/main-repo.2
-SYSTEM                          mkdir ${OPAMTMP}/default/packages/main-repo/main-repo.2
-SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.2/opam -> ${OPAMTMP}/default/packages/main-repo/main-repo.2/opam
-SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files -> ${OPAMTMP}/default/packages/main-repo/main-repo.2/files
-SYSTEM                          mkdir ${OPAMTMP}/default/packages/main-repo/main-repo.2/files
-SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files/x-file.main-repo.2 -> ${OPAMTMP}/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
-SYSTEM                          copy ${BASEDIR}/REPO/repo -> ${OPAMTMP}/default/repo
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "repo" "packages"
 Processing  1/1: [default: rsync]
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}/default" "repo" "packages"
 SYSTEM                          mv ${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp -> ${BASEDIR}/OPAM/repo/default.tar.gz.new
-SYSTEM                          rmdir ${OPAMTMP}
-SYSTEM                          rm ${OPAMTMP}/default/packages/main-repo/main-repo.1/opam
-SYSTEM                          rm ${OPAMTMP}/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
-SYSTEM                          rm ${OPAMTMP}/default/packages/main-repo/main-repo.2/opam
-SYSTEM                          rm ${OPAMTMP}/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
-SYSTEM                          rm ${OPAMTMP}/default/repo
 SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.tar.gz.new
 FILE(repo)                      Read ./<none> in 0.000s
 FILE(repo)                      Read [default]/repo in 0.000s
