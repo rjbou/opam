@@ -305,6 +305,29 @@ let get_diff_tars tar1 tar2 =
      in
      return_patch_diffs ~strip:false diffs "tar-tar" chrono)
 
+let get_diff_dirs parent_dir dir1 dir2 =
+  let tdebug = tdebug false in
+  tdebug "DIFF DIR DIR";
+  let chrono = OpamConsole.timer () in
+  log "diff: %a/{%a,%a}"
+    (slog OpamFilename.Dir.to_string) parent_dir
+    (slog OpamFilename.Base.to_string) dir1
+    (slog OpamFilename.Base.to_string) dir2;
+  let dir1 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir1) in
+  let dir2 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir2) in
+  let dir1_contents = read_dir_contents dir1 in
+  let dir2_contents = read_dir_contents dir2 in
+  let diffs, seen = OpamStd.String.Map.fold
+      (fun filename content_dir (diffs, seen) ->
+         get_content_diffs filename dir1_contents content_dir diffs seen
+      ) dir2_contents ([], OpamStd.String.Set.empty)
+  in
+  let diffs =
+    get_deletion_diffs dir1_contents diffs seen
+  in
+  return_patch_diffs ~strip:false diffs "dir-dir" chrono
+
+
 let get_diff_tar_dir tar_file dir =
   let tdebug = tdebug false in
   tdebug "DIFF TAR DIR";

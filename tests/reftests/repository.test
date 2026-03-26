@@ -939,7 +939,7 @@ packages
 repo
 ### sh -c "cat OPAM/log/patch-*"
 --- /dev/null
-+++ test-git.new/packages/test/test.3/opam
++++ packages/test/test.3/opam
 @@ -0,0 +1,1 @@
 +opam-version: "2.0"
 ### :: Update local path repository when source contains a .git directory changes
@@ -965,6 +965,6 @@ some file
 Now run 'opam upgrade' to apply any package updates.
 ### sh -c "cat OPAM/log/patch-*"
 --- /dev/null
-+++ test-git.new/packages/test/test.4/opam
++++ packages/test/test.4/opam
 @@ -0,0 +1,1 @@
 +opam-version: "2.0"
