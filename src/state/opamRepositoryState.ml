@@ -115,7 +115,9 @@ let get_repo_files rt name dir =
             (OpamFilename.to_string filename);
         if OpamFilename.starts_with xfiles_dir filename then
           let content = lazy (
-            log ~level:5 "read %s"
+          (* TAR TODO : veru hackish *)
+            OpamConsole.log "SYSTEM" ~level:5
+              "read %s"
               OpamFilename.Op.(
                 OpamFilename.to_string
                   (OpamFilename.raw_dir (OpamRepositoryName.to_string name)
