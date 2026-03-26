@@ -697,7 +697,10 @@ cp p.patch $pkgpath/files/dir/
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+<<<<<<< HEAD
 opam-file                       Mismatching extra-files at packages/good-md5-good-sha256/good-md5-good-sha256.1: missing from 'files' directory (1)
+=======
+>>>>>>> bbdea9b0d (update: rewrite loading repo from diff)
 Now run 'opam upgrade' to apply any package updates.
 ### opam install good-nested-md5.1
 The following actions will be performed:
