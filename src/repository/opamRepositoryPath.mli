@@ -31,6 +31,9 @@ val pin_cache: OpamUrl.t -> dirname
 (** Return the repo file *)
 val repo: OpamRepositoryRoot.Dir.t -> OpamFile.Repo.t OpamFile.t
 
+(** Packages directory name: {i packages} *)
+val packages_dirname: dirname
+
 (** Packages folder: {i $repo/packages} *)
 val packages_dir: OpamRepositoryRoot.Dir.t -> dirname
 

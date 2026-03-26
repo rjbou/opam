@@ -210,7 +210,8 @@ let load_raw_opams_and_aux_from_tar repo_name tar =
       (OpamStd.Format.itemize (fun (f,_) -> OpamFilename.to_string f) raw_repository);
   let opams_map =
     List.fold_left (fun acc (filename, content) ->
-        if OpamFilename.basename filename = OpamFilename.Base.of_string "opam" then
+        if OpamFilename.starts_with OpamRepositoryPath.packages_dirname filename
+        && OpamFilename.basename filename = OpamFilename.Base.of_string "opam" then
           let key = OpamFilename.dirname filename in
           let value = filename, content, OpamFilename.Map.empty in
           OpamFilename.Dir.Map.add key value acc
@@ -316,136 +317,15 @@ let load_opams_from_diff repo diffs rt =
   let existing_opams =
     OpamRepositoryName.Map.find repo.repo_name rt.repo_opams
   in
-  let process_file =
-    match get_repo_root rt repo with
-    | OpamRepositoryRoot.Tar tar ->
-      let repo_root = tar in
-      if tdebug then
-        OpamConsole.error "RS:load opams from diff: tar mode";
-      let _, opams_map =
-        load_raw_opams_and_aux_from_tar repo.repo_name tar
-      in
-      let read pkg_dir =
-      let open OpamStd.Option.Op in
-        OpamFilename.Dir.Map.find_opt pkg_dir opams_map
-        >>=  fun (filename, content, xfiles) ->
-        read_package_opam_tar ~repo_name:repo.repo_name
-          ~repo_root pkg_dir filename content xfiles
-      in
-      if tdebug then
-        OpamConsole.error "RS:load opams from diff: patch ops\n%s"
-          (OpamStd.Format.itemize
-             (Format.asprintf "%a" Patch.pp_operation)
-             diffs);
-      fun (opams, processed_dirs) file ~is_removal ->
-        let pkg_dir =
-          let file = OpamFilename.raw file in
-          let dirname = OpamFilename.dirname file in
-          let basename = OpamFilename.basename_dir dirname in
-          let full_path =
-            (OpamFilename.Dir.to_string dirname)
-          in
-          if OpamFilename.Base.to_string basename = "files" then
-            OpamFilename.raw_dir (Filename.dirname full_path)
-          else
-            OpamFilename.raw_dir full_path
-        in
-        if OpamFilename.Dir.Set.mem pkg_dir processed_dirs then
-          opams, processed_dirs
-        else
-          let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-          (match read pkg_dir with
-           | Some (nv, opam) ->
-             OpamPackage.Map.add nv opam opams, processed_dirs
-           | None ->
-             if is_removal then
-               match OpamPackage.of_dirname pkg_dir with
-               | None ->
-                 log "ERR: directory name not a valid package: ignored %s"
-                   (OpamFilename.Dir.to_string pkg_dir);
-                 opams, processed_dirs
-               | Some nv ->
-                 OpamPackage.Map.remove nv opams, processed_dirs
-             else
-               opams, processed_dirs
-          )
-    | OpamRepositoryRoot.Dir repo_root ->
-      if tdebug then
-        OpamConsole.error "RS:load opams from diff: dir mode";
-      (if tdebug then
-         let dir = OpamRepositoryRoot.Dir.to_dir repo_root in
-         OpamConsole.error "RD:load_ opamsfrom diff: files in %s:\n%s"
-           (OpamFilename.Dir.to_string dir)
-           (OpamStd.Format.itemize (fun f ->
-                Printf.sprintf "%s [%s]"
-                  (OpamFilename.to_string f)
-                  (try List.hd (String.split_on_char '\n' (OpamFilename.read f))
-                   with _ -> "ERROR"))
-               (OpamFilename.rec_files dir)));
-      fun (opams, processed_dirs) file ~is_removal ->
-        let pkg_dir =
-          let file = OpamFilename.raw file in
-          let dirname = OpamFilename.dirname file in
-          let basename = OpamFilename.basename_dir dirname in
-          let full_path =
-            Filename.concat
-              (OpamRepositoryRoot.Dir.to_string repo_root)
-              (OpamFilename.Dir.to_string dirname)
-          in
-          if OpamFilename.Base.to_string basename = "files" then
-            OpamFilename.Dir.of_string (Filename.dirname full_path)
-          else
-            OpamFilename.Dir.of_string full_path
-        in
-        if OpamFilename.Dir.Set.mem pkg_dir processed_dirs then
-          opams, processed_dirs
-        else
-          let processed_dirs = OpamFilename.Dir.Set.add pkg_dir processed_dirs in
-          match read_package_opam_dir ~repo_name:repo.repo_name ~repo_root pkg_dir with
-          | Some (nv, opam) -> OpamPackage.Map.add nv opam opams, processed_dirs
-          | None ->
-            if is_removal then
-              match OpamPackage.of_dirname pkg_dir with
-              | None ->
-                log "ERR: directory name not a valid package: ignored %s"
-                  (OpamFilename.Dir.to_string pkg_dir);
-                opams, processed_dirs
-              | Some nv ->
-                OpamPackage.Map.remove nv opams, processed_dirs
-            else
-              opams, processed_dirs
-  in
-  let remove_file file acc = process_file acc file ~is_removal:true in
-  let add_file file acc = process_file acc file ~is_removal:false in
-  let process_operation acc = function
-    | Patch.Edit (old_file, new_file) ->
-      if String.equal old_file new_file
-      then
-        add_file new_file acc
-      else
-        remove_file old_file acc |> add_file new_file
-    | Patch.Delete file -> remove_file file acc
-    | Patch.Create file -> add_file file acc
-    | Patch.Git_ext (file1, file2, git_ext) ->
-      match git_ext with
-      | Patch.Rename_only (_, _) -> remove_file file1 acc |> add_file file2
-      | Patch.Delete_only -> remove_file file1 acc
-      | Patch.Create_only -> add_file file2 acc
-  in
-  Fun.protect
-    (fun () -> List.fold_left process_operation
-        (existing_opams, OpamFilename.Dir.Set.empty) diffs |> fst)
-    ~finally:OpamConsole.clear_status
-(*
-
   let repo_root = get_repo_root rt repo in
+  if tdebug then
+    OpamConsole.error "RS:load opams from diff: patch ops\n%s"
+      (OpamStd.Format.itemize
+         (Format.asprintf "%a" Patch.pp_operation)
+         diffs);
   let open OpamFilename.Op in
   let add, remove =
-    let packages_dir =
-      OpamRepositoryPath.packages_dir repo_root
-      |> OpamFilename.remove_prefix_dir repo_root
-      |> OpamFilename.raw_dir
-    in
+    let packages_dir = OpamRepositoryPath.packages_dirname in
     let is_opam_file file =
       let filename = OpamFilename.raw file in
       if OpamFilename.starts_with packages_dir filename then
@@ -455,7 +335,9 @@ let load_opams_from_diff repo diffs rt =
           | Some nv -> Some nv
           | None ->
             log "ERR: directory name not a valid package: ignored %s"
-              (OpamFilename.to_string (repo_root//file));
+              (OpamFilename.to_string
+                 (OpamFilename.raw_dir (OpamRepositoryRoot.to_string repo_root)
+                  // file));
             None
         else None
       else None
@@ -502,6 +384,41 @@ let load_opams_from_diff repo diffs rt =
         else dir::lst)
       xfiles []
   in
+  let read_package_opam =
+    match repo_root with
+    | OpamRepositoryRoot.Tar tar ->
+      if tdebug then
+        OpamConsole.error "RS:load opams from diff: tar mode";
+      let repo_root = tar in
+      let _, opams_map =
+        load_raw_opams_and_aux_from_tar repo.repo_name tar
+      in
+      fun dir ->
+        let open OpamStd.Option.Op in
+        OpamFilename.Dir.Map.find_opt dir opams_map
+        >>= fun (filename, content, xfiles) ->
+        read_package_opam_tar ~repo_name:repo.repo_name
+          ~repo_root dir filename content xfiles
+    | OpamRepositoryRoot.Dir dir ->
+      if tdebug then
+        OpamConsole.error "RS:load opams from diff: dir mode";
+      let repo_root = dir in
+      (if tdebug then
+         let dir = OpamRepositoryRoot.Dir.to_dir repo_root in
+         OpamConsole.error "RD:load_ opamsfrom diff: files in %s:\n%s"
+           (OpamFilename.Dir.to_string dir)
+           (OpamStd.Format.itemize (fun f ->
+                Printf.sprintf "%s [%s]"
+                  (OpamFilename.to_string f)
+                  (try List.hd (String.split_on_char '\n' (OpamFilename.read f))
+                   with _ -> "ERROR"))
+               (OpamFilename.rec_files dir)));
+      fun dir ->
+        let dir =
+          OpamRepositoryRoot.Dir.Op.(repo_root / (OpamFilename.Dir.to_string dir))
+        in
+        read_package_opam_dir ~repo_name:repo.repo_name ~repo_root dir
+  in
   let process_operations opams =
     (* remove obsolete packages *)
     let opams =
@@ -510,7 +427,7 @@ let load_opams_from_diff repo diffs rt =
         opams removals
     in
     let read_and_add dir opams =
-      match read_package_opam ~repo_name:repo.repo_name ~repo_root dir with
+      match read_package_opam dir with
       | Some (nv, opam) -> OpamPackage.Map.add nv opam opams
       | None ->
         log "ERR: Could not load %s, ignored"
@@ -520,20 +437,19 @@ let load_opams_from_diff repo diffs rt =
     (* add new packages *)
     let opams =
       OpamPackage.Map.fold (fun _nv file ->
-          read_and_add (OpamFilename.dirname (repo_root // file)))
+          read_and_add (OpamFilename.dirname (OpamFilename.raw file)))
         additions opams
     in
     (* update extra files *)
     let opams =
       List.fold_left (fun opams dir ->
-          read_and_add (repo_root / (OpamFilename.Dir.to_string dir)) opams)
+          read_and_add dir opams)
         opams xfiles
     in
     opams
   in
   Fun.protect (fun () -> process_operations existing_opams)
     ~finally:OpamConsole.clear_status
-*)
 
 let load_repo_from_dir repo repo_root =
   let repo_def =

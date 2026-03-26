@@ -35,7 +35,10 @@ let pin_cache u =
 
 let repo repo_root = OpamRepositoryRoot.Dir.repo repo_root
 
-let packages_dir repo_root = OpamRepositoryRoot.Dir.to_dir repo_root / "packages"
+let packages_name = "packages"
+let packages_dirname = OpamFilename.raw_dir packages_name
+
+let packages_dir repo_root = OpamRepositoryRoot.Dir.to_dir repo_root / packages_name
 
 let packages repo_root prefix nv =
   match prefix with
@@ -63,6 +66,7 @@ let install_nv_dir filename =
   in
   let rec aux (pre, rest) =
     match rest with
+    (* use packages_name *)
     | "packages"::packages ->
       (* We don't check packages/name/name.version layer because repo loading
          is more permissive *)
@@ -90,7 +94,7 @@ module Remote = struct
     root_url / "repo"
 
   let packages_url root_url =
-    root_url / "packages"
+    root_url / packages_name
 
   let archive root_url nv =
     root_url / "archives" / (OpamPackage.to_string nv ^ "+opam.tar.gz")
