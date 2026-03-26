@@ -17,8 +17,11 @@ build: ["test" "-f" "bar"]
 some content
 ### sh hash.sh REPO foo.1
 ### : Internal repository storage as archive or plain directory :
+### OPAMREPOSITORYTARRING=0
 ### opam switch create tarring --empty
 ### opam update -vv | grep '^\+'
++ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}/default" "repo" "packages"
++ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default
 lock
@@ -36,7 +39,7 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.2
 ### opam update default -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "repo" "packages"
++ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "packages" "repo"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default.tar.gz
 lock
@@ -75,10 +78,9 @@ some content
 ### opam install foo.4 -vv | grep '^\+' | sed-cmd test tar
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.4)
 ### mkdir tarred-ext
-### tar xf OPAM/repo/tarred.tar.gz
+### mkdir tarred
+### tar xf OPAM/repo/tarred.tar.gz -C tarred
 ### diff -ru ./tarred REPO
-diff: ./tarred: No such file or directory
-# Return code 2 #
 ### ls $OPAMROOT/repo | grep -v "cache"
 lock
 repos-config
