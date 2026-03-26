@@ -68,7 +68,7 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default-strict] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
-RSTATE                          ERR: directory name not a valid package: ignored packages/no-nv/opam
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default-strict.tar.gz/packages/no-nv/opam
 FILE(opam)                      Read packages/direct-root.1/opam in 0.000s
 FILE(opam)                      Read packages/good/good.1/opam in 0.000s
 FILE(opam)                      Read packages/ba/baz/n-nv-not-root.1/opam in 0.000s
@@ -86,7 +86,7 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
-RSTATE                          ERR: directory name not a valid package: ignored packages/no-nv/opam
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default.tar.gz/packages/no-nv/opam
 FILE(opam)                      Read packages/direct-root.1/opam in 0.000s
 FILE(opam)                      Read packages/good/good.1/opam in 0.000s
 FILE(opam)                      Read packages/ba/baz/n-nv-not-root.1/opam in 0.000s
@@ -198,6 +198,12 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default-strict] Initialised
 UPDATE                          Repository has new changes
+FILE(opam)                      Read packages/ba/baz/n-nv-not-root.1/opam in 0.000s
+FILE(opam)                      Read packages/direct-root.1/opam in 0.000s
+FILE(opam)                      Read packages/good/good.1/opam in 0.000s
+FILE(opam)                      Read packages/i/n/e/r/very-inned-n-nv/very-inner-n-nv.1/opam in 0.000s
+FILE(opam)                      Read packages/no-nv/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored packages/no-nv/opam
 [ERROR] In packages/not-same-nv-in/not-same-nv-in.2/opam:
         This file is for package 'not-same-nv-in.2' but has mismatching fields 'name:different 'version:1.
 [ERROR] Strict mode: aborting
@@ -210,15 +216,15 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default] Initialised
 UPDATE                          Repository has new changes
-FILE(opam)                      Read packages/not-same-nv-in/not-same-nv-in.2/opam in 0.000s
+FILE(opam)                      Read packages/ba/baz/n-nv-not-root.1/opam in 0.000s
+FILE(opam)                      Read packages/direct-root.1/opam in 0.000s
+FILE(opam)                      Read packages/good/good.1/opam in 0.000s
+FILE(opam)                      Read packages/i/n/e/r/very-inned-n-nv/very-inner-n-nv.1/opam in 0.000s
 FILE(opam)                      Read packages/no-nv/opam in 0.000s
 RSTATE                          ERR: directory name not a valid package: ignored packages/no-nv/opam
-FILE(opam)                      Read packages/direct-root.1/opam in 0.000s
-FILE(opam)                      Read packages/i/n/e/r/very-inned-n-nv/very-inner-n-nv.1/opam in 0.000s
-FILE(opam)                      Read packages/v/e/r/y/very-inner.1/opam in 0.000s
-FILE(opam)                      Read packages/ba/baz/n-nv-not-root.1/opam in 0.000s
+FILE(opam)                      Read packages/not-same-nv-in/not-same-nv-in.2/opam in 0.000s
 FILE(opam)                      Read packages/not/no-n-nv.1/opam in 0.000s
-FILE(opam)                      Read packages/good/good.1/opam in 0.000s
+FILE(opam)                      Read packages/v/e/r/y/very-inner.1/opam in 0.000s
 ### : list all
 ### opam list -A
 # Packages matching: any
