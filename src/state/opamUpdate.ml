@@ -188,7 +188,7 @@ let repository rt repo =
              (OpamFilename.dirname_dir
                 (OpamRepositoryRoot.Dir.to_dir dir)))
 *)
-      | Tar tar, _, #OpamUrl.version_control ->
+      | Tar _, _, #OpamUrl.version_control ->
         if tdebug then
           OpamConsole.error "UPD:FRU: change of format ? shouldn't happen";
         assert false (* TAR TODO *)
@@ -204,16 +204,6 @@ let repository rt repo =
         if tdebug then
           OpamConsole.error "UPD:FRU: change of format ? keep dir";
         repo_root, Done None
-(*
-      if OpamRepositoryConfig.(!r.repo_tarring) &&
-         repo.repo_url.backend <> `http then
-        match repo_root with
-        | Tar _ ->
-          repo_root, Done None
-        | Dir dir ->
-          Tar tarred_repo, OpamRepositoryRoot.make_tar_gz_job tarred_repo dir
-      else repo_root, Done None
-*)
     in
     res
     @@+ function
@@ -245,14 +235,6 @@ let repository rt repo =
               (OpamRepositoryRoot.to_string repo_root);
           OpamRepositoryState.load_opams_from_diff repo diffs rt
       in
-      (* TAR TODO moved into finalise
-            if OpamRepositoryConfig.(!r.repo_tarring) ||
-               repo.repo_url.backend = `http then
-              let local_dir = OpamRepositoryPath.root gt.root repo.repo_name in
-              OpamRepositoryRoot.Dir.remove local_dir
-            else
-              OpamRepositoryRoot.Tar.remove tarred_repo;
-      *)
       Done (Some (
           (* Return an update function to make parallel execution possible *)
           fun rt ->

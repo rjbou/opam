@@ -165,23 +165,7 @@ module B = struct
             (OpamRepositoryRoot.make_tar_gz_job quarantine
                (OpamRepositoryRoot.Dir.of_dir dir)
              @@+ function
-             | None ->
-               Done (Result ())
-(*
-                   OpamConsole.error "DIR %s" (OpamFilename.Dir.to_string dir);
-            (OpamRepositoryRoot.make_tar_gz_job quarantine (OpamRepositoryRoot.Dir.of_dir dir)
-             @@+ function
-             | None ->
-               let old =
-                 OpamFilename.basename_dir dir
-                 |> OpamFilename.Base.to_string
-                 |> OpamFilename.raw_dir
-               in
-               OpamRepositoryRoot.Tar.change_root_dir
-                 ~old ~new_:(OpamRepositoryName.to_string repo_name) quarantine;
-               Done (Result ())
-             (* TAR TODO : better error msg *)
-*)
+             | None -> Done (Result ())
              | Some exn -> Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
           | None ->
             OpamFilename.with_tmp_dir_job (fun dir ->
@@ -191,8 +175,7 @@ module B = struct
                   (OpamRepositoryRoot.make_tar_gz_job quarantine
                      (OpamRepositoryRoot.Dir.of_dir dir)
                    @@+ function
-                   | None ->
-                     Done (Result ())
+                   | None -> Done (Result ())
                    | Some exn ->
                      Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
                 | exn -> Done exn)
