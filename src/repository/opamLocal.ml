@@ -162,18 +162,8 @@ module B = struct
        OpamRepositoryBackend.job_text repo_name "sync"
          (match OpamUrl.local_dir url with
           | Some dir ->
-            (OpamFilename.with_tmp_dir_job (fun tmpdir ->
-                 let external_dir = dir in
-                 let internal_dir =
-                   OpamFilename.(Op.(tmpdir / OpamRepositoryName.to_string repo_name))
-                 in
-                 if tdebug then
-                   OpamConsole.error "Temporary hack : copyign %s -> %s"
-                     (OpamFilename.Dir.to_string external_dir)
-                     (OpamFilename.Dir.to_string internal_dir);
-                 OpamFilename.copy_dir_except_vcs ~src:external_dir ~dst:internal_dir;
-                 (OpamRepositoryRoot.make_tar_gz_job quarantine
-                    (OpamRepositoryRoot.Dir.of_dir internal_dir)))
+            (OpamRepositoryRoot.make_tar_gz_job quarantine
+               (OpamRepositoryRoot.Dir.of_dir dir)
              @@+ function
              | None ->
                Done (Result ())
