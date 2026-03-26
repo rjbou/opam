@@ -17,11 +17,8 @@ build: ["test" "-f" "bar"]
 some content
 ### sh hash.sh REPO foo.1
 ### : Internal repository storage as archive or plain directory :
-### OPAMREPOSITORYTARRING=0
 ### opam switch create tarring --empty
 ### opam update -vv | grep '^\+'
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}/default" "repo" "packages"
-+ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default
 lock
@@ -39,13 +36,14 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.2
 ### opam update default -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "packages" "repo"
++ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo" "default"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default.tar.gz
 lock
 plain
 repos-config
 ### opam install foo.2 -vv | grep '^\+' | sed-cmd test tar
++ tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.2)
 ### opam repository remove default --all
 ### : Add tarred repo (tarred)
@@ -64,6 +62,7 @@ plain
 repos-config
 tarred.tar.gz
 ### opam install foo.3 -vv | grep '^\+' | sed-cmd test tar
++ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.3)
 ### opam repository remove plain --all
 ### : Update tarred repo (tarred)
@@ -74,12 +73,13 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.4
 ### opam update -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${OPAMTMP}/tarred" "repo" "packages"
++ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
++ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.tmp" "-C" "${OPAMTMP}" "tarred"
 ### opam install foo.4 -vv | grep '^\+' | sed-cmd test tar
++ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.4)
 ### mkdir tarred-ext
-### mkdir tarred
-### tar xf OPAM/repo/tarred.tar.gz -C tarred
+### tar xf OPAM/repo/tarred.tar.gz
 ### diff -ru ./tarred REPO
 ### ls $OPAMROOT/repo | grep -v "cache"
 lock
@@ -94,8 +94,7 @@ build: ["test" "-f" "quux"]
 some content
 ### sh hash.sh REPO foo.5
 ### opam update -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${OPAMTMP}/tarred" "repo" "packages"
-+ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${BASEDIR}/OPAM/repo/tarred"
++ tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${OPAMTMP}"
 ### opam install foo.5 -vv | grep '^\+' | sed-cmd test
 + test "-f" "quux" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.5)
 ### ls $OPAMROOT/repo | grep -v "cache"
@@ -550,7 +549,7 @@ first  --
  1 oper file://${BASEDIR}/OPER
 ### opam repository --this-switch add oper2 ./OPER2 --strict
 [oper2] Initialised
-[ERROR] In packages/second/second.2/opam:
+[ERROR] In ${BASEDIR}/OPAM/repo/oper2/packages/second/second.2/opam:
         This file is for package 'second.2' but has mismatching fields 'version:2.2.
 [ERROR] Strict mode: aborting
 [ERROR] Could not update repository "oper2": OpamStd.OpamSys.Exit(30)
@@ -562,7 +561,7 @@ first  --
  1 oper file://${BASEDIR}/OPER
 ### opam repository --this-switch set-url oper ./OPER2 --strict
 [oper] Initialised
-[ERROR] In packages/second/second.2/opam:
+[ERROR] In ${BASEDIR}/OPAM/repo/oper/packages/second/second.2/opam:
         This file is for package 'second.2' but has mismatching fields 'version:2.2.
 [ERROR] Strict mode: aborting
 [ERROR] Could not update repository "oper": OpamStd.OpamSys.Exit(30)

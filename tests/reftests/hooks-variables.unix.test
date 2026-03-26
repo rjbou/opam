@@ -29,8 +29,6 @@ EOF
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [default: rsync]
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}/default" "repo" "packages"
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
@@ -235,8 +233,6 @@ EOF
 ### opam update
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [default: rsync]
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${OPAMTMP}/default" "repo" "packages"
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.

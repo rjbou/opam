@@ -1,16 +1,14 @@
 N0REP0
-### OPAMREPOSITORYTARRING=1
 ### :: Simple update
 ### <REPO/packages/pkg/pkg.1/opam>
 opam-version: "2.0"
 ### opam update --verbose
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [default: rsync]
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
-### : Path repo
+### :I: Path repo
 ### <install>
 this is an install file
 ### openssl md5 install | '.*= ' -> '' >$ INSTALL_MD5
@@ -203,7 +201,7 @@ opam-version: "2.0"
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-opam-file                       Mismatching extra-files at packages/qux/qux.1: wrong checksum (1)
+opam-file                       Mismatching extra-files at ${BASEDIR}/OPAM/repo/default/packages/qux/qux.1: wrong checksum (1)
 Now run 'opam upgrade' to apply any package updates.
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
@@ -217,7 +215,7 @@ opam-version: "2.0"
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-opam-file                       Missing expected extra files qux.installl at packages/qux/qux.1/files
+opam-file                       Missing expected extra files qux.installl at ${BASEDIR}/OPAM/repo/default/packages/qux/qux.1/files
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
 ### :II: Git repo
@@ -518,10 +516,10 @@ synopsis: "Gamma package - UPDATED"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/gamma/gamma.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/gamma/gamma.1/opam in 0.000s
 ### opam show gamma.1 --field synopsis
 Gamma package - UPDATED
 ### :III:2: Add a new package - update should process only 1 new file
@@ -532,10 +530,10 @@ synopsis: "Delta package - NEW"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/delta/delta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/delta/delta.1/opam in 0.000s
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all -s --repo=incremental
 alpha
@@ -548,8 +546,8 @@ gamma
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all -s --repo=incremental
@@ -565,16 +563,16 @@ opam-version: "2.0"
 ### <INCR_REPO/packages/zeta/zeta.1/opam>
 opam-version: "2.0"
 ### rm INCR_REPO/packages/delta/delta.1/opam
-### OPAMDEBUGSECTIONS="REPO_BACKEND FILE(opam) opam-file" OPAMDEBUG=-3 opam update incremental | unordered
+### OPAMDEBUGSECTIONS="REPO_BACKEND FILE(opam)" OPAMDEBUG=-3 opam update incremental | unordered
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 4 changed files) done in 0.00s.
-FILE(opam)                      Read packages/alpha/alpha.1/opam in 0.000s
-FILE(opam)                      Read packages/epsilon/epsilon.1/opam in 0.000s
-FILE(opam)                      Read packages/zeta/zeta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 4 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/zeta/zeta.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/epsilon/epsilon.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/alpha/alpha.1/opam in 0.000s
 Now run 'opam upgrade' to apply any package updates.
 ### :III:5: Verify all changes were applied - 2 added, 1 modified, 1 deleted
 ### opam show alpha.1 --field synopsis
@@ -604,10 +602,10 @@ build: [ "test" "-f" "%{name}%.installl" ]
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 2 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 2 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
 Now run 'opam upgrade' to apply any package updates.
 ### opam show eta --field extra-files: | $INSTALL_MD5 -> hash
 "eta.installl" "md5=hash"
@@ -629,10 +627,10 @@ build: [ "test" "-f" "%{name}%.installl" ]
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 2 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 2 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
 Now run 'opam upgrade' to apply any package updates.
 ### opam show eta --field extra-files: | $AINSTALL_MD5 -> hash
 "eta.installl" "md5=hash"
@@ -654,10 +652,10 @@ build: [ "test" "-f" "%{name}%.installl" ]
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 2 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 2 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
 Now run 'opam upgrade' to apply any package updates.
 ### opam show eta --field extra-files:
 
@@ -687,11 +685,11 @@ build: [ "test" "-f" "%{name}%.installl" ]
 ### OPAMDEBUGSECTIONS="REPO_BACKEND opam-file FILE(opam)" OPAMDEBUG=-3 opam update incremental | unordered
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
 opam-file                       Missing extra-files field for eta.installl for eta.1, ignoring them.
 ### opam show eta --field extra-files:
 
@@ -722,12 +720,12 @@ build: [ "test" "-f" "%{name}%.installl" ]
 ### OPAMDEBUGSECTIONS="REPO_BACKEND opam-file FILE(opam)" OPAMDEBUG=-3 opam update incremental | unordered
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 2 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
-opam-file                       Mismatching extra-files at packages/eta/eta.1: wrong checksum (1)
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 2 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
+opam-file                       Mismatching extra-files at ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1: wrong checksum (1)
 Now run 'opam upgrade' to apply any package updates.
 ### opam show eta --field extra-files: | $INSTALL_MD5 -> hash
 "eta.installl" "md5=hash"
@@ -759,12 +757,12 @@ build: [ "test" "-f" "%{name}%.installl" ]
 ### OPAMDEBUGSECTIONS="REPO_BACKEND opam-file FILE(opam)" OPAMDEBUG=-3 opam update incremental | unordered
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
-REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
-FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
-opam-file                       Missing expected extra files eta.installl at packages/eta/eta.1/files
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental,incremental.new}
+REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/opam in 0.000s
+opam-file                       Missing expected extra files eta.installl at ${BASEDIR}/OPAM/repo/incremental/packages/eta/eta.1/files
 ### opam show eta --field extra-files: | $INSTALL_MD5 -> hash
 "eta.installl" "md5=hash"
 ### opam install eta
