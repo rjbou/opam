@@ -101,7 +101,7 @@ let get_repo_files rt name dir =
     if tdebug then
       OpamConsole.error "RS:GRF: xfiles dir %s"
         (OpamFilename.Dir.to_string xfiles_dir);
-    OpamTar.fold_reg_files (fun acc filename_s content ->
+    OpamRepositoryRoot.Tar.fold (fun acc filename_s content ->
         let filename =
           OpamFilename.raw filename_s
         in
@@ -127,7 +127,7 @@ let get_repo_files rt name dir =
           in
           (basename, content)::acc
         else acc)
-      [] (OpamRepositoryRoot.Tar.to_file tar)
+      [] tar
   | OpamRepositoryRoot.Dir repo_root ->
     if tdebug then
       OpamConsole.error "RS:GRF: GET REPO FIULES DIR";
@@ -183,9 +183,9 @@ let read_package_opam_tar ~repo_name ~repo_root package_dir filename content ext
 let load_raw_opams_and_aux_from_tar repo_name tar =
   let tdebug = false in
   let raw_repository =
-    OpamTar.fold_reg_files (fun acc filename content ->
-        (filename, content) :: acc) []
-      (OpamRepositoryRoot.Tar.to_file tar)
+    OpamRepositoryRoot.Tar.fold (fun acc filename content ->
+        (filename, content) :: acc)
+      [] tar
   in
   let repo_def =
     (* TAR TODO with root url ? *)
@@ -559,7 +559,8 @@ let unlock rt =
   (rt :> unlocked repos_state)
 
 let drop rt =
-  let _ = unlock rt in ()
+  let _ = unlock rt in
+  OpamRepositoryRoot.Tar.unload_repo_tars ()
 
 let with_write_lock ?dontblock rt f =
   if OpamStateConfig.is_newer_than_self ~lock_kind:`Lock_write rt.repos_global

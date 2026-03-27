@@ -122,8 +122,7 @@ let get_diff repo1 repo2 =
   );
   let get_contents =
     let get_tar_contents tar =
-      OpamTar.fold_reg_files
-        (fun acc filename content ->
+     OpamRepositoryRoot.Tar.fold (fun acc filename content ->
            OpamStd.String.Map.add filename content acc)
         OpamStd.String.Map.empty tar
     in
@@ -156,7 +155,7 @@ let get_diff repo1 repo2 =
     | OpamRepositoryRoot.Dir dir ->
       read_dir_contents (OpamRepositoryRoot.Dir.to_dir dir)
     | OpamRepositoryRoot.Tar tar ->
-      get_tar_contents (OpamRepositoryRoot.Tar.to_file tar)
+      get_tar_contents tar
   in
   let contents1 = get_contents repo1 in
   let contents2 = get_contents repo2 in

@@ -76,6 +76,8 @@ module Tar : sig
   val ls : t -> string
   val extract_files: (string -> bool) -> t -> (string * string) list
   val fold: ('a -> string -> string -> 'a) -> 'a -> t -> 'a
+  (* clean hashtbl that keep the repositories in ram *)
+  val unload_repo_tars: unit -> unit
 end
 
 val make_tar_gz_job : Tar.t -> Dir.t -> exn option OpamProcess.job

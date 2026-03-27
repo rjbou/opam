@@ -71,11 +71,32 @@ module Tar = struct
   let move = OpamFilename.move
   let is_symlink = OpamFilename.is_symlink
 
+  let archives : (OpamHash.t, string OpamStd.String.Map.t) Hashtbl.t = Hashtbl.create 8
+  let unload_repo_tars () = Hashtbl.clear archives
+
+  let fold f x tar =
+    let hash = OpamHash.compute ~kind:`SHA256 (OpamFilename.to_string tar) in
+    match Hashtbl.find_opt archives hash with
+    | Some contents ->
+      OpamStd.String.Map.fold (fun filename content acc ->
+          f acc filename content)
+        contents x
+    | None ->
+      let result, map =
+        OpamTar.fold_reg_files (fun (acc, map) file content ->
+            f acc file content,
+            OpamStd.String.Map.add file content map)
+          (x, OpamStd.String.Map.empty) tar
+      in
+      Hashtbl.add archives hash map;
+      result
+
   let files t =
-    OpamTar.fold_reg_files (fun files file _ -> file::files) [] t
+    fold (fun files file _ -> file::files) [] t
   let ls t =
     OpamStd.Format.itemize Fun.id (files t)
-  let patch ~allow_unclean patch tar =
+
+  let patch_with_dir_extraction ~allow_unclean patch tar =
     (* TAR TODO update when we have tar patch *)
     let job =
       let tdebug = false in
@@ -223,11 +244,9 @@ module Tar = struct
     with exn -> Error exn
 
   let extract_files cond t =
-    OpamTar.fold_reg_files (fun acc file content ->
+    fold (fun acc file content ->
         if cond file then (file,content)::acc else acc)
       [] t
-
-  let fold = OpamTar.fold_reg_files
 
   let is_empty t =
     if exists t then
@@ -322,7 +341,7 @@ let delayed_read_repo = function
     let repo_content =
       let exception Found of string in
       try
-        OpamTar.fold_reg_files (fun () fname content ->
+        Tar.fold (fun () fname content ->
         (* TAR TODO :  here we need to have the inner repo file bc root of
            archive is the directory of the repo. Maybe it need to be changed,
            it will have an impact in a lot of stuff *)
