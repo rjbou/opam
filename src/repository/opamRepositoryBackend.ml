@@ -367,3 +367,63 @@ let get_diff_dir_tar dir tar_file =
     get_deletion_diffs dir_contents diffs seen
   in
   return_patch_diffs diffs "dir-tar" chrono
+
+let get_diff repo1 repo2 =
+  let tdebug = tdebug false in
+  tdebug "DIFF GENERIQ";
+  let chrono = OpamConsole.timer () in
+  let prefix r = if OpamRepositoryRoot.is_tar r then "tar" else "dir" in
+  (if OpamFilename.Dir.equal
+      (OpamRepositoryRoot.dirname repo1)
+      (OpamRepositoryRoot.dirname repo2) then
+     log "diff: %a/{%a,%a}"
+       (slog (fun t ->
+            OpamFilename.Dir.to_string  (OpamRepositoryRoot.dirname t))) repo1
+       (slog (fun t ->
+            OpamFilename.Base.to_string (OpamRepositoryRoot.basename t))) repo1
+       (slog (fun t ->
+            OpamFilename.Base.to_string (OpamRepositoryRoot.basename t))) repo2
+   else
+     log "diff: %s %a vs %s %a"
+       (prefix repo1)
+       (slog OpamRepositoryRoot.to_string) repo1
+       (prefix repo1)
+       (slog OpamRepositoryRoot.to_string) repo2
+  );
+  let get_contents = function
+    | OpamRepositoryRoot.Dir dir ->
+      read_dir_contents (OpamRepositoryRoot.Dir.to_dir dir)
+    | OpamRepositoryRoot.Tar tar ->
+      get_tar_contents (OpamRepositoryRoot.Tar.to_file tar)
+  in
+  let contents1 = get_contents repo1 in
+  let contents2 = get_contents repo2 in
+  let diffs, seen = OpamStd.String.Map.fold
+      (fun filename content2 (diffs, seen) ->
+         get_content_diffs filename contents1 content2 diffs seen
+      ) contents2 ([], OpamStd.String.Set.empty)
+  in
+  let diffs =
+    get_deletion_diffs contents1 diffs seen
+  in
+  let label = prefix repo1 ^ "-" ^ prefix repo2 in
+  return_patch_diffs ~strip:false diffs label chrono
+
+let get_diff_dir_tar dir tar =
+  get_diff
+    OpamRepositoryRoot.(Dir (Dir.of_dir dir))
+    OpamRepositoryRoot.(Tar (Tar.of_file tar))
+let get_diff_tars tar1 tar2 =
+  get_diff
+    OpamRepositoryRoot.(Tar (Tar.of_file tar1))
+    OpamRepositoryRoot.(Tar (Tar.of_file tar2))
+let get_diff_dirs parent_dir dir1 dir2 =
+  let dir1 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir1) in
+  let dir2 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir2) in
+  get_diff
+    OpamRepositoryRoot.(Dir (Dir.of_dir dir1))
+    OpamRepositoryRoot.(Dir (Dir.of_dir dir2))
+let get_diff_tar_dir tar dir =
+  get_diff
+    OpamRepositoryRoot.(Tar (Tar.of_file tar))
+    OpamRepositoryRoot.(Dir (Dir.of_dir dir))
