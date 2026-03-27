@@ -364,3 +364,33 @@ let delayed_read_repo = function
         with _ -> OpamFile.Repo.empty
     in
     (Option.is_some repo_content, read)
+
+let in_dir f = function
+  | Dir dir -> f dir
+  | Tar tar ->
+    let tdebug = false in
+    OpamFilename.with_tmp_dir (fun dir ->
+        Tar.extract_in tar dir;
+        let repo_dir = Dir.of_dir dir in
+        if tdebug then
+          (OpamConsole.error "dirs %s"
+             (OpamStd.List.to_string OpamFilename.Dir.to_string
+                (OpamFilename.dirs dir));
+           OpamConsole.error "XXXXXXXX dir is %s"
+             (OpamStd.String.split
+                ( OpamFilename.Dir.to_string dir) '/'
+              |> OpamStd.List.to_string Fun.id));
+        let res = f repo_dir in
+        let open OpamProcess.Job.Op in
+        OpamProcess.Job.run
+          (make_tar_gz_job tar repo_dir
+           @@| function
+           | Some e ->
+             Printf.ksprintf failwith
+               "Failed to regenerate local repository archive: %s"
+               (Printexc.to_string e)
+           | None ->
+             if tdebug then
+               OpamConsole.error "After Archive\n%s"
+                 (Tar.ls tar);
+             res))

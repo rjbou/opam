@@ -115,3 +115,8 @@ val patch :
 (** Returns a pair [(exists, f)] where [exists] tells whether the
     [repo] file exists in the repository and [f] reads it *)
 val delayed_read_repo : t -> bool * (unit -> OpamFile.Repo.t)
+
+(** Applies the function in the repository root directory. If repository root
+    is an archive, it uncompress it, applies the function and update archive
+    with the changed directory. *)
+val in_dir: (OpamFilename.Dir.t -> 'a) -> t -> 'a
