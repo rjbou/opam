@@ -146,22 +146,22 @@ let content_patch_failure_truncated = [
   diff_file_plus_fst;
 ]
 let diff_patch_failure_truncated =
-  "--- diff-file\n" ^
-  "+++ diff-file\n" ^
+  "--- first/diff-file\n" ^
+  "+++ second/diff-file\n" ^
   "@@ -1,1 +1,1 @@\n" ^
   "-foo\n" ^
   "+bar\n" ^
-  "--- diff-fi\n"
+  "--- first/diff-fi\n"
 
 let _good_diff =
   "\n" ^
-  "--- diff-file\n" ^
-  "+++ diff-file\n" ^
+  "--- first/diff-file\n" ^
+  "+++ second/diff-file\n" ^
   "@@ -1,1 +1,1 @@\n" ^
   "-foo\n" ^
   "+bar\n" ^
-  "--- diff-file-plus-fst\n" ^
-  "+++ diff-file-plus-fst\n" ^
+  "--- first/diff-file-plus-fst\n" ^
+  "+++ second/diff-file-plus-fst\n" ^
   "@@ -2,1 +2,0 @@\n" ^
   "-bar\n"
 
@@ -326,7 +326,6 @@ let generate_git_diff dir =
     [ "commit"; "-qm"; "second" ];
     [ "status" ];
     [ "-c"; "diff.noprefix=false"; "diff"; "--text"; "--no-ext-diff"; "-R"; "-p";
-    "--no-prefix";
       "HEAD..HEAD^"; "--output="^(OpamFilename.to_string name) ]
   ] in
   git_cmds first_root commands "Git generate diff";
@@ -364,21 +363,16 @@ let diff_patch dir setup =
     | DiffPatch ->
       print "*** DIFF ***\n";
       match
-        OpamRepositoryBackend.get_diff
-        OpamRepositoryRoot.(Dir (Dir.of_dir OpamFilename.Op.(dir / first)))
-        OpamRepositoryRoot.(Dir (Dir.of_dir OpamFilename.Op.(dir / second)))
+        OpamRepositoryBackend.get_diff_dirs dir
+          (OpamFilename.Base.of_string first)
+          (OpamFilename.Base.of_string second)
       with
       | exception Failure s -> print "ERROR: %s\n" (rm_hex s); None
       | exception e ->
         print "ERROR: %s\n" (rm_hex @@ Printexc.to_string e);
         None
       | None -> print "No diff\n"; None
-      | Some (f,ops) ->
-(*
-      print "OPS\n%s\n---\n"
-        ((Format.asprintf "%a" Patch.pp_list) ops);
-*)
-      Some f
+      | Some (f,_) -> Some f
   in
   match diff with
   | None -> ()

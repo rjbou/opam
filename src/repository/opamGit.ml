@@ -39,7 +39,7 @@ module VCS : OpamVCS.VCS = struct
       (* Enforce this option, it can break our use of git if set *)
       git repo_root [ "config" ; "--local" ; "fetch.prune"; "false"];
       (* We reset diff.noprefix to ensure we get a `-p1` patch and avoid <https://github.com/ocaml/opam/issues/3627>. *)
-      git repo_root [ "config" ; "--local" ; "diff.noprefix"; "true"];
+      git repo_root [ "config" ; "--local" ; "diff.noprefix"; "false"];
       (* Disable automatic line-ending conversion and switch core.eol to Unix.
          THIS DOES NOT MEAN ALL FILES GET LF-ONLY LINE-ENDINGS!
          This combination of settings means that files will be checked out
@@ -198,7 +198,7 @@ module VCS : OpamVCS.VCS = struct
        unregistered directories. *)
     OpamSystem.raise_on_process_error r;
     (* We also reset diff.noprefix here to handle already existing repo. *)
-    git repo_root ~stdout:patch_file [ "-c" ; "diff.noprefix=true" ; "diff" ; "--text" ; "--no-ext-diff" ; "-R" ; "-p" ; rref; "--" ]
+    git repo_root ~stdout:patch_file [ "-c" ; "diff.noprefix=false" ; "diff" ; "--text" ; "--no-ext-diff" ; "-R" ; "-p" ; rref; "--" ]
     @@> fun r ->
     if not (OpamProcess.check_success_and_cleanup r) then
       (finalise ();

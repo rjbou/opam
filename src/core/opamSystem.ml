@@ -1687,7 +1687,7 @@ let parse_patch ~dir ~file =
     file'
   in
   let content = read file' in
-  Fun.protect (fun () -> Patch.parse ~p:0 content)
+  Fun.protect (fun () -> Patch.parse ~p:1 content)
     ~finally:(fun () -> if not (OpamConsole.debug ()) then Sys.remove file')
 
 let register_printer () =
