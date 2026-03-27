@@ -101,6 +101,7 @@ val to_string : t -> string
 
 val is_tar: t -> bool
 val is_dir: t -> bool
+val ls: t -> string
 
 val copy : src:t -> dst:t -> exn option OpamProcess.job
 val move : src:t -> dst:t -> exn option OpamProcess.job

@@ -250,6 +250,11 @@ module Tar = struct
 
   let fold = OpamTar.fold_reg_files
 
+  let is_empty t =
+    if exists t then
+      Some (match files t with | [] -> true | _ -> false)
+    else None
+
 end
 
 let make_tar_gz_job = OpamFilename.make_tar_gz_job ~root:true
@@ -269,7 +274,7 @@ let remove = function
 
 let is_empty = function
   | Dir dir -> Dir.is_empty dir
-  | Tar _tar -> None
+  | Tar tar -> Tar.is_empty tar
 
 let make_empty = function
   | Dir dir -> Dir.make_empty dir
@@ -295,6 +300,12 @@ let is_tar = function
 let is_dir = function
   | Dir _ -> true
   | Tar _ -> false
+
+let ls = function
+  | Dir dir ->
+    OpamFilename.rec_files dir
+    |> OpamStd.Format.itemize OpamFilename.to_string
+  | Tar tar -> Tar.ls tar
 
 let copy ~src ~dst =
   let open OpamProcess.Job.Op in
