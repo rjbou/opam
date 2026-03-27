@@ -89,29 +89,26 @@ let get_root rt name =
 let get_repo_root rt repo =
   get_root_raw rt.repos_global.root repo.repo_name
 
+(* TAR TODO : it is simpler to keep it as is *)
 let get_repo_files rt name dir =
   let tdebug = false in
   match get_root rt name with
   | OpamRepositoryRoot.Tar tar ->
     if tdebug then
       OpamConsole.error "RS: GET REPO FIULES Tar";
-    let xfiles_dir =
-      OpamFilename.raw_dir dir
-    in
+    let xfiles_dir = OpamFilename.raw_dir dir in
     if tdebug then
       OpamConsole.error "RS:GRF: xfiles dir %s"
         (OpamFilename.Dir.to_string xfiles_dir);
     OpamRepositoryRoot.Tar.fold (fun acc filename_s content ->
-        let filename =
-          OpamFilename.raw filename_s
-        in
+        let filename = OpamFilename.raw filename_s in
         if tdebug then
           OpamConsole.error "RS:GRF: starts with lookup %B %s"
             (OpamFilename.starts_with xfiles_dir filename)
             (OpamFilename.to_string filename);
         if OpamFilename.starts_with xfiles_dir filename then
           let content = lazy (
-            (* TAR TODO : veru hackish *)
+            (* TAR TODO : veru hackish remove ? *)
             OpamConsole.log "SYSTEM" ~level:5
               "read %s"
               OpamFilename.Op.(
@@ -267,7 +264,8 @@ let load_repo_from_tar_gz repo_name tar =
     in
     let opams =
       OpamFilename.Dir.Map.fold (fun pkgdir (filename, content, otherfiles) opams ->
-          match read_package_opam_tar ~repo_name ~repo_root pkgdir filename content otherfiles with
+          match read_package_opam_tar ~repo_name ~repo_root
+                  pkgdir filename content otherfiles with
           | Some (nv, opam) -> OpamPackage.Map.add nv opam opams
           | None -> opams
         ) opams_map OpamPackage.Map.empty
