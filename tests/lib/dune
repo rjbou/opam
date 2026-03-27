@@ -1,7 +1,8 @@
 (test
   (name      patcher)
   (modules   patcher)
-  (libraries opam-core))
+  (libraries opam-core)
+  (action (run %{test})))
 
 (test
   (name TypeGymnastics)
@@ -12,4 +13,5 @@
 (test
   (name patchDiff)
   (modules patchDiff)
-  (libraries str opam-repository))
+  (libraries str opam-repository)
+  (action (run %{test})))

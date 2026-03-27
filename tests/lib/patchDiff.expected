@@ -49,39 +49,39 @@
   > foo
 
 *** DIFF ***
---- first/diff-dir-plus-fst/fst
-+++ second/diff-dir-plus-fst/fst
-@@ -2,0 +2,1 @@
-+bar
---- first/diff-dir-plus-snd/fst
-+++ second/diff-dir-plus-snd/fst
-@@ -2,1 +2,0 @@
--bar
---- first/diff-file
-+++ second/diff-file
-@@ -1,1 +1,1 @@
--foo
-+bar
---- first/diff-file-plus-fst
-+++ second/diff-file-plus-fst
-@@ -2,1 +2,0 @@
--bar
---- first/diff-file-plus-snd
-+++ second/diff-file-plus-snd
-@@ -2,0 +2,1 @@
-+bar
---- first/dir-only-fst/fst
+--- file-only-fst
 +++ /dev/null
 @@ -1,1 +0,0 @@
 -foo
---- first/file-only-fst
+--- dir-only-fst/fst
 +++ /dev/null
 @@ -1,1 +0,0 @@
 -foo
 --- /dev/null
-+++ second/file-only-snd
++++ file-only-snd
 @@ -0,0 +1,1 @@
 +foo
+--- diff-file-plus-snd
++++ diff-file-plus-snd
+@@ -2,0 +2,1 @@
++bar
+--- diff-file-plus-fst
++++ diff-file-plus-fst
+@@ -2,1 +2,0 @@
+-bar
+--- diff-file
++++ diff-file
+@@ -1,1 +1,1 @@
+-foo
++bar
+--- diff-dir-plus-snd/fst
++++ diff-dir-plus-snd/fst
+@@ -2,1 +2,0 @@
+-bar
+--- diff-dir-plus-fst/fst
++++ diff-dir-plus-fst/fst
+@@ -2,0 +2,1 @@
++bar
 
 *** PATCHED ***
 + first/
@@ -126,49 +126,49 @@
   > foo
 
 *** GIT DIFF ***
-diff --git b/diff-dir-plus-fst/fst a/diff-dir-plus-fst/fst
+diff --git diff-dir-plus-fst/fst diff-dir-plus-fst/fst
 index c0ffee..c0ffee c0ffee
---- b/diff-dir-plus-fst/fst
-+++ a/diff-dir-plus-fst/fst
+--- diff-dir-plus-fst/fst
++++ diff-dir-plus-fst/fst
 @@ -1 +1,2 @@
  foo
 +bar
-diff --git b/diff-dir-plus-snd/fst a/diff-dir-plus-snd/fst
+diff --git diff-dir-plus-snd/fst diff-dir-plus-snd/fst
 index c0ffee..c0ffee c0ffee
---- b/diff-dir-plus-snd/fst
-+++ a/diff-dir-plus-snd/fst
+--- diff-dir-plus-snd/fst
++++ diff-dir-plus-snd/fst
 @@ -1,2 +1 @@
  foo
 -bar
-diff --git b/diff-file a/diff-file
+diff --git diff-file diff-file
 index c0ffee..c0ffee c0ffee
---- b/diff-file
-+++ a/diff-file
+--- diff-file
++++ diff-file
 @@ -1 +1 @@
 -foo
 +bar
-diff --git b/diff-file-plus-fst a/diff-file-plus-fst
+diff --git diff-file-plus-fst diff-file-plus-fst
 index c0ffee..c0ffee c0ffee
---- b/diff-file-plus-fst
-+++ a/diff-file-plus-fst
+--- diff-file-plus-fst
++++ diff-file-plus-fst
 @@ -1,2 +1 @@
  foo
 -bar
-diff --git b/diff-file-plus-snd a/diff-file-plus-snd
+diff --git diff-file-plus-snd diff-file-plus-snd
 index c0ffee..c0ffee c0ffee
---- b/diff-file-plus-snd
-+++ a/diff-file-plus-snd
+--- diff-file-plus-snd
++++ diff-file-plus-snd
 @@ -1 +1,2 @@
  foo
 +bar
-diff --git b/file-only-fst a/file-only-fst
+diff --git file-only-fst file-only-fst
 deleted file mode c0ffee
 index c0ffee..c0ffee
---- b/file-only-fst
+--- file-only-fst
 +++ /dev/null
 @@ -1 +0,0 @@
 -foo
-diff --git b/dir-only-fst/fst a/file-only-snd
+diff --git dir-only-fst/fst file-only-snd
 similarity index 100%
 rename from dir-only-fst/fst
 rename to file-only-snd
@@ -311,8 +311,8 @@ ERROR: Symlinks are unsupported
   > foo
 
 *** DIFF ***
---- first/hardlinked-file-fst
-+++ second/hardlinked-file-fst
+--- hardlinked-file-fst
++++ hardlinked-file-fst
 @@ -1,1 +1,1 @@
 -bar
 +foo
@@ -406,12 +406,12 @@ patch format
   > foo
 
 *** GIVEN DIFF ***
---- first/diff-file
-+++ second/diff-file
+--- diff-file
++++ diff-file
 @@ -1,1 +1,1 @@
 -foo
 +bar
---- first/diff-fi
+--- diff-fi
 
 *** PATCHED ***
 + first/
@@ -445,7 +445,7 @@ patch format
   > foo
 
 *** DIFF ***
-diff --git second/im-empty second/im-empty
+diff --git im-empty im-empty
 new file mode 100644
 
 *** PATCHED ***
@@ -459,7 +459,7 @@ new file mode 100644
   > foo
 
 *** GIT DIFF ***
-diff --git b/im-empty a/im-empty
+diff --git im-empty im-empty
 new file mode c0ffee
 index c0ffee..c0ffee
 
@@ -488,7 +488,7 @@ index c0ffee..c0ffee
   > foo
 
 *** DIFF ***
-diff --git first/im-empty first/im-empty
+diff --git im-empty im-empty
 deleted file mode 100644
 
 *** PATCHED ***
@@ -500,7 +500,7 @@ deleted file mode 100644
   > foo
 
 *** GIT DIFF ***
-diff --git b/im-empty a/im-empty
+diff --git im-empty im-empty
 deleted file mode c0ffee
 index c0ffee..c0ffee
 
@@ -531,14 +531,14 @@ index c0ffee..c0ffee
   > foo
 
 *** DIFF ***
---- /dev/null
-+++ second/inner/move-me
-@@ -0,0 +1,1 @@
-+bar
---- first/move-me
+--- move-me
 +++ /dev/null
 @@ -1,1 +0,0 @@
 -bar
+--- /dev/null
++++ inner/move-me
+@@ -0,0 +1,1 @@
++bar
 
 *** PATCHED ***
 + first/
@@ -555,7 +555,7 @@ index c0ffee..c0ffee
   > foo
 
 *** GIT DIFF ***
-diff --git b/move-me a/inner/move-me
+diff --git move-me inner/move-me
 similarity index 100%
 rename from move-me
 rename to inner/move-me
@@ -595,15 +595,15 @@ rename to inner/move-me
   > foo
 
 *** DIFF ***
---- first/im-here/delete-me
-+++ /dev/null
-@@ -1,1 +0,0 @@
--bar
---- first/im-not-here/delete-me
+--- im-not-here/delete-me
 +++ /dev/null
 @@ -1,1 +0,0 @@
 -baz
 \ No newline at end of file
+--- im-here/delete-me
++++ /dev/null
+@@ -1,1 +0,0 @@
+-bar
 
 *** PATCHED ***
 + first/
@@ -615,17 +615,17 @@ rename to inner/move-me
   > foo
 
 *** GIT DIFF ***
-diff --git b/im-here/delete-me a/im-here/delete-me
+diff --git im-here/delete-me im-here/delete-me
 deleted file mode c0ffee
 index c0ffee..c0ffee
---- b/im-here/delete-me
+--- im-here/delete-me
 +++ /dev/null
 @@ -1 +0,0 @@
 -bar
-diff --git b/im-not-here/delete-me a/im-not-here/delete-me
+diff --git im-not-here/delete-me im-not-here/delete-me
 deleted file mode c0ffee
 index c0ffee..c0ffee
---- b/im-not-here/delete-me
+--- im-not-here/delete-me
 +++ /dev/null
 @@ -1 +0,0 @@
 -baz
