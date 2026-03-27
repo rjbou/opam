@@ -287,6 +287,15 @@ let to_string = function
   | Dir dir -> Dir.to_string dir
   | Tar tar -> Tar.to_string tar
 
+
+let is_tar = function
+  | Dir _ -> false
+  | Tar _ -> true
+
+let is_dir = function
+  | Dir _ -> true
+  | Tar _ -> false
+
 let copy ~src ~dst =
   let open OpamProcess.Job.Op in
   match src, dst with

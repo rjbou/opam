@@ -98,6 +98,10 @@ val make_empty : t -> unit
 val dirname : t -> OpamFilename.Dir.t
 val basename : t -> OpamFilename.Base.t
 val to_string : t -> string
+
+val is_tar: t -> bool
+val is_dir: t -> bool
+
 val copy : src:t -> dst:t -> exn option OpamProcess.job
 val move : src:t -> dst:t -> exn option OpamProcess.job
 val is_symlink : t -> bool
