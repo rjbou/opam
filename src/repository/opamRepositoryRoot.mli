@@ -74,7 +74,6 @@ module Tar : sig
   (* TAR TODO: for debug purpose *)
   val files : t -> string list
   val ls : t -> string
-  val change_root_dir: old:OpamFilename.Dir.t -> new_:string -> t -> unit
   val extract_files: (string -> bool) -> t -> (string * string) list
   val fold: ('a -> string -> string -> 'a) -> 'a -> t -> 'a
 end

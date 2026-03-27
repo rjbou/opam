@@ -222,27 +222,6 @@ module Tar = struct
         operations_result diffs
     with exn -> Error exn
 
-
-  let change_root_dir ~old:_ ~new_:_ t =
-    let open OpamTar.Inplace in
-    with_open_out t (fun ttar ->
-        write ttar)
-(*
-    with_open_out t (fun ttar ->
-        let newtar = ttar in
-        fold_reg_files (fun newtar file content ->
-            let filename = OpamFilename.raw file in
-            let new_file =
-              OpamFilename.swap_prefix ~old ~new_ filename
-              |> OpamFilename.to_string
-            in
-            remove file newtar
-            |> add ~fname:new_file ~content)
-          newtar ttar
-        |> write
-      )
-*)
-
   let extract_files cond t =
     OpamTar.fold_reg_files (fun acc file content ->
         if cond file then (file,content)::acc else acc)
