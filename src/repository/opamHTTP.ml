@@ -73,35 +73,17 @@ module B = struct
       (* Check for format mismatch: if repo_root and quarantine have different types,
          return Update_full to trigger format conversion via OpamRepositoryRoot.copy *)
       let needs_conversion =
-        match repo_root, quarantine with
-        | OpamRepositoryRoot.Dir _, OpamRepositoryRoot.Tar _ ->
-          true
-        | OpamRepositoryRoot.Tar _, OpamRepositoryRoot.Dir _ ->
-          assert false (* Not happening *)
-        | _ ->
-          false
+        if OpamRepositoryRoot.is_tar repo_root
+        && OpamRepositoryRoot.is_dir quarantine then
+          assert false; (* Not happening *)
+        OpamRepositoryRoot.is_dir repo_root
+        && OpamRepositoryRoot.is_tar quarantine
       in
       if needs_conversion then
         Done (OpamRepositoryBackend.Update_full quarantine)
       else
         OpamStd.Exn.finally finalise @@ fun () ->
-        (match repo_root, quarantine with
-         | OpamRepositoryRoot.Tar old_tar, OpamRepositoryRoot.Tar new_tar ->
-           OpamRepositoryBackend.get_diff_tars
-             (OpamRepositoryRoot.Tar.to_file old_tar)
-             (OpamRepositoryRoot.Tar.to_file new_tar)
-         | OpamRepositoryRoot.Dir _dir, OpamRepositoryRoot.Dir _dir2 ->
-           OpamRepositoryBackend.get_diff_dirs
-             (OpamRepositoryRoot.dirname repo_root)
-             (OpamRepositoryRoot.basename repo_root)
-             (OpamRepositoryRoot.basename quarantine)
-         | OpamRepositoryRoot.Tar tar, OpamRepositoryRoot.Dir dir ->
-           OpamRepositoryBackend.get_diff_tar_dir
-             (OpamRepositoryRoot.Tar.to_file tar) (OpamRepositoryRoot.Dir.to_dir dir)
-         | OpamRepositoryRoot.Dir dir, OpamRepositoryRoot.Tar tar ->
-           OpamRepositoryBackend.get_diff_dir_tar
-             (OpamRepositoryRoot.Dir.to_dir dir) (OpamRepositoryRoot.Tar.to_file tar)
-        )
+        OpamRepositoryBackend.get_diff repo_root quarantine
         |> function
         | None -> Done OpamRepositoryBackend.Update_empty
         | Some patch -> Done (OpamRepositoryBackend.Update_patch patch)

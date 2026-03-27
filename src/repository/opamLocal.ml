@@ -200,8 +200,7 @@ module B = struct
            Done (OpamRepositoryBackend.Update_full (OpamRepositoryRoot.Tar quarantine))
          else
            OpamStd.Exn.finally finalise @@ fun () ->
-           OpamRepositoryBackend.get_diff_tars (OpamRepositoryRoot.Tar.to_file tar)
-             (OpamRepositoryRoot.Tar.to_file quarantine)
+           OpamRepositoryBackend.get_diff repo_root  (OpamRepositoryRoot.Tar quarantine)
            |> function
            | None -> Done OpamRepositoryBackend.Update_empty
            | Some p -> Done (OpamRepositoryBackend.Update_patch p)
@@ -241,10 +240,7 @@ module B = struct
           Done (OpamRepositoryBackend.Update_full (OpamRepositoryRoot.Dir quarantine))
         else
           OpamStd.Exn.finally finalise @@ fun () ->
-          OpamRepositoryBackend.get_diff_dirs
-            (OpamFilename.dirname_dir (OpamRepositoryRoot.Dir.to_dir repo_root))
-            (OpamFilename.basename_dir (OpamRepositoryRoot.Dir.to_dir repo_root))
-            (OpamFilename.basename_dir (OpamRepositoryRoot.Dir.to_dir quarantine))
+          OpamRepositoryBackend.get_diff (OpamRepositoryRoot.Dir repo_root) (OpamRepositoryRoot.Dir quarantine)
           |> function
           | None -> Done OpamRepositoryBackend.Update_empty
           | Some p -> Done (OpamRepositoryBackend.Update_patch p)

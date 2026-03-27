@@ -408,22 +408,3 @@ let get_diff repo1 repo2 =
   in
   let label = prefix repo1 ^ "-" ^ prefix repo2 in
   return_patch_diffs ~strip:false diffs label chrono
-
-let get_diff_dir_tar dir tar =
-  get_diff
-    OpamRepositoryRoot.(Dir (Dir.of_dir dir))
-    OpamRepositoryRoot.(Tar (Tar.of_file tar))
-let get_diff_tars tar1 tar2 =
-  get_diff
-    OpamRepositoryRoot.(Tar (Tar.of_file tar1))
-    OpamRepositoryRoot.(Tar (Tar.of_file tar2))
-let get_diff_dirs parent_dir dir1 dir2 =
-  let dir1 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir1) in
-  let dir2 = OpamFilename.Op.(parent_dir / OpamFilename.Base.to_string dir2) in
-  get_diff
-    OpamRepositoryRoot.(Dir (Dir.of_dir dir1))
-    OpamRepositoryRoot.(Dir (Dir.of_dir dir2))
-let get_diff_tar_dir tar dir =
-  get_diff
-    OpamRepositoryRoot.(Tar (Tar.of_file tar))
-    OpamRepositoryRoot.(Dir (Dir.of_dir dir))
