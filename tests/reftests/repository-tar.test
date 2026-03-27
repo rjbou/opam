@@ -59,8 +59,10 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
-[default] Initialised
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
+REPO_BACKEND                    Internal diff (tar-tar, non-empty, 3 changed files) done in 0.00s.
+[default] synchronised from http://localhost:port
+REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
@@ -91,8 +93,10 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
-[default] Initialised
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
+REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
+[default] synchronised from http://localhost:port
+REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
@@ -124,8 +128,10 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
-REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
-[default] Initialised
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
+REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
+[default] synchronised from http://localhost:port
+REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 Processing: [default: loading data]
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
