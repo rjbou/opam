@@ -75,6 +75,8 @@ module Tar = struct
   let unload_repo_tars () = Hashtbl.clear archives
 
   let fold f x tar =
+  (* TAR TODO : do we need to have a sha256 ? md5 have collision, will it
+     really happen irl ? *)
     let hash = OpamHash.compute ~kind:`SHA256 (OpamFilename.to_string tar) in
     match Hashtbl.find_opt archives hash with
     | Some contents ->
@@ -96,7 +98,7 @@ module Tar = struct
   let ls t =
     OpamStd.Format.itemize Fun.id (files t)
 
-  let patch_with_dir_extraction ~allow_unclean patch tar =
+  let _patch_with_dir_extraction ~allow_unclean patch tar =
     (* TAR TODO update when we have tar patch *)
     let job =
       let tdebug = false in
@@ -285,6 +287,18 @@ let dirname = function
 let basename = function
   | Dir dir -> OpamFilename.basename_dir (Dir.to_dir dir)
   | Tar tar -> OpamFilename.basename (Tar.to_file tar)
+
+let remove_prefix file = function
+  | Dir dir ->
+    OpamFilename.remove_prefix dir file
+    |> OpamFilename.raw
+  | Tar _ -> file
+
+let remove_prefix_dir d = function
+  | Dir dir ->
+    OpamFilename.remove_prefix_dir dir d
+    |> OpamFilename.raw_dir
+  | Tar _ -> d
 
 let to_string = function
   | Dir dir -> Dir.to_string dir

@@ -98,6 +98,8 @@ val is_empty : t -> bool option
 val make_empty : t -> unit
 val dirname : t -> OpamFilename.Dir.t
 val basename : t -> OpamFilename.Base.t
+val remove_prefix: OpamFilename.t -> t -> OpamFilename.t
+val remove_prefix_dir: OpamFilename.Dir.t -> t -> OpamFilename.Dir.t
 val to_string : t -> string
 
 val is_tar: t -> bool

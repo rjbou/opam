@@ -118,13 +118,19 @@ let mkdir dir =
     end in
   aux dir
 
+let is_vcs = function
+    | ".git" | ".hg" | "_darcs" -> true
+    | _ -> false
+
 let get_files_t ~except_vcs dirname =
   let dir = Unix.opendir dirname in
   let rec aux files =
     match Unix.readdir dir with
     | "." | ".." -> aux files
-    | ".git" | ".hg" | "_darcs" when except_vcs -> aux files
-    | file -> aux (file :: files)
+    | file ->
+      if except_vcs && is_vcs file then aux files
+      else
+        aux (file :: files)
     | exception End_of_file -> files
   in
   let files = aux [] in
@@ -371,12 +377,14 @@ let files_all_not_dir =
 let directories_strict =
   list (fun f -> try Sys2.is_directory f with Sys_error _ -> false)
 
-let directories_with_links =
-  list (fun f -> try Sys.is_directory f with Sys_error _ -> false)
+let directories_with_links ?(except_vcs=false) =
+  list (fun f ->
+  if except_vcs && is_vcs f then false else
+  try Sys.is_directory f with Sys_error _ -> false)
 
 let rec_files dir =
   let rec aux accu dir =
-    let d = directories_with_links dir in
+    let d = directories_with_links ~except_vcs:true dir in
     let f = files_with_links dir in
     List.fold_left aux (f @ accu) d in
   aux [] dir
@@ -1675,7 +1683,14 @@ let patch ~allow_unclean ?patch_filename ~dir diffs =
       if dirname_src <> (Filename.dirname dst : string) then
         rmdir_cleanup dirname_src
   in
+  let tdebug = false in
+  if tdebug then
+    OpamConsole.error "patch: before\n%s"
+      (OpamStd.Format.itemize Fun.id (rec_files dir));
   List.iter apply diffs
+  ; if tdebug then
+    OpamConsole.error "patch: after\n%s"
+      (OpamStd.Format.itemize Fun.id (rec_files dir))
 
 let parse_patch ~dir ~file =
   if not (Sys.file_exists file) then

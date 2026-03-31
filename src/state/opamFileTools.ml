@@ -824,62 +824,62 @@ let t_lint ?check_extra_files ?(check_upstream=false) ?(all=false) t =
        Option.map OpamFile.URL.checksum t.url = Some []);
     (let upstream_error =
        if not check_upstream then None else
-       match t.url with
-       | None -> Some "No url defined"
-       | Some urlf ->
-         let open OpamProcess.Job.Op in
-         let check_checksum f =
-           match OpamFile.URL.checksum urlf with
-           | [] -> None
-           | chks ->
-             let not_corresponding =
-               List.filter_map (fun chk ->
-                   match OpamHash.mismatch (OpamFilename.to_string f) chk with
-                   | Some m -> Some (m, chk)
-                   | None -> None)
-                 chks
-             in
-             if not_corresponding = [] then None
-             else
-             let msg =
-               let is_singular = function [_] -> true | _ -> false in
-               Printf.sprintf "The archive doesn't match checksum%s:\n%s."
-                 (if is_singular not_corresponding then "" else "s")
-                 (OpamStd.Format.itemize (fun (good, bad) ->
-                      Printf.sprintf "archive: %s, in opam file: %s"
-                        (OpamHash.to_string good) (OpamHash.to_string bad))
-                     not_corresponding)
-             in
-             Some msg
-         in
-         let url = OpamFile.URL.url urlf in
-         OpamProcess.Job.run @@
-         OpamFilename.with_tmp_dir_job @@ fun dir ->
-         match url.backend with
-         | #OpamUrl.version_control -> Done None (* shouldn't happen *)
-         | `http ->
-           OpamProcess.Job.catch (function
-               | Failure msg -> Done (Some msg)
-               | OpamDownload.Download_fail (s,l) ->
-                 Done (Some (OpamStd.Option.default l s))
-               | e -> Done (Some (Printexc.to_string e)))
-           @@ fun () ->
-           OpamDownload.download ~overwrite:false url dir
-           @@| check_checksum
-         | `rsync ->
-           let filename =
-             let open OpamStd.Option.Op in
-             (OpamFile.OPAM.name_opt t
-              >>| OpamPackage.Name.to_string)
-             +! "lint-check-upstream"
-             |> OpamFilename.Base.of_string
-             |> OpamFilename.create dir
+         match t.url with
+         | None -> Some "No url defined"
+         | Some urlf ->
+           let open OpamProcess.Job.Op in
+           let check_checksum f =
+             match OpamFile.URL.checksum urlf with
+             | [] -> None
+             | chks ->
+               let not_corresponding =
+                 List.filter_map (fun chk ->
+                     match OpamHash.mismatch (OpamFilename.to_string f) chk with
+                     | Some m -> Some (m, chk)
+                     | None -> None)
+                   chks
+               in
+               if not_corresponding = [] then None
+               else
+                 let msg =
+                   let is_singular = function [_] -> true | _ -> false in
+                   Printf.sprintf "The archive doesn't match checksum%s:\n%s."
+                     (if is_singular not_corresponding then "" else "s")
+                     (OpamStd.Format.itemize (fun (good, bad) ->
+                          Printf.sprintf "archive: %s, in opam file: %s"
+                            (OpamHash.to_string good) (OpamHash.to_string bad))
+                         not_corresponding)
+                 in
+                 Some msg
            in
-           OpamLocal.rsync_file url filename
-           @@| function
-           | Up_to_date () | Result () -> check_checksum filename
-           | Not_available (_,src) ->
-             Some ("Source not found: "^src)
+           let url = OpamFile.URL.url urlf in
+           OpamProcess.Job.run @@
+           OpamFilename.with_tmp_dir_job @@ fun dir ->
+           match url.backend with
+           | #OpamUrl.version_control -> Done None (* shouldn't happen *)
+           | `http ->
+             OpamProcess.Job.catch (function
+                 | Failure msg -> Done (Some msg)
+                 | OpamDownload.Download_fail (s,l) ->
+                   Done (Some (OpamStd.Option.default l s))
+                 | e -> Done (Some (Printexc.to_string e)))
+             @@ fun () ->
+             OpamDownload.download ~overwrite:false url dir
+             @@| check_checksum
+           | `rsync ->
+             let filename =
+               let open OpamStd.Option.Op in
+               (OpamFile.OPAM.name_opt t
+                >>| OpamPackage.Name.to_string)
+               +! "lint-check-upstream"
+               |> OpamFilename.Base.of_string
+               |> OpamFilename.create dir
+             in
+             OpamLocal.rsync_file url filename
+             @@| function
+             | Up_to_date () | Result () -> check_checksum filename
+             | Not_available (_,src) ->
+               Some ("Source not found: "^src)
      in
      cond 60 `Error "Upstream check failed"
        ~detail:(Option.to_list upstream_error)
@@ -1186,39 +1186,39 @@ let lint_gen ?check_extra_files ?check_upstream ?(handle_dirname=false)
       in
       let t, warnings =
         if handle_dirname = false then t, [] else
-        match OpamPackage.of_filename (OpamFile.filename filename) with
-        | None -> t, []
-        | Some nv ->
-          let fname = nv.OpamPackage.name in
-          let fversion = nv.OpamPackage.version in
-          let t, name_warn =
-            match t.OpamFile.OPAM.name with
-            | Some tname ->
-              if tname = fname then t, [] else
-                t,
-                [ 4, `Warning,
-                  Printf.sprintf
-                    "Field 'name: %S' while the directory name or pinning \
-                     implied %S"
-                    (OpamPackage.Name.to_string tname)
-                    (OpamPackage.Name.to_string fname) ]
-            | None ->
-              OpamFile.OPAM.with_name fname t, []
-          in
-          let t, version_warn =
-            match t.OpamFile.OPAM.version with
-            | Some tversion ->
-              if tversion = fversion then t, [] else
-                t,
-                [ 4, `Warning,
-                  Printf.sprintf
-                    "Field 'version: %S' while the directory name or pinning \
-                     implied %S"
-                    (OpamPackage.Version.to_string tversion)
-                    (OpamPackage.Version.to_string fversion) ]
-            | None -> OpamFile.OPAM.with_version fversion t, []
-          in
-          t, name_warn @ version_warn
+          match OpamPackage.of_filename (OpamFile.filename filename) with
+          | None -> t, []
+          | Some nv ->
+            let fname = nv.OpamPackage.name in
+            let fversion = nv.OpamPackage.version in
+            let t, name_warn =
+              match t.OpamFile.OPAM.name with
+              | Some tname ->
+                if tname = fname then t, [] else
+                  t,
+                  [ 4, `Warning,
+                    Printf.sprintf
+                      "Field 'name: %S' while the directory name or pinning \
+                       implied %S"
+                      (OpamPackage.Name.to_string tname)
+                      (OpamPackage.Name.to_string fname) ]
+              | None ->
+                OpamFile.OPAM.with_name fname t, []
+            in
+            let t, version_warn =
+              match t.OpamFile.OPAM.version with
+              | Some tversion ->
+                if tversion = fversion then t, [] else
+                  t,
+                  [ 4, `Warning,
+                    Printf.sprintf
+                      "Field 'version: %S' while the directory name or pinning \
+                       implied %S"
+                      (OpamPackage.Version.to_string tversion)
+                      (OpamPackage.Version.to_string fversion) ]
+              | None -> OpamFile.OPAM.with_version fversion t, []
+            in
+            t, name_warn @ version_warn
       in
       warnings,
       Some (OpamFile.OPAM.with_metadata_dir
@@ -1299,9 +1299,9 @@ let warns_to_string ws =
 
 let warns_to_json ?filename ws =
   let filename =
-  match filename with
-  | Some f -> f
-  | None -> "stdout"
+    match filename with
+    | Some f -> f
+    | None -> "stdout"
   in
   let warn, err =
     List.fold_left (fun (w,e) (n,we,s) ->
@@ -1314,16 +1314,16 @@ let warns_to_json ?filename ws =
         | `Error -> w, arr::e) ([],[]) ws
   in
   let result =
-  match warn,err with
-  | [],[] -> "passed"
-  | _, _::_ -> "error"
-  | _::_, [] -> "warning"
+    match warn,err with
+    | [],[] -> "passed"
+    | _, _::_ -> "error"
+    | _::_, [] -> "warning"
   in
   `O [
     "file", `String filename;
     "result", `String result;
-     "warnings", `A warn;
-     "errors", `A err
+    "warnings", `A warn;
+    "errors", `A err
   ]
 
 (* Package definition loading *)
@@ -1331,6 +1331,491 @@ let warns_to_json ?filename ws =
 open OpamFilename.Op
 open OpamStd.Option.Op
 
+let _legacy =
+  let try_read rd f =
+    try rd f, None with
+    | (OpamSystem.Internal_error _ | Not_found) as exc ->
+      if OpamFormatConfig.(!r.strict) then
+        OpamConsole.error_and_exit `File_error
+          "Could not read file %s: %s.\nAborting (strict mode)."
+          (OpamFile.to_string f) (Printexc.to_string exc);
+      None,
+      let f = OpamFile.filename f in
+      Some (OpamFilename.(Base.to_string (basename f)),
+            (Some (pos_file f), Printexc.to_string exc))
+    | OpamPp.Bad_format bf as exc ->
+      if OpamFormatConfig.(!r.strict) then
+        OpamConsole.error_and_exit `File_error
+          "Errors while parsing %s: %s.\nAborting (strict mode)."
+          (OpamFile.to_string f) (Printexc.to_string exc);
+      None,
+      let f = OpamFile.filename f in
+      Some (OpamFilename.(Base.to_string (basename f)), bf)
+  in
+
+  let add_aux_files ?dir ?(files_subdir_hashes=false) opam =
+    let tdebug = false in
+    let dir = match dir with
+      | None ->
+        (match OpamFile.OPAM.metadata_dir opam with
+         | None -> None
+         | Some (None, dir) ->
+           if tdebug then
+             OpamConsole.error "ADD AUX FILES absolute dir %s" (dir);
+           Some (OpamFilename.Dir.of_string dir)
+         | Some (Some r, _) ->
+           if tdebug then
+             OpamConsole.error "ADD AUX FILES relative dir";
+           failwith ("Repository "^OpamRepositoryName.to_string r^
+                     " not registered for add_aux_files!"))
+      | some -> some
+    in
+    match dir with
+    | None -> opam
+    | Some dir ->
+      let (url_file: OpamFile.URL.t OpamFile.t) =
+        OpamFile.make (dir // "url")
+      in
+      let (descr_file: OpamFile.Descr.t OpamFile.t)  =
+        OpamFile.make (dir // "descr")
+      in
+      let files_dir =
+        OpamFilename.Op.(dir / "files")
+      in
+      let opam =
+        match OpamFile.OPAM.url opam, try_read OpamFile.URL.read_opt url_file with
+        | None, (Some url, None) -> OpamFile.OPAM.with_url url opam
+        | Some opam_url, (Some url, errs) ->
+          if url = opam_url && errs = None then
+            log "Duplicate definition of url in '%s' and opam file"
+              (OpamFile.to_string url_file)
+          else
+            OpamConsole.warning
+              "File '%s' ignored (conflicting url already specified in the \
+               'opam' file)"
+              (OpamFile.to_string url_file);
+          opam
+        | _, (_, Some err) ->
+          OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
+        | _, (None, None) -> opam
+      in
+      let opam =
+        match OpamFile.OPAM.descr opam,
+              try_read OpamFile.Descr.read_opt descr_file with
+        | None, (Some descr, None) -> OpamFile.OPAM.with_descr descr opam
+        | Some _, (Some _, _) ->
+          log "Duplicate descr in '%s' and opam file"
+            (OpamFile.to_string descr_file);
+          opam
+        | _, (_, Some err) ->
+          OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
+        | _, (None, None)  -> opam
+      in
+      let opam =
+        let extra_files =
+          OpamFilename.opt_dir files_dir >>| fun dir ->
+          OpamFilename.rec_files dir
+          |> List.map (fun file ->
+              file,
+              OpamFilename.Base.of_string
+                (OpamSystem.back_to_forward
+                   (OpamFilename.remove_prefix dir file)))
+        in
+        match OpamFile.OPAM.extra_files opam, extra_files with
+        | None, None -> opam
+        | None, Some ef ->
+          let log ?level act =
+            log ?level
+              "Missing extra-files field for %a for %a, %s them."
+              (slog @@ OpamStd.List.concat_map ", "
+                 (fun (_,f) -> OpamFilename.Base.to_string f)) ef
+              OpamStd.Op.(slog @@ OpamPackage.to_string @* OpamFile.OPAM.package)
+              opam act
+          in
+          if files_subdir_hashes then
+            (log ~level:2 "adding";
+             let ef =
+               List.map
+                 (fun (file, basename) ->
+                    basename,
+                    OpamHash.compute (OpamFilename.to_string file))
+                 ef
+             in
+             OpamFile.OPAM.with_extra_files ef opam)
+          else
+            (log "ignoring";
+             opam)
+        | Some ef, None ->
+          log "Missing expected extra files %s at %s/files"
+            (OpamStd.List.concat_map ", "
+               (fun (f,_) -> OpamFilename.Base.to_string f) ef)
+            (OpamFilename.Dir.to_string dir);
+          opam
+        | Some oef, Some ef ->
+          let wr_check, nf_opam, rest =
+            List.fold_left (fun (wr_check, nf_opam, rest) (file, basename) ->
+                match OpamStd.List.pick_assoc
+                        OpamFilename.Base.equal basename rest with
+                | None, rest ->
+                  wr_check, (basename::nf_opam), rest
+                | Some ohash, rest ->
+                  (if OpamHash.check_file (OpamFilename.to_string file) ohash then
+                     wr_check
+                   else
+                     basename::wr_check),
+                  nf_opam, rest
+              ) ([], [], oef) ef
+          in
+          let nf_file = List.map fst rest in
+          if nf_file <> [] || wr_check <> [] || nf_opam <> [] then
+            log "Mismatching extra-files at %s: %s"
+              (OpamFilename.Dir.to_string dir)
+              ((if nf_file = [] then None else
+                  Some (Printf.sprintf "missing from 'files' directory (%d)"
+                          (List.length nf_file)))
+               :: (if nf_opam = [] then None else
+                     Some (Printf.sprintf "missing from opam file (%d)"
+                             (List.length nf_opam)))
+               :: (if wr_check = [] then None else
+                     Some (Printf.sprintf "wrong checksum (%d)"
+                             (List.length wr_check)))
+               :: []
+               |> OpamStd.List.filter_some
+               |> OpamStd.Format.pretty_list);
+          opam
+      in
+      opam
+  in
+
+  let read_opam dir =
+    let (opam_file: OpamFile.OPAM.t OpamFile.t) =
+      OpamFile.make (dir // "opam")
+    in
+    match try_read OpamFile.OPAM.read_opt opam_file with
+    | Some opam, None -> Some (add_aux_files ~dir ~files_subdir_hashes:false opam)
+    | _, Some err ->
+      OpamConsole.warning
+        "Could not read file %s. skipping:\n%s"
+        (OpamFile.to_string opam_file)
+        (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
+      None
+    | None, None -> None
+    | exception OpamPp.Bad_version ((_, _errmsg), Some version) ->
+      let sversion = OpamVersion.to_string version in
+      let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
+      log "opam-version %S unsupported on %s. Added as dummy unavailable package."
+        sversion (OpamFile.to_string opam_file);
+      Some
+        (OpamFile.OPAM.empty
+         |> OpamFile.OPAM.with_available
+           (FOp (FIdent ([], OpamVariable.of_string "opam-version", None),
+                 `Geq, FString sversion))
+         |> OpamFile.OPAM.with_descr_body
+           (Printf.sprintf
+              "This package uses opam %s file format which opam %s cannot \
+               read.\n\n\
+               In order to install or view information on this package, please \
+               upgrade your opam installation to at least version %s."
+              sversion scurrent sversion))
+  in
+
+  let read_repo_opam_dir ~repo_name ~repo_root dir =
+    let open OpamStd.Option.Op in
+    let tdebug = false in
+    if tdebug then
+      (OpamConsole.error "FT:RROD: read_repo_opam dir --> %s"
+         (OpamFilename.Dir.to_string dir);
+       OpamConsole.error "FT:RROD: read_repo_opam rel --> %s"
+         ( (OpamFilename.remove_prefix_dir
+              (OpamRepositoryRoot.Dir.to_dir repo_root) dir)));
+    read_opam dir >>|
+    OpamFile.OPAM.with_metadata_dir
+      (Some (Some repo_name,
+             OpamFilename.remove_prefix_dir
+               (OpamRepositoryRoot.Dir.to_dir repo_root) dir))
+  in
+
+  ()
+
+let _obsolete_tar =
+  let try_read_tar
+    = fun rd c f ->
+      log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename f));
+      try Some (rd c), None with
+      | (OpamSystem.Internal_error _ | Not_found) as exc ->
+        if OpamFormatConfig.(!r.strict) then
+          OpamConsole.error_and_exit `File_error
+            "Could not read file %s: %s.\nAborting (strict mode)."
+            (OpamFile.to_string f) (Printexc.to_string exc);
+        None,
+        let f = OpamFile.filename f in
+        Some (OpamFilename.(Base.to_string (basename f)),
+              (Some (pos_file f), Printexc.to_string exc))
+      | OpamPp.Bad_format bf as exc ->
+        if OpamFormatConfig.(!r.strict) then
+          OpamConsole.error_and_exit `File_error
+            "Errors while parsing %s: %s.\nAborting (strict mode)."
+            (OpamFile.to_string f) (Printexc.to_string exc);
+        None,
+        let f = OpamFile.filename f in
+        Some (OpamFilename.(Base.to_string (basename f)), bf)
+  in
+
+  let try_read_t = fun rd c f ->
+    log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename f));
+    try Some (rd c), None with
+    | (OpamSystem.Internal_error _ | Not_found) as exc ->
+      if OpamFormatConfig.(!r.strict) then
+        OpamConsole.error_and_exit `File_error
+          "Could not read file %s: %s.\nAborting (strict mode)."
+          (OpamFile.to_string f) (Printexc.to_string exc);
+      None,
+      let f = OpamFile.filename f in
+      Some (OpamFilename.(Base.to_string (basename f)),
+            (Some (pos_file f), Printexc.to_string exc))
+    | OpamPp.Bad_format bf as exc ->
+      if OpamFormatConfig.(!r.strict) then
+        OpamConsole.error_and_exit `File_error
+          "Errors while parsing %s: %s.\nAborting (strict mode)."
+          (OpamFile.to_string f) (Printexc.to_string exc);
+      None,
+      let f = OpamFile.filename f in
+      Some (OpamFilename.(Base.to_string (basename f)), bf)
+  in
+
+  let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFilename.Map.t) =
+    let tdebug = false in
+    let dir = match dir with
+      | None ->
+        (match OpamFile.OPAM.metadata_dir opam with
+         | None -> None
+         | Some (None, dir) ->
+           if tdebug then
+             OpamConsole.error "ADD AUX FILES TAR absolute dir %s" (dir);
+           Some (OpamFilename.Dir.of_string dir)
+         | Some (Some r, _) ->
+           if tdebug then
+             OpamConsole.error "ADD AUX FILES TAR relative dir";
+           failwith ("Repository "^OpamRepositoryName.to_string r^
+                     " not registered for add_aux_files!"))
+      | some -> some
+    in
+    match dir with
+    | None -> opam
+    | Some dir ->
+      let url_file  =
+        let f = dir // "url" in
+        OpamFile.make f
+      in
+      let descr_file  =
+        let f = dir // "descr" in
+        OpamFile.make f
+      in
+      let files_dir =
+        OpamFilename.Op.(dir / "files")
+      in
+      let try_read_url f  =
+        match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
+        | Some content ->
+          try_read_tar (OpamFile.URL.read_from_string ~filename:f) content f
+        | None -> None, None
+      in
+      let try_read_descr f  =
+        match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
+        | Some content ->
+          try_read_tar (OpamFile.Descr.read_from_string ~filename:f) content f
+        | None -> None, None
+      in
+      let opam =
+        match OpamFile.OPAM.url opam,
+              try_read_url url_file
+        with
+        | None, (Some url, None) -> OpamFile.OPAM.with_url url opam
+        | Some opam_url, (Some url, errs) ->
+          if url = opam_url && errs = None then
+            log "Duplicate definition of url in '%s' and opam file"
+              (OpamFile.to_string url_file)
+          else
+            OpamConsole.warning
+              "File '%s' ignored (conflicting url already specified in the \
+               'opam' file)"
+              (OpamFile.to_string url_file);
+          opam
+        | _, (_, Some err) ->
+          OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
+        | _, (None, None) -> opam
+      in
+      let opam =
+        match OpamFile.OPAM.descr opam,
+              try_read_descr descr_file with
+        | None, (Some descr, None) -> OpamFile.OPAM.with_descr descr opam
+        | Some _, (Some _, _) ->
+          log "Duplicate descr in '%s' and opam file"
+            (OpamFile.to_string descr_file);
+          opam
+        | _, (_, Some err) ->
+          OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
+        | _, (None, None)  -> opam
+      in
+      let opam =
+        let n = OpamPackage.Name.to_string (OpamFile.OPAM.name opam) in
+        let extra_files =
+          let tdebug = false in
+          if tdebug then
+            OpamConsole.error "OFT:AAF:%s: XFS :\n%s" n
+              (OpamStd.Format.itemize OpamFilename.to_string
+                 (OpamFilename.Map.keys xfs));
+          let xfiles =
+            OpamFilename.Map.fold (fun file content ef ->
+                if tdebug then
+                  OpamConsole.error "OFT:AAF: pre %s file %s -> %B"
+                    (OpamFilename.Dir.to_string files_dir)
+                    (OpamFilename.to_string file)
+                    (OpamFilename.starts_with files_dir file);
+                if OpamFilename.starts_with files_dir file then
+                  let basename =
+                    file
+                    |> OpamFilename.remove_prefix files_dir
+                    |> OpamFilename.Base.of_string
+                  in
+                  (file, basename, content)::ef
+                else ef) xfs []
+          in
+          match List.rev xfiles with
+          | [] -> None
+          | ef -> Some ef
+        in
+        if tdebug then
+          (OpamConsole.error "OFT:AAF:%s: opam ef %s" n
+             (OpamStd.Option.to_string ~none:"XXX"
+                (OpamStd.List.to_string  (fun (f,_) -> OpamFilename.Base.to_string f))
+                (OpamFile.OPAM.extra_files opam));
+           OpamConsole.error "OFT:AAF:%s: arch ef %s" n
+             (OpamStd.Option.to_string ~none:"XXX"
+                (OpamStd.List.to_string  (fun (f,_,_) -> OpamFilename.to_string f))
+                extra_files);
+          );
+        match OpamFile.OPAM.extra_files opam, extra_files with
+        | None, None -> opam
+        | None, Some ef ->
+          let log ?level act =
+            log ?level
+              "Missing extra-files field for %a for %a, %s them."
+              (slog @@ OpamStd.List.concat_map ", "
+                 (fun (_,f,_) -> OpamFilename.Base.to_string f)) ef
+              OpamStd.Op.(slog @@ OpamPackage.to_string @* OpamFile.OPAM.package)
+              opam act
+          in
+          if files_subdir_hashes then
+            (log ~level:2 "adding";
+             let ef =
+               List.map
+                 (fun (_, basename, content) ->
+                    basename,
+                    OpamHash.compute_from_string content)
+                 ef
+             in
+             OpamFile.OPAM.with_extra_files ef opam)
+          else
+            (log "ignoring";
+             opam)
+        | Some ef, None ->
+          log "Missing expected extra files %s at %s/files"
+            (OpamStd.List.concat_map ", "
+               (fun (f,_) -> OpamFilename.Base.to_string f) ef)
+            (OpamFilename.Dir.to_string dir);
+          opam
+        | Some oef, Some ef ->
+          let wr_check, nf_opam, rest =
+            List.fold_left (fun (wr_check, nf_opam, rest) (_file, basename, content) ->
+                match OpamStd.List.pick_assoc
+                        OpamFilename.Base.equal basename rest with
+                | None, rest ->
+                  if tdebug then
+                    OpamConsole.error "not found hash for %s"
+                      (OpamFilename.Base.to_string basename);
+                  wr_check, (basename::nf_opam), rest
+                | Some ohash, rest ->
+                  if tdebug then
+                    OpamConsole.error "found hash for %s -> %B"
+                      (OpamFilename.Base.to_string basename)
+                      (OpamHash.check_string content ohash);
+                  (if OpamHash.check_string content ohash then
+                     wr_check
+                   else
+                     basename::wr_check),
+                  nf_opam, rest
+              ) ([], [], oef) ef
+          in
+          let nf_file = List.map fst rest in
+          if nf_file <> [] || wr_check <> [] || nf_opam <> [] then
+            log "Mismatching extra-files at %s: %s"
+              (OpamFilename.Dir.to_string dir)
+              ((if nf_file = [] then None else
+                  Some (Printf.sprintf "missing from 'files' directory (%d)"
+                          (List.length nf_file)))
+               :: (if nf_opam = [] then None else
+                     Some (Printf.sprintf "missing from opam file (%d)"
+                             (List.length nf_opam)))
+               :: (if wr_check = [] then None else
+                     Some (Printf.sprintf "wrong checksum (%d)"
+                             (List.length wr_check)))
+               :: []
+               |> OpamStd.List.filter_some
+               |> OpamStd.Format.pretty_list);
+          opam
+      in
+      opam
+  in
+
+  let read_opam_tar dir filename content xfs =
+    let opam_file = OpamFile.make filename in
+    let filename = OpamFile.make filename in
+    match try_read_tar (OpamFile.OPAM.read_from_string ~filename) content filename with
+    | Some opam, None -> Some (add_aux_files_tar ~dir ~files_subdir_hashes:false opam xfs)
+    | _, Some err ->
+      OpamConsole.warning
+        "Could not read file %s. skipping:\n%s"
+        (OpamFile.to_string opam_file)
+        (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
+      None
+    | None, None -> None
+    | exception OpamPp.Bad_version ((_, _errmsg), Some version) ->
+      let sversion = OpamVersion.to_string version in
+      let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
+      log "opam-version %S unsupported on %s. Added as dummy unavailable package."
+        sversion (OpamFile.to_string opam_file);
+      Some
+        (OpamFile.OPAM.empty
+         |> OpamFile.OPAM.with_available
+           (FOp (FIdent ([], OpamVariable.of_string "opam-version", None),
+                 `Geq, FString sversion))
+         |> OpamFile.OPAM.with_descr_body
+           (Printf.sprintf
+              "This package uses opam %s file format which opam %s cannot \
+               read.\n\n\
+               In order to install or view information on this package, please \
+               upgrade your opam installation to at least version %s."
+              sversion scurrent sversion))
+  in
+
+  let read_repo_opam_tar ~repo_name ~repo_root:_ dir file content xfs =
+    let open OpamStd.Option.Op in
+    let tdebug = false in
+    let rel =
+      OpamFilename.remove_prefix_dir
+        (OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name))
+        dir
+    in
+    if tdebug then
+      (OpamConsole.error "FT:RROT: read_repo_opam_tar dir --> %s"
+         (OpamFilename.Dir.to_string dir);
+       OpamConsole.error "FT:RROT: read_repo_opam_tar rel --> %s" (rel));
+    read_opam_tar dir file content xfs
+    >>| OpamFile.OPAM.with_metadata_dir
+      (Some (Some repo_name, rel))
+  in
+  ()
 
 let try_read rd f =
   try rd f, None with
@@ -1352,28 +1837,10 @@ let try_read rd f =
     let f = OpamFile.filename f in
     Some (OpamFilename.(Base.to_string (basename f)), bf)
 
-let try_read_tar rd c f =
-  log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename f));
-  try Some (rd c), None with
-  | (OpamSystem.Internal_error _ | Not_found) as exc ->
-    if OpamFormatConfig.(!r.strict) then
-      OpamConsole.error_and_exit `File_error
-        "Could not read file %s: %s.\nAborting (strict mode)."
-        (OpamFile.to_string f) (Printexc.to_string exc);
-    None,
-    let f = OpamFile.filename f in
-    Some (OpamFilename.(Base.to_string (basename f)),
-          (Some (pos_file f), Printexc.to_string exc))
-  | OpamPp.Bad_format bf as exc ->
-    if OpamFormatConfig.(!r.strict) then
-      OpamConsole.error_and_exit `File_error
-        "Errors while parsing %s: %s.\nAborting (strict mode)."
-        (OpamFile.to_string f) (Printexc.to_string exc);
-    None,
-    let f = OpamFile.filename f in
-    Some (OpamFilename.(Base.to_string (basename f)), bf)
+let read_from_content rd content =
+  fun f -> Some (rd ?filename:(Some f) content)
 
-let add_aux_files ?dir ?(files_subdir_hashes=false) opam =
+let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
   let tdebug = false in
   let dir = match dir with
     | None ->
@@ -1388,170 +1855,38 @@ let add_aux_files ?dir ?(files_subdir_hashes=false) opam =
            OpamConsole.error "ADD AUX FILES relative dir";
          failwith ("Repository "^OpamRepositoryName.to_string r^
                    " not registered for add_aux_files!"))
-    | some -> some
+    | Some dir ->
+      if tdebug then
+        OpamConsole.error "ADD AUX FILES given dir %s" (OpamFilename.Dir.to_string dir);
+      Some dir
   in
   match dir with
   | None -> opam
   | Some dir ->
-    let (url_file: OpamFile.URL.t OpamFile.t) =
-      OpamFile.make (dir // "url")
+    let string_of_dir d =
+      match dir_label with
+      | Some repo_root ->
+        Printf.sprintf "%s (out of %s)"
+          (OpamFilename.Dir.to_string d)
+          (OpamRepositoryRoot.to_string repo_root)
+      | None -> OpamFilename.Dir.to_string d
     in
-    let (descr_file: OpamFile.Descr.t OpamFile.t)  =
-      OpamFile.make (dir // "descr")
-    in
-    let files_dir =
-      OpamFilename.Op.(dir / "files")
-    in
-    let opam =
-      match OpamFile.OPAM.url opam, try_read OpamFile.URL.read_opt url_file with
-      | None, (Some url, None) -> OpamFile.OPAM.with_url url opam
-      | Some opam_url, (Some url, errs) ->
-        if url = opam_url && errs = None then
-          log "Duplicate definition of url in '%s' and opam file"
-            (OpamFile.to_string url_file)
-        else
-          OpamConsole.warning
-            "File '%s' ignored (conflicting url already specified in the \
-             'opam' file)"
-            (OpamFile.to_string url_file);
-        opam
-      | _, (_, Some err) ->
-        OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
-      | _, (None, None) -> opam
-    in
-    let opam =
-      match OpamFile.OPAM.descr opam,
-            try_read OpamFile.Descr.read_opt descr_file with
-      | None, (Some descr, None) -> OpamFile.OPAM.with_descr descr opam
-      | Some _, (Some _, _) ->
-        log "Duplicate descr in '%s' and opam file"
-          (OpamFile.to_string descr_file);
-        opam
-      | _, (_, Some err) ->
-        OpamFile.OPAM.with_format_errors (err :: opam.format_errors) opam
-      | _, (None, None)  -> opam
-    in
-    let opam =
-      let extra_files =
-        OpamFilename.opt_dir files_dir >>| fun dir ->
-        OpamFilename.rec_files dir
-        |> List.map (fun file ->
-            file,
-            OpamFilename.Base.of_string
-              (OpamSystem.back_to_forward
-                 (OpamFilename.remove_prefix dir file)))
-      in
-      match OpamFile.OPAM.extra_files opam, extra_files with
-      | None, None -> opam
-      | None, Some ef ->
-        let log ?level act =
-          log ?level
-            "Missing extra-files field for %a for %a, %s them."
-            (slog @@ OpamStd.List.concat_map ", "
-               (fun (_,f) -> OpamFilename.Base.to_string f)) ef
-            OpamStd.Op.(slog @@ OpamPackage.to_string @* OpamFile.OPAM.package)
-            opam act
-        in
-        if files_subdir_hashes then
-          (log ~level:2 "adding";
-           let ef =
-             List.map
-               (fun (file, basename) ->
-                  basename,
-                  OpamHash.compute (OpamFilename.to_string file))
-               ef
-           in
-           OpamFile.OPAM.with_extra_files ef opam)
-        else
-          (log "ignoring";
-           opam)
-      | Some ef, None ->
-        log "Missing expected extra files %s at %s/files"
-          (OpamStd.List.concat_map ", "
-             (fun (f,_) -> OpamFilename.Base.to_string f) ef)
-          (OpamFilename.Dir.to_string dir);
-        opam
-      | Some oef, Some ef ->
-        let wr_check, nf_opam, rest =
-          List.fold_left (fun (wr_check, nf_opam, rest) (file, basename) ->
-              match OpamStd.List.pick_assoc
-                      OpamFilename.Base.equal basename rest with
-              | None, rest ->
-                wr_check, (basename::nf_opam), rest
-              | Some ohash, rest ->
-                (if OpamHash.check_file (OpamFilename.to_string file) ohash then
-                   wr_check
-                 else
-                   basename::wr_check),
-                nf_opam, rest
-            ) ([], [], oef) ef
-        in
-        let nf_file = List.map fst rest in
-        if nf_file <> [] || wr_check <> [] || nf_opam <> [] then
-          log "Mismatching extra-files at %s: %s"
-            (OpamFilename.Dir.to_string dir)
-            ((if nf_file = [] then None else
-                Some (Printf.sprintf "missing from 'files' directory (%d)"
-                        (List.length nf_file)))
-             :: (if nf_opam = [] then None else
-                   Some (Printf.sprintf "missing from opam file (%d)"
-                           (List.length nf_opam)))
-             :: (if wr_check = [] then None else
-                   Some (Printf.sprintf "wrong checksum (%d)"
-                           (List.length wr_check)))
-             :: []
-             |> OpamStd.List.filter_some
-             |> OpamStd.Format.pretty_list);
-        opam
-    in
-    opam
-
-let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFilename.Map.t) =
-  let tdebug = false in
-  let dir = match dir with
-    | None ->
-      (match OpamFile.OPAM.metadata_dir opam with
-       | None -> None
-       | Some (None, dir) ->
-         if tdebug then
-           OpamConsole.error "ADD AUX FILES TAR absolute dir %s" (dir);
-         Some (OpamFilename.Dir.of_string dir)
-       | Some (Some r, _) ->
-         if tdebug then
-           OpamConsole.error "ADD AUX FILES TAR relative dir";
-         failwith ("Repository "^OpamRepositoryName.to_string r^
-                   " not registered for add_aux_files!"))
-    | some -> some
-  in
-  match dir with
-  | None -> opam
-  | Some dir ->
-    let url_file  =
-      let f = dir // "url" in
-      OpamFile.make f
-    in
-    let descr_file  =
-      let f = dir // "descr" in
-      OpamFile.make f
-    in
-    let files_dir =
-      OpamFilename.Op.(dir / "files")
-    in
-    let try_read_url f  =
-      match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
-      | Some content ->
-        try_read_tar (OpamFile.URL.read_from_string ~filename:f) content f
-      | None -> None, None
-    in
-    let try_read_descr f  =
-      match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
-      | Some content ->
-        try_read_tar (OpamFile.Descr.read_from_string ~filename:f) content f
-      | None -> None, None
+    let url_file = OpamFile.make (dir // "url") in
+    let descr_file = OpamFile.make (dir // "descr") in
+    let files_dir = OpamFilename.Op.(dir / "files") in
+    let try_read
+      : 'a. (?filename:'a OpamFile.typed_file -> string -> 'a)
+        -> 'a OpamFile.t ->  'a option * (string * OpamPp.bad_format) option
+      = fun
+        rd f ->
+        match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
+        | Some content ->
+          try_read (read_from_content rd (Lazy.force content)) f
+        | None -> None, None
     in
     let opam =
       match OpamFile.OPAM.url opam,
-            try_read_url url_file
+            try_read OpamFile.URL.read_from_string url_file
       with
       | None, (Some url, None) -> OpamFile.OPAM.with_url url opam
       | Some opam_url, (Some url, errs) ->
@@ -1570,7 +1905,7 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
     in
     let opam =
       match OpamFile.OPAM.descr opam,
-            try_read_descr descr_file with
+            try_read OpamFile.Descr.read_from_string descr_file with
       | None, (Some descr, None) -> OpamFile.OPAM.with_descr descr opam
       | Some _, (Some _, _) ->
         log "Duplicate descr in '%s' and opam file"
@@ -1581,7 +1916,12 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
       | _, (None, None)  -> opam
     in
     let opam =
-      let n = OpamPackage.Name.to_string (OpamFile.OPAM.name opam) in
+      let n =
+        if tdebug then "" else
+          try
+            OpamPackage.Name.to_string (OpamFile.OPAM.name opam)
+          with _ -> "in "^ string_of_dir dir
+      in
       let extra_files =
         let tdebug = false in
         if tdebug then
@@ -1592,7 +1932,7 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
           OpamFilename.Map.fold (fun file content ef ->
               if tdebug then
                 OpamConsole.error "OFT:AAF: pre %s file %s -> %B"
-                  (OpamFilename.Dir.to_string files_dir)
+                  (string_of_dir files_dir)
                   (OpamFilename.to_string file)
                   (OpamFilename.starts_with files_dir file);
               if OpamFilename.starts_with files_dir file then
@@ -1601,7 +1941,7 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
                   |> OpamFilename.remove_prefix files_dir
                   |> OpamFilename.Base.of_string
                 in
-                (file, basename, content)::ef
+                (basename, Lazy.force content)::ef
               else ef) xfs []
         in
         match List.rev xfiles with
@@ -1613,9 +1953,9 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
            (OpamStd.Option.to_string ~none:"XXX"
               (OpamStd.List.to_string  (fun (f,_) -> OpamFilename.Base.to_string f))
               (OpamFile.OPAM.extra_files opam));
-         OpamConsole.error "OFT:AAF:%s: arch ef %s" n
+         OpamConsole.error "OFT:AAF:%s: repo ef %s" n
            (OpamStd.Option.to_string ~none:"XXX"
-              (OpamStd.List.to_string  (fun (f,_,_) -> OpamFilename.to_string f))
+              (OpamStd.List.to_string  (fun (f,_) -> OpamFilename.Base.to_string f))
               extra_files);
         );
       match OpamFile.OPAM.extra_files opam, extra_files with
@@ -1625,17 +1965,15 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
           log ?level
             "Missing extra-files field for %a for %a, %s them."
             (slog @@ OpamStd.List.concat_map ", "
-               (fun (_,f,_) -> OpamFilename.Base.to_string f)) ef
+               (fun (f,_) -> OpamFilename.Base.to_string f)) ef
             OpamStd.Op.(slog @@ OpamPackage.to_string @* OpamFile.OPAM.package)
             opam act
         in
         if files_subdir_hashes then
           (log ~level:2 "adding";
            let ef =
-             List.map
-               (fun (_, basename, content) ->
-                  basename,
-                  OpamHash.compute_from_string content)
+             List.map (fun (basename, content) ->
+                 basename, OpamHash.compute_from_string content)
                ef
            in
            OpamFile.OPAM.with_extra_files ef opam)
@@ -1643,14 +1981,14 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
           (log "ignoring";
            opam)
       | Some ef, None ->
-        log "Missing expected extra files %s at %s/files"
+        log "Missing expected extra files %s at %s"
           (OpamStd.List.concat_map ", "
              (fun (f,_) -> OpamFilename.Base.to_string f) ef)
-          (OpamFilename.Dir.to_string dir);
+          (string_of_dir files_dir);
         opam
       | Some oef, Some ef ->
         let wr_check, nf_opam, rest =
-          List.fold_left (fun (wr_check, nf_opam, rest) (_file, basename, content) ->
+          List.fold_left (fun (wr_check, nf_opam, rest) (basename, content) ->
               match OpamStd.List.pick_assoc
                       OpamFilename.Base.equal basename rest with
               | None, rest ->
@@ -1667,13 +2005,13 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
                    wr_check
                  else
                    basename::wr_check),
-                nf_opam, rest
-            ) ([], [], oef) ef
+                nf_opam, rest)
+            ([], [], oef) ef
         in
         let nf_file = List.map fst rest in
         if nf_file <> [] || wr_check <> [] || nf_opam <> [] then
           log "Mismatching extra-files at %s: %s"
-            (OpamFilename.Dir.to_string dir)
+            (string_of_dir dir)
             ((if nf_file = [] then None else
                 Some (Printf.sprintf "missing from 'files' directory (%d)"
                         (List.length nf_file)))
@@ -1690,97 +2028,140 @@ let add_aux_files_tar ?dir ?(files_subdir_hashes=false) opam (xfs: string OpamFi
     in
     opam
 
-let read_opam dir =
-  let (opam_file: OpamFile.OPAM.t OpamFile.t) =
-    OpamFile.make (dir // "opam")
+let get_xfs ~repo_root dir =
+  let to_key =
+    match repo_root with
+    | Some repo_root ->
+      fun file ->
+        OpamRepositoryRoot.remove_prefix file repo_root
+    | None -> Fun.id
   in
-  match try_read OpamFile.OPAM.read_opt opam_file with
-  | Some opam, None -> Some (add_aux_files ~dir ~files_subdir_hashes:false opam)
-  | _, Some err ->
-    OpamConsole.warning
-      "Could not read file %s. skipping:\n%s"
-      (OpamFile.to_string opam_file)
-      (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
-    None
-  | None, None -> None
-  | exception OpamPp.Bad_version ((_, _errmsg), Some version) ->
-    let sversion = OpamVersion.to_string version in
-    let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
-    log "opam-version %S unsupported on %s. Added as dummy unavailable package."
-      sversion (OpamFile.to_string opam_file);
-    Some
-      (OpamFile.OPAM.empty
-       |> OpamFile.OPAM.with_available
-         (FOp (FIdent ([], OpamVariable.of_string "opam-version", None),
-               `Geq, FString sversion))
-       |> OpamFile.OPAM.with_descr_body
-         (Printf.sprintf
-            "This package uses opam %s file format which opam %s cannot \
-             read.\n\n\
-             In order to install or view information on this package, please \
-             upgrade your opam installation to at least version %s."
-            sversion scurrent sversion))
-
-let read_opam_tar dir filename content xfs =
-  let opam_file = OpamFile.make filename in
-  let filename = OpamFile.make filename in
-  match try_read_tar (OpamFile.OPAM.read_from_string ~filename) content filename with
-  | Some opam, None -> Some (add_aux_files_tar ~dir ~files_subdir_hashes:false opam xfs)
-  | _, Some err ->
-    OpamConsole.warning
-      "Could not read file %s. skipping:\n%s"
-      (OpamFile.to_string opam_file)
-      (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
-    None
-  | None, None -> None
-  | exception OpamPp.Bad_version ((_, _errmsg), Some version) ->
-    let sversion = OpamVersion.to_string version in
-    let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
-    log "opam-version %S unsupported on %s. Added as dummy unavailable package."
-      sversion (OpamFile.to_string opam_file);
-    Some
-      (OpamFile.OPAM.empty
-       |> OpamFile.OPAM.with_available
-         (FOp (FIdent ([], OpamVariable.of_string "opam-version", None),
-               `Geq, FString sversion))
-       |> OpamFile.OPAM.with_descr_body
-         (Printf.sprintf
-            "This package uses opam %s file format which opam %s cannot \
-             read.\n\n\
-             In order to install or view information on this package, please \
-             upgrade your opam installation to at least version %s."
-            sversion scurrent sversion))
-
-let read_repo_opam_dir ~repo_name ~repo_root dir =
-  let open OpamStd.Option.Op in
+  let r =
+    List.fold_left (fun map file ->
+        OpamFilename.Map.add (to_key file)
+          (lazy (OpamFilename.read file)) map)
+      OpamFilename.Map.empty (OpamFilename.rec_files dir)
+  in
   let tdebug = false in
   if tdebug then
-  (OpamConsole.error "FT:RROD: read_repo_opam dir --> %s"
-     (OpamFilename.Dir.to_string dir);
-   OpamConsole.error "FT:RROD: read_repo_opam rel --> %s"
-     ( (OpamFilename.remove_prefix_dir
-          (OpamRepositoryRoot.Dir.to_dir repo_root) dir)));
-  read_opam dir >>|
-  OpamFile.OPAM.with_metadata_dir
-    (Some (Some repo_name,
-           OpamFilename.remove_prefix_dir
-             (OpamRepositoryRoot.Dir.to_dir repo_root) dir))
+    OpamConsole.error "OFF:get_xfs:\n%s"
+      (OpamStd.Format.itemize OpamFilename.to_string (OpamFilename.Map.keys r));
+  r
 
-let read_repo_opam_tar ~repo_name ~repo_root:_ dir file content xfs =
+let get_contents ~repo_root dir =
+  let file = dir // "opam" in
+  let content = lazy (OpamFilename.read file) in
+  let xfs = get_xfs ~repo_root dir in
+  file, content, xfs
+
+let add_aux_files ?dir ?files_subdir_hashes opam =
+  let tdebug = false in
+  if tdebug then
+    OpamConsole.error "OFF:add_aux_files %s"
+      (OpamStd.Option.to_string ~none:"XXX" OpamFilename.Dir.to_string dir);
+  let dir = match dir with
+    | None ->
+      (match OpamFile.OPAM.metadata_dir opam with
+       | None -> None
+       | Some (None, dir) ->
+         Some (OpamFilename.Dir.of_string dir)
+       | Some (Some r, _) ->
+         failwith ("Repository "^OpamRepositoryName.to_string r^
+                   " not registered for add_aux_files!"))
+    | some -> some
+  in
+  match dir with
+  | None -> opam
+  | Some dir ->
+    (* We are in the case of an absolute dir here *)
+    let xfs = get_xfs ~repo_root:None dir in
+    add_aux_files_t ~dir ?files_subdir_hashes opam xfs
+
+let read_opam_t ?dir_label dir filename content xfs =
+  let tdebug = false in
+  if tdebug then
+    OpamConsole.error "OFF:read_opam_t %s %s"
+      (OpamFilename.Dir.to_string dir) (OpamFilename.to_string filename);
+  let opam_file = OpamFile.make filename in
+  let filename = OpamFile.make filename in
+  let rd f =
+    try
+      Some (OpamFile.OPAM.read_from_string
+      ?filename:(Some f) (Lazy.force content))
+    with OpamSystem.File_not_found _ -> None
+  in
+  match try_read rd filename with
+  | Some opam, None ->
+    Some (add_aux_files_t ?dir_label ~dir ~files_subdir_hashes:false opam xfs)
+  | _, Some err ->
+    OpamConsole.warning
+      "Could not read file %s. skipping:\n%s"
+      (OpamFile.to_string opam_file)
+      (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
+    None
+  | None, None -> None
+  | exception OpamPp.Bad_version ((_, _errmsg), Some version) ->
+    let sversion = OpamVersion.to_string version in
+    let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
+    log "opam-version %S unsupported on %s. Added as dummy unavailable package."
+      sversion (OpamFile.to_string opam_file);
+    Some
+      (OpamFile.OPAM.empty
+       |> OpamFile.OPAM.with_available
+         (FOp (FIdent ([], OpamVariable.of_string "opam-version", None),
+               `Geq, FString sversion))
+       |> OpamFile.OPAM.with_descr_body
+         (Printf.sprintf
+            "This package uses opam %s file format which opam %s cannot \
+             read.\n\n\
+             In order to install or view information on this package, please \
+             upgrade your opam installation to at least version %s."
+            sversion scurrent sversion))
+
+let read_opam dir =
+  let tdebug = false in
+  if tdebug then
+    OpamConsole.error "OFF:read_opam %s" (OpamFilename.Dir.to_string dir);
+  let file, content, xfs = get_contents ~repo_root:None dir in
+  read_opam_t dir file content xfs
+
+let read_repo_opam_t ~repo_name ~repo_root dir file content xfs =
+  let tdebug = false in
+  if tdebug then
+    OpamConsole.error "OFF: read_repo_opam %s" (OpamFilename.Dir.to_string dir);
   let open OpamStd.Option.Op in
   let tdebug = false in
-  let rel =
+  let rel = OpamFilename.Dir.to_string dir in
+(*
     OpamFilename.remove_prefix_dir
       (OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name))
       dir
   in
+*)
   if tdebug then
     (OpamConsole.error "FT:RROT: read_repo_opam_tar dir --> %s"
        (OpamFilename.Dir.to_string dir);
      OpamConsole.error "FT:RROT: read_repo_opam_tar rel --> %s" (rel));
-  read_opam_tar dir file content xfs >>|
-  OpamFile.OPAM.with_metadata_dir
+  read_opam_t ~dir_label:repo_root dir file content xfs
+  >>| OpamFile.OPAM.with_metadata_dir
     (Some (Some repo_name, rel))
+
+let read_repo_opam_tar ~repo_name ~repo_root dir file content xfs =
+  let repo_root = OpamRepositoryRoot.Tar repo_root in
+  let xfs = OpamFilename.Map.map (fun c -> lazy c) xfs in
+  read_repo_opam_t ~repo_name ~repo_root dir file (lazy content) xfs
+
+let read_repo_opam_dir ~repo_name ~repo_root dir =
+  let repo_root = OpamRepositoryRoot.Dir repo_root in
+  let file, content, xfs = get_contents ~repo_root:(Some repo_root) dir in
+  let dir = OpamRepositoryRoot.remove_prefix_dir dir repo_root in
+(*
+    OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name)
+    / (OpamFilename.remove_prefix_dir
+         (OpamRepositoryRoot.Dir.to_dir repo_root) dir)
+  in
+*)
+  read_repo_opam_t ~repo_name ~repo_root dir file content xfs
 
 let dep_formula_to_string f =
   let pp =

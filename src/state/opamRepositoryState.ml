@@ -343,7 +343,7 @@ let load_opams_from_diff repo diffs rt =
         match is_opam_file file with
         | Some nv ->
           if rm then
-            adds, nv::rms, xfs
+            adds, OpamPackage.Set.add nv rms, xfs
           else
             OpamPackage.Map.add nv file adds, rms, xfs
         | None ->
@@ -369,14 +369,23 @@ let load_opams_from_diff repo diffs rt =
         | Patch.Delete_only -> remove file1 acc
         | Patch.Create_only -> add file2 acc
     in
-    List.fold_left operations OpamPackage.(Map.empty, [], Map.empty) diffs
+    List.fold_left operations OpamPackage.(Map.empty, Set.empty, Map.empty) diffs
   in
   let xfiles =
     OpamPackage.Map.fold (fun nv dir lst ->
-        if (OpamPackage.Map.mem nv additions) then lst
+        if OpamPackage.Map.mem nv additions
+        || OpamPackage.Set.mem nv removals then lst
         else dir::lst)
       xfiles []
   in
+  if tdebug then
+    (OpamConsole.error "RS:load opam from diff: ADDITIONS\n%s"
+       (OpamPackage.Map.to_string Fun.id additions);
+     OpamConsole.error "RS:load opam from diff: REMOVALS\n%s"
+       (OpamPackage.Set.to_string removals);
+     OpamConsole.error "RS:load opam from diff: ADDITIONS\n%s"
+       (OpamStd.List.to_string OpamFilename.Dir.to_string xfiles));
+
   let read_and_add =
     let read_package_opam =
       match repo_root with
@@ -406,7 +415,8 @@ let load_opams_from_diff repo diffs rt =
                     (OpamFilename.to_string f)
                     (try List.hd (String.split_on_char '\n' (OpamFilename.read f))
                      with _ -> "ERROR"))
-                 (OpamFilename.rec_files dir)));
+                 (OpamFilename.rec_files dir
+                 |> List.filter (fun f -> not (OpamStd.String.contains ~sub:".git" (OpamFilename.to_string f))))));
         fun dir ->
           let dir =
             OpamRepositoryRoot.Dir.Op.(repo_root
@@ -425,8 +435,7 @@ let load_opams_from_diff repo diffs rt =
   let process_operations opams =
     (* remove obsolete packages *)
     let opams =
-      List.fold_left (fun opams nv -> OpamPackage.Map.remove nv opams)
-        opams removals
+      OpamPackage.Set.fold OpamPackage.Map.remove removals opams
     in
     (* add new packages *)
     let opams =

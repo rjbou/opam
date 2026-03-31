@@ -203,7 +203,7 @@ opam-version: "2.0"
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-opam-file                       Mismatching extra-files at packages/qux/qux.1: wrong checksum (1)
+opam-file                       Mismatching extra-files at packages/qux/qux.1 (out of ${BASEDIR}/OPAM/repo/default.tar.gz): wrong checksum (1)
 Now run 'opam upgrade' to apply any package updates.
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
@@ -217,7 +217,7 @@ opam-version: "2.0"
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
-opam-file                       Missing expected extra files qux.installl at packages/qux/qux.1/files
+opam-file                       Missing expected extra files qux.installl at packages/qux/qux.1/files (out of ${BASEDIR}/OPAM/repo/default.tar.gz)
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
 ### :II: Git repo
@@ -346,7 +346,7 @@ opam-version: "2.0"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [git-test] synchronised from git+file://${BASEDIR}/GITREPO
-opam-file                       Mismatching extra-files at ${BASEDIR}/OPAM/repo/git-test/packages/qux/qux.1: wrong checksum (1)
+opam-file                       Mismatching extra-files at packages/qux/qux.1 (out of ${BASEDIR}/OPAM/repo/git-test): wrong checksum (1)
 Now run 'opam upgrade' to apply any package updates.
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
@@ -361,7 +361,7 @@ opam-version: "2.0"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [git-test] synchronised from git+file://${BASEDIR}/GITREPO
-opam-file                       Missing expected extra files qux.installl at ${BASEDIR}/OPAM/repo/git-test/packages/qux/qux.1/files
+opam-file                       Missing expected extra files qux.installl at packages/qux/qux.1/files (out of ${BASEDIR}/OPAM/repo/git-test)
 ### opam show qux --field extra-files: | $INSTALL_MD5 -> hash
 "qux.installl" "md5=hash"
 ### :II:6: Package removal with prefix directories
@@ -453,7 +453,7 @@ rm 'packages/prefix-pkg-c/pkg-c.1/files/k/1'
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [git-test] synchronised from git+file://${BASEDIR}/GITREPO
-opam-file                       Missing expected extra files 1, k/1 at ${BASEDIR}/OPAM/repo/git-test/packages/prefix-pkg-c/pkg-c.1/files
+opam-file                       Missing expected extra files 1, k/1 at packages/prefix-pkg-c/pkg-c.1/files (out of ${BASEDIR}/OPAM/repo/git-test)
 ### : ^ opam was updated so the missing extra files are detected
 ### opam list --all --repo=git-test -s
 new-pkg
@@ -725,7 +725,7 @@ build: [ "test" "-f" "%{name}%.installl" ]
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 2 changed files) done in 0.00s.
 FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
-opam-file                       Mismatching extra-files at packages/eta/eta.1: wrong checksum (1)
+opam-file                       Mismatching extra-files at packages/eta/eta.1 (out of ${BASEDIR}/OPAM/repo/incremental.tar.gz): wrong checksum (1)
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 Now run 'opam upgrade' to apply any package updates.
@@ -762,7 +762,7 @@ build: [ "test" "-f" "%{name}%.installl" ]
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{incremental.tar.gz,incremental.tar.gz.new}
 REPO_BACKEND                    Internal diff (tar-tar, non-empty, 1 changed files) done in 0.00s.
 FILE(opam)                      Read packages/eta/eta.1/opam in 0.000s
-opam-file                       Missing expected extra files eta.installl at packages/eta/eta.1/files
+opam-file                       Missing expected extra files eta.installl at packages/eta/eta.1/files (out of ${BASEDIR}/OPAM/repo/incremental.tar.gz)
 [incremental] synchronised from file://${BASEDIR}/INCR_REPO
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ### opam show eta --field extra-files: | $INSTALL_MD5 -> hash

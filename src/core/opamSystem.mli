@@ -196,8 +196,9 @@ val dirs: string -> string list
 val dir_is_empty: string -> bool option
 
 (** [directories_with_links dir] returns the directories in the directory [dir].
-    Links pointing to directory are also returned. *)
-val directories_with_links: string -> string list
+    Links pointing to directory are also returned.
+    TAR TODO update doc *)
+val directories_with_links: ?except_vcs:bool -> string -> string list
 
 (** Make a comman suitable for OpamProcess.Job. if [verbose], is set,
     command and output will be displayed (at command end for the
