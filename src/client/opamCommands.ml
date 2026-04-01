@@ -2502,24 +2502,24 @@ let repository cli =
       in
       OpamGlobalState.with_ `Lock_none @@ fun gt ->
       OpamRepositoryState.with_ `Lock_write gt @@ fun rt ->
-      OpamFilename.with_tmp_dir @@ fun tmp_dir ->
+      OpamFilename.with_tmp_dir @@ fun inn ->
       let rt0 = rt in
       let backup =
-        let tar = OpamRepositoryPath.tar gt.root name in
-        if OpamRepositoryRoot.Tar.exists tar then
-          (let target = OpamRepositoryRoot.Tar.backup ~tmp_dir tar in
-           OpamRepositoryRoot.Tar.copy ~src:tar ~dst:target;
-           fun () -> OpamRepositoryRoot.Tar.copy ~src:target ~dst:tar)
-        else
-          (let dir = OpamRepositoryPath.root gt.root name in
+        let repo_root =
+          OpamRepositoryState.get_repo_root rt
+            (OpamRepositoryState.get_repo rt name)
+        in
+        (* TAR TODO reintroduce the check :
            if not (OpamRepositoryRoot.Dir.exists dir) then
-             OpamConsole.error_and_exit `Internal_error
-               "Repository not found, consider running 'opam update %s' \
-                to retrieve a consistent state."
-               (OpamRepositoryName.to_string name);
-           let target = OpamRepositoryRoot.Dir.backup ~tmp_dir dir in
-           OpamRepositoryRoot.Dir.copy ~src:dir ~dst:target;
-           fun () -> OpamRepositoryRoot.Dir.copy ~src:target ~dst:dir)
+           OpamConsole.error_and_exit `Internal_error
+            "Repository not found, consider running 'opam update %s' \
+             to retrieve a consistent state."
+            (OpamRepositoryName.to_string name);*)
+        let target = OpamRepositoryRoot.backup ~inn repo_root in
+        (* TAR TODO : handle the reutnr of this *)
+        OpamRepositoryRoot.copy ~src:repo_root ~dst:target;
+        (* TAR TODO : handle the reutnr of this *)
+        fun () -> OpamRepositoryRoot.copy ~src:target ~dst:repo_root
       in
       let rt = OpamRepositoryCommand.set_url rt name url trust_anchors in
       let failed, rt =
