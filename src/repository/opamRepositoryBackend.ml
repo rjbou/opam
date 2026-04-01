@@ -189,14 +189,13 @@ let get_diff repo1 repo2 =
           | Some diff -> diff :: diffs)
       contents1 diffs
   in
-  let label = prefix repo1 ^ "-" ^ prefix repo2 in
   match diffs with
   | [] ->
-    log "Internal diff (%s, empty) done in %.2fs." label (chrono ());
+    log "Internal diff (empty) done in %.2fs." (chrono ());
     None
   | diffs ->
-    log "Internal diff (%s, non-empty, %a changed files) done in %.2fs."
-      label (slog (fun l -> string_of_int (List.length l))) diffs (chrono ());
+    log "Internal diff (non-empty, %a changed files) done in %.2fs."
+      (slog (fun l -> string_of_int (List.length l))) diffs (chrono ());
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
     OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list diffs);
