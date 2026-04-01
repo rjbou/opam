@@ -99,8 +99,15 @@ let strip_repo_suffix patch =
   {patch with operation}
 
 let get_diff repo1 repo2 =
-  let tdebug = tdebug false in
-  tdebug "DIFF GENERIQ";
+  let tdebug = false in
+  if tdebug then OpamConsole.error "RBCK: DIFF GENERIQ";
+  if tdebug then OpamConsole.error "RBCK: diff repo1 : %s" (OpamRepositoryRoot.to_string repo1);
+  if tdebug then OpamConsole.error "RBCK: diff repo2 : %s" (OpamRepositoryRoot.to_string repo2);
+  if false
+  && ((OpamRepositoryRoot.is_dir repo1 && OpamRepositoryRoot.is_tar repo2)
+      || (OpamRepositoryRoot.is_dir repo2 && OpamRepositoryRoot.is_tar repo1))
+  then
+    OpamConsole.error "RBACK: DIFF BETWEEN TWO TYPES, yeah!";
   let chrono = OpamConsole.timer () in
   let prefix r = if OpamRepositoryRoot.is_tar r then "tar" else "dir" in
   (if OpamFilename.Dir.equal
@@ -122,8 +129,8 @@ let get_diff repo1 repo2 =
   );
   let get_contents =
     let get_tar_contents tar =
-     OpamRepositoryRoot.Tar.fold (fun acc filename content ->
-           OpamStd.String.Map.add filename content acc)
+      OpamRepositoryRoot.Tar.fold (fun acc filename content ->
+          OpamStd.String.Map.add filename content acc)
         OpamStd.String.Map.empty tar
     in
     let read_dir_contents dir =

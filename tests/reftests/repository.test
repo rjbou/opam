@@ -20,7 +20,6 @@ some content
 ### OPAMREPOSITORYTARRING=0
 ### opam switch create tarring --empty
 ### opam update -vv | grep '^\+'
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "repo" "packages"
 + /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/default.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default
@@ -40,6 +39,7 @@ some content
 ### sh hash.sh REPO foo.2
 ### opam update default -vv | grep '^\+' | sed-cmd tar
 + tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "packages" "repo"
++ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "repo" "packages"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default.tar.gz
 lock
@@ -94,7 +94,6 @@ build: ["test" "-f" "quux"]
 some content
 ### sh hash.sh REPO foo.5
 ### opam update -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "repo" "packages"
 + tar "xfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz" "-C" "${BASEDIR}/OPAM/repo/tarred"
 ### opam install foo.5 -vv | grep '^\+' | sed-cmd test
 + test "-f" "quux" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.5)
@@ -968,3 +967,135 @@ Now run 'opam upgrade' to apply any package updates.
 +++ packages/test/test.4/opam
 @@ -0,0 +1,1 @@
 +opam-version: "2.0"
+### : repository format change
+### : we test here only local dir or tarred to & grom vcs. Simple local to and
+### :   from tar is aleady tested at the beginning of the file
+### : should the test force tarred/dir/git by directly writing it internally
+### :   or should it keep using opam to setup the state ?
+### : ===> it should be done via internal change, it is unreachable states via opam
+### ## ### opam repository remove oper oper3 test-git to-many-commits
+### ## ### <CHG/repo>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/yan/yan.1/opam>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/yan/yan.1/files/nay>
+### ## un
+### ## ### sh hash.sh CHG yan.1
+### ## ### opam switch create format-change --empty
+### ## ### OPAMREPOSITORYTARRING=1
+### ## ### unset OPAMDEBUGSECTIONS
+### ## ### OPAMDEBUG=-5 OPAMVERBOSE=1
+### ## ### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### ## ### opam repository add changes ./CHG --this-switch
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### cp OPAM/repo/changes.tar.gz changes.tar.gz
+### ## ### :: local tarred - git * no changes
+### ## ### git -C ./CHG init -q
+### ## ### git -C ./CHG config core.autocrlf false
+### ## ### git -C ./CHG add repo packages
+### ## ### git -C ./CHG commit -qm "yan"
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam repository set-url changes git+file://${BASEDIR}/CHG
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam install yan
+### ## ### :: local tarred - git * changes
+### ## ### OPAMREPOSITORYTARRING=1
+### ## ### cp OPAM/repo/changes.tar.gz changes.tar.gz
+### ## ### rm -r OPAM/repo/changes
+### ## ### <CHG/packages/sin/sin.2/opam>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/sin/sin.2/files/nis>
+### ## deux
+### ## ### sh hash.sh CHG sin.2
+### ## ### git -C ./CHG add packages
+### ## ### git -C ./CHG commit -qm "sin"
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### opam install sin
+### ## ### :: git - local tarred * no changes
+### ## ### OPAMREPOSITORYTARRING=1
+### ## ### cp -R OPAM/repo/changes changes
+### ## ### rm -rf CHG/.git
+### ## ### opam update
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam reinstall sin
+### ## ### :: git - local tarred * changes
+### ## ### OPAMREPOSITORYTARRING=1
+### ## ### <CHG/packages/krad/krad.3/opam>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/krad/krad.3/files/dark>
+### ## trois
+### ## ### sh hash.sh CHG krad.3
+### ## ### rm OPAM/repo/changes
+### ## ### mv changes OPAM/repo/changes
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam install krad
+### ## ### :: local dir - git * no changes
+### ## ### OPAMREPOSITORYTARRING=0
+### ## ### mkdir OPAM/repo/changes
+### ## ### tar cf OPAM/repo/changes.tar.gz OPAM/repo/changes
+### ## ### git -C ./CHG init -q
+### ## ### git -C ./CHG config core.autocrlf false
+### ## ### git -C ./CHG add repo packages
+### ## ### git -C ./CHG commit -qm "krad"
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam reinstall krad
+### ## ### :: local dir - git * changes
+### ## ### OPAMREPOSITORYTARRING=0
+### ## ### <CHG/packages/okkoz/okkoz.4/opam>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/okkoz/okkoz.4/files/zokko>
+### ## quatre
+### ## ### sh hash.sh CHG zokko.4
+### ## ### git -C ./CHG add packages
+### ## ### git -C ./CHG commit -qm "okkoz"
+### ## ### mkdir OPAM/repo/changes
+### ## ### tar cf OPAM/repo/changes.tar.gz OPAM/repo/changes
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam install okkoz
+### ## ### :: git - local dir * no changes
+### ## ### OPAMREPOSITORYTARRING=0
+### ## ### cp -R OPAM/repo/changes changes
+### ## ### rm -rf CHG/.git
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam reinstall okkoz
+### ## ### :: git - local dir * changes
+### ## ### OPAMREPOSITORYTARRING=0
+### ## ### <CHG/packages/semmus/semmus.5/opam>
+### ## opam-version: "2.0"
+### ## ### <CHG/packages/semmus/semmus.5/files/summes>
+### ## cinq
+### ## ### sh hash.sh CHG semmus.5
+### ## ### rm OPAM/repo/changes
+### ## ### mv changes OPAM/repo/changes
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz
+### ## ### opam install semmus
+### ## ### :: both exists
+### ## ### OPAMREPOSITORYTARRING=0
+### ## ### cp changes.tar.gz OPAM/repo/changes.tar.gz
+### ## ### <CHG/packages/semmus/semmus.5/opam>
+### ## opam-version: "2.0"
+### ## build: true
+### ## ### opam update
+### ## ### test -d OPAM/repo/changes
+### ## ### test -d OPAM/repo/changes/.git
+### ## ### test -f OPAM/repo/changes.tar.gz

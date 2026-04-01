@@ -16,16 +16,18 @@ Generating index.tar.gz...
 Done.
 ### opam repo --all | grep -v '^#'
 default      file://${BASEDIR}/REPO <default>
-### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND" OPAMDEBUG=-3 OPAMVERBOSE=1
-### opam repo set-url default http://localhost:$HTTPSERVERPORT --set-default | sed-cmd curl tar | "${HTTPSERVERPORT}" -> "port" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --'
+### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### opam repo set-url default http://localhost:$HTTPSERVERPORT --set-default | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 REPOSITORY                      repository-set-url
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
+curl-or-wget -- "http://localhost:port/index.tar.gz"
 REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
 [default] Initialised
+UPDATE                          Repository has new changes
 Processing: [default: loading data]
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
@@ -50,8 +52,8 @@ opam-version:"2.0"
 Generating urls.txt...
 Generating index.tar.gz...
 Done.
-### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND" OPAMDEBUG=-3 OPAMVERBOSE=1
-### opam update | sed-cmd curl tar | "${HTTPSERVERPORT}" -> "port"
+### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### opam update | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -59,10 +61,12 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
+curl-or-wget -- "http://localhost:port/index.tar.gz"
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+UPDATE                          Repository has new changes
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
@@ -84,8 +88,8 @@ tujuh  --
 Generating urls.txt...
 Generating index.tar.gz...
 Done.
-### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND" OPAMDEBUG=-3 OPAMVERBOSE=1
-### opam update | sed-cmd curl tar | "${HTTPSERVERPORT}" -> "port"
+### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### opam update | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -93,10 +97,12 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
+curl-or-wget -- "http://localhost:port/index.tar.gz"
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+UPDATE                          Repository has new changes
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
@@ -119,8 +125,8 @@ build: true
 Generating urls.txt...
 Generating index.tar.gz...
 Done.
-### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND" OPAMDEBUG=-3 OPAMVERBOSE=1
-### opam update | sed-cmd curl tar | "${HTTPSERVERPORT}" -> "port"
+### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### opam update | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -128,10 +134,12 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
+curl-or-wget -- "http://localhost:port/index.tar.gz"
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+UPDATE                          Repository has new changes
 Processing: [default: loading data]
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
@@ -145,4 +153,55 @@ enam   --
 lima   --
 satu   --
 tiga   --
+### : from dir to tar, http mode
+### <packages/delapan/delapan.9/opam>
+opam-version: "2.0"
+### <packages/enam/enam.6/opam>
+opam-version: "2.0"
+### rm -r packages/tiga
+### opam admin index
+Generating urls.txt...
+Generating index.tar.gz...
+Done.
+### find OPAM/repo
+OPAM/repo
+OPAM/repo/state-magicv.cache
+OPAM/repo/repos-config
+OPAM/repo/default.tar.gz
+OPAM/repo/lock
+### mkdir OPAM/repo/default
+### tar xf OPAM/repo/default.tar.gz -C OPAM/repo/default
+### rm OPAM/repo/default.tar.gz
+### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### opam update | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
+FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
+RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
+RSTATE                          Cache found
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+UPDATE                          repository format change: from directory to archive (${BASEDIR}/OPAM/repo/default.tar.gz)
+Processing  1/1:
++ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "packages" "repo"
+REPOSITORY                      update default from http://localhost:port
+Processing  1/1: [default: http]
+curl-or-wget -- "http://localhost:port/index.tar.gz"
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
+REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
+[default] synchronised from http://localhost:port
+REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
+UPDATE                          Repository has new changes
+Processing: [default: loading data]
+Now run 'opam upgrade' to apply any package updates.
+### unset OPAMDEBUGSECTIONS
+### unset OPAMDEBUG
+### unset OPAMVERBOSE
+### opam list --all
+# Packages matching: any
+# Name  # Installed # Synopsis
+delapan --
+dua     --
+empat   --
+enam    --
+lima    --
+satu    --
 [[[Killing busybox]]]
