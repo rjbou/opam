@@ -26,7 +26,7 @@ module Dir : sig
   val quarantine : t -> t
 
   val with_tmp : (t -> 'a) -> 'a
-  val backup : tmp_dir:OpamFilename.Dir.t -> t -> t
+  val backup : inn:OpamFilename.Dir.t -> t -> t
 
   val cwd : unit -> t
   val in_dir : t -> (unit -> 'a) -> 'a
@@ -56,7 +56,7 @@ module Tar : sig
   val to_string : t -> string
 
   val quarantine : t -> t
-  val backup : tmp_dir:OpamFilename.Dir.t -> t -> t
+  val backup : inn:OpamFilename.Dir.t -> t -> t
 
   val exists : t -> bool
   val remove : t -> unit
@@ -92,6 +92,9 @@ type t =
     points to a statically known repository located in the same parent
     directory as [repo_root]. *)
 val quarantine : t -> t
+
+(* backup into [inn] *)
+val backup: inn:OpamFilename.Dir.t -> t -> t
 
 val remove : t -> unit
 val is_empty : t -> bool option

@@ -25,9 +25,9 @@ module Dir = struct
 
   let quarantine repo_root = OpamFilename.raw_dir (to_string repo_root ^ ".new")
   let with_tmp = OpamFilename.with_tmp_dir
-  let backup ~tmp_dir repo_root =
+  let backup ~inn repo_root =
     let open OpamFilename.Op in
-    tmp_dir / OpamFilename.Base.to_string (OpamFilename.basename_dir repo_root)
+    inn / OpamFilename.Base.to_string (OpamFilename.basename_dir repo_root)
 
   let cwd = OpamFilename.cwd
   let in_dir = OpamFilename.in_dir
@@ -60,8 +60,8 @@ module Tar = struct
   let to_string = OpamFilename.to_string
 
   let quarantine tar = OpamFilename.raw (to_string tar ^ ".new")
-  let backup ~tmp_dir tar =
-    OpamFilename.create tmp_dir (OpamFilename.basename tar)
+  let backup ~inn tar =
+    OpamFilename.create inn (OpamFilename.basename tar)
 
   let exists = OpamFilename.exists
   let remove = OpamFilename.remove
@@ -267,6 +267,10 @@ type t =
 let quarantine = function
   | Dir dir -> Dir (Dir.quarantine dir)
   | Tar tar -> Tar (Tar.quarantine tar)
+
+let backup ~inn = function
+  | Dir dir -> Dir (Dir.backup ~inn dir)
+  | Tar tar -> Tar (Tar.backup ~inn tar)
 
 let remove = function
   | Dir dir -> Dir.remove dir
