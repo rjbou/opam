@@ -72,9 +72,9 @@ Processing  1/1: [default: rsync]
 SYSTEM                          mv ${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp -> ${BASEDIR}/OPAM/repo/default.tar.gz.new
 SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.tar.gz.new
 FILE(repo)                      Read ./<none> in 0.000s
-FILE(repo)                      Read [default]/repo in 0.000s
-FILE(opam)                      Read packages/main-repo/main-repo.1/opam in 0.000s
-FILE(opam)                      Read packages/main-repo/main-repo.2/opam in 0.000s
+FILE(repo)                      Read ./repo (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
+FILE(opam)                      Read packages/main-repo/main-repo.1/opam (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
+FILE(opam)                      Read packages/main-repo/main-repo.2/opam (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
 SYSTEM                          write ${BASEDIR}/OPAM/log/patch-xxx
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]

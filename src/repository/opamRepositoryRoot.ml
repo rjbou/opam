@@ -346,6 +346,15 @@ let patch ~allow_unclean patch = function
   | Dir dir -> Dir.patch ~allow_unclean patch dir
   | Tar tar -> Tar.patch ~allow_unclean patch tar
 
+let read_file (type a) (module R : OpamFile.IO_FILE with type t = a)
+    ?(safe=false) repo_root
+  : ?filename:a OpamFile.t -> string -> a =
+  let rd =
+    if safe then R.safe_read_from_string
+    else R.read_from_string
+  in
+  rd ~loc:(to_string repo_root)
+
 let delayed_read_repo = function
   | Dir dir ->
     let repo_file_path = Dir.repo dir in

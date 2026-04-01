@@ -101,6 +101,9 @@ val basename : t -> OpamFilename.Base.t
 val remove_prefix: OpamFilename.t -> t -> OpamFilename.t
 val remove_prefix_dir: OpamFilename.Dir.t -> t -> OpamFilename.Dir.t
 val to_string : t -> string
+val read_file:
+  (module OpamFile.IO_FILE with type t = 'a) ->
+  ?safe:bool -> t -> ?filename:'a OpamFile.t -> string -> 'a
 
 val is_tar: t -> bool
 val is_dir: t -> bool

@@ -178,7 +178,7 @@ let read_package_opam_tar ~repo_name ~repo_root package_dir filename content ext
       (OpamFilename.to_string OpamFilename.Op.(package_dir // "opam"));
     None
 
-let load_raw_opams_and_aux_from_tar repo_name tar =
+let load_raw_opams_and_aux_from_tar _repo_name tar =
   let tdebug = false in
   let raw_repository =
     OpamRepositoryRoot.Tar.fold (fun acc filename content ->
@@ -190,14 +190,10 @@ let load_raw_opams_and_aux_from_tar repo_name tar =
     let filename = "repo" in
     match List.assoc_opt filename raw_repository with
     | Some content ->
-      let filename =
-        let open OpamFilename.Op in
-        OpamFile.make
-          (OpamFilename.raw_dir ("["^OpamRepositoryName.to_string repo_name^"]")
-           // filename)
-      in
+      let filename = OpamFile.make (OpamFilename.raw filename) in
       let _ = log ~level:5 "read %s" (OpamFilename.to_string (OpamFile.filename filename)) in
-      OpamFile.Repo.safe_read_from_string ~filename content
+      OpamRepositoryRoot.read_file ~safe:true (module OpamFile.Repo)
+        (OpamRepositoryRoot.Tar tar) ~filename content
     | None -> OpamFile.Repo.empty
   in
   let raw_repository = List.map (fun (f,c) -> OpamFilename.raw f, c) raw_repository in

@@ -1837,9 +1837,6 @@ let try_read rd f =
     let f = OpamFile.filename f in
     Some (OpamFilename.(Base.to_string (basename f)), bf)
 
-let read_from_content rd content =
-  fun f -> Some (rd ?filename:(Some f) content)
-
 let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
   let tdebug = false in
   let dir = match dir with
@@ -1863,31 +1860,35 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
   match dir with
   | None -> opam
   | Some dir ->
-    let string_of_dir d =
+    let string_of_dir =
       match dir_label with
       | Some repo_root ->
-        Printf.sprintf "%s (out of %s)"
-          (OpamFilename.Dir.to_string d)
-          (OpamRepositoryRoot.to_string repo_root)
-      | None -> OpamFilename.Dir.to_string d
+        fun d ->
+          Printf.sprintf "%s (out of %s)"
+            (OpamFilename.Dir.to_string d)
+            (OpamRepositoryRoot.to_string repo_root)
+      | None -> OpamFilename.Dir.to_string
     in
     let url_file = OpamFile.make (dir // "url") in
     let descr_file = OpamFile.make (dir // "descr") in
     let files_dir = OpamFilename.Op.(dir / "files") in
-    let try_read
-      : 'a. (?filename:'a OpamFile.typed_file -> string -> 'a)
-        -> 'a OpamFile.t ->  'a option * (string * OpamPp.bad_format) option
-      = fun
-        rd f ->
+    let try_read (type a) (module R: OpamFile.IO_FILE with type t = a)
+      : a OpamFile.t -> a option * (string * OpamPp.bad_format) option =
+      let reader =
+        match dir_label with
+        | Some repo_root ->
+          OpamRepositoryRoot.read_file (module R) ~safe:false repo_root
+        | None -> R.read_from_string ?loc:None
+      in
+      fun f ->
         match OpamFilename.Map.find_opt (OpamFile.filename f) xfs with
         | Some content ->
-          try_read (read_from_content rd (Lazy.force content)) f
+          let reader f = Some (reader ~filename:f (Lazy.force content)) in
+          try_read reader f
         | None -> None, None
     in
     let opam =
-      match OpamFile.OPAM.url opam,
-            try_read OpamFile.URL.read_from_string url_file
-      with
+      match OpamFile.OPAM.url opam, try_read (module OpamFile.URL) url_file with
       | None, (Some url, None) -> OpamFile.OPAM.with_url url opam
       | Some opam_url, (Some url, errs) ->
         if url = opam_url && errs = None then
@@ -1905,7 +1906,7 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
     in
     let opam =
       match OpamFile.OPAM.descr opam,
-            try_read OpamFile.Descr.read_from_string descr_file with
+            try_read (module OpamFile.Descr) descr_file with
       | None, (Some descr, None) -> OpamFile.OPAM.with_descr descr opam
       | Some _, (Some _, _) ->
         log "Duplicate descr in '%s' and opam file"
@@ -2084,19 +2085,30 @@ let read_opam_t ?dir_label dir filename content xfs =
       (OpamFilename.Dir.to_string dir) (OpamFilename.to_string filename);
   let opam_file = OpamFile.make filename in
   let filename = OpamFile.make filename in
-  let rd f =
-    try
-      Some (OpamFile.OPAM.read_from_string
-      ?filename:(Some f) (Lazy.force content))
-    with OpamSystem.File_not_found _ -> None
+  let rd =
+    let loc = Option.map OpamRepositoryRoot.to_string dir_label in
+    fun f ->
+      try
+        Some (OpamFile.OPAM.read_from_string
+                ?loc ?filename:(Some f) (Lazy.force content))
+      with OpamSystem.File_not_found _ -> None
   in
+    let string_of_opamfile =
+      match dir_label with
+      | Some repo_root ->
+        fun f ->
+          Printf.sprintf "%s (out of %s)"
+            (OpamFile.to_string f)
+            (OpamRepositoryRoot.to_string repo_root)
+      | None -> OpamFile.to_string
+    in
   match try_read rd filename with
   | Some opam, None ->
     Some (add_aux_files_t ?dir_label ~dir ~files_subdir_hashes:false opam xfs)
   | _, Some err ->
     OpamConsole.warning
       "Could not read file %s. skipping:\n%s"
-      (OpamFile.to_string opam_file)
+      (string_of_opamfile opam_file)
       (OpamPp.string_of_bad_format (OpamPp.Bad_format (snd err)));
     None
   | None, None -> None
@@ -2104,7 +2116,7 @@ let read_opam_t ?dir_label dir filename content xfs =
     let sversion = OpamVersion.to_string version in
     let scurrent = OpamVersion.to_string OpamVersion.current_nopatch in
     log "opam-version %S unsupported on %s. Added as dummy unavailable package."
-      sversion (OpamFile.to_string opam_file);
+      sversion (string_of_opamfile opam_file);
     Some
       (OpamFile.OPAM.empty
        |> OpamFile.OPAM.with_available
@@ -2154,6 +2166,7 @@ let read_repo_opam_tar ~repo_name ~repo_root dir file content xfs =
 let read_repo_opam_dir ~repo_name ~repo_root dir =
   let repo_root = OpamRepositoryRoot.Dir repo_root in
   let file, content, xfs = get_contents ~repo_root:(Some repo_root) dir in
+  let file = OpamRepositoryRoot.remove_prefix file repo_root in
   let dir = OpamRepositoryRoot.remove_prefix_dir dir repo_root in
 (*
     OpamFilename.raw_dir (OpamRepositoryName.to_string repo_name)
