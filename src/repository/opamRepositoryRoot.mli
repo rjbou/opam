@@ -111,6 +111,7 @@ val ls: t -> string
 
 val copy : src:t -> dst:t -> exn option OpamProcess.job
 val move : src:t -> dst:t -> exn option OpamProcess.job
+val exists : t -> bool
 val is_symlink : t -> bool
 val patch :
   allow_unclean:bool ->

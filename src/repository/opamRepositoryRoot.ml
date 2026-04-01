@@ -338,6 +338,10 @@ let move ~src ~dst =
     | None -> remove src; Done None
     | Some exn -> Done (Some exn)
 
+let exists = function
+  | Dir dir -> Dir.exists dir
+  | Tar tar -> Tar.exists tar
+
 let is_symlink = function
   | Dir dir -> Dir.is_symlink dir
   | Tar tar -> Tar.is_symlink tar
