@@ -110,11 +110,12 @@ let get_repo_files rt name dir =
           let content = lazy (
             (* TAR TODO : veru hackish remove ? *)
             OpamConsole.log "SYSTEM" ~level:5
-              "read %s"
+              "read %s from %s"
               OpamFilename.Op.(
                 OpamFilename.to_string
                   (OpamFilename.raw_dir (OpamRepositoryName.to_string name)
-                   // filename_s));
+                   // filename_s))
+              (OpamRepositoryRoot.Tar.to_string tar);
             content)
           in
           let basename =
