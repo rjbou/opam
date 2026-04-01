@@ -156,8 +156,7 @@ module B = struct
     let populate_quarantine () =
       match repo_root with
       | OpamRepositoryRoot.Tar _ ->
-        (* TAR TODO : backport the check in opam repo root ? *)
-        (let quarantine = match quarantine with OpamRepositoryRoot.Tar q -> q | _ -> assert false in
+        (let quarantine = OpamRepositoryRoot.get_tar quarantine in
          match OpamUrl.local_dir url with
          | Some dir ->
            (OpamRepositoryRoot.make_tar_gz_job quarantine
@@ -178,10 +177,9 @@ module B = struct
                     Done (Not_available (Some "tar failed", (Printexc.to_string exn))))
                | exn -> Done exn))
       | OpamRepositoryRoot.Dir dir ->
-        (let quarantine = match quarantine with OpamRepositoryRoot.Dir d -> d | _ -> assert false in
+        (let quarantine = OpamRepositoryRoot.get_dir quarantine in
          match OpamUrl.local_dir url with
          | Some dir ->
-           (* TAR TODO : backport the check in opam repo root ? *)
            let dir = OpamRepositoryRoot.Dir.of_dir dir in
            OpamRepositoryRoot.Dir.copy_except_vcs ~src:dir ~dst:quarantine;
            (* fixme: Would be best to symlink, but at the moment our filename api
@@ -197,16 +195,14 @@ module B = struct
     in
     OpamProcess.Job.catch (fun e ->
         finalise ();
-        Done (OpamRepositoryBackend.Update_err e))
-    @@ fun () ->
+        Done (OpamRepositoryBackend.Update_err e)) @@ fun () ->
     OpamRepositoryBackend.job_text repo_name "sync"
-      (populate_quarantine ())
-    @@+ function
+      (populate_quarantine ()) @@| function
     | Not_available (_, msg) ->
       finalise ();
-      Done (OpamRepositoryBackend.Update_err (Failure ("rsync error: " ^ msg)))
+      OpamRepositoryBackend.Update_err (Failure ("rsync error: " ^ msg))
     | Up_to_date () ->
-      finalise (); Done OpamRepositoryBackend.Update_empty
+      finalise ();  OpamRepositoryBackend.Update_empty
     | Result () ->
       if tdebug then
         (OpamConsole.error "LOCAL:fetch: QUR CONTENT %s\n%s"
@@ -218,13 +214,13 @@ module B = struct
               OpamRepositoryRoot.ls repo_root
             else "ABSENT"));
       if OpamRepositoryRoot.is_empty repo_root <> Some false then
-        Done (OpamRepositoryBackend.Update_full quarantine)
+        OpamRepositoryBackend.Update_full quarantine
       else
         OpamStd.Exn.finally finalise @@ fun () ->
         OpamRepositoryBackend.get_diff repo_root quarantine
         |> function
-        | None -> Done OpamRepositoryBackend.Update_empty
-        | Some p -> Done (OpamRepositoryBackend.Update_patch p)
+        | None ->  OpamRepositoryBackend.Update_empty
+        | Some p -> OpamRepositoryBackend.Update_patch p
 
 
   let repo_update_complete _ _ = Done ()
