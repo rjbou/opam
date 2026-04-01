@@ -120,6 +120,7 @@ let set_url rt name url trust_anchors =
       OpamConsole.error_and_exit `Not_found "No repository %s found"
         (OpamRepositoryName.to_string name);
   in
+  (* TAR TODO : see how to handle this more elegantly. This scheme is in several places *)
   OpamRepositoryRoot.Dir.remove
     (OpamRepositoryPath.root rt.repos_global.root name);
   OpamRepositoryRoot.Tar.remove
