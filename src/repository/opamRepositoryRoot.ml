@@ -313,6 +313,20 @@ let is_dir = function
   | Dir _ -> true
   | Tar _ -> false
 
+let get_dir = function
+  | Dir dir -> dir
+  | Tar tar ->
+    OpamConsole.error_and_exit `Internal_error
+      "OpamRepositoryRoot.dir: Access to non existent repository archive %s"
+      (Tar.to_string tar)
+
+let get_tar = function
+  | Dir dir ->
+    OpamConsole.error_and_exit `Internal_error
+      "OpamRepositoryRoot.dir: Access to non existent repository directory %s"
+      (Dir.to_string dir)
+  | Tar tar -> tar
+
 let ls = function
   | Dir dir ->
     OpamFilename.rec_files dir
