@@ -2502,48 +2502,42 @@ let repository cli =
       in
       OpamGlobalState.with_ `Lock_none @@ fun gt ->
       OpamRepositoryState.with_ `Lock_write gt @@ fun rt ->
-      OpamProcess.Job.run @@
-      (OpamFilename.with_tmp_dir_job @@ fun inn ->
-       let repo_root =
-         OpamRepositoryState.get_repo_root rt
-           (OpamRepositoryState.get_repo rt name)
-       in
-       if not (OpamRepositoryRoot.exists repo_root) then
-         OpamConsole.error_and_exit `Internal_error
-           "Repository not found, consider running 'opam update %s' \
-            to retrieve a consistent state."
-           (OpamRepositoryName.to_string name);
-       let rt0 = rt in
-       let backup = OpamRepositoryRoot.backup ~inn repo_root in
-       let open OpamProcess.Job.Op in
-       OpamRepositoryRoot.copy_job ~src:repo_root ~dst:backup @@+ function
-       | Some exn -> raise exn
-       | None ->
-         let restore_backup () =
-           OpamRepositoryRoot.copy_job ~src:backup ~dst:repo_root @@+ function
-           | Some exn -> raise exn
-           | None -> Done ()
+      OpamFilename.with_tmp_dir @@ fun inn ->
+      let repo_root =
+        OpamRepositoryState.get_repo_root rt
+          (OpamRepositoryState.get_repo rt name)
+      in
+      if not (OpamRepositoryRoot.exists repo_root) then
+        OpamConsole.error_and_exit `Internal_error
+          "Repository not found, consider running 'opam update %s' \
+           to retrieve a consistent state."
+          (OpamRepositoryName.to_string name);
+      let rt0 = rt in
+      let backup = OpamRepositoryRoot.backup ~inn repo_root in
+      OpamRepositoryRoot.copy ~src:repo_root ~dst:backup;
+      let restore_backup () =
+        OpamRepositoryRoot.copy ~src:backup ~dst:repo_root
+      in
+      let rt = OpamRepositoryCommand.set_url rt name url trust_anchors in
+      let failed, rt =
+        OpamRepositoryCommand.update_with_auto_upgrade rt [name]
+      in
+      OpamRepositoryState.drop rt;
+      (match failed with
+       | [] -> `Ok ()
+       | _ ->
+         let repo = OpamRepositoryState.get_repo rt0 name in
+         OpamConsole.error
+           "Fetching repository %s with %s fails, reverting to %s"
+           (OpamRepositoryName.to_string name)
+           (OpamUrl.to_string url)
+           (OpamUrl.to_string repo.repo_url);
+         let rt =
+           OpamRepositoryCommand.set_url rt0 name repo.repo_url repo.repo_trust
          in
-         let rt = OpamRepositoryCommand.set_url rt name url trust_anchors in
-         let failed, rt =
-           OpamRepositoryCommand.update_with_auto_upgrade rt [name]
-         in
+         restore_backup ();
          OpamRepositoryState.drop rt;
-         (match failed with
-          | [] -> Done (`Ok ())
-          | _ ->
-            let repo = OpamRepositoryState.get_repo rt0 name in
-            OpamConsole.error
-              "Fetching repository %s with %s fails, reverting to %s"
-              (OpamRepositoryName.to_string name)
-              (OpamUrl.to_string url)
-              (OpamUrl.to_string repo.repo_url);
-            let rt =
-              OpamRepositoryCommand.set_url rt0 name repo.repo_url repo.repo_trust
-            in
-            restore_backup () @@| function () ->
-              OpamRepositoryState.drop rt;
-              OpamStd.Sys.exit_because `Sync_error))
+         OpamStd.Sys.exit_because `Sync_error)
     | Some `set_repos, names ->
       let names = List.map OpamRepositoryName.of_string names in
       OpamGlobalState.with_ `Lock_none @@ fun gt ->
