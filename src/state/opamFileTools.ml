@@ -1329,7 +1329,6 @@ let warns_to_json ?filename ws =
 (* Package definition loading *)
 
 open OpamFilename.Op
-open OpamStd.Option.Op
 
 let try_read rd f =
   try rd f, None with
