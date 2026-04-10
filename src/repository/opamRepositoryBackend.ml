@@ -12,7 +12,7 @@ open OpamTypes
 
 let log ?level fmt = OpamConsole.log "REPO_BACKEND" ?level fmt
 let slog = OpamConsole.slog
-let tdebug go =
+let _tdebug go =
   if go then
     fun fmt ->
       Printf.ksprintf (fun str ->  OpamConsole.error "RBACK:%s" str) fmt
