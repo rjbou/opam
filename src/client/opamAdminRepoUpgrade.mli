@@ -12,6 +12,6 @@ val clear_cache: unit -> unit
 
 val upgradeto_version: OpamVersion.t
 
-val do_upgrade: OpamFilename.Dir.t -> unit
+val do_upgrade: OpamRepositoryRoot.Dir.t -> unit
 
-val do_upgrade_mirror: OpamFilename.Dir.t -> OpamUrl.t -> unit
+val do_upgrade_mirror: OpamRepositoryRoot.Dir.t -> OpamUrl.t -> unit

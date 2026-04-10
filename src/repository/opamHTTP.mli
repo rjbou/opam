@@ -13,4 +13,4 @@
 
 module B: OpamRepositoryBackend.S
 
-val make_index_tar_gz: OpamFilename.Dir.t -> unit
+val make_index_tar_gz: OpamRepositoryRoot.Dir.t -> unit

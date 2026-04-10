@@ -270,8 +270,9 @@ let update_with_auto_upgrade rt repo_names =
                  OpamConsole.error "RPC:UWAU: %s"
                    (OpamRepositoryRoot.to_string repo_root)
              in
-             OpamRepositoryRoot.in_dir
-               OpamAdminRepoUpgrade.do_upgrade repo_root;
+             OpamRepositoryRoot.in_dir (fun dir ->
+                 OpamAdminRepoUpgrade.do_upgrade (OpamRepositoryRoot.Dir.of_dir dir))
+               repo_root;
              let def, opams =
                OpamRepositoryState.load_repo r repo_root
              in
