@@ -337,7 +337,12 @@ let ls = function
     |> OpamStd.Format.itemize OpamFilename.to_string
   | Tar tar -> Tar.ls tar
 
-let copy ~src ~dst =
+let wrap_job f =
+  match OpamProcess.Job.run (f ()) with
+  | Some exn -> raise exn
+  | None -> ()
+
+let copy_job ~src ~dst =
   let open OpamProcess.Job.Op in
   match src, dst with
   | Dir src, Dir dst -> Dir.copy ~src ~dst; Done None
@@ -345,16 +350,33 @@ let copy ~src ~dst =
   | Tar src, Dir dst -> OpamFilename.extract_in_job src dst
   | Dir src, Tar dst -> OpamFilename.make_tar_gz_job dst src
 
-let move ~src ~dst =
+let copy ~src ~dst =
+  match src, dst with
+  | Dir src, Dir dst -> Dir.copy ~src ~dst
+  | Tar src, Tar dst -> Tar.copy ~src ~dst
+  | Tar src, Dir dst -> OpamFilename.extract_in src dst
+  | Dir src, Tar dst ->
+    wrap_job @@ fun () -> OpamFilename.make_tar_gz_job dst src
+
+let move_job ~src ~dst =
   let open OpamProcess.Job.Op in
   match src, dst with
   | Dir src, Dir dst -> Dir.move ~src ~dst; Done None
   | Tar src, Tar dst -> Tar.move ~src ~dst; Done None
   | Tar _, Dir _
   | Dir _, Tar _ ->
-    copy ~src ~dst @@+ function
+    copy_job ~src ~dst @@+ function
     | None -> remove src; Done None
     | Some exn -> Done (Some exn)
+
+let move ~src ~dst =
+  match src, dst with
+  | Dir src, Dir dst -> Dir.move ~src ~dst
+  | Tar src, Tar dst -> Tar.move ~src ~dst
+  | Tar _, Dir _
+  | Dir _, Tar _ ->
+    copy ~src ~dst;
+    remove src
 
 let exists = function
   | Dir dir -> Dir.exists dir

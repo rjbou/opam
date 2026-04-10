@@ -2516,11 +2516,11 @@ let repository cli =
        let rt0 = rt in
        let backup = OpamRepositoryRoot.backup ~inn repo_root in
        let open OpamProcess.Job.Op in
-       OpamRepositoryRoot.copy ~src:repo_root ~dst:backup @@+ function
+       OpamRepositoryRoot.copy_job ~src:repo_root ~dst:backup @@+ function
        | Some exn -> raise exn
        | None ->
          let restore_backup () =
-           OpamRepositoryRoot.copy ~src:backup ~dst:repo_root @@+ function
+           OpamRepositoryRoot.copy_job ~src:backup ~dst:repo_root @@+ function
            | Some exn -> raise exn
            | None -> Done ()
          in

@@ -114,8 +114,10 @@ val get_dir: t -> Dir.t
 val get_tar: t -> Tar.t
 val ls: t -> string
 
-val copy : src:t -> dst:t -> exn option OpamProcess.job
-val move : src:t -> dst:t -> exn option OpamProcess.job
+val copy_job : src:t -> dst:t -> exn option OpamProcess.job
+val move_job : src:t -> dst:t -> exn option OpamProcess.job
+val copy : src:t -> dst:t -> unit
+val move : src:t -> dst:t -> unit
 val exists : t -> bool
 val is_symlink : t -> bool
 val patch :
