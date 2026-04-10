@@ -25,7 +25,7 @@ val cycle_check: universe -> package_set * formula list list
     sets are empty. *)
 val check:
   quiet:bool -> installability:bool -> cycles:bool -> obsolete:bool ->
-  OpamRepositoryRoot.Dir.t ->
+  dirname ->
   package_set * package_set * package_set * package_set * package_set
 
 (** Returns a subset of "obsolete" packages, i.e. packages for which a strictly
