@@ -12,23 +12,76 @@
 (* TAR TODO : use filename instead of string to navigate in archive *)
 open OpamTypes
 
+module File : sig
+  include OpamStd.ABSTRACT
+
+  module Dir : sig
+    include OpamStd.ABSTRACT
+    val of_dir : OpamFilename.Dir.t -> t
+    val to_dir : t -> OpamFilename.Dir.t
+  end
+
+  module Base : sig
+    include OpamStd.ABSTRACT
+    val of_base : OpamFilename.Base.t -> t
+    val to_base : t -> OpamFilename.Base.t
+  end
+
+  module Op : sig
+    (** Create a new directory *)
+    val (/): Dir.t -> string -> Dir.t
+    (** Create a new filename *)
+    val (//): Dir.t -> string -> t
+  end
+
+  val of_filename : filename -> t
+  val to_filename : t -> filename
+
+  (** Check whether a filename starts by a given Dir.t *)
+  val starts_with: Dir.t -> t -> bool
+
+  (** Add a file extension *)
+  val add_extension: t -> string -> t
+
+  (** Return the directory name *)
+  val dirname: t -> Dir.t
+
+  (** Return the base name *)
+  val basename: t -> Base.t
+
+  (** Return the deeper directory name *)
+  val basename_dir: Dir.t -> Base.t
+
+  (** Retrieves the contents from the hard disk. *)
+  val read: t -> string
+
+  (** Remove a prefix from a file name *)
+  val remove_prefix: Dir.t -> t -> string
+
+  (* val remove_prefix_dir: Dir.t -> Dir.t -> string *)
+  val root_dir: t -> string option
+
+end
+
 type tar = filename
+type tar_file = File.t
+type tar_content = string
 
 val fold_reg_files :
-  ('acc -> string -> string -> 'acc) -> 'acc -> tar -> 'acc
+  ('acc -> tar_file -> tar_content -> 'acc) -> 'acc -> tar -> 'acc
 
 module Inplace : sig
   type t
 
   val with_open_out : tar -> (t -> 'a) -> 'a
   val fold_reg_files :
-    ('acc -> string -> string -> 'acc) ->
+    ('acc -> tar_file -> tar_content -> 'acc) ->
     'acc -> t -> 'acc
-  val add : fname:string -> content:string -> t -> t
-  val remove : fname:string -> t -> t
-  val remove_dir : dname:string -> t -> t
-  val exists: fname:string -> t -> bool
-  val read: fname:string -> t -> string
-  val mv: src:string -> dst:string -> t -> t
+  val add : fname:tar_file -> content:tar_content -> t -> t
+  val remove : fname:tar_file -> t -> t
+  val remove_dir : dname:File.Dir.t -> t -> t
+  val exists: fname:tar_file -> t -> bool
+  val read: fname:tar_file -> t ->tar_content
+  val mv: src:tar_file -> dst:tar_file -> t -> t
   val write : t -> unit
 end

@@ -120,7 +120,8 @@ val read_repo_opam_dir:
     correctly for the given repository. *)
 val read_repo_opam_tar:
   repo_name:repository_name -> repo_root:OpamRepositoryRoot.Tar.t ->
-  dirname -> filename -> string -> string OpamFilename.Map.t
+  OpamTar.File.Dir.t -> OpamTar.File.t -> OpamTar.tar_content
+  -> OpamTar.tar_content OpamTar.File.Map.t
   -> OpamFile.OPAM.t option
 
 (** Adds data from 'url' and 'descr' files found in the specified dir or the
