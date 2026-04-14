@@ -718,7 +718,7 @@ let rec list_remove x = function
   | [] -> []
   | y :: r -> if x = y then r else y :: list_remove x r
 
-let run_http_server () =
+let run_http_server dir () =
   let port =
     let rec aux p =
       if p < 1030 then aux (Random.int 49000)
@@ -726,20 +726,24 @@ let run_http_server () =
     in
     aux (Random.int 49000)
   in
-(*   let port = 12345 in *)
+  (*   let port = 12345 in *)
   let cmd = "busybox" in
   let args = ["httpd"; "-p"; string_of_int port] in
   let args = args @ ["-f"] in
+  (*
+  let cmd = "python" in
+  let args = ["-m"; "http.server"; string_of_int port; "-b"; "127.0.0.1" ; "-d" ; dir] in
+  *)
   (try
-    let out = command ~pidshow:true ~background:true cmd args in
-(*     Printf.printf "HTTP SERVER launched on port %d\n%s" port out; *)
-    Printf.printf "HTTP SERVER launched\n%s" out;
-    ()
-  with Command_failure (rcode, cmd, out) ->
-    Printf.printf ">> %s\n" cmd;
-    Printf.printf "# Return code %d #\n%s" rcode out
-    );
-    port
+     let out = command ~pidshow:true ~background:true cmd args in
+     (*     Printf.printf "HTTP SERVER launched on port %d\n%s" port out; *)
+     Printf.printf "HTTP SERVER launched\n%s" out;
+     ()
+   with Command_failure (rcode, cmd, out) ->
+     Printf.printf ">> %s\n" cmd;
+     Printf.printf "# Return code %d #\n%s" rcode out
+  );
+  port
 
 let print_opamfile file =
   try
@@ -1247,7 +1251,7 @@ let run_test ?(vars=[]) ~opam t =
           | None -> vars
           | Some v -> (v, r) :: List.filter (fun (w,_) -> v <> w) vars)
         | Http_server ->
-          let port = run_http_server () in
+          let port = run_http_server dir () in
           ("HTTPSERVERPORT", string_of_int port)::vars
           )
       vars
