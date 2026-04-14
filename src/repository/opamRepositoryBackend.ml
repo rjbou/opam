@@ -124,7 +124,7 @@ let get_diff repo1 repo2 =
      log "diff: %s %a vs %s %a"
        (prefix repo1)
        (slog OpamRepositoryRoot.to_string) repo1
-       (prefix repo1)
+       (prefix repo2)
        (slog OpamRepositoryRoot.to_string) repo2
   );
   let get_contents =
