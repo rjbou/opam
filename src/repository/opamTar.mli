@@ -12,6 +12,7 @@
 (* TAR TODO : use filename instead of string to navigate in archive *)
 open OpamTypes
 
+(*
 module File : sig
   include OpamStd.ABSTRACT
 
@@ -30,6 +31,7 @@ module File : sig
   module Op : sig
     (** Create a new directory *)
     val (/): Dir.t -> string -> Dir.t
+
     (** Create a new filename *)
     val (//): Dir.t -> string -> t
   end
@@ -62,9 +64,10 @@ module File : sig
   val root_dir: t -> string option
 
 end
+*)
 
 type tar = filename
-type tar_file = File.t
+type tar_file = OpamFilename.Raw.t
 type tar_content = string
 
 val fold_reg_files :
@@ -79,9 +82,9 @@ module Inplace : sig
     'acc -> t -> 'acc
   val add : fname:tar_file -> content:tar_content -> t -> t
   val remove : fname:tar_file -> t -> t
-  val remove_dir : dname:File.Dir.t -> t -> t
+  val remove_dir : dname:OpamFilename.Raw.Dir.t -> t -> t
   val exists: fname:tar_file -> t -> bool
-  val read: fname:tar_file -> t ->tar_content
+  val read: fname:tar_file -> t -> tar_content
   val mv: src:tar_file -> dst:tar_file -> t -> t
   val write : t -> unit
 end

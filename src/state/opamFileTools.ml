@@ -1144,26 +1144,26 @@ let extra_files_default_tar tar filename =
      OpamPinned.orig_opam_file that writes it in /tmp*)
   let filename =
     let rec aux filename =
-      match OpamTar.File.root_dir filename with
+      match OpamFilename.Raw.root_dir filename with
       | Some "packages" | None -> filename
       | Some dir ->
         let filename =
-          (OpamTar.File.of_string
-             (OpamTar.File.remove_prefix (OpamTar.File.Dir.of_string dir) filename))
+          (OpamFilename.Raw.of_string
+             (OpamFilename.Raw.remove_prefix (OpamFilename.Raw.Dir.of_string dir) filename))
         in
         aux filename
     in
-    aux (OpamTar.File.of_filename (OpamFile.filename filename))
+    aux (OpamFilename.Raw.of_filename (OpamFile.filename filename))
   in
   let dir =
-    OpamTar.File.Op.(OpamTar.File.dirname filename / "files")
+    OpamFilename.Raw.Op.(OpamFilename.Raw.dirname filename / "files")
   in
   List.map
     (fun (f,c) ->
-       OpamFilename.Base.of_string (OpamTar.File.remove_prefix dir f),
+       OpamFilename.Base.of_string (OpamFilename.Raw.remove_prefix dir f),
        OpamHash.check_string c)
     (OpamRepositoryRoot.Tar.extract_files
-       (OpamTar.File.starts_with dir) tar)
+       (OpamFilename.Raw.starts_with dir) tar)
 
 let lint_gen ?check_extra_files ?check_upstream ?(handle_dirname=false)
     reader filename =
@@ -1393,8 +1393,8 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
         | None -> R.read_from_string ?loc:None
       in
       fun f ->
-        match OpamTar.File.Map.find_opt
-                (OpamTar.File.of_filename (OpamFile.filename f)) xfs with
+        match OpamFilename.Raw.Map.find_opt
+                (OpamFilename.Raw.of_filename (OpamFile.filename f)) xfs with
         | Some content ->
           let reader f = Some (reader ~filename:f (Lazy.force content)) in
           try_read reader f
@@ -1440,22 +1440,22 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
         let tdebug = false in
         if tdebug then
           OpamConsole.error "OFT:AAF:%s: XFS :\n%s" n
-            (OpamStd.Format.itemize OpamTar.File.to_string
-               (OpamTar.File.Map.keys xfs));
+            (OpamStd.Format.itemize OpamFilename.Raw.to_string
+               (OpamFilename.Raw.Map.keys xfs));
         let xfiles =
           (* TAR TODO : check that it working with different slashes *)
-          let files_dir = OpamTar.File.Dir.of_dir files_dir in
-          let string_of_dir d = string_of_dir (OpamTar.File.Dir.to_dir d) in
-          OpamTar.File.Map.fold (fun file content ef ->
+          let files_dir = OpamFilename.Raw.Dir.of_dir files_dir in
+          let string_of_dir d = string_of_dir (OpamFilename.Raw.Dir.to_dir d) in
+          OpamFilename.Raw.Map.fold (fun file content ef ->
               if tdebug then
                 OpamConsole.error "OFT:AAF: pre %s file %s -> %B"
                   (string_of_dir files_dir)
-                  (OpamTar.File.to_string file)
-                  (OpamTar.File.starts_with files_dir file);
-              if OpamTar.File.starts_with files_dir file then
+                  (OpamFilename.Raw.to_string file)
+                  (OpamFilename.Raw.starts_with files_dir file);
+              if OpamFilename.Raw.starts_with files_dir file then
                 let basename =
                   file
-                  |> OpamTar.File.remove_prefix files_dir
+                  |> OpamFilename.Raw.remove_prefix files_dir
                   |> OpamFilename.Base.of_string
                 in
                 (basename, Lazy.force content)::ef
@@ -1555,14 +1555,14 @@ let get_xfs ~repo_root dir =
   in
   let r =
     List.fold_left (fun map file ->
-        OpamTar.File.Map.add (OpamTar.File.of_filename (to_key file))
+        OpamFilename.Raw.Map.add (OpamFilename.Raw.of_filename (to_key file))
           (lazy (OpamFilename.read file)) map)
-      OpamTar.File.Map.empty (OpamFilename.rec_files dir)
+      OpamFilename.Raw.Map.empty (OpamFilename.rec_files dir)
   in
   let tdebug = false in
   if tdebug then
     OpamConsole.error "OFF:get_xfs:\n%s"
-      (OpamStd.Format.itemize OpamTar.File.to_string (OpamTar.File.Map.keys r));
+      (OpamStd.Format.itemize OpamFilename.Raw.to_string (OpamFilename.Raw.Map.keys r));
   r
 
 let get_contents ~repo_root dir =
@@ -1675,10 +1675,10 @@ let read_repo_opam_t ~repo_name ~repo_root dir file content xfs =
     (Some (Some repo_name, rel))
 
 let read_repo_opam_tar ~repo_name ~repo_root dir file content xfs =
-  let file = OpamTar.File.to_filename file in
-  let dir = OpamTar.File.Dir.to_dir dir in
+  let file = OpamFilename.Raw.to_filename file in
+  let dir = OpamFilename.Raw.Dir.to_dir dir in
   let repo_root = OpamRepositoryRoot.Tar repo_root in
-  let xfs = OpamTar.File.Map.map (fun c -> lazy c) xfs in
+  let xfs = OpamFilename.Raw.Map.map (fun c -> lazy c) xfs in
   read_repo_opam_t ~repo_name ~repo_root dir file (lazy content) xfs
 
 let read_repo_opam_dir ~repo_name ~repo_root dir =

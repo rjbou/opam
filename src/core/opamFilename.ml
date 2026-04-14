@@ -9,12 +9,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type DIRSEP = sig
+  val slash : string
+  val concat : string -> string -> string
+  val basename : string -> string
+  val dirname : string -> string
+  val forward_to_back : string -> string
+  val back_to_forward : string -> string
+end
+
+module Internal (DirSep : DIRSEP) = struct
+
 let might_escape ~sep path =
   let sep =
     match sep with
     | `Unix -> Re.char '/'
     | `Windows -> Re.alt Re.[  char '\\'; char '/' ]
-    | `Unspecified -> Re.str Filename.dir_sep
+    | `Unspecified -> Re.str DirSep.slash
   in
   List.exists (String.equal Filename.parent_dir_name)
     Re.(split (compile sep) path)
@@ -32,7 +43,7 @@ module Base = struct
     filename ^ "." ^ suffix
 end
 
-let log fmt = OpamConsole.log "FILENAME" fmt
+let log fmt = OpamConsole.log "DIRNAME" fmt
 let slog = OpamConsole.slog
 
 module Dir = struct
@@ -46,18 +57,18 @@ module Dir = struct
     let dirname =
       if dirname = "~" then OpamStd.Sys.home ()
       else if
-        OpamCompat.String.starts_with ~prefix:("~"^Filename.dir_sep) dirname
+        OpamCompat.String.starts_with ~prefix:("~"^DirSep.slash) dirname
       then
-        Filename.concat (OpamStd.Sys.home ())
-          (OpamStd.String.remove_prefix ~prefix:("~"^Filename.dir_sep) dirname)
+        DirSep.concat (OpamStd.Sys.home ())
+          (OpamStd.String.remove_prefix ~prefix:("~"^DirSep.slash) dirname)
       else dirname
     in
-(*     OpamConsole.error "******************** DIR OF STRING %s -> %s" dirname (   OpamSystem.real_path (OpamSystem.forward_to_back dirname)); *)
-    OpamSystem.real_path (OpamSystem.forward_to_back dirname)
+(*     OpamConsole.error "******************** DIR OF STRING %s -> %s" dirname (   OpamSystem.real_path (DirSep.forward_to_back dirname)); *)
+    OpamSystem.real_path (DirSep.forward_to_back dirname)
 
   let to_string dirname = dirname
   let of_list dirs =
-    String.concat Filename.dir_sep dirs
+    String.concat DirSep.slash dirs
 
 end
 
@@ -123,9 +134,9 @@ let opt_dir dirname =
   if exists_dir dirname then Some dirname else None
 
 let basename_dir dirname =
-  Base.of_string (Filename.basename (Dir.to_string dirname))
+  Base.of_string (DirSep.basename (Dir.to_string dirname))
 
-let dirname_dir dirname = Filename.dirname (Dir.to_string dirname)
+let dirname_dir dirname = DirSep.dirname (Dir.to_string dirname)
 
 let link_dir ~target ~link =
   if exists_dir link then
@@ -135,7 +146,7 @@ let link_dir ~target ~link =
     OpamSystem.link (Dir.to_string target) (Dir.to_string link)
 
 let to_list_dir dir =
-  let base d = Dir.of_string (Filename.basename (Dir.to_string d)) in
+  let base d = Dir.of_string (DirSep.basename (Dir.to_string d)) in
   let rec aux acc dir =
     let d = dirname_dir dir in
     if d <> dir then aux (base dir :: acc) d
@@ -144,11 +155,11 @@ let to_list_dir dir =
 
 let (/) d1 s2 =
   let s1 = Dir.to_string d1 in
-  raw_dir (Filename.concat s1 s2)
+  raw_dir (DirSep.concat s1 s2)
 
 let concat_and_resolve d1 s2 =
   let s1 = Dir.to_string d1 in
-  Dir.of_string (Filename.concat s1 s2)
+  Dir.of_string (DirSep.concat s1 s2)
 
 type t = {
   dirname:  Dir.t;
@@ -160,16 +171,16 @@ let create dirname basename =
 if basename  = "<none>" then
 OpamConsole.error "++++++ CREATE %s %s"  (dirname) (basename);
 *)
-  let b1 = OpamSystem.forward_to_back (Filename.dirname (Base.to_string basename)) in
-  let b2 = Base.of_string (Filename.basename (Base.to_string basename)) in
-  let dirname = OpamSystem.forward_to_back dirname in
+  let b1 = DirSep.forward_to_back (DirSep.dirname (Base.to_string basename)) in
+  let b2 = Base.of_string (DirSep.basename (Base.to_string basename)) in
+  let dirname = DirSep.forward_to_back dirname in
   if basename = b2 then
     { dirname; basename }
   else
     let b1 =
       if dirname = ""
       then b1
-      else OpamStd.String.remove_prefix ~prefix:Filename.dir_sep b1
+      else OpamStd.String.remove_prefix ~prefix:DirSep.slash b1
     in
     { dirname = dirname / b1; basename = b2 }
 
@@ -182,8 +193,8 @@ OpamConsole.error "++++++ OF BASENAME %s %s"  (dirname) (basename);
   { dirname; basename }
 
 let raw str =
-  let dirname = raw_dir (Filename.dirname str) in
-  let basename = Base.of_string (Filename.basename str) in
+  let dirname = raw_dir (DirSep.dirname str) in
+  let basename = Base.of_string (DirSep.basename str) in
   create dirname basename
 
 let to_string t =
@@ -191,10 +202,10 @@ let to_string t =
 if Base.to_string t.basename  = "<none>" then
 OpamConsole.error "++++++TO STRING %s %s"  (Dir.to_string t.dirname) (Base.to_string t.basename);
 *)
-  Filename.concat (Dir.to_string t.dirname) (Base.to_string t.basename)
+  DirSep.concat (Dir.to_string t.dirname) (Base.to_string t.basename)
 
 let to_list t =
-  (String.split_on_char Filename.dir_sep.[0] t.dirname)
+  (String.split_on_char DirSep.slash.[0] t.dirname)
   @ [ t.basename ]
 
 let touch t =
@@ -210,8 +221,8 @@ let written_since file =
   (Unix.time () -. last_update)
 
 let of_string s =
-  let dirname = Filename.dirname s in
-  let basename = Filename.basename s in
+  let dirname = DirSep.dirname s in
+  let basename = DirSep.basename s in
 (*
 if basename  = "<none>" then
 OpamConsole.error "++++++OF STRING %s %s"  (dirname) (basename);
@@ -340,7 +351,7 @@ let readlink src =
     try
       let rl = Unix.readlink (to_string src) in
       if Filename.is_relative rl then
-        of_string (Filename.concat (dirname src) rl)
+        of_string (DirSep.concat (dirname src) rl)
       else of_string rl
     with Unix.Unix_error _ -> src
   else
@@ -372,7 +383,7 @@ let dir_starts_with pfx dir =
 let remove_prefix prefix filename =
   let prefix =
     let str = Dir.to_string prefix in
-    if str = "" then "" else Filename.concat str "" in
+    if str = "" then "" else DirSep.concat str "" in
   let filename = to_string filename in
   OpamStd.String.remove_prefix ~prefix filename
 
@@ -382,24 +393,24 @@ let remove_prefix_dir prefix dir =
   if prefix = "" then dirname
   else
     OpamStd.String.remove_prefix ~prefix dirname |>
-    OpamStd.String.remove_prefix ~prefix:Filename.dir_sep
+    OpamStd.String.remove_prefix ~prefix:DirSep.slash
 
 (* TAR TODO : hackish... *)
 let rec root_dir filename =
-  if Char.equal filename.dirname.[0] Filename.dir_sep.[0] then
+  if Char.equal filename.dirname.[0] DirSep.slash.[0] then
     let dirname =
       String.sub filename.dirname 1 (String.length filename.dirname - 2)
     in
-    Option.map ((^) Filename.dir_sep)
+    Option.map ((^) DirSep.slash)
       (root_dir { filename with dirname })
   else
-    match OpamStd.String.cut_at filename.dirname Filename.dir_sep.[0] with
+    match OpamStd.String.cut_at filename.dirname DirSep.slash.[0] with
     | Some (root, _rest) -> Some root
     | None -> None
 
 let swap_prefix ~old ~new_ filename =
   let without_root = remove_prefix old filename in
-  raw (Filename.concat new_ without_root)
+  raw (DirSep.concat new_ without_root)
 
 let process_in ?root fn src dst =
   let basename = match root with
@@ -408,7 +419,7 @@ let process_in ?root fn src dst =
       if starts_with r src then remove_prefix r src
       else OpamSystem.internal_error "%s is not a prefix of %s"
           (Dir.to_string r) (to_string src) in
-  let dst = Filename.concat (Dir.to_string dst) basename in
+  let dst = DirSep.concat (Dir.to_string dst) basename in
   fn ~src ~dst:(of_string dst)
 
 let copy_in ?root = process_in ?root copy
@@ -479,12 +490,12 @@ let link ?(relative=false) ~target ~link =
     | Some ancestor ->
       let back =
         let rel = remove_prefix_dir ancestor (dirname link) in
-        OpamStd.List.concat_map Filename.dir_sep
+        OpamStd.List.concat_map DirSep.slash
           (fun _ -> "..")
-          (OpamStd.String.split rel Filename.dir_sep.[0])
+          (OpamStd.String.split rel DirSep.slash.[0])
       in
       let forward = remove_prefix ancestor target in
-      Filename.concat back forward
+      DirSep.concat back forward
   in
   OpamSystem.link target (to_string link)
 [@@ocaml.warning "-16"]
@@ -565,10 +576,10 @@ let with_flock_write_then_read ?dontblock file write read =
 
 let prettify_path s =
   let aux ~short ~prefix =
-    let prefix = Filename.concat prefix "" in
+    let prefix = DirSep.concat prefix "" in
     if OpamCompat.String.starts_with ~prefix s then
       let suffix = OpamStd.String.remove_prefix ~prefix s in
-      Some (Filename.concat short suffix)
+      Some (DirSep.concat short suffix)
     else
       None in
   try
@@ -615,10 +626,10 @@ module SubPath = struct
   let equal = String.equal
 
   let of_string s =
-    OpamSystem.back_to_forward s
+    DirSep.back_to_forward s
     |> OpamStd.String.remove_prefix ~prefix:"./"
     |> of_string
-  let to_string = OpamSystem.forward_to_back
+  let to_string = DirSep.forward_to_back
   let normalised_string s = s
 
   let (/) d s = d / to_string s
@@ -633,8 +644,8 @@ module Op = struct
   let (/) = (/)
 
   let (//) d1 s2 =
-    let d = Filename.dirname s2 in
-    let b = Filename.basename s2 in
+    let d = DirSep.dirname s2 in
+    let b = DirSep.basename s2 in
     if d <> "." then
       create (d1 / d) (Base.of_string b)
     else
@@ -737,3 +748,100 @@ let to_attribute root file =
     s.Unix.st_perm in
   let digest = OpamHash.compute ~kind:`MD5 (to_string file) in
   Attribute.create basename digest (Some perm)
+
+end
+
+module Local : DIRSEP = struct
+  let slash = Filename.dir_sep
+  let concat = Filename.concat
+  let dirname = Filename.dirname
+  let basename = Filename.basename
+  let forward_to_back = OpamSystem.forward_to_back
+  let back_to_forward = OpamSystem.back_to_forward
+end
+
+module Unix : DIRSEP = struct
+  (* same everywhere *)
+  let current_dir_name = "."
+  let dir_sep = "/"
+  let is_dir_sep s i = s.[i] = '/'
+  (* This function implements the Open Group specification found here:
+     [[1]] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/basename.html
+     In step 1 of [[1]], we choose to return "." for empty input.
+      (for compatibility with previous versions of OCaml)
+     In step 2, we choose to process "//" normally.
+     Step 6 is not implemented: we consider that the [suffix] operand is
+      always absent.  Suffixes are handled by [chop_suffix] and [chop_extension].
+  *)
+  let generic_basename is_dir_sep current_dir_name name =
+    let rec find_end n =
+      if n < 0 then String.sub name 0 1
+      else if is_dir_sep name n then find_end (n - 1)
+      else find_beg n (n + 1)
+    and find_beg n p =
+      if n < 0 then String.sub name 0 p
+      else if is_dir_sep name n then String.sub name (n + 1) (p - n - 1)
+      else find_beg (n - 1) p
+    in
+    if name = ""
+    then current_dir_name
+    else find_end (String.length name - 1)
+
+  let basename = generic_basename is_dir_sep current_dir_name
+
+  (* This function implements the Open Group specification found here:
+     [[2]] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/dirname.html
+     In step 6 of [[2]], we choose to process "//" normally.
+  *)
+  let generic_dirname is_dir_sep current_dir_name name =
+    let rec trailing_sep n =
+      if n < 0 then String.sub name 0 1
+      else if is_dir_sep name n then trailing_sep (n - 1)
+      else base n
+    and base n =
+      if n < 0 then current_dir_name
+      else if is_dir_sep name n then intermediate_sep n
+      else base (n - 1)
+    and intermediate_sep n =
+      if n < 0 then String.sub name 0 1
+      else if is_dir_sep name n then intermediate_sep (n - 1)
+      else String.sub name 0 (n + 1)
+    in
+    if name = ""
+    then current_dir_name
+    else trailing_sep (String.length name - 1)
+
+  let dirname = generic_dirname is_dir_sep current_dir_name
+
+  let concat dirname filename =
+    let l = String.length dirname in
+    if l = 0 || is_dir_sep dirname (l-1)
+    then dirname ^ filename
+    else dirname ^ dir_sep ^ filename
+
+  let slash = dir_sep
+  let forward_to_back = Fun.id
+  let back_to_forward = Fun.id
+end
+
+include Internal (Local)
+
+module Raw = struct
+  type filename = t
+  module OpamFilename = Internal (Unix)
+  include OpamFilename
+  let of_string = raw
+  let of_filename (t:filename) : t = { dirname = t.dirname ; basename = t.basename; }
+  let to_filename (t:t) : filename = {dirname = t.dirname ; basename = t.basename; }
+  module Dir = struct
+    include OpamFilename.Dir
+    let of_string = raw_dir
+    let of_dir t = t
+    let to_dir t = t
+  end
+  module Base = struct
+    include OpamFilename.Base
+    let of_base t = t
+    let to_base t = t
+  end
+end

@@ -23,8 +23,10 @@ let tdebug go =
       Printf.ksprintf (fun _ -> ()) fmt
 
 
+(*
 module File = struct
-  include OpamFilename
+  include OpamFilename.Raw
+(*
   let of_string = raw
   module Dir = struct
     include OpamFilename.Dir
@@ -39,12 +41,14 @@ module File = struct
   end
   let of_filename t = t
   let to_filename t = t
+*)
 end
 
+*)
 open OpamTypes
 type tar = filename
 
-type tar_file = File.t
+type tar_file = OpamFilename.Raw.t
 type tar_content = string
 
 let rec safe_read fd buf off len =
@@ -83,7 +87,7 @@ let fold_reg_files_aux f acc fd =
     match hdr.Tar.Header.link_indicator with
     | Normal ->
       let* content = Tar.really_read (Int64.to_int hdr.file_size) in
-      let acc = f acc (OpamFilename.raw hdr.file_name) content in
+      let acc = f acc (OpamFilename.Raw.of_string hdr.file_name) content in
       Tar.return (Ok acc)
     | Directory -> Tar.return (Ok acc)
     | Hard -> failwith "hardlinks unsupported"
@@ -104,7 +108,7 @@ let fold_reg_files f acc fname =
   fold_reg_files_aux f acc fd
 
 module Inplace = struct
-  module Map = OpamFilename.Map
+  module Map = OpamFilename.Raw.Map
   type t = Unix.file_descr * tar_content Map.t
 
   let tdebug = tdebug false
@@ -118,20 +122,20 @@ module Inplace = struct
     Map.fold (fun k x acc -> f acc k x) t acc
 
   let exists ~fname (_, t) =
-    tdebug "exists: %s" (OpamFilename.to_string fname);
+    tdebug "exists: %s" (OpamFilename.Raw.to_string fname);
     Map.mem fname t
 
   let read ~fname (_, t) =
-    tdebug "read: %s" (OpamFilename.to_string fname);
+    tdebug "read: %s" (OpamFilename.Raw.to_string fname);
     Map.find fname t
 
   let add ~fname ~content (fd, t) =
-    tdebug "add: %s" (OpamFilename.to_string fname);
+    tdebug "add: %s" (OpamFilename.Raw.to_string fname);
     (fd, Map.add fname content t)
 
   let mv ~src ~dst ((fd,t) as tar) =
     tdebug "%s" @@ Printf.sprintf "mv: %s -> %s"
-    (OpamFilename.to_string src) (OpamFilename.to_string dst);
+    (OpamFilename.Raw.to_string src) (OpamFilename.Raw.to_string dst);
     let content = read ~fname:src tar in
     let t =
       Map.remove src t
@@ -140,14 +144,14 @@ module Inplace = struct
     (fd, t)
 
   let remove ~fname (fd, t) =
-    tdebug "rm: %s" (OpamFilename.to_string fname);
+    tdebug "rm: %s" (OpamFilename.Raw.to_string fname);
     (fd, Map.remove fname t)
 
   let remove_dir ~dname (fd, t) =
-    tdebug "rmdir: %s" (OpamFilename.Dir.to_string dname);
+    tdebug "rmdir: %s" (OpamFilename.Raw.Dir.to_string dname);
     let t =
       Map.filter (fun fname _ ->
-          not (OpamFilename.starts_with dname fname)) t
+          not (OpamFilename.Raw.starts_with dname fname)) t
     in
     (fd, t)
 
@@ -170,7 +174,7 @@ module Inplace = struct
     let entries =
       let dispenser =
         Map.fold (fun path content acc ->
-            let path = OpamFilename.to_string path in
+            let path = OpamFilename.Raw.to_string path in
             let hdr =
               Tar.Header.make ~file_mode:0o640 ~mod_time:0L ~user_id:0 ~group_id:0
                 path (Int64.of_int (String.length content))

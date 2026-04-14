@@ -71,7 +71,7 @@ module Tar = struct
   let move = OpamFilename.move
   let is_symlink = OpamFilename.is_symlink
 
-  let archives : (OpamHash.t, string OpamTar.File.Map.t) Hashtbl.t = Hashtbl.create 8
+  let archives : (OpamHash.t, string OpamFilename.Raw.Map.t) Hashtbl.t = Hashtbl.create 8
   let unload_repo_tars () = Hashtbl.clear archives
 
   let fold f x tar =
@@ -80,15 +80,15 @@ module Tar = struct
     let hash = OpamHash.compute ~kind:`SHA256 (OpamFilename.to_string tar) in
     match Hashtbl.find_opt archives hash with
     | Some contents ->
-      OpamTar.File.Map.fold (fun filename content acc ->
+      OpamFilename.Raw.Map.fold (fun filename content acc ->
           f acc filename content)
         contents x
     | None ->
       let result, map =
         OpamTar.fold_reg_files (fun (acc, map) file content ->
             f acc file content,
-            OpamTar.File.Map.add file content map)
-          (x, OpamTar.File.Map.empty) tar
+            OpamFilename.Raw.Map.add file content map)
+          (x, OpamFilename.Raw.Map.empty) tar
       in
       Hashtbl.add archives hash map;
       result
@@ -96,7 +96,7 @@ module Tar = struct
   let files t =
     fold (fun files file _ -> file::files) [] t
   let ls t =
-    OpamStd.Format.itemize OpamTar.File.to_string (files t)
+    OpamStd.Format.itemize OpamFilename.Raw.to_string (files t)
 
   let _patch_with_dir_extraction ~allow_unclean patch tar =
     (* TAR TODO update when we have tar patch *)
@@ -147,7 +147,7 @@ module Tar = struct
       OpamStd.Option.default ("in archive "^to_string tar)
         patch_filename
     in
-    let get_path file = OpamTar.File.of_string file in
+    let get_path file = OpamFilename.Raw.of_string file in
     let module Tar = OpamTar.Inplace in
     let apply diff tar =
       let patch ~file content diff =
@@ -165,7 +165,7 @@ module Tar = struct
           | Some x ->
             let tar =
              OpamStd. Option.map_default (fun content ->
-                  Tar.add ~fname:(OpamTar.File.add_extension file ".orig") ~content tar)
+                  Tar.add ~fname:(OpamFilename.Raw.add_extension file ".orig") ~content tar)
                  tar content
             in
             tar, x
@@ -189,8 +189,8 @@ module Tar = struct
         let tar, content = patch ~file:file (Some content) diff in
         let tar = Tar.add ~fname:file ~content tar in
         let tar =
-          if file1_exists && file1 <> (file2 : OpamTar.File.t) then
-            Tar.remove_dir ~dname:(OpamTar.File.dirname file1) tar
+          if file1_exists && file1 <> (file2 : OpamFilename.Raw.t) then
+            Tar.remove_dir ~dname:(OpamFilename.Raw.dirname file1) tar
           else
             tar
         in
@@ -198,7 +198,7 @@ module Tar = struct
       | Patch.Delete file | Patch.Git_ext (file, _, Patch.Delete_only) ->
         let file = get_path file in
         let tar = Tar.remove ~fname:file tar in
-        let tar = Tar.remove_dir ~dname:(OpamTar.File.dirname file) tar in
+        let tar = Tar.remove_dir ~dname:(OpamFilename.Raw.dirname file) tar in
         tar
       | Patch.Create file | Patch.Git_ext (_, file, Patch.Create_only) ->
         let file = get_path file in
@@ -208,9 +208,9 @@ module Tar = struct
         let src = get_path src in
         let dst = get_path dst in
         let tar = Tar.mv ~src ~dst tar in
-        let dirname_src = OpamTar.File.dirname src in
+        let dirname_src = OpamFilename.Raw.dirname src in
         let tar =
-          if dirname_src <> (OpamTar.File.dirname dst : OpamTar.File.Dir.t) then
+          if dirname_src <> (OpamFilename.Raw.dirname dst : OpamFilename.Raw.Dir.t) then
             Tar.remove_dir ~dname:dirname_src tar
           else tar
         in
@@ -412,7 +412,7 @@ let delayed_read_repo = function
         (* TAR TODO :  here we need to have the inner repo file bc root of
            archive is the directory of the repo. Maybe it need to be changed,
            it will have an impact in a lot of stuff *)
-            if OpamTar.File.equal fname (OpamTar.File.of_string "repo") then
+            if OpamFilename.Raw.equal fname (OpamFilename.Raw.of_string "repo") then
               raise (Found content))
 (*
             match String.split_on_char Filename.dir_sep.[0] fname with

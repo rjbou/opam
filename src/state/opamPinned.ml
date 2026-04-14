@@ -305,11 +305,11 @@ let orig_opam_file st name opam =
     | OpamRepositoryRoot.Dir dir ->
       lookup (OpamRepositoryRoot.Dir.to_dir dir / rel )
     | OpamRepositoryRoot.Tar tar ->
-      let dir = OpamTar.File.Dir.of_string rel in
-      let opam_files, locked_files = files (OpamTar.File.Dir.to_dir dir) in
+      let dir = OpamFilename.Raw.Dir.of_string rel in
+      let opam_files, locked_files = files (OpamFilename.Raw.Dir.to_dir dir) in
       (* TAR TODO : use a generic files functions *)
-      let opam_files = List.map OpamTar.File.of_filename opam_files in
-      let locked_files = List.map OpamTar.File.of_filename locked_files in
+      let opam_files = List.map OpamFilename.Raw.of_filename opam_files in
+      let locked_files = List.map OpamFilename.Raw.of_filename locked_files in
       (* TAR TODO : some comments to check
          it is better to fold over the full repo only once and the look again
          on smaller lists instead of looking twice over all repo where there is
@@ -317,12 +317,12 @@ let orig_opam_file st name opam =
       let opams =
         OpamRepositoryRoot.Tar.extract_files (fun f ->
             Option.is_some
-            @@ List.find_opt (OpamTar.File.equal f) locked_files
-               ++ List.find_opt (OpamTar.File.equal f) opam_files)
+            @@ List.find_opt (OpamFilename.Raw.equal f) locked_files
+               ++ List.find_opt (OpamFilename.Raw.equal f) opam_files)
           tar
       in
       let to_opam (f,c) =
-        let f = OpamTar.File.to_string f in
+        let f = OpamFilename.Raw.to_string f in
         let tmp = OpamFilename.mk_tmp_dir () in
         let filename = tmp // f in
         OpamFilename.write filename c;
