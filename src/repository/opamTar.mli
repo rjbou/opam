@@ -10,7 +10,6 @@
 
 (* TAR TODO : documentation *)
 (* TAR TODO : use filename instead of string to navigate in archive *)
-open OpamTypes
 
 (*
 module File : sig
@@ -66,12 +65,17 @@ module File : sig
 end
 *)
 
-type tar = filename
+type tar = OpamFilename.t
 type tar_file = OpamFilename.Raw.t
 type tar_content = string
 
 val fold_reg_files :
   ('acc -> tar_file -> tar_content -> 'acc) -> 'acc -> tar -> 'acc
+
+val patch:
+  allow_unclean:bool ->
+  [`Patch_file of string | `Patch_diffs of Patch.t list ] -> tar ->
+  (Patch.operation list, exn) result
 
 module Inplace : sig
   type t

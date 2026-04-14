@@ -206,4 +206,32 @@ module Inplace = struct
     ()
 end
 
+module PatchConf = struct
+  type root = OpamFilename.t
+  module Tar = Inplace
+  type file = OpamFilename.Raw.t
+  type target = Tar.t
+  let label = "archive"
+  let translate_patch = false
+  let root_to_string = OpamFilename.to_string
+  let end_slash = Fun.id
+  let get_path _fail _target =
+    (* TAR TODO check escapability ? *)
+    OpamFilename.Raw.of_string
+  let ext file ext = OpamFilename.Raw.add_extension file ext
+  let write file content target = Tar.add ~fname:file ~content target
+  let exists file = Tar.exists ~fname:file
+  let read file = Tar.read ~fname:file
+  let remove file = Tar.remove ~fname:file
+  let remove_dir file target =
+    Tar.remove_dir ~dname:(OpamFilename.Raw.dirname file) target
+  let same_dirname ~src ~dst =
+    OpamFilename.Raw.dirname src
+    <> (OpamFilename.Raw.dirname dst : OpamFilename.Raw.Dir.t)
+  let mv = Tar.mv
+  let open_ = Tar.with_open_out
+  let save = Tar.write
+end
 
+let patch ~allow_unclean patch_source tar =
+  OpamPatch.patch (module PatchConf) ~allow_unclean patch_source tar
