@@ -167,6 +167,11 @@ let get_diff repo1 repo2 =
   in
   let contents1 = get_contents repo1 in
   let contents2 = get_contents repo2 in
+  if tdebug then
+    (OpamConsole.error "ORB:DIFF: CONTENTS 1:\n%s"
+       (OpamStd.Format.itemize Fun.id (OpamStd.String.Map.keys contents1));
+     (OpamConsole.error "ORB:DIFF: CONTENTS 2:\n%s"
+        (OpamStd.Format.itemize Fun.id (OpamStd.String.Map.keys contents2))));
   let get_content_diffs filename contents1 content2 diffs seen =
     (* Compute content diffs for a single file.
        Compares [content2] (new) against [contents1] (old state map).
@@ -197,6 +202,9 @@ let get_diff repo1 repo2 =
           | Some diff -> diff :: diffs)
       contents1 diffs
   in
+  if tdebug then
+    OpamConsole.error "ORB:DIFF: patch list\n %s"
+      ((Format.asprintf "%a" Patch.pp_list) diffs);
   match diffs with
   | [] ->
     log "Internal diff (empty) done in %.2fs." (chrono ());
@@ -207,6 +215,8 @@ let get_diff repo1 repo2 =
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
     OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list diffs);
+  if tdebug then
+    OpamConsole.error "ORB:DIFF: patch file \n%s" (OpamFilename.read patch_file);
     (* TAR TODO : decide what we do with stripping... we need to check that it
        is ok to strip eerything, i don't think so, patchDiff is broken *)
     let strip = false in
