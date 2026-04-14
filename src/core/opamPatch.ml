@@ -53,12 +53,12 @@ let patch_t (type a) (module C : PATCH_CONF with type root = a)
     in
     C.get_path fail to_patch file
   in
-  let patch file content diff to_patch =
+  let patch file content diff patching =
     (* NOTE: The None case returned by [Patch.patch] is only returned
        if [diff = Patch.Delete _]. This sub-function is not called in
        this case so we [assert false] instead. *)
     match Patch.patch ~cleanly:true content diff with
-    | Some x -> to_patch, x
+    | Some x -> patching, x
     | None -> assert false (* See NOTE above *)
     | exception _ when not allow_unclean ->
       internal_patch_error "Patch %S does not apply cleanly."
@@ -66,12 +66,12 @@ let patch_t (type a) (module C : PATCH_CONF with type root = a)
     | exception _ ->
       match Patch.patch ~cleanly:false content diff with
       | Some x ->
-        let to_patch =
+        let patching =
           OpamStd.Option.map_default (fun content ->
-              C.write (C.ext file ".orig") content to_patch)
-            to_patch content
+              C.write (C.ext file ".orig") content patching)
+            patching content
         in
-        to_patch, x
+        patching, x
       | None -> assert false (* See NOTE above *)
       | exception _ ->
         (* TAR TODO : write somewhere else ?
@@ -81,46 +81,43 @@ let patch_t (type a) (module C : PATCH_CONF with type root = a)
         internal_patch_error "Patch %S does not apply cleanly."
           patch_info_path
   in
-  let apply to_patch diff =
+  let apply patching diff =
     match diff.Patch.operation with
     | Patch.Edit (file1, file2) ->
       let file1 = get_path file1 in
       let file2 = get_path file2 in
-      let file1_exists = C.exists file1 to_patch in
+      let file1_exists = C.exists file1 patching in
       (* That seems to be the GNU patch behaviour *)
       let file = if file1_exists then file1 else file2 in
-      let content = C.read file to_patch in
-      let to_patch, content = patch file (Some content) diff to_patch in
-      let to_patch = C.write file content to_patch in
-      let to_patch =
+      let content = C.read file patching in
+      let patching, content = patch file (Some content) diff patching in
+      let patching = C.write file content patching in
+      let patching =
         if file1_exists && file1 <> (file2 : C.file) then
-          C.remove_dir file1 to_patch
+          C.remove_dir file1 patching
         else
-          to_patch
+          patching
       in
-      to_patch
+      patching
     | Patch.Delete file | Patch.Git_ext (file, _, Patch.Delete_only) ->
       let file = get_path file in
-      let to_patch = C.remove file to_patch in
-      let to_patch = C.remove_dir file to_patch in
-      to_patch
+      let patching = C.remove file patching in
+      let patching = C.remove_dir file patching in
+      patching
     | Patch.Create file | Patch.Git_ext (_, file, Patch.Create_only) ->
       let file = get_path file in
-      let to_patch, content = patch file None diff to_patch in
-      C.write file content to_patch
+      let patching, content = patch file None diff patching in
+      C.write file content patching
     | Patch.Git_ext (_, _, Patch.Rename_only (src, dst)) ->
       let src = get_path src in
       let dst = get_path dst in
-      let to_patch = C.mv ~src ~dst to_patch in
-      let to_patch =
-        if C.same_dirname ~src ~dst then
-          C.remove_dir src to_patch
-        else to_patch
-      in
-      to_patch
+      let patching = C.mv ~src ~dst patching in
+      if C.same_dirname ~src ~dst then
+        C.remove_dir src patching
+      else patching
   in
-  C.open_ to_patch (fun patched ->
-      let patched = List.fold_left apply patched diffs in
+  C.open_ to_patch (fun patching ->
+      let patched = List.fold_left apply patching diffs in
       C.save patched)
 
 let translate_patch ~dir orig corrected =
