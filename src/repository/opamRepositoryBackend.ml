@@ -80,23 +80,27 @@ let job_text name label =
 
 (* Serves to remove the repository suffix since the quarantine mechanism in
    local and http patches causes incoherencies with vcs patches *)
-let strip_repo_suffix patch =
-  let rm_prefix f =
-    match OpamStd.String.cut_at f '/' with
-    | None ->
-      log "Internal diff: failed to remove prefix of %s" f;
-      f
-    | Some (_, r) -> r
-  in
-  let operation =
-    match patch.Patch.operation with
-    | Patch.Create f -> Patch.Create (rm_prefix f)
-    | Patch.Delete f -> Patch.Delete (rm_prefix f)
-    | Patch.Edit (f1, f2) -> Patch.Edit (rm_prefix f1, rm_prefix f2)
-    | Patch.Git_ext (f1, f2, ext) ->
-      Patch.Git_ext (rm_prefix f1, rm_prefix f2, ext)
-  in
-  {patch with operation}
+let add_prefix repo1 repo2 =
+  let prefix1 = OpamFilename.Base.to_string (OpamRepositoryRoot.basename repo1) in
+  let prefix2 = OpamFilename.Base.to_string (OpamRepositoryRoot.basename repo2) in
+  let p1 = Filename.concat prefix1 in
+  let p2 = Filename.concat prefix2 in
+  fun patch ->
+    let operation =
+      match patch.Patch.operation with
+      | Patch.Create f -> Patch.Create (p2 f)
+      | Patch.Delete f -> Patch.Delete (p1 f)
+      | Patch.Edit (f1, f2) -> Patch.Edit (p1 f1, p2 f2)
+      | Patch.Git_ext (f1, f2, ext) ->
+        let f1, f2 =
+          match ext with
+          | Patch.Rename_only (_, _) -> f1, f2
+          | Patch.Delete_only -> p1 f1, p1 f2
+          | Patch.Create_only -> p2 f1, p2 f2
+        in
+        Patch.Git_ext (f1, f2, ext)
+    in
+    {patch with operation}
 
 let get_diff repo1 repo2 =
   let tdebug = false in
@@ -138,18 +142,22 @@ let get_diff repo1 repo2 =
       (* Recursively read directory contents into a string map.
          Returns a map from relative file paths to their contents. *)
       let rec aux acc prefix current_dir =
-        let dir_path = OpamFilename.Dir.to_string current_dir in
+        let dir_path = current_dir in
         let entries = OpamSystem.get_files_except_vcs dir_path in
         List.fold_left (fun acc entry ->
             let full_path = Filename.concat dir_path entry in
-            let relative_path = if prefix = "" then entry else prefix ^ "/" ^ entry in
+            let relative_path =
+              match prefix with
+              | None -> entry
+              | Some prefix -> prefix ^ "/" ^ entry
+            in
             let stat = Unix.lstat full_path in
             match stat.Unix.st_kind with
             | Unix.S_REG ->
               let content = OpamSystem.read full_path in
               OpamStd.String.Map.add relative_path content acc
             | Unix.S_DIR ->
-              aux acc relative_path (OpamFilename.Dir.of_string full_path)
+              aux acc (Some relative_path) full_path
             | Unix.S_LNK -> failwith "Symlinks are unsupported"
             | Unix.S_CHR -> failwith "Character devices are unsupported"
             | Unix.S_BLK -> failwith "Block devices are unsupported"
@@ -157,11 +165,11 @@ let get_diff repo1 repo2 =
             | Unix.S_SOCK -> failwith "Sockets are unsupported"
           ) acc entries
       in
-      aux OpamStd.String.Map.empty "" dir
+      aux OpamStd.String.Map.empty None dir
     in
     function
     | OpamRepositoryRoot.Dir dir ->
-      read_dir_contents (OpamRepositoryRoot.Dir.to_dir dir)
+      read_dir_contents (OpamRepositoryRoot.Dir.to_string dir)
     | OpamRepositoryRoot.Tar tar ->
       get_tar_contents tar
   in
@@ -214,14 +222,8 @@ let get_diff repo1 repo2 =
       (slog (fun l -> string_of_int (List.length l))) diffs (chrono ());
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
-    OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list diffs);
-  if tdebug then
-    OpamConsole.error "ORB:DIFF: patch file \n%s" (OpamFilename.read patch_file);
-    (* TAR TODO : decide what we do with stripping... we need to check that it
-       is ok to strip eerything, i don't think so, patchDiff is broken *)
-    let strip = false in
-    let diffs =
-      if strip then List.map strip_repo_suffix diffs
-      else diffs
-    in
+    let file_diffs = List.map (add_prefix repo1 repo2) diffs in
+    OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list file_diffs);
+    if tdebug then
+      OpamConsole.error "ORB:DIFF: patch file \n%s" (OpamFilename.read patch_file);
     Some (patch_file, diffs)
