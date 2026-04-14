@@ -721,7 +721,7 @@ let rec list_remove x = function
 let run_http_server () =
   let port =
     let rec aux p =
-      if p < 1025 then Random.int 49000
+      if p < 1030 then aux (Random.int 49000)
       else p
     in
     aux (Random.int 49000)
