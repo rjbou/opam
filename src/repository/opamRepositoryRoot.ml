@@ -268,18 +268,11 @@ let delayed_read_repo = function
   | Tar tar ->
     let repo_content =
       let exception Found of string in
+      let repo = OpamFilename.Raw.of_string "repo" in
       try
         Tar.fold (fun () fname content ->
-        (* TAR TODO :  here we need to have the inner repo file bc root of
-           archive is the directory of the repo. Maybe it need to be changed,
-           it will have an impact in a lot of stuff *)
-            if OpamFilename.Raw.equal fname (OpamFilename.Raw.of_string "repo") then
+            if OpamFilename.Raw.equal fname repo then
               raise (Found content))
-(*
-            match String.split_on_char Filename.dir_sep.[0] fname with
-            | [_; "repo"] -> raise (Found content)
-            | _ -> ())
-*)
           () (Tar.to_file tar);
         None
       with Found content -> Some content
