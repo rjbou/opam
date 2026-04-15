@@ -75,7 +75,7 @@ module Tar = struct
   let unload_repo_tars () = Hashtbl.clear archives
 
   let fold f x tar =
-  (* TAR TODO : do we need to have a sha256 ? md5 have collision, will it
+  (* TAR TOQUESTION : do we need to have a sha256 ? md5 have collision, will it
      really happen irl ? *)
     let hash = OpamHash.compute ~kind:`SHA256 (OpamFilename.to_string tar) in
     match Hashtbl.find_opt archives hash with

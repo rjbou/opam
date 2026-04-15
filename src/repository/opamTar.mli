@@ -8,7 +8,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* TAR TODO : documentation *)
+(* TAR TODOC : documentation *)
 (* TAR TODO : use filename instead of string to navigate in archive *)
 
 type tar = OpamFilename.t

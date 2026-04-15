@@ -8,7 +8,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* TAR TODO : documentation *)
+(* TAR TODOC : documentation *)
 (* TAR TODO : change fname to tar when accurate *)
 
 open Tar.Syntax

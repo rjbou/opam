@@ -117,5 +117,5 @@ val job_text:
     Unsupported file types: symlinks, character devices, block devices,
     named pipes, sockets.
     Unsupported comparison: comparison between regular files and directories. *)
-(* TAR TODO : update doc *)
+(* TAR TODOC : update doc *)
 val get_diff: OpamRepositoryRoot.t -> OpamRepositoryRoot.t -> (filename * Patch.t list) option

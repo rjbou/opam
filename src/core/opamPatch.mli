@@ -31,7 +31,7 @@ module type PATCH_CONF = sig
   val save : target -> unit
 end
 
-(** TAR TODO : update doc
+(** TAR TODOC : update doc
     [patch ~allow_unclean ?patch_filename ~dir diffs] applies a patch to
     directory [dir].
 
@@ -56,5 +56,5 @@ val translate_patch: dir:string -> string -> string -> unit
 (** [parse_patch ~dir patch_file] processes and parses a patch file.
     Returns the parsed patch diffs or raises [Not_found] if the patch file
     doesn't exist or can't be parsed.
-    TAR TODO update doc for translate*)
+    TAR TODOC update doc for translate*)
 val parse_patch: translate:string option -> string -> Patch.t list

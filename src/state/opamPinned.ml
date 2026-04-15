@@ -310,7 +310,7 @@ let orig_opam_file st name opam =
       (* TAR TODO : use a generic files functions *)
       let opam_files = List.map OpamFilename.Raw.of_filename opam_files in
       let locked_files = List.map OpamFilename.Raw.of_filename locked_files in
-      (* TAR TODO : some comments to check
+      (* TAR TOQUESTION : some comments to check
          it is better to fold over the full repo only once and the look again
          on smaller lists instead of looking twice over all repo where there is
          no locked file *)

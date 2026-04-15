@@ -89,7 +89,7 @@ let get_root rt name =
 let get_repo_root rt repo =
   get_root_raw rt.repos_global.root repo.repo_name
 
-(* TAR TODO : it is simpler to keep it as is *)
+(* TAR TOCOMMENT : it is simpler to keep it as is and not factorise dir & tar *)
 let get_repo_files rt name dir =
   let tdebug = false in
   match get_root rt name with
@@ -185,7 +185,6 @@ let load_raw_opams_and_aux_from_tar _repo_name tar =
       [] tar
   in
   let repo_def =
-    (* TAR TODO with root url ? *)
     let filename = OpamFilename.Raw.of_string "repo" in
     match List.assoc_opt filename raw_repository with
     | Some content ->
@@ -228,7 +227,7 @@ let load_raw_opams_and_aux_from_tar _repo_name tar =
               if OpamFilename.Raw.starts_with dir filename then
                 raise (Found (dir, value))
             ) acc;
-          (* TAR TODO skipping msg ? *)
+          (* TAR TOQUESTION add a skipping message ? *)
           acc
         with Found (key, value) ->
           let fo, co, map = value in
@@ -258,6 +257,7 @@ let load_repo_from_tar_gz repo_name tar =
     let repo_def, opams_map =
       load_raw_opams_and_aux_from_tar repo_name tar
     in
+    (* repo_url is added in load_repo to avoid having it as argument *)
     let opams =
       OpamFilename.Raw.Dir.Map.fold (fun pkgdir (filename, content, otherfiles) opams ->
           match read_package_opam_tar ~repo_name ~repo_root
