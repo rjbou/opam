@@ -33,6 +33,7 @@ exception Internal_patch_error of string
 
 let patch_t (type a) (module C : PATCH_CONF with type root = a)
     ~allow_unclean ?patch_filename (to_patch:a) diffs =
+  if diffs = [] then () else
   let tdebug = false in
   if tdebug then
     OpamConsole.error "patch_t: patch %s"
