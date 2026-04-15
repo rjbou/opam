@@ -123,7 +123,7 @@ let clean_background_processes () =
   Hashtbl.iter (fun pid cmd ->
 (*       Printf.printf "[[[Killing [%d] %s]]]\n" pid cmd; *)
       Printf.printf "[[[Killing %s]]]\n" cmd;
-      try Unix.kill Sys.sigterm pid
+      try Unix.kill pid Sys.sigterm
       with Unix.Unix_error (ESRCH, "kill", _) ->
 (*       Printf.printf "ERROROR\n"; *)
       ()
