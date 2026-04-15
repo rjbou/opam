@@ -191,6 +191,7 @@ module PatchConf = struct
   let label = "archive"
   let translate_patch = false
   let root_to_string = OpamFilename.to_string
+  let file_to_string = OpamFilename.Raw.to_string
   let end_slash = Fun.id
   let get_path _fail _target =
     (* TAR TODO check escapability ? *)
@@ -198,6 +199,7 @@ module PatchConf = struct
   let ext file ext = OpamFilename.Raw.add_extension file ext
   let write file content target = Tar.add ~fname:file ~content target
   let exists file = Tar.exists ~fname:file
+  let exists_dir _file _target = false
   let read file = Tar.read ~fname:file
   let remove file = Tar.remove ~fname:file
   let remove_dir file target =

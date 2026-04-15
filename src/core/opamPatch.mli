@@ -15,11 +15,13 @@ module type PATCH_CONF = sig
   val label : string
   val translate_patch : bool
   val root_to_string : root -> string
+  val file_to_string : file -> string
   val end_slash : root -> root
   val get_path : (unit -> unit) -> root -> string -> file
   val ext : file -> string -> file
   val write : file -> string -> target -> target
   val exists : file -> target -> bool
+  val exists_dir : file -> target -> bool
   val read : file -> target -> string
   val remove : file -> target -> target
   val remove_dir : file -> target -> target

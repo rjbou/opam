@@ -15,11 +15,13 @@ module type PATCH_CONF = sig
   val label : string
   val translate_patch : bool
   val root_to_string : root -> string
+  val file_to_string : file -> string
   val end_slash : root -> root
   val get_path : (unit -> unit) -> root -> string -> file
   val ext : file -> string -> file
   val write : file -> string -> target -> target
   val exists : file -> target -> bool
+  val exists_dir : file -> target -> bool
   val read : file -> target -> string
   val remove : file -> target -> target
   val remove_dir : file -> target -> target
@@ -82,43 +84,125 @@ let patch_t (type a) (module C : PATCH_CONF with type root = a)
         internal_patch_error "Patch %S does not apply cleanly."
           patch_info_path
   in
+  let contained_in ~prefix ~inn =
+    OpamCompat.String.starts_with
+      ~prefix:(C.file_to_string prefix) (C.file_to_string inn)
+  in
+  let tdebug = false in
+  if tdebug then Printexc.record_backtrace true ;
   let apply patching diff =
-    match diff.Patch.operation with
-    | Patch.Edit (file1, file2) ->
-      let file1 = get_path file1 in
-      let file2 = get_path file2 in
-      let file1_exists = C.exists file1 patching in
-      (* That seems to be the GNU patch behaviour *)
-      let file = if file1_exists then file1 else file2 in
-      let content = C.read file patching in
-      let patching, content = patch file (Some content) diff patching in
-      let patching = C.write file content patching in
+    try
       let patching =
-        if file1_exists && file1 <> (file2 : C.file) then
-          C.remove_dir file1 patching
-        else
+        match diff.Patch.operation with
+        | Patch.Edit (file1, file2) ->
+          let file1 = get_path file1 in
+          let file2 = get_path file2 in
+          let file1_exists = C.exists file1 patching in
+          (* That seems to be the GNU patch behaviour *)
+          let file = if file1_exists then file1 else file2 in
+          let content = C.read file patching in
+          let patching, content = patch file (Some content) diff patching in
+          let patching = C.write file content patching in
+          let patching =
+            if file1_exists && file1 <> (file2 : C.file) then
+              C.remove_dir file1 patching
+            else
+              patching
+          in
           patching
+        | Patch.Delete file | Patch.Git_ext (file, _, Patch.Delete_only) ->
+          let file = get_path file in
+          let patching = C.remove file patching in
+          let patching = C.remove_dir file patching in
+          patching
+        | Patch.Create file | Patch.Git_ext (_, file, Patch.Create_only) ->
+          let file = get_path file in
+          let patching, content = patch file None diff patching in
+          C.write file content patching
+        | Patch.Git_ext (_, _, Patch.Rename_only (src, dst)) ->
+          let src = get_path src in
+          let dst = get_path dst in
+          let check_and_write_dst longest_path content patching =
+            if C.exists_dir longest_path patching then
+              let _ : C.target = C.write src content patching in
+              failwith
+                (Printf.sprintf "Directory of %s is not empty, \
+                                 failed to remove to write %s"
+                   (C.file_to_string src)
+                   (C.file_to_string dst))
+            else
+              C.write dst content patching
+          in
+          (* case a/b/FILE -> a/b/FILE/anotherfile *)
+          if contained_in ~prefix:src ~inn:dst then
+            let content = C.read src patching in
+            let patching = C.remove src patching in
+            let patching = check_and_write_dst dst content patching in
+            patching
+            (* case a/b/FILE/anotherfile -> a/b/FILE *)
+          else if contained_in ~prefix:dst ~inn:src then
+            let content = C.read src patching in
+            let patching = C.remove src patching in
+            let patching = C.remove_dir src patching in
+            let patching = check_and_write_dst src content patching in
+            patching
+          else
+            let patching = C.mv ~src ~dst patching in
+            if C.same_dirname ~src ~dst then
+              C.remove_dir src patching
+            else patching
+      in Ok patching
+    with exn ->
+    if tdebug then
+    OpamConsole.error "Error %s" (Printexc.get_backtrace ());
+    Error (diff, exn)
+  in
+  let rec loop diffs patching =
+    let patched, remaining =
+      let rec aux patching remaining = function
+        | diff::rem ->
+          (match apply patching diff with
+           | Ok patched -> aux patched remaining rem
+           | Error rej -> aux patching (rej::remaining) rem)
+        | [] -> patching, remaining
       in
-      patching
-    | Patch.Delete file | Patch.Git_ext (file, _, Patch.Delete_only) ->
-      let file = get_path file in
-      let patching = C.remove file patching in
-      let patching = C.remove_dir file patching in
-      patching
-    | Patch.Create file | Patch.Git_ext (_, file, Patch.Create_only) ->
-      let file = get_path file in
-      let patching, content = patch file None diff patching in
-      C.write file content patching
-    | Patch.Git_ext (_, _, Patch.Rename_only (src, dst)) ->
-      let src = get_path src in
-      let dst = get_path dst in
-      let patching = C.mv ~src ~dst patching in
-      if C.same_dirname ~src ~dst then
-        C.remove_dir src patching
-      else patching
+      aux patching [] diffs
+    in
+    if remaining = [] then patched
+    else
+      let remaining_diffs, _ = List.split remaining in
+      if diffs = remaining_diffs then
+        let file_msg, _error_msg =
+          let printed =
+            let get_file = function
+              | Patch.Create f
+              | Patch.Delete f
+              | Patch.Git_ext (f, _, Create_only)
+              | Patch.Git_ext (_, f, Delete_only)
+                -> f
+              | Patch.Edit (f1, f2)
+              | Patch.Git_ext (f1, f2, Rename_only _)
+                -> f1 ^ " - " ^ f2
+            in
+            List.map (fun (diff, exn) ->
+                let file = get_file diff.Patch.operation in
+                file,
+                file ^ ": " ^ Printexc.to_string exn)
+              remaining
+          in
+          let diffs, errors = List.split printed in
+          OpamStd.List.to_string Fun.id diffs,
+          OpamStd.Format.itemize Fun.id errors
+        in
+(*
+        OpamConsole.error
+          "Error during patching, failed to apply:\n %s" error_msg;
+*)
+        internal_patch_error "%s" file_msg
+      else loop remaining_diffs patched
   in
   C.open_ to_patch (fun patching ->
-      let patched = List.fold_left apply patching diffs in
+      let patched : C.target = loop diffs patching in
       C.save patched)
 
 let translate_patch ~dir orig corrected =
@@ -454,8 +538,7 @@ let patch (type a) (module C : PATCH_CONF with type root = a)
     Ok (List.map (fun d -> d.Patch.operation) diffs)
   in
   let patch ?patch_filename diffs =
-    patch_t (module C) ~allow_unclean ?patch_filename to_patch
-      diffs
+    patch_t (module C) ~allow_unclean ?patch_filename to_patch diffs
   in
   try
     match patch_source with

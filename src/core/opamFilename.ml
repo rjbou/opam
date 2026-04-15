@@ -510,6 +510,7 @@ module PatchConf = struct
   let label = "directory"
   let translate_patch = true
   let root_to_string root = root
+  let file_to_string file = file
   let end_slash dir = Filename.concat (OpamSystem.real_path dir) ""
   let get_path fail dir file =
     let file = OpamSystem.real_path (Filename.concat dir file) in
@@ -519,6 +520,9 @@ module PatchConf = struct
   let ext file ext = file ^ ext
   let write file content _target = OpamSystem.write file content
   let exists file _target = Sys.file_exists file
+  let exists_dir file _target =
+    let dir = Filename.dirname file in
+    Sys.file_exists dir && Sys.is_directory dir
   let read file _target = OpamSystem.read file
   let remove file _target = OpamSystem.remove_file file
   let remove_dir file _target = OpamSystem.rmdir_cleanup (Filename.dirname file)

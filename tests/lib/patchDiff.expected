@@ -263,8 +263,20 @@ similarity index 100%
 rename from file-fst-dir-snd
 rename to file-fst-dir-snd/fst
 
-*** GIT PATCH ERROR ***
-ERROR: Unix.Unix_error(Unix.ENOTDIR, "lstat", "/tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/file-fst-dir-snd/fst")
+*** GIT PATCHED ***
++ first/
++ first/file-fst-dir-snd
++ first/file-fst-dir-snd/fst
+  > foo
++ first/same-file
+  > foo
++ second/
++ second/file-fst-dir-snd
++ second/file-fst-dir-snd/fst
+  > foo
++ second/same-file
+  > foo
+
 
 ----------------------
  Test 3: diff dir/file error
@@ -311,8 +323,18 @@ similarity index 100%
 rename from dir-fst-file-snd/fst
 rename to dir-fst-file-snd
 
-*** GIT PATCH ERROR ***
-ERROR: OpamSystem.Internal_error("Cannot remove /tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd (Unix.Unix_error(Unix.EISDIR, \"unlink\", \"/tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd\")).")
+*** GIT PATCHED ***
++ first/
++ first/dir-fst-file-snd
+  > foo
++ first/same-file
+  > foo
++ second/
++ second/dir-fst-file-snd
+  > foo
++ second/same-file
+  > foo
+
 
 ----------------------
  Test 4: symlink fst
@@ -757,8 +779,18 @@ index c0ffee..c0ffee
 @@ -1 +0,0 @@
 -bar
 
-*** GIT PATCH ERROR ***
-ERROR: OpamSystem.Internal_error("Cannot remove /tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd (Unix.Unix_error(Unix.EISDIR, \"unlink\", \"/tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd\")).")
+*** GIT PATCHED ***
++ first/
++ first/dir-fst-file-snd
+  > foo
++ first/same-file
+  > foo
++ second/
++ second/dir-fst-file-snd
+  > foo
++ second/same-file
+  > foo
+
 
 ----------------------
  Test 15: diff dir/file error, with content in the dir that is not removed
@@ -796,4 +828,4 @@ index c0ffee..c0ffee
 -bar
 
 *** PATCH ERROR ***
-ERROR: OpamSystem.Internal_error("Cannot remove /tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd (Unix.Unix_error(Unix.EISDIR, \"unlink\", \"/tmp/build_c0ffee_dune/opam-c0ffee-c0ffee/first/dir-fst-file-snd\")).")
+ERROR: OpamPatch.Internal_patch_error("{ dir-fst-file-snd/fst - dir-fst-file-snd }")
