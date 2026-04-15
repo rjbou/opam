@@ -1235,7 +1235,10 @@ let lint_gen ?check_extra_files ?check_upstream ?(handle_dirname=false)
     | OpamPp.Bad_format_list bfl -> List.map warn_of_bad_format bfl, None
   in
   let check_extra_files = match check_extra_files with
-    | None -> extra_files_default_dir filename (* TAR TODO : keep it as is ? *)
+    | None -> extra_files_default_dir filename
+    (* TAR QUESTION : keep it as is with directory ? i think yes, it is in the
+       case where is not called via lint_repo_package, so it doesn't need to
+       handle another layout  *)
     | Some f -> f
   in
   warnings @ (match t with Some t -> lint ~check_extra_files ?check_upstream t | None -> []),
@@ -1263,10 +1266,8 @@ let lint_repo_package repo_root ?check_extra_files ?check_upstream ?handle_dirna
     | None ->
       let extra_files =
         match repo_root with
-        | OpamRepositoryRoot.Dir _ ->
-          extra_files_default_dir
-        | OpamRepositoryRoot.Tar tar ->
-          extra_files_default_tar tar
+        | OpamRepositoryRoot.Dir _ -> extra_files_default_dir
+        | OpamRepositoryRoot.Tar tar -> extra_files_default_tar tar
       in
       extra_files filename
   in
