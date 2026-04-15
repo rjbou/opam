@@ -363,9 +363,11 @@ let diff_patch dir setup =
     | DiffPatch ->
       print "*** DIFF ***\n";
       match
-        OpamRepositoryBackend.get_diff_dirs dir
-          (OpamFilename.Base.of_string first)
-          (OpamFilename.Base.of_string second)
+        OpamRepositoryBackend.get_diff
+          (OpamRepositoryRoot.Dir
+             (OpamRepositoryRoot.Dir.of_dir (dir / first)))
+          (OpamRepositoryRoot.Dir
+             (OpamRepositoryRoot.Dir.of_dir (dir / second)))
       with
       | exception Failure s -> print "ERROR: %s\n" (rm_hex s); None
       | exception e ->
