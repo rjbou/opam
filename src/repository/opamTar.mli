@@ -11,60 +11,6 @@
 (* TAR TODO : documentation *)
 (* TAR TODO : use filename instead of string to navigate in archive *)
 
-(*
-module File : sig
-  include OpamStd.ABSTRACT
-
-  module Dir : sig
-    include OpamStd.ABSTRACT
-    val of_dir : OpamFilename.Dir.t -> t
-    val to_dir : t -> OpamFilename.Dir.t
-  end
-
-  module Base : sig
-    include OpamStd.ABSTRACT
-    val of_base : OpamFilename.Base.t -> t
-    val to_base : t -> OpamFilename.Base.t
-  end
-
-  module Op : sig
-    (** Create a new directory *)
-    val (/): Dir.t -> string -> Dir.t
-
-    (** Create a new filename *)
-    val (//): Dir.t -> string -> t
-  end
-
-  val of_filename : filename -> t
-  val to_filename : t -> filename
-
-  (** Check whether a filename starts by a given Dir.t *)
-  val starts_with: Dir.t -> t -> bool
-
-  (** Add a file extension *)
-  val add_extension: t -> string -> t
-
-  (** Return the directory name *)
-  val dirname: t -> Dir.t
-
-  (** Return the base name *)
-  val basename: t -> Base.t
-
-  (** Return the deeper directory name *)
-  val basename_dir: Dir.t -> Base.t
-
-  (** Retrieves the contents from the hard disk. *)
-  val read: t -> string
-
-  (** Remove a prefix from a file name *)
-  val remove_prefix: Dir.t -> t -> string
-
-  (* val remove_prefix_dir: Dir.t -> Dir.t -> string *)
-  val root_dir: t -> string option
-
-end
-*)
-
 type tar = OpamFilename.t
 type tar_file = OpamFilename.Raw.t
 type tar_content = string

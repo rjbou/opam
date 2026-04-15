@@ -777,6 +777,8 @@ module Local : DIRSEP = struct
 end
 
 module Unix : DIRSEP = struct
+  (* Functions copied from OCaml Stdlib : Filename.ml *)
+
   (* same everywhere *)
   let current_dir_name = "."
   let dir_sep = "/"

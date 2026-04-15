@@ -22,29 +22,6 @@ let tdebug go =
     fun fmt ->
       Printf.ksprintf (fun _ -> ()) fmt
 
-
-(*
-module File = struct
-  include OpamFilename.Raw
-(*
-  let of_string = raw
-  module Dir = struct
-    include OpamFilename.Dir
-    let of_string = raw_dir
-    let of_dir t = t
-    let to_dir t = t
-  end
-  module Base = struct
-    include OpamFilename.Base
-    let of_base t = t
-    let to_base t = t
-  end
-  let of_filename t = t
-  let to_filename t = t
-*)
-end
-
-*)
 open OpamTypes
 type tar = filename
 
