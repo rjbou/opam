@@ -13,51 +13,28 @@
 
 open OpamTypes
 
-(** Repository local path: {i $opam/repo/<name>} *)
-val root: dirname -> repository_name -> OpamRepositoryRoot.Dir.t
-
-val tar: dirname -> repository_name -> OpamRepositoryRoot.Tar.t
+module Names :sig
+  val repo : string
+  val repo_f : string
+  val packages : string
+  val download_cache : string
+  val files : string
+end
 
 (** Prefix where to store the downloaded files cache: {i $opam/download-cache}.
     Warning, this is relative to the opam root, not a repository root. *)
 val download_cache: dirname -> dirname
+
+(** Returns package and main directory if the path is an install file one:
+    {i $repo/packages/XXX[/...]/$NAME.$VERSION/files/...}
+*)
+val install_nv_dir: OpamFilename.Raw.t -> (package * OpamFilename.Raw.Dir.t) option
 
 (** Pin global cache, located in temporary directory, cleaned at end of process *)
 val pin_cache_dir: unit -> dirname
 
 (** Pin cache for a given download url. *)
 val pin_cache: OpamUrl.t -> dirname
-
-(** Return the repo file *)
-val repo: OpamRepositoryRoot.Dir.t -> OpamFile.Repo.t OpamFile.t
-
-(** Packages directory name: {i packages} *)
-val packages_dirname: dirname
-
-(** Packages folder: {i $repo/packages} *)
-val packages_dir: OpamRepositoryRoot.Dir.t -> dirname
-
-(** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
-val packages: OpamRepositoryRoot.Dir.t -> string option -> package -> dirname
-
-(** Return the OPAM file for a given package:
-    {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
-val opam: OpamRepositoryRoot.Dir.t -> string option -> package -> OpamFile.OPAM.t OpamFile.t
-
-(** Return the description file for a given package:
-    {i $repo/packages/XXX/$NAME.VERSION/descr} *)
-val descr: OpamRepositoryRoot.Dir.t -> string option -> package -> OpamFile.Descr.t OpamFile.t
-
-(** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
-val url: OpamRepositoryRoot.Dir.t -> string option -> package -> OpamFile.URL.t OpamFile.t
-
-(** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
-val files: OpamRepositoryRoot.Dir.t -> string option -> package -> dirname
-
-(** Returns package and main directory if the path is an install file one:
-    {i $repo/packages/XXX[/...]/$NAME.$VERSION/files/...}
-*)
-val install_nv_dir: filename -> (package * dirname) option
 
 (** Url constructor for parts of remote repositories, when applicable (http and
     rsync). Function take the repo's root url. *)

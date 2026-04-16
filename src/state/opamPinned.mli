@@ -64,3 +64,9 @@ val name_of_opam_filename: ?locked:string -> dirname -> filename -> name option
 val orig_opam_file:
   'a switch_state -> OpamPackage.Name.t -> OpamFile.OPAM.t ->
   OpamFile.OPAM.t OpamFile.t option
+
+(** Pin global cache, located in temporary directory, cleaned at end of process *)
+val pin_cache_dir: unit -> dirname
+
+(** Pin cache for a given download url. *)
+val pin_cache: OpamUrl.t -> dirname

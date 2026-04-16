@@ -77,11 +77,11 @@ module Cache = struct
 end
 
 let get_root_raw root name =
-  let tar = OpamRepositoryPath.tar root name in
+  let tar = OpamRepositoryRoot.Tar.Path.root root name in
   if OpamRepositoryRoot.Tar.exists tar then
     OpamRepositoryRoot.Tar tar
   else
-    OpamRepositoryRoot.Dir (OpamRepositoryPath.root root name)
+    OpamRepositoryRoot.Dir (OpamRepositoryRoot.Dir.Path.root root name)
 
 let get_root rt name =
   get_root_raw rt.repos_global.root name
@@ -200,7 +200,7 @@ let load_raw_opams_and_aux_from_tar _repo_name tar =
   let opams_map =
     List.fold_left (fun acc (filename, content) ->
         if OpamFilename.Raw.starts_with
-        (OpamFilename.Raw.Dir.of_dir OpamRepositoryPath.packages_dirname) filename
+            (OpamFilename.Raw.Dir.of_string OpamRepositoryPath.Names.packages) filename
         && OpamFilename.Raw.basename filename = OpamFilename.Raw.Base.of_string "opam" then
           let key = OpamFilename.Raw.dirname filename in
           let value = filename, content, OpamFilename.Raw.Map.empty in
@@ -291,7 +291,9 @@ let load_opams_from_dir repo_name repo_root =
     else r
   in
   Fun.protect
-    (fun () -> aux OpamPackage.Map.empty (OpamRepositoryPath.packages_dir repo_root))
+    (fun () ->
+       aux OpamPackage.Map.empty
+         (OpamRepositoryRoot.Dir.Path.packages_dir repo_root))
     ~finally:OpamConsole.clear_status
 
 let load_opams repo_name repo_root =
@@ -315,8 +317,10 @@ let load_opams_from_diff repo diffs rt =
   let open OpamFilename.Raw.Op in
   let additions, removals, xfiles =
     let add, remove =
-      let packages_dir = OpamRepositoryPath.packages_dirname in
-      let packages_dir = OpamFilename.Raw.Dir.of_dir packages_dir in
+      let packages_dir =
+        OpamRepositoryPath.Names.packages
+        |> OpamFilename.Raw.Dir.of_string
+      in
       let is_opam_file filename =
         if OpamFilename.Raw.starts_with packages_dir filename then
           if OpamFilename.Raw.Base.equal (OpamFilename.Raw.basename filename)
@@ -332,10 +336,7 @@ let load_opams_from_diff repo diffs rt =
           else None
         else None
       in
-      let is_install_file file =
-        OpamRepositoryPath.install_nv_dir
-          (OpamFilename.Raw.to_filename file)
-      in
+      let is_install_file = OpamRepositoryPath.install_nv_dir in
       let aux file ~rm (adds, rms, xfs) =
         (* TAR TODO : simplify when patches go to filename type instead of strings *)
         let file = OpamFilename.Raw.of_string file in
@@ -349,7 +350,6 @@ let load_opams_from_diff repo diffs rt =
           match is_install_file file with
           | Some (nv, dir) ->
             (* TAR TODO : opam repo path install nv dir should return tarfile *)
-            let dir = OpamFilename.Raw.Dir.of_dir dir in
             adds, rms, OpamPackage.Map.add nv dir xfs
           | None -> adds, rms, xfs
       in
@@ -462,7 +462,7 @@ let load_opams_from_diff repo diffs rt =
 let load_repo_from_dir repo repo_root =
   let repo_def =
     (* Have a non repo_root dependant version for this ? *)
-    OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root)
+    OpamFile.Repo.safe_read (OpamRepositoryRoot.Dir.Path.repo repo_root)
     |> OpamFile.Repo.with_root_url repo.repo_url
   in
   let opams = load_opams_from_dir repo.repo_name repo_root in

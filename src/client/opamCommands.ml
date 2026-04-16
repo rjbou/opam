@@ -4346,9 +4346,10 @@ let clean cli =
        OpamRepositoryName.Set.iter (fun r ->
            OpamConsole.msg "Removing repository %s\n"
              (OpamRepositoryName.to_string r);
+           (* TAR TODO : replace with ORR.remove *)
            rmdir
-             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryPath.root root r));
-           rm (OpamRepositoryRoot.Tar.to_file (OpamRepositoryPath.tar root r)))
+             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryRoot.Dir.Path.root root r));
+           rm (OpamRepositoryRoot.Tar.to_file (OpamRepositoryRoot.Tar.Path.root root r)))
          unused_repos;
        let repos_config =
          OpamRepositoryName.Map.filter

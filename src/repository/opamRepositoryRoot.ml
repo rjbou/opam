@@ -16,6 +16,64 @@ let tdebug go =
     fun fmt ->
       Printf.ksprintf (fun _ -> ()) fmt
 
+module type PATH = sig
+  open OpamTypes
+  type rooot
+  type dirname
+
+  (** Repository local path: {i $opam/repo/<name>} *)
+  val root: OpamFilename.Dir.t -> repository_name -> rooot
+
+  (** Return the repo file *)
+  val repo: rooot -> OpamFile.Repo.t OpamFile.t
+
+  (** Packages folder: {i $repo/packages} *)
+  val packages_dir: rooot -> dirname
+
+  (** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
+  val packages: rooot -> string option -> package -> dirname
+
+  (** Return the OPAM file for a given package:
+      {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
+  val opam: rooot -> string option -> package -> OpamFile.OPAM.t OpamFile.t
+
+  (** Return the description file for a given package:
+      {i $repo/packages/XXX/$NAME.VERSION/descr} *)
+  val descr: rooot -> string option -> package -> OpamFile.Descr.t OpamFile.t
+
+  (** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
+  val url: rooot -> string option -> package -> OpamFile.URL.t OpamFile.t
+
+  (** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
+  val files: rooot -> string option -> package -> dirname
+end
+
+module type OP = sig
+  type file
+  type dir
+  val (/): dir -> string -> dir
+  val (//): dir -> string -> file
+  val dir_of_string : string -> dir
+end
+
+module Path (Op: OP) = struct
+  open Op
+
+  let repo = OpamRepositoryPath.Names.repo_f
+  let packages_dir = OpamRepositoryPath.Names.packages
+
+  let packages prefix nv =
+    match prefix with
+    | None   -> (dir_of_string packages_dir) / OpamPackage.to_string nv
+    | Some p -> (dir_of_string packages_dir) / p / OpamPackage.to_string nv
+
+  let opam prefix nv = packages prefix nv // "opam"
+  let descr prefix nv = packages prefix nv // "descr"
+  let url prefix nv = packages prefix nv // "url"
+  let files prefix nv = packages prefix nv / OpamRepositoryPath.Names.files
+
+end
+
 module Dir = struct
   type t = OpamFilename.Dir.t
 
@@ -43,11 +101,34 @@ module Dir = struct
   let is_empty = OpamFilename.dir_is_empty
   let dirname = OpamFilename.dirname_dir
 
-  let repo repo_root = OpamFilename.Op.(repo_root // "repo" |> OpamFile.make)
-
   module Op = struct
     let (/) d s = OpamFilename.Op.(d / s)
     let (//) d s = OpamFilename.Op.(d // s)
+  end
+
+  module Path = struct
+    module P = Path (struct
+        type file = OpamFilename.t
+        type dir = OpamFilename.Dir.t
+        include OpamFilename.Op
+        let dir_of_string = OpamFilename.raw_dir
+      end)
+    type rooot = t
+    type dirname = OpamFilename.Dir.t
+    open OpamFilename.Op
+    let raw_d = OpamFilename.Dir.to_string
+    let raw = OpamFilename.to_string
+
+    let root root name =
+      of_dir (root / OpamRepositoryPath.Names.repo / OpamRepositoryName.to_string name)
+    let repo root = OpamFile.make (root // P.repo)
+    let packages_dir root = root / P.packages_dir
+    let packages root prefix nv = root / (raw_d (P.packages prefix nv))
+    let make_file f root prefix nv = OpamFile.make (root // (raw (f prefix nv)))
+    let opam = make_file P.opam
+    let descr = make_file P.descr
+    let url = make_file P.url
+    let files root prefix nv = root / raw_d (P.files prefix nv)
   end
 
 end
@@ -75,8 +156,8 @@ module Tar = struct
   let unload_repo_tars () = Hashtbl.clear archives
 
   let fold f x tar =
-  (* TAR TOQUESTION : do we need to have a sha256 ? md5 have collision, will it
-     really happen irl ? *)
+    (* TAR TOQUESTION : do we need to have a sha256 ? md5 have collision, will it
+       really happen irl ? *)
     let hash = OpamHash.compute ~kind:`SHA256 (OpamFilename.to_string tar) in
     match Hashtbl.find_opt archives hash with
     | Some contents ->
@@ -115,6 +196,32 @@ module Tar = struct
     if exists t then
       Some (match files t with | [] -> true | _ -> false)
     else None
+
+  module Path = struct
+    module P = Path (struct
+        type file = OpamFilename.Raw.t
+        type dir = OpamFilename.Raw.Dir.t
+        include OpamFilename.Raw.Op
+        let dir_of_string = OpamFilename.Raw.Dir.of_string
+      end)
+    type rooot = t
+    type dirname = OpamFilename.Raw.Dir.t
+    let root root name =
+      let open OpamFilename.Op in
+      of_file (root / OpamRepositoryPath.Names.repo
+               // (OpamRepositoryName.to_string name ^ ".tar.gz"))
+    let (!) = OpamFilename.Raw.of_string
+    let (!!) = OpamFilename.Raw.Dir.of_string
+    let opamfile_make rf = OpamFile.make (OpamFilename.Raw.to_filename rf)
+    let repo _ = opamfile_make (! P.repo)
+    let packages_dir _ = !! P.packages_dir
+    let packages _ prefix nv = P.packages prefix nv
+    let make_file f prefix nv = opamfile_make (f prefix nv)
+    let opam _ = make_file P.opam
+    let descr _ = make_file P.descr
+    let url _ = make_file P.url
+    let files (_:rooot) prefix nv = P.files prefix nv
+  end
 
 end
 
@@ -262,13 +369,13 @@ let read_file (type a) (module R : OpamFile.IO_FILE with type t = a)
 
 let delayed_read_repo = function
   | Dir dir ->
-    let repo_file_path = Dir.repo dir in
+    let repo_file_path = Dir.Path.repo dir in
     let read () = OpamFile.Repo.safe_read repo_file_path in
     (OpamFile.exists repo_file_path, read)
   | Tar tar ->
     let repo_content =
       let exception Found of string in
-      let repo = OpamFilename.Raw.of_string "repo" in
+      let repo = OpamFilename.Raw.of_string OpamRepositoryPath.Names.repo_f in
       try
         Tar.fold (fun () fname content ->
             if OpamFilename.Raw.equal fname repo then

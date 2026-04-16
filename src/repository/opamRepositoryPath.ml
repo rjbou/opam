@@ -11,13 +11,6 @@
 
 open OpamFilename.Op
 
-let root root name =
-  OpamRepositoryRoot.Dir.of_dir (root / "repo" / OpamRepositoryName.to_string name)
-
-let tar root name = OpamRepositoryRoot.Tar.of_file (root / "repo" // (OpamRepositoryName.to_string name ^ ".tar.gz"))
-
-let download_cache root = root / "download-cache"
-
 let pin_cache_dir =
   let dir =
     lazy (OpamSystem.mk_temp_dir ~prefix:"opam-pin-cache" ()
@@ -33,41 +26,26 @@ let pin_cache u =
      OpamUrl.to_string u)
     0 16
 
-let repo repo_root = OpamRepositoryRoot.Dir.repo repo_root
+module Names = struct
+  let repo = "repo"
+  let repo_f = "repo"
+  let packages = "packages"
+  let download_cache = "download-cache"
+  let files = "files"
+end
 
-let packages_name = "packages"
-let packages_dirname = OpamFilename.raw_dir packages_name
-
-let packages_dir repo_root = OpamRepositoryRoot.Dir.to_dir repo_root / packages_name
-
-let packages repo_root prefix nv =
-  match prefix with
-  | None   -> packages_dir repo_root / OpamPackage.to_string nv
-  | Some p -> packages_dir repo_root / p / OpamPackage.to_string nv
-
-let opam repo_root prefix nv =
-  packages repo_root prefix nv // "opam" |> OpamFile.make
-
-let descr repo_root prefix nv =
-  packages repo_root prefix nv // "descr" |> OpamFile.make
-
-let url repo_root prefix nv =
-  packages repo_root prefix nv // "url" |> OpamFile.make
-
-let files repo_root prefix nv =
-  packages repo_root prefix nv / "files"
+let download_cache root = root / Names.download_cache
 
 let install_nv_dir filename =
   let rec find_files prefix_files tail =
     match tail with
-    | "files"::_ -> Some prefix_files
+    | files::_ when String.equal files Names.files -> Some prefix_files
     | h::t -> find_files (h::prefix_files) t
     | [] -> None
   in
   let rec aux (pre, rest) =
     match rest with
-    (* use packages_name *)
-    | "packages"::packages ->
+    | p::packages when String.equal p Names.packages ->
       (* We don't check packages/name/name.version layer because repo loading
          is more permissive *)
       (match find_files [] packages with
@@ -75,8 +53,10 @@ let install_nv_dir filename =
          (match OpamPackage.of_string_opt nv with
           | Some pkg ->
             let dir =
-              OpamFilename.Dir.of_list
-                (List.rev (nv :: prefix_files @ ("packages"::pre)))
+              (*(List.rev (nv :: prefix_files @ (Names.packages::pre))) *)
+              List.rev (nv :: prefix_files @ [Names.packages])
+              |> OpamFilename.Dir.of_list
+              |> OpamFilename.Raw.Dir.of_dir
             in
             Some (pkg, dir)
           | None -> None)
@@ -84,17 +64,17 @@ let install_nv_dir filename =
     | p::r -> aux (p::pre, r)
     | [] -> None
   in
-  aux ([], OpamFilename.to_list filename)
+  aux ([], OpamFilename.to_list (OpamFilename.Raw.to_filename filename))
 
 module Remote = struct
   (** URL, not FS paths *)
   open OpamUrl.Op
 
   let repo root_url =
-    root_url / "repo"
+    root_url / Names.repo_f
 
   let packages_url root_url =
-    root_url / packages_name
+    root_url / Names.packages
 
   let archive root_url nv =
     root_url / "archives" / (OpamPackage.to_string nv ^ "+opam.tar.gz")

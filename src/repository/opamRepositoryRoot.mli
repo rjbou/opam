@@ -11,6 +11,39 @@
 (** This module abstract the notion of repository root over its concrete
     implementation (could be a database, a file, a directory, etc.) *)
 
+module type PATH = sig
+  open OpamTypes
+  type rooot
+  type dirname
+
+  (** Repository local path: {i $opam/repo/<name>} *)
+  val root: OpamFilename.Dir.t -> repository_name -> rooot
+
+  (** Return the repo file *)
+  val repo: rooot -> OpamFile.Repo.t OpamFile.t
+
+  (** Packages folder: {i $repo/packages} *)
+  val packages_dir: rooot -> dirname
+
+  (** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
+  val packages: rooot -> string option -> package -> dirname
+
+  (** Return the OPAM file for a given package:
+      {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
+  val opam: rooot -> string option -> package -> OpamFile.OPAM.t OpamFile.t
+
+  (** Return the description file for a given package:
+      {i $repo/packages/XXX/$NAME.VERSION/descr} *)
+  val descr: rooot -> string option -> package -> OpamFile.Descr.t OpamFile.t
+
+  (** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
+  val url: rooot -> string option -> package -> OpamFile.URL.t OpamFile.t
+
+  (** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
+  val files: rooot -> string option -> package -> dirname
+
+end
+
 (** Repository root implemented as a directory *)
 module Dir : sig
   type t
@@ -40,12 +73,12 @@ module Dir : sig
   val is_empty : t -> bool option
   val dirname : t -> OpamFilename.Dir.t
 
-  val repo : t -> OpamFile.Repo.t OpamFile.t
-
   module Op: sig
     val ( / ) : t -> string -> OpamFilename.Dir.t
     val ( // ) : t -> string -> OpamFilename.t
   end
+
+  module Path : PATH with type rooot = t and type dirname = OpamFilename.Dir.t
 end
 
 module Tar : sig
@@ -79,6 +112,8 @@ module Tar : sig
   val fold: ('a -> OpamTar.tar_file -> OpamTar.tar_content -> 'a) -> 'a -> t -> 'a
   (* clean hashtbl that keep the repositories in ram *)
   val unload_repo_tars: unit -> unit
+
+  module Path : PATH with type rooot = t and type dirname = OpamFilename.Raw.Dir.t
 end
 
 val make_tar_gz_job : Tar.t -> Dir.t -> exn option OpamProcess.job

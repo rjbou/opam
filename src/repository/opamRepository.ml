@@ -464,10 +464,10 @@ let pull_file_to_cache label ~cache_dir ?(cache_urls=[]) checksums remote_urls =
         | _, (Not_available _ as na) -> na)
 
 let packages repo_root =
-  OpamPackage.list (OpamRepositoryPath.packages_dir repo_root)
+  OpamPackage.list (OpamRepositoryRoot.Dir.Path.packages_dir repo_root)
 
 let packages_with_prefixes repo_root =
-  OpamPackage.prefixes (OpamRepositoryPath.packages_dir repo_root)
+  OpamPackage.prefixes (OpamRepositoryRoot.Dir.Path.packages_dir repo_root)
 
 let validate_repo_update repo repo_root update =
   match

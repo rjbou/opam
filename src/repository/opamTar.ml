@@ -22,7 +22,6 @@ let tdebug go =
     fun fmt ->
       Printf.ksprintf (fun _ -> ()) fmt
 
-open OpamTypes
 type tar = filename
 
 type tar_file = OpamFilename.Raw.t

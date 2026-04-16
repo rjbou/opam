@@ -333,3 +333,18 @@ let orig_opam_file st name opam =
       List.find_opt (mem locked_files) opams
       ++ List.find_opt (mem opam_files) opams
       >>| to_opam
+
+let pin_cache_dir =
+  let dir =
+    lazy (OpamSystem.mk_temp_dir ~prefix:"opam-pin-cache" ()
+          |> OpamFilename.Dir.of_string )
+  in
+  fun () -> Lazy.force dir
+
+let pin_cache u =
+  pin_cache_dir () /
+  String.sub
+    (OpamHash.contents @@
+     OpamHash.compute_from_string ~kind:`SHA512 @@
+     OpamUrl.to_string u)
+    0 16
