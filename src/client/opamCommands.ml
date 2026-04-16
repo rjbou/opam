@@ -4346,7 +4346,7 @@ let clean cli =
        OpamRepositoryName.Set.iter (fun r ->
            OpamConsole.msg "Removing repository %s\n"
              (OpamRepositoryName.to_string r);
-           (* TAR TODO : replace with ORR.remove *)
+           (* TAR TOQUESTION: do we introduce remove with dry run just for this call ? i'd say no *)
            rmdir
              (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryRoot.Dir.Path.root root r));
            rm (OpamRepositoryRoot.Tar.to_file (OpamRepositoryRoot.Tar.Path.root root r)))

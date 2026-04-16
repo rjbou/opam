@@ -81,12 +81,7 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
-    (* TAR TODO : see how to have a function that give that. Not possible in opam repo root *)
-    if OpamRepositoryRoot.Dir.exists
-        (OpamRepositoryRoot.Dir.Path.root root name)
-    || OpamRepositoryRoot.Tar.exists
-         (OpamRepositoryRoot.Tar.Path.root root name)
-    then
+    if OpamRepositoryRoot.root_exists root name then
       OpamConsole.error_and_exit `Bad_arguments
         "Invalid repository name, %s exists"
         (OpamRepositoryRoot.Dir.to_string

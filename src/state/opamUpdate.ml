@@ -101,8 +101,7 @@ let repository rt repo =
     (* shouldn't happen, we remove both and do a full update *)
     (if tar_exists && dir_exists then
        (log "repository exists as directory and archive, removing both";
-        OpamRepositoryRoot.remove dir;
-        OpamRepositoryRoot.remove tar);
+        OpamRepositoryRoot.remove_both rt.repos_global.root repo.repo_name);
      match repo.repo_url.backend with
      | `rsync when OpamRepositoryConfig.(!r.repo_tarring) ->
        if dir_exists then dir_to_tar else done_tar

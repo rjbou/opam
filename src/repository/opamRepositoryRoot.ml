@@ -422,3 +422,11 @@ let in_dir f = function
                OpamConsole.error "After Archive\n%s"
                  (Tar.ls tar);
              res))
+
+let remove_both root name =
+  remove (Tar (Tar.Path.root root name));
+  remove (Dir (Dir.Path.root root name))
+
+let root_exists root name =
+  exists (Tar (Tar.Path.root root name))
+  || exists (Dir (Dir.Path.root root name))

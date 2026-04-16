@@ -169,3 +169,7 @@ val delayed_read_repo : t -> bool * (unit -> OpamFile.Repo.t)
     is an archive, it uncompress it, applies the function and update archive
     with the changed directory. *)
 val in_dir: (OpamFilename.Dir.t -> 'a) -> t -> 'a
+
+(** TAR TODOC remove directory and archive, if present *)
+val remove_both : OpamFilename.Dir.t -> OpamRepositoryName.t -> unit
+val root_exists : OpamFilename.Dir.t -> OpamRepositoryName.t -> bool
