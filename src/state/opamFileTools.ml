@@ -1145,7 +1145,8 @@ let extra_files_default_tar tar filename =
   let filename =
     let rec aux filename =
       match OpamFilename.Raw.root_dir filename with
-      | Some "packages" | None -> filename
+      | Some p when String.equal p OpamRepositoryPath.Names.packages -> filename
+      | None -> filename
       | Some dir ->
         let filename =
           (OpamFilename.Raw.of_string

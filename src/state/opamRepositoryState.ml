@@ -185,7 +185,7 @@ let load_raw_opams_and_aux_from_tar _repo_name tar =
       [] tar
   in
   let repo_def =
-    let filename = OpamFilename.Raw.of_string "repo" in
+    let filename = OpamFilename.Raw.of_string OpamRepositoryPath.Names.repo_f in
     match List.assoc_opt filename raw_repository with
     | Some content ->
       let filename = OpamFile.make (OpamFilename.Raw.to_filename filename) in

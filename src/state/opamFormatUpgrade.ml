@@ -653,7 +653,7 @@ let from_1_3_dev2_to_1_3_dev5 ~on_the_fly:_ root conf =
           in
           OpamFile.OPAM.write
             (OpamFile.make
-               (root / "packages" / OpamPackage.Name.to_string name
+               (root / OpamRepositoryPath.Names.packages / OpamPackage.Name.to_string name
                 / OpamPackage.to_string nv // "opam"))
             comp_opam;
           OpamFile.Dot_config.write config_f config;
@@ -715,16 +715,16 @@ let from_1_3_dev6_to_1_3_dev7 ~on_the_fly:_ root conf =
            (OpamFile.make (meta_dir // "switch-state")))
         .sel_installed
       in
-      OpamFilename.mkdir (meta_dir / "packages");
+      OpamFilename.mkdir (meta_dir / OpamRepositoryPath.Names.packages);
       OpamPackage.Set.iter (fun nv ->
           let dstdir =
-            meta_dir / "packages" / OpamPackage.to_string nv
+            meta_dir / OpamRepositoryPath.Names.packages / OpamPackage.to_string nv
           in
           try
             let srcdir =
               List.find (fun d -> OpamFilename.exists (d // "opam")) [
                 meta_dir / "overlay" / OpamPackage.Name.to_string nv.name;
-                root / "packages" / OpamPackage.Name.to_string nv.name /
+                root / OpamRepositoryPath.Names.packages / OpamPackage.Name.to_string nv.name /
                 OpamPackage.to_string nv;
               ]
             in
@@ -741,7 +741,7 @@ let from_1_3_dev6_to_1_3_dev7 ~on_the_fly:_ root conf =
         )
         installed)
     (OpamFile.Config.installed_switches conf);
-  OpamFilename.rmdir (root / "packages");
+  OpamFilename.rmdir (root / OpamRepositoryPath.Names.packages);
   OpamFilename.rmdir (root / "packages.dev");
   OpamFilename.rmdir (root / "state.cache");
   conf, gtc_none
@@ -851,7 +851,7 @@ let from_2_0_alpha_to_2_0_alpha2 ~on_the_fly:_ root conf =
                 OpamPackage.Version.of_string full_version
             in
             let new_nv = OpamPackage.create name version in
-            let pkgdir nv = meta_dir / "packages" / OpamPackage.to_string nv in
+            let pkgdir nv = meta_dir / OpamRepositoryPath.Names.packages / OpamPackage.to_string nv in
             if OpamFilename.exists_dir (pkgdir nv) then
               OpamFilename.move_dir ~src:(pkgdir nv) ~dst:(pkgdir new_nv);
             OpamStd.Option.Op.(
@@ -1031,7 +1031,7 @@ let from_2_0_beta_to_2_0_beta5 ~on_the_fly:_ root conf =
       in
       OpamFile.Switch_config.write switch_config config;
       let opam_files_dirs =
-        OpamFilename.dirs (switch_meta_dir / "packages") @
+        OpamFilename.dirs (switch_meta_dir / OpamRepositoryPath.Names.packages) @
         OpamFilename.dirs (switch_meta_dir / "overlay")
       in
       List.iter (fun d ->

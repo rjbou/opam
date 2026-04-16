@@ -101,8 +101,12 @@ end
 
 let make_index_tar_gz repo_root =
   OpamRepositoryRoot.Dir.in_dir repo_root (fun () ->
-    let to_include = [ "version"; "packages"; "repo" ] in
-    match List.filter Sys.file_exists to_include with
-    | [] -> ()
-    | d  -> OpamSystem.command ("tar" :: "czhf" :: "index.tar.gz" :: "--exclude=.git*" :: d)
-  )
+      let to_include = [
+        "version";
+        OpamRepositoryPath.Names.packages;
+        OpamRepositoryPath.Names.repo_f;
+      ] in
+      match List.filter Sys.file_exists to_include with
+      | [] -> ()
+      | d  -> OpamSystem.command ("tar" :: "czhf" :: "index.tar.gz" :: "--exclude=.git*" :: d)
+    )
