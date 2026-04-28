@@ -392,7 +392,7 @@ let directories_with_links ?(except_vcs=false) =
 
 let rec_files dir =
   let rec aux accu dir =
-    let d = directories_with_links dir in
+    let d = directories_with_links ~except_vcs:true dir in
     let f = files_with_links dir in
     List.fold_left aux (f @ accu) d in
   aux [] dir
