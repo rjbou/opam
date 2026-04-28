@@ -1054,7 +1054,7 @@ deux
 ### sh hash.sh CHG sin.2
 ### git -C ./CHG add packages
 ### git -C ./CHG commit -qm "sin"
-### opam update | sed-cmd git | grep -v "HEAD is now"
+### opam update | sed-cmd git tar | grep -v "HEAD is now"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -1062,7 +1062,7 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 UPDATE                          repository format change: from archive to directory (${BASEDIR}/OPAM/repo/changes)
 Processing  1/1:
-+ /usr/bin/tar "xfz" "${BASEDIR}/OPAM/repo/changes.tar.gz" "-C" "${BASEDIR}/OPAM/repo/changes"
++ tar "xfz" "${BASEDIR}/OPAM/repo/changes.tar.gz" "-C" "${BASEDIR}/OPAM/repo/changes"
 REPOSITORY                      update changes from git+file://${BASEDIR}/CHG
 Processing  1/1: [changes: git]
 + git "init" (CWD=${BASEDIR}/OPAM/repo/changes)
@@ -1297,7 +1297,7 @@ opam-version: "2.0"
 ### <CHG/packages/semmus/semmus.5/files/summes>
 cinq
 ### sh hash.sh CHG semmus.5
-### rm OPAM/repo/changes
+### rm OPAM/repo/changes | '^[^:]+: ' -> 'rm: '
 rm: cannot remove 'OPAM/repo/changes': Is a directory
 # Return code 1 #
 ### rm -r OPAM/repo/changes
@@ -1336,7 +1336,7 @@ Done.
 opam-version: "2.0"
 repositories:
   "changes" {"file://${BASEDIR}/CHG"}
-### rm -r CHG/.git
+### rm -r CHG/.git | '^[^:]+: ' -> 'rm: '
 rm: cannot remove 'CHG/.git': No such file or directory
 # Return code 1 #
 ### OPAMREPOSITORYTARRING=0
@@ -1368,7 +1368,7 @@ Now run 'opam upgrade' to apply any package updates.
 ### <CHG/packages/semmus/semmus.5/opam>
 opam-version: "2.0"
 build: false
-### opam update
+### opam update | sed-cmd tar
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
@@ -1456,7 +1456,7 @@ foo.6     --
 ### : change format from old tarred to the new one, trigger from global state
 ### rm -rf "$OPAMROOT"
 ### OPAMREPOSITORYTARRING=1
-### opam init --no-setup --bypass-checks --disable-sandbox --bare old-tarred ./old-tarred | sed-cmd tar
+### opam init --no-setup --bypass-checks --disable-sandbox --bare old-tarred ./old-tarred | sed-cmd tar | grep -v 'cygpath\.exe' | grep -v '^- '
 No configuration file found, using built-in defaults.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
