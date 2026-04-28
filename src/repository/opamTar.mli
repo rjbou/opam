@@ -25,6 +25,12 @@ val fold_reg_files :
    content of [dir] *)
 val create_flat : tar -> dirname -> unit
 
+(* Apply a patch on an archive *)
+val patch:
+  allow_unclean:bool ->
+  [`Patch_file of string | `Patch_diffs of Patch.t list ] -> tar ->
+  (Patch.operation list, exn) result
+
 (* This module contains helpers to act on the archive once openned *)
 module Inplace : sig
   type t
