@@ -13,6 +13,7 @@ open OpamFilename.Op
 
 let root root name =
   root / OpamRepositoryPathName.repo_d / OpamRepositoryName.to_string name
+  |> OpamRepositoryRoot.Dir.of_dir
 
 let tar root name =
   root / OpamRepositoryPathName.repo_d //
@@ -35,9 +36,12 @@ let pin_cache u =
      OpamUrl.to_string u)
     0 16
 
-let repo repo_root = repo_root // OpamRepositoryPathName.repo_f |> OpamFile.make
+let repo repo_root =
+  OpamRepositoryRoot.Dir.to_dir repo_root // OpamRepositoryPathName.repo_f
+  |> OpamFile.make
 
-let packages_dir repo_root = repo_root / OpamRepositoryPathName.packages_d
+let packages_dir repo_root =
+  OpamRepositoryRoot.Dir.to_dir repo_root / OpamRepositoryPathName.packages_d
 
 let packages repo_root prefix nv =
   match prefix with

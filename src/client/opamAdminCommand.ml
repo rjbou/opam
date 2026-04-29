@@ -27,7 +27,7 @@ let repo_version_lt repo_root v =
   if OpamVersion.compare v v' > 0 then Some v' else None
 
 let checked_repo_root ?(check=true) () =
-  let repo_root = OpamFilename.cwd () in
+  let repo_root = OpamRepositoryRoot.Dir.cwd () in
   if not (OpamFilename.exists_dir (OpamRepositoryPath.packages_dir repo_root))
   then
     OpamConsole.error_and_exit `Bad_arguments
@@ -97,6 +97,7 @@ let index_command cli =
   let cmd global_options urls_txt () =
     OpamArg.apply_global_options cli global_options;
     let repo_root = checked_repo_root () in
+    let repo_root_dir = OpamRepositoryRoot.Dir.to_dir repo_root in
     let repo_file = OpamRepositoryPath.repo repo_root in
     let repo_def =
       match OpamFile.Repo.read_opt repo_file with
@@ -112,12 +113,14 @@ let index_command cli =
           (t.Unix.tm_year + 1900) (t.Unix.tm_mon +1) t.Unix.tm_mday
           t.Unix.tm_hour t.Unix.tm_min
       in
-      match OpamUrl.guess_version_control (OpamFilename.Dir.to_string repo_root)
+      match
+        OpamUrl.guess_version_control
+          (OpamRepositoryRoot.Dir.to_string repo_root)
       with
       | None -> date ()
       | Some vcs ->
         let module VCS = (val OpamRepository.find_backend_by_kind vcs) in
-        match OpamProcess.Job.run (VCS.revision repo_root) with
+        match OpamProcess.Job.run (VCS.revision repo_root_dir) with
         | None -> date ()
         | Some hash -> hash
     in
@@ -127,13 +130,13 @@ let index_command cli =
       (OpamConsole.msg "Generating urls.txt...\n";
        OpamFilename.of_string OpamRepositoryPathName.repo_f ::
        (if urls_txt = `full_urls_txt then
-          OpamFilename.rec_files OpamFilename.Op.(repo_root / "compilers") @
+          OpamFilename.rec_files OpamFilename.Op.(repo_root_dir / "compilers") @
           OpamFilename.rec_files (OpamRepositoryPath.packages_dir repo_root)
         else []) |>
        List.fold_left (fun set f ->
            if not (OpamFilename.exists f) then set else
-           let attr = OpamFilename.to_attribute repo_root f in
-           OpamFilename.Attribute.Set.add attr set
+             let attr = OpamFilename.to_attribute repo_root_dir f in
+             OpamFilename.Attribute.Set.add attr set
          ) OpamFilename.Attribute.Set.empty |>
        OpamFile.File_attributes.write
          (OpamFile.make (OpamFilename.of_string "urls.txt")));
@@ -154,8 +157,10 @@ let cache_urls repo_root repo_def =
     List.filter_map (fun rel ->
         if OpamStd.String.contains ~sub:"://" rel
         then OpamUrl.parse_opt ~handle_suffix:false rel
-        else Some OpamUrl.Op.(OpamUrl.of_string
-                                (OpamFilename.Dir.to_string repo_root) / rel))
+        else
+          Some
+            OpamUrl.Op.(OpamUrl.of_string
+                          (OpamRepositoryRoot.Dir.to_string repo_root) / rel))
       (OpamFile.Repo.dl_cache repo_def)
   in
   repo_dl_cache @ global_dl_cache
@@ -289,7 +294,10 @@ let cache_command cli =
             (OpamPackage.Map.bindings pkg_prefixes))
     in
 
-    let cache_dir_url = OpamFilename.remove_prefix_dir repo_root cache_dir in
+    let cache_dir_url =
+      OpamFilename.remove_prefix_dir
+        (OpamRepositoryRoot.Dir.to_dir repo_root) cache_dir
+    in
     if not no_repo_update then
       if not (OpamStd.List.mem String.equal
                 cache_dir_url (OpamFile.Repo.dl_cache repo_def)) then
@@ -838,7 +846,8 @@ let lint_command cli =
     OpamArg.apply_global_options cli global_options;
     let repo_root = checked_repo_root () in
     if not (OpamFilename.exists_dir
-              OpamFilename.Op.(repo_root / OpamRepositoryPathName.packages_d))
+              OpamFilename.Op.(OpamRepositoryRoot.Dir.to_dir repo_root
+                               / OpamRepositoryPathName.packages_d))
     then
         OpamConsole.error_and_exit `Bad_arguments
           "No repository found in current directory.\n\
