@@ -463,11 +463,13 @@ let do_upgrade_mirror repo_root base_url =
     if OpamFilename.exists src then
       OpamFilename.copy ~src ~dst:(tmp_mirror_dir // f)
   in
-  copy_dir "packages";
+  copy_dir OpamRepositoryPathName.packages_d;
   copy_dir "compilers";
-  copy_file "repo";
+  copy_file OpamRepositoryPathName.repo_f;
   do_upgrade tmp_mirror_dir;
-  let repo_file = OpamFile.make (OpamFilename.of_string "repo") in
+  let repo_file =
+    OpamFile.make (OpamFilename.of_string OpamRepositoryPathName.repo_f)
+  in
   let repo0 = OpamFile.Repo.safe_read repo_file in
   let opam_version_fid =
     FIdent ([], OpamVariable.of_string "opam-version", None)
@@ -501,9 +503,7 @@ let do_upgrade_mirror repo_root base_url =
     OpamFile.Repo.with_redirect (redir :: OpamFile.Repo.redirect repo0)
   in
   OpamFile.Repo.write repo_file repo_12;
-  OpamFile.Repo.write
-    (OpamFile.make OpamFilename.Op.(tmp_mirror_dir // "repo"))
-    repo_20;
+  OpamFile.Repo.write (OpamRepositoryPath.repo tmp_mirror_dir) repo_20;
   let dir20 = OpamFilename.Dir.of_string upgradeto_version_string in
   OpamFilename.rmdir dir20;
   OpamFilename.move_dir ~src:tmp_mirror_dir ~dst:dir20;

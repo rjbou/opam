@@ -91,7 +91,9 @@ let get_repo_root rt repo =
   get_root_raw rt.repos_global.root rt.repos_tmp repo.repo_name
 
 let get_repo_files rt name dir =
-  let dir = OpamFilename.Op.(get_root rt name / dir) in
+  let dir =
+    OpamFilename.Op.(get_root rt name / dir / OpamRepositoryPathName.files_d)
+  in
   let files = OpamFilename.rec_files dir in
   List.map (fun file ->
       OpamFilename.Base.of_string
@@ -160,7 +162,8 @@ let load_opams_from_diff repo diffs rt =
           (OpamFilename.Dir.to_string repo_root)
           (OpamFilename.Dir.to_string dirname)
       in
-      if OpamFilename.Base.to_string basename = "files" then
+      if String.equal OpamRepositoryPathName.files_d
+          (OpamFilename.Base.to_string basename) then
         OpamFilename.Dir.of_string (Filename.dirname full_path)
       else
         OpamFilename.Dir.of_string full_path

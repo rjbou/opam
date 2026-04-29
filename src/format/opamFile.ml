@@ -3672,7 +3672,7 @@ module OPAM = struct
        in
        (basename, content, hash)
      | Some (Some r, rel) ->
-       let files = get_repo_files r (rel ^ Filename.dir_sep ^ "files") in
+       let files = get_repo_files r rel in
        extra_files o >>| List.map @@ fun (basename, hash) ->
        let content =
          OpamStd.List.assoc_opt OpamFilename.Base.equal basename files
