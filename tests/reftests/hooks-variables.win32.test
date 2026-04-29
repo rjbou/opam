@@ -28,8 +28,6 @@ EOF
 ### opam update | sed-cmd tar
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [default: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "packages" "repo"
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.
@@ -234,8 +232,6 @@ EOF
 ### opam update | sed-cmd tar
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [default: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "packages" "repo"
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
 Now run 'opam upgrade' to apply any package updates.

@@ -622,7 +622,7 @@ Clearing cache of downloaded files
 ### # currently writing in /tmp as a common it copies in
 ### # /tmp/build_d2b6ce_dune/opam-reftest-8f9413/escape-good-md5.1/../../../no-checksum/no-checksum.1/files
 ### # This is needed for test portability, windows doesn't check path before resolving it
-### mkdir ${BASEDIR}/OPAM/repo/default/packages/escape-good-md5/escape-good-md5.1/files
+### mkdir ${BASEDIR}/OPAM/repo/default/packages/escape-good-md5/escape-good-md5.1/files | '^[^:]+: ' -> 'mkdir: '
 mkdir: cannot create directory '${BASEDIR}/OPAM/repo/default/packages/escape-good-md5/escape-good-md5.1/files': No such file or directory
 # Return code 1 #
 ### opam install escape-good-md5
