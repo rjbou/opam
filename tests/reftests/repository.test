@@ -1332,10 +1332,9 @@ The following actions will be performed:
 -> installed semmus.5
 Done.
 ### :: both exists - no tarring
-### cat OPAM/repo/repos-config
+### opam-cat OPAM/repo/repos-config
 opam-version: "2.0"
-repositories:
-  "changes" {"file://${BASEDIR}/CHG"}
+repositories: "changes" {"file://${BASEDIR}/CHG"}
 ### rm -r CHG/.git | '^[^:]+: ' -> 'rm: '
 rm: cannot remove 'CHG/.git': No such file or directory
 # Return code 1 #

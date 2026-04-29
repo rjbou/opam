@@ -1338,7 +1338,8 @@ let try_read rd f =
     if OpamFormatConfig.(!r.strict) then
       OpamConsole.error_and_exit `File_error
         "Could not read file %s: %s.\nAborting (strict mode)."
-        (OpamFile.to_string f) (Printexc.to_string exc);
+        (OpamSystem.back_to_forward (OpamFile.to_string f))
+        (Printexc.to_string exc);
     None,
     let f = OpamFile.filename f in
     Some (OpamFilename.(Base.to_string (basename f)),
@@ -1347,7 +1348,8 @@ let try_read rd f =
     if OpamFormatConfig.(!r.strict) then
       OpamConsole.error_and_exit `File_error
         "Errors while parsing %s: %s.\nAborting (strict mode)."
-        (OpamFile.to_string f) (Printexc.to_string exc);
+        (OpamSystem.back_to_forward (OpamFile.to_string f))
+        (Printexc.to_string exc);
     None,
     let f = OpamFile.filename f in
     Some (OpamFilename.(Base.to_string (basename f)), bf)
@@ -1624,9 +1626,11 @@ let read_opam_t ?dir_label dir filename content xfs =
     | Some repo_root ->
       fun f ->
         Printf.sprintf "%s (out of %s)"
-          (OpamFile.to_string f)
+          (OpamSystem.back_to_forward (OpamFile.to_string f))
           (OpamRepositoryRoot.to_string repo_root)
-    | None -> OpamFile.to_string
+    | None ->
+      fun f ->
+        OpamSystem.back_to_forward (OpamFile.to_string f)
   in
   match try_read rd filename with
   | Some opam, None ->
