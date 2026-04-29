@@ -3854,9 +3854,10 @@ let source cli =
             = None
          then
            let f =
-             if OpamFilename.exists_dir Op.(dir / "opam")
-             then OpamFile.make Op.(dir / "opam" // "opam")
-             else OpamFile.make Op.(dir // "opam")
+             let opam = OpamPathName.opam_f in
+             if OpamFilename.exists_dir Op.(dir / opam)
+             then OpamFile.make Op.(dir / OpamPathName.opam_d // opam)
+             else OpamFile.make Op.(dir // opam)
            in
            OpamFile.OPAM.write f
              (OpamFile.OPAM.with_substs [] @@
