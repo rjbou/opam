@@ -44,7 +44,7 @@ module Dir = struct
 
 end
 
-let make_tar_gz_job = OpamFilename.make_tar_gz_job ~root:false
+let make_tar_gz = OpamTar.create_flat
 let extract_in_job = OpamFilename.extract_in_job
 
 type t =
@@ -125,3 +125,4 @@ let delayed_read_repo = function
 
 let in_dir f = function
   | Dir dir -> f dir
+

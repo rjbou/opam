@@ -21,6 +21,10 @@ type tar_content = string
 val fold_reg_files :
   ('acc -> tar_file -> tar_content -> 'acc) -> 'acc -> tar -> 'acc
 
+(* [create_flat tar dir] Creates an compressed archive [tar] containing the flat
+   content of [dir] *)
+val create_flat : tar -> dirname -> unit
+
 (* This module contains helpers to act on the archive once openned *)
 module Inplace : sig
   type t
