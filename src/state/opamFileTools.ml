@@ -1392,7 +1392,9 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
     let descr_file : OpamFile.Descr_legacy.t OpamFile.t =
       OpamFile.make (dir // "descr")
     in
-    let files_dir = OpamFilename.Op.(dir / "files") in
+    let files_dir =
+      OpamFilename.Unix.Op.(OpamFilename.Unix.Dir.of_dir dir / "files")
+    in
     let try_read (type a) (module R: OpamFile.IO_FILE with type t = a)
       : a OpamFile.t -> a option * (string * OpamPp.bad_format) option =
       let reader =
@@ -1454,8 +1456,6 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
             (OpamStd.Format.itemize OpamFilename.Unix.to_string
                (OpamFilename.Unix.Map.keys xfs));
         let xfiles =
-          (* TAR TODO : check that it working with different slashes *)
-          let files_dir = OpamFilename.Unix.Dir.of_dir files_dir in
           let string_of_dir d = string_of_dir (OpamFilename.Unix.Dir.to_dir d) in
           OpamFilename.Unix.Map.fold (fun file content ef ->
               if tdebug then
@@ -1512,7 +1512,7 @@ let add_aux_files_t ?dir_label ?dir ?(files_subdir_hashes=false) opam xfs =
         log "Missing expected extra files %s at %s"
           (OpamStd.List.concat_map ", "
              (fun (f,_) -> OpamFilename.Base.to_string f) ef)
-          (string_of_dir files_dir);
+          (string_of_dir (OpamFilename.Unix.Dir.to_dir files_dir));
         opam
       | Some oef, Some ef ->
         let wr_check, nf_opam, rest =
