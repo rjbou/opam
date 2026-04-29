@@ -52,7 +52,7 @@ module Dir : sig
 
 end
 
-val make_tar_gz_job : filename -> Dir.t -> exn option OpamProcess.job
+val make_tar_gz : filename -> Dir.t -> unit
 val extract_in_job : filename -> Dir.t -> exn option OpamProcess.job
 
 type t =
