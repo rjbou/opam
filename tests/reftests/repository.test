@@ -1430,11 +1430,11 @@ Continue? [Y/n] y
 Upgrading the internal repository format for 'old-tarred'...
 RSTATE                          No cache found
 Processing: [old-tarred: loading data]
-RSTATE                          read ./repo
+RSTATE                          read repo
 RSTATE                          loaded opam files from repo old-tarred in 0.000s
 [empty-r] Initialised
 Processing: [empty-r: loading data]
-RSTATE                          read ./repo
+RSTATE                          read repo
 [NOTE] Repository empty-r has been added to the selections of switch empty only.
        Run `opam repository add empty-r --all-switches|--set-default' to use it in all existing switches, or in newly created switches, respectively.
 
@@ -1464,7 +1464,7 @@ RSTATE                          loaded opam files from repo old-tarred in 0.000s
 
 <><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
 [old-tarred] Initialised
-RSTATE                          read ./repo
+RSTATE                          read repo
 ### opam switch create empty --empty
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
@@ -1498,7 +1498,7 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 Processing: [old-tarred: loading data]
-RSTATE                          read ./repo
+RSTATE                          read repo
 RSTATE                          loaded opam files from repo old-tarred in 0.000s
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
