@@ -81,9 +81,7 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
-    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.root root name) ||
-       OpamFilename.exists (OpamRepositoryPath.tar root name)
-    then
+    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.root root name) then
       OpamConsole.error_and_exit `Bad_arguments
         "Invalid repository name, %s exists"
         (OpamRepositoryRoot.Dir.to_string (OpamRepositoryRoot.Dir.root root name));
@@ -107,8 +105,6 @@ let remove rt name =
   OpamRepositoryState.Cache.save rt;
   OpamRepositoryRoot.Dir.remove
     (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
-  OpamFilename.remove
-    (OpamRepositoryPath.tar rt.repos_global.root name);
   rt
 
 let set_url rt name url trust_anchors =
@@ -121,10 +117,7 @@ let set_url rt name url trust_anchors =
   in
   OpamRepositoryRoot.Dir.remove
     (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
-  OpamFilename.remove
-    (OpamRepositoryPath.tar rt.repos_global.root name);
   let repo = { repo with repo_url = url; repo_trust = trust_anchors; } in
-  OpamRepositoryState.remove_from_repos_tmp  rt name;
   update_repos_config rt (OpamRepositoryName.Map.add name repo rt.repositories)
 
 let print_selection rt ~short repos_list =
@@ -258,23 +251,11 @@ let update_with_auto_upgrade rt repo_names =
                 OpamRepositoryState.Cache.remove ());
              OpamConsole.msg "Upgrading repository \"%s\"...\n"
                (OpamRepositoryName.to_string r.repo_name);
-             let open OpamProcess.Job.Op in
              let repo_root =
                match OpamRepositoryState.get_repo_root rt r with
                | OpamRepositoryRoot.Dir x -> x
              in
              OpamAdminRepoUpgrade.do_upgrade repo_root;
-             if OpamRepositoryConfig.(!r.repo_tarring) then
-               OpamProcess.Job.run
-                 (OpamRepositoryRoot.make_tar_gz_job
-                    (OpamRepositoryPath.tar rt.repos_global.root r.repo_name)
-                    repo_root
-                  @@| function
-                  | Some e ->
-                    Printf.ksprintf failwith
-                      "Failed to regenerate local repository archive: %s"
-                      (Printexc.to_string e)
-                  | None -> ());
              let def =
                OpamRepositoryRoot.Dir.to_dir repo_root
                |> OpamRepositoryPath.repo

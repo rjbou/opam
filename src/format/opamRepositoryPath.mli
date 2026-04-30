@@ -16,7 +16,8 @@ open OpamTypes
 (** Repository local path: {i $opam/repo/<name>} *)
 val root: dirname -> repository_name -> dirname
 
-val tar: dirname -> repository_name -> filename
+(** obsolete, no longer use *)
+val repo_tarring: dirname -> repository_name -> filename
 
 (** Prefix where to store the downloaded files cache: {i $opam/download-cache}.
     Warning, this is relative to the opam root, not a repository root. *)
