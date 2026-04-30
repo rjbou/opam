@@ -430,10 +430,16 @@ module Unix : sig
 
   val to_filename : t -> filename
 
+  (** Check whether a filename starts by a given Dir.t *)
+  val starts_with: Dir.t -> t -> bool
+
   (** Return the base name *)
   val basename: t -> Base.t
 
   (** Return the directory name *)
   val dirname: t -> Dir.t
+
+  (** Adds a dot and the given file extension *)
+  val add_extension: t -> string -> t
 
 end
