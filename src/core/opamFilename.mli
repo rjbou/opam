@@ -426,4 +426,11 @@ module Unix : sig
   val of_filename : filename -> t
 
   val to_filename : t -> filename
+
+  (** Return the base name *)
+  val basename: t -> Base.t
+
+  (** Return the directory name *)
+  val dirname: t -> Dir.t
+
 end
