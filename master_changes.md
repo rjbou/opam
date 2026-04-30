@@ -312,3 +312,4 @@ users)
   * `OpamCompat.Seq`: add `to_dispenser` [#6945 @kit-ty-kate]
   * `OpamSystem.directories_with_links`, `OpamSystem.rec_files`, `OpamFilename.rec_files`: add optional `?except_vcs` that default to false to exclude VCS directories [#6625 @kit-ty-kate @rjbou]
   * `OpamFilename.make_tar_gz{_job}`: rename `make_tar_gz_job` into `make_tar_gz` as it no longer need an external process call [#6945 @kit-ty-kate]
+  * `OpamFilename.Unix`: add `basename` and `dirname` [#6625 @rjbou]
