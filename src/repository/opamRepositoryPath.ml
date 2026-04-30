@@ -15,7 +15,7 @@ let root root name =
   root / OpamRepositoryPathName.repo_d / OpamRepositoryName.to_string name
   |> OpamRepositoryRoot.Dir.of_dir
 
-let tar root name = root / OpamRepositoryPathName.repo_d // (OpamRepositoryName.to_string name ^ ".tar.gz")
+let repo_tarring root name = root / OpamRepositoryPathName.repo_d // (OpamRepositoryName.to_string name ^ ".tar.gz")
 
 let download_cache root = root / OpamRepositoryPathName.download_cache_d
 

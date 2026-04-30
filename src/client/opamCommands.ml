@@ -2527,21 +2527,15 @@ let repository cli =
       OpamFilename.with_tmp_dir @@ fun tmp_dir ->
       let rt0 = rt in
       let backup =
-        let tar = OpamRepositoryPath.tar gt.root name in
-        if OpamFilename.exists tar then
-          (let target = OpamFilename.create tmp_dir (OpamFilename.basename tar) in
-           OpamFilename.copy ~src:tar ~dst:target;
-           fun () -> OpamFilename.copy ~src:target ~dst:tar)
-        else
-          (let dir = OpamRepositoryPath.root gt.root name in
-           if not (OpamRepositoryRoot.Dir.exists dir) then
-             OpamConsole.error_and_exit `Internal_error
-               "Repository not found, consider running 'opam update %s' \
-                to retrieve a consistent state."
-               (OpamRepositoryName.to_string name);
-           let target = OpamRepositoryRoot.Dir.backup ~inn:tmp_dir dir in
-           OpamRepositoryRoot.Dir.copy ~src:dir ~dst:target;
-           fun () -> OpamRepositoryRoot.Dir.copy ~src:target ~dst:dir)
+        let dir = OpamRepositoryPath.root gt.root name in
+        if not (OpamRepositoryRoot.Dir.exists dir) then
+          OpamConsole.error_and_exit `Internal_error
+            "Repository not found, consider running 'opam update %s' \
+             to retrieve a consistent state."
+            (OpamRepositoryName.to_string name);
+        let target = OpamRepositoryRoot.Dir.backup ~inn:tmp_dir dir in
+        OpamRepositoryRoot.Dir.copy ~src:dir ~dst:target;
+        fun () -> OpamRepositoryRoot.Dir.copy ~src:target ~dst:dir
       in
       let rt = OpamRepositoryCommand.set_url rt name url trust_anchors in
       let failed, rt =
@@ -4280,7 +4274,7 @@ let clean cli =
       try OpamFilename.rmdir d
       with OpamSystem.Internal_error msg -> OpamConsole.warning "Error ignored: %s" msg
     in
-    let rm f =
+    let _rm f =
       if dry_run then
         OpamConsole.msg "rm -f \"%s\"\n"
           (OpamFilename.to_string f)
@@ -4361,8 +4355,7 @@ let clean cli =
            OpamConsole.msg "Removing repository %s\n"
              (OpamRepositoryName.to_string r);
            rmdir
-             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryPath.root root r));
-           rm (OpamRepositoryPath.tar root r))
+             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryPath.root root r)))
          unused_repos;
        let repos_config =
          OpamRepositoryName.Map.filter
