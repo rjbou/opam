@@ -423,7 +423,7 @@ let patch ~allow_unclean ?patch_filename ~dir diffs =
               if Filename.dirname src <> (Filename.dirname dst : string) then
                 remove_dir src));
         Ok ()
-      with _ -> Error diff
+      with exn -> Error (diff, exn)
     in
     let rec loop diffs =
       let remaining =
@@ -438,10 +438,36 @@ let patch ~allow_unclean ?patch_filename ~dir diffs =
       in
       if remaining = [] then ()
       else
-        if diffs = remaining then
-          internal_patch_error "Patch %S does not apply cleanly."
-            patch_info_path
-        else loop remaining
+        let remaining_diffs, _ = List.split remaining in
+        if diffs = remaining_diffs then
+          let file_msg, _error_msg =
+            let printed =
+              let get_file = function
+                | Patch.Create f
+                | Patch.Delete f
+                | Patch.Git_ext (f, _, Create_only)
+                | Patch.Git_ext (_, f, Delete_only)
+                  -> f
+                | Patch.Edit (f1, f2)
+                | Patch.Git_ext (f1, f2, Rename_only _)
+                  -> f1 ^ " - " ^ f2
+              in
+              List.map (fun (diff, exn) ->
+                  let file = get_file diff.Patch.operation in
+                  file,
+                  file ^ ": " ^ Printexc.to_string exn)
+                remaining
+            in
+            let diffs, errors = List.split printed in
+            OpamStd.List.to_string Fun.id diffs,
+            OpamStd.Format.itemize Fun.id errors
+          in
+(*
+          OpamConsole.error
+            "Error during patching, failed to apply:\n %s" _error_msg;
+*)
+          internal_patch_error "%s" file_msg
+        else loop remaining_diffs
     in
     loop diffs
 
