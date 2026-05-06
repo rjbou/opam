@@ -435,7 +435,7 @@ patch format
   > foo
 
 *** DIFF ***
-diff --git second/im-empty second/im-empty
+diff --git first/im-empty second/im-empty
 new file mode 100644
 
 *** PATCHED ***
@@ -470,7 +470,7 @@ index c0ffee..c0ffee
   > foo
 
 *** DIFF ***
-diff --git first/im-empty first/im-empty
+diff --git first/im-empty second/im-empty
 deleted file mode 100644
 
 *** PATCHED ***

@@ -87,14 +87,7 @@ let add_prefix repo1 repo2 =
       | Patch.Create f -> Patch.Create (p2 f)
       | Patch.Delete f -> Patch.Delete (p1 f)
       | Patch.Edit (f1, f2) -> Patch.Edit (p1 f1, p2 f2)
-      | Patch.Git_ext (f1, f2, ext) ->
-        let f1, f2 =
-          match ext with
-          | Patch.Rename_only (_, _) -> f1, f2
-          | Patch.Delete_only -> p1 f1, p1 f2
-          | Patch.Create_only -> p2 f1, p2 f2
-        in
-        Patch.Git_ext (f1, f2, ext)
+      | Patch.Git_ext (f1, f2, ext) -> Patch.Git_ext (p1 f1, p2 f2, ext)
     in
     {patch with operation}
 
