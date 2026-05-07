@@ -399,3 +399,7 @@ let in_dir f = function
         let res = f repo_dir in
         make_tar_gz tar repo_dir;
         res)
+
+let root_exists root name =
+  exists (Tar (Tar.Path.root root name))
+  || exists (Dir (Dir.Path.root root name))
