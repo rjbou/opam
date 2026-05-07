@@ -400,6 +400,10 @@ let in_dir f = function
         make_tar_gz tar repo_dir;
         res)
 
+let remove_both root name =
+  remove (Tar (Tar.Path.root root name));
+  remove (Dir (Dir.Path.root root name))
+
 let root_exists root name =
   exists (Tar (Tar.Path.root root name))
   || exists (Dir (Dir.Path.root root name))

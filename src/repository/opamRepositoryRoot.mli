@@ -179,4 +179,6 @@ val delayed_read_repo : t -> bool * (unit -> OpamFile.Repo.t)
     with the changed directory. *)
 val in_dir: (dirname -> 'a) -> t -> 'a
 
+(** TAR TODOC remove directory and archive, if present *)
+val remove_both : dirname -> repository_name -> unit
 val root_exists : dirname -> repository_name -> bool
