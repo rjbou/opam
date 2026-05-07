@@ -94,9 +94,8 @@ let get_repo_root rt repo =
 let get_repo_files rt name dir =
   match get_root rt name with
   | OpamRepositoryRoot.Dir repo_root ->
-    let dir =
-      OpamFilename.Op.(OpamRepositoryRoot.Dir.to_dir repo_root / dir)
-    in
+    let dir = OpamSystem.forward_to_back dir in
+    let dir = OpamRepositoryRoot.Dir.Op.(repo_root / dir) in
     let files = OpamFilename.rec_files dir in
     List.map (fun file ->
         OpamFilename.Base.of_string
