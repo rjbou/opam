@@ -28,8 +28,7 @@ REPOSITORY                      repository-set-url
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
-+ tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
-REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.new
+REPOSITORY                      default: applying update from scratch at ${BASEDIR}/OPAM/repo/default.tar.gz.new
 [default] Initialised
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
@@ -66,14 +65,16 @@ RSTATE                          Cache found
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
-+ tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-Now run 'opam upgrade' to apply any package updates.
+'${OPAM} update' failed.
+Fatal error:
+File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
+# Return code 99 #
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -82,11 +83,8 @@ Now run 'opam upgrade' to apply any package updates.
 # Name # Installed # Synopsis
 dua    --
 empat  --
-enam   --
-lima   --
 satu   --
 tiga   --
-tujuh  --
 ### : remove packages
 ### rm -r packages/tujuh
 ### opam admin index
@@ -103,15 +101,16 @@ RSTATE                          Cache found
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
-+ tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/packages/tujuh/tujuh.7/opam, ignored
-Now run 'opam upgrade' to apply any package updates.
+'${OPAM} update' failed.
+Fatal error:
+File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
+# Return code 99 #
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -120,8 +119,6 @@ Now run 'opam upgrade' to apply any package updates.
 # Name # Installed # Synopsis
 dua    --
 empat  --
-enam   --
-lima   --
 satu   --
 tiga   --
 ### : change packages
@@ -142,13 +139,16 @@ RSTATE                          Cache found
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
-+ tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
+'${OPAM} update' failed.
+Fatal error:
+File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
+# Return code 99 #
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -157,8 +157,6 @@ Processing: [default: loading data]
 # Name # Installed # Synopsis
 dua    --
 empat  --
-enam   --
-lima   --
 satu   --
 tiga   --
 ### : from dir to tar, http mode
@@ -173,40 +171,13 @@ Generating index.tar.gz...
 Done.
 ### find OPAM/repo | sort
 OPAM/repo
-OPAM/repo/default
-OPAM/repo/default/packages
-OPAM/repo/default/packages/dua
-OPAM/repo/default/packages/dua/dua.2
-OPAM/repo/default/packages/dua/dua.2/opam
-OPAM/repo/default/packages/empat
-OPAM/repo/default/packages/empat/empat.4
-OPAM/repo/default/packages/empat/empat.4/opam
-OPAM/repo/default/packages/enam
-OPAM/repo/default/packages/enam/enam.6
-OPAM/repo/default/packages/enam/enam.6/opam
-OPAM/repo/default/packages/lima
-OPAM/repo/default/packages/lima/lima.5
-OPAM/repo/default/packages/lima/lima.5/opam
-OPAM/repo/default/packages/satu
-OPAM/repo/default/packages/satu/satu.1
-OPAM/repo/default/packages/satu/satu.1/opam
-OPAM/repo/default/packages/tiga
-OPAM/repo/default/packages/tiga/tiga.3
-OPAM/repo/default/packages/tiga/tiga.3/opam
-OPAM/repo/default/repo
+OPAM/repo/default.tar.gz
 OPAM/repo/lock
 OPAM/repo/repos-config
 OPAM/repo/state-magicv.cache
 ### mkdir OPAM/repo/default
-mkdir: cannot create directory 'OPAM/repo/default': File exists
-# Return code 1 #
 ### tar xf OPAM/repo/default.tar.gz -C OPAM/repo/default
-tar: OPAM/repo/default.tar.gz: Cannot open: No such file or directory
-tar: Error is not recoverable: exiting now
-# Return code 2 #
 ### rm OPAM/repo/default.tar.gz
-rm: cannot remove 'OPAM/repo/default.tar.gz': No such file or directory
-# Return code 1 #
 ### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
 ### opam update | sed-cmd curl tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
@@ -214,28 +185,28 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+UPDATE                          repository format change: from directory to archive (${BASEDIR}/OPAM/repo/default.tar.gz)
 REPOSITORY                      update default from http://localhost:port
 Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
-+ tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
-REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
+REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default.tar.gz,default.tar.gz.new}
 REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/packages/tiga/tiga.3/opam, ignored
-Now run 'opam upgrade' to apply any package updates.
+'${OPAM} update' failed.
+Fatal error:
+File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
+# Return code 99 #
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
 ### opam list --all
 # Packages matching: any
-# Name  # Installed # Synopsis
-delapan --
-dua     --
-empat   --
-enam    --
-lima    --
-satu    --
+# Name # Installed # Synopsis
+dua    --
+empat  --
+satu   --
+tiga   --
 [[[Killing micro_httpd]]]
