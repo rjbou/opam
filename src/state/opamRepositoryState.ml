@@ -80,6 +80,10 @@ module Cache = struct
 end
 
 let get_root_raw root name =
+  let tar = OpamRepositoryRoot.Tar.Path.root root name in
+  if OpamRepositoryRoot.Tar.exists tar then
+    OpamRepositoryRoot.Tar tar
+  else
     OpamRepositoryRoot.Dir (OpamRepositoryRoot.Dir.Path.root root name)
 
 let get_root rt name =
