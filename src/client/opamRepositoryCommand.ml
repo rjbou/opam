@@ -81,10 +81,10 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
-    if OpamRepositoryRoot.Dir.exists (OpamRepositoryPath.root root name) then
+    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.Path.root root name) then
       OpamConsole.error_and_exit `Bad_arguments
         "Invalid repository name, %s exists"
-        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryPath.root root name));
+        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryRoot.Dir.Path.root root name));
     if url.OpamUrl.backend = `rsync &&
        OpamUrl.local_dir url <> None &&
        OpamUrl.local_dir (OpamRepositoryPath.Remote.packages_url url)
@@ -104,7 +104,9 @@ let remove rt name =
   in
   OpamRepositoryState.Cache.save rt;
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryPath.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.Path.root rt.repos_global.root name);
+  OpamRepositoryRoot.Tar.remove
+    (OpamRepositoryRoot.Tar.Path.root rt.repos_global.root name);
   rt
 
 let set_url rt name url trust_anchors =
@@ -116,7 +118,9 @@ let set_url rt name url trust_anchors =
         (OpamRepositoryName.to_string name);
   in
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryPath.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.Path.root rt.repos_global.root name);
+  OpamRepositoryRoot.Tar.remove
+    (OpamRepositoryRoot.Tar.Path.root rt.repos_global.root name);
   let repo = { repo with repo_url = url; repo_trust = trust_anchors; } in
   update_repos_config rt (OpamRepositoryName.Map.add name repo rt.repositories)
 
@@ -257,7 +261,7 @@ let update_with_auto_upgrade rt repo_names =
              in
              OpamAdminRepoUpgrade.do_upgrade repo_root;
              let def =
-               OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root) |>
+               OpamFile.Repo.safe_read (OpamRepositoryRoot.Dir.Path.repo repo_root) |>
                OpamFile.Repo.with_root_url r.repo_url
              in
              let opams =

@@ -80,7 +80,7 @@ module Cache = struct
 end
 
 let get_root_raw root name =
-  OpamRepositoryRoot.Dir (OpamRepositoryPath.root root name)
+    OpamRepositoryRoot.Dir (OpamRepositoryRoot.Dir.Path.root root name)
 
 let get_root rt name =
   get_root_raw rt.repos_global.root name
@@ -139,7 +139,9 @@ let load_opams_from_dir repo_name repo_root =
     else r
   in
   Fun.protect
-    (fun () -> aux OpamPackage.Map.empty (OpamRepositoryPath.packages_dir repo_root))
+    (fun () ->
+       aux OpamPackage.Map.empty
+         (OpamRepositoryRoot.Dir.Path.packages_dir repo_root))
     ~finally:OpamConsole.clear_status
 
 let load_opams_from_diff repo diffs rt =
@@ -229,7 +231,8 @@ let load_opams_from_diff repo diffs rt =
 
 let load_repo_from_dir repo repo_root =
   let repo_def =
-    OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root)
+    (* Have a non repo_root dependant version for this ? *)
+    OpamFile.Repo.safe_read (OpamRepositoryRoot.Dir.Path.repo repo_root)
     |> OpamFile.Repo.with_root_url repo.repo_url
   in
   let opams = load_opams_from_dir repo.repo_name repo_root in

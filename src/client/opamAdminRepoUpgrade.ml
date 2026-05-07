@@ -154,8 +154,8 @@ let do_upgrade repo_root =
   let write_opam ?(add_files=[]) opam =
     let nv = O.package opam in
     let pfx = Some (OpamPackage.name_to_string nv) in
-    let files_dir = OpamRepositoryPath.files repo_root pfx nv in
-    O.write (OpamRepositoryPath.opam repo_root pfx nv) opam;
+    let files_dir = OpamRepositoryRoot.Dir.Path.files repo_root pfx nv in
+    O.write (OpamRepositoryRoot.Dir.Path.opam repo_root pfx nv) opam;
     List.iter (fun (base,contents) ->
         OpamFilename.(write Op.(files_dir // base) contents))
       add_files
@@ -418,7 +418,7 @@ let do_upgrade repo_root =
     (OpamPackage.Name.Set.to_string all_base_packages);
 
   OpamPackage.Map.iter (fun package prefix ->
-      let opam_file = OpamRepositoryPath.opam repo_root prefix package in
+      let opam_file = OpamRepositoryRoot.Dir.Path.opam repo_root prefix package in
       let opam0 = OpamFile.OPAM.read opam_file in
       OpamFile.OPAM.print_errors ~file:opam_file opam0;
       let nv = OpamFile.OPAM.package opam0 in
@@ -433,16 +433,16 @@ let do_upgrade repo_root =
           (OpamFile.OPAM.write_with_preserved_format opam_file opam;
            List.iter OpamFilename.remove [
              OpamFile.filename
-               (OpamRepositoryPath.descr repo_root prefix package);
+               (OpamRepositoryRoot.Dir.Path.descr repo_root prefix package);
              OpamFile.filename
-               (OpamRepositoryPath.url repo_root prefix package);
+               (OpamRepositoryRoot.Dir.Path.url repo_root prefix package);
            ];
            OpamConsole.status_line "Updated %s" (OpamFile.to_string opam_file))
     )
     packages;
   OpamConsole.clear_status ();
 
-  let repo_file = OpamRepositoryPath.repo repo_root in
+  let repo_file = OpamRepositoryRoot.Dir.Path.repo repo_root in
   OpamFile.Repo.write repo_file
     (OpamFile.Repo.with_opam_version upgradeto_version
        (OpamFile.Repo.safe_read repo_file))

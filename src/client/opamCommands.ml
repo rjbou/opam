@@ -2527,7 +2527,7 @@ let repository cli =
       OpamFilename.with_tmp_dir @@ fun tmp_dir ->
       let rt0 = rt in
       let backup =
-        let dir = OpamRepositoryPath.root gt.root name in
+        let dir = OpamRepositoryRoot.Dir.Path.root gt.root name in
         if not (OpamRepositoryRoot.Dir.exists dir) then
           OpamConsole.error_and_exit `Internal_error
             "Repository not found, consider running 'opam update %s' \
@@ -4355,7 +4355,7 @@ let clean cli =
            OpamConsole.msg "Removing repository %s\n"
              (OpamRepositoryName.to_string r);
            rmdir
-             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryPath.root root r)))
+             (OpamRepositoryRoot.Dir.to_dir (OpamRepositoryRoot.Dir.Path.root root r)))
          unused_repos;
        let repos_config =
          OpamRepositoryName.Map.filter
