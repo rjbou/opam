@@ -68,11 +68,12 @@ Processing  1/1: [default: http]
 curl-or-wget -- "http://localhost:port/index.tar.gz"
 + tar "xfz" "${OPAMTMP}/index.tar.gz" "-C" "${BASEDIR}/OPAM/repo/default.new"
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{default,default.new}
-REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done in 0.00s.
+REPO_BACKEND                    Internal diff (non-empty, 4 changed files) done in 0.00s.
 [default] synchronised from http://localhost:port
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/./opam, ignored
 Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
