@@ -844,4 +844,15 @@ module Unix = struct
     let prefix = if prefix = "" then "" else concat prefix "" in
     OpamStd.String.remove_prefix ~prefix filename
 
+  let rec root_dir filename =
+    if Char.equal filename.[0] dir_sep.[0] then
+      let filename =
+        String.sub filename 1 (String.length filename - 2)
+      in
+      Option.map ((^) dir_sep) (root_dir filename)
+    else
+      match OpamStd.String.cut_at filename dir_sep.[0] with
+      | Some (root, _rest) -> Some root
+      | None -> None
+
 end
