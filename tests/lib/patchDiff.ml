@@ -113,19 +113,18 @@ let content_file_dir_with_content_error = [
   };
 ]
 
-let gitdiff_patch_failure_dir_non_empty = {|
-diff --git b/dir-fst-file-snd/fst a/dir-fst-file-snd
-similarity index 100%
-rename from dir-fst-file-snd/fst
-rename to dir-fst-file-snd
-diff --git b/dir-fst-file-snd/remove-me a/dir-fst-file-snd/remove-me
-deleted file mode c0ffee
-index c0ffee..c0ffee
---- b/dir-fst-file-snd/remove-me
-+++ /dev/null
-@@ -1 +0,0 @@
--bar
-|}
+let gitdiff_patch_failure_dir_non_empty =
+  "diff --git b/dir-fst-file-snd/fst a/dir-fst-file-snd\n" ^
+  "similarity index 100%\n" ^
+  "rename from dir-fst-file-snd/fst\n" ^
+  "rename to dir-fst-file-snd\n" ^
+  "diff --git b/dir-fst-file-snd/remove-me a/dir-fst-file-snd/remove-me\n" ^
+  "deleted file mode c0ffee\n" ^
+  "index c0ffee..c0ffee\n" ^
+  "--- b/dir-fst-file-snd/remove-me\n" ^
+  "+++ /dev/null\n" ^
+  "@@ -1 +0,0 @@\n" ^
+  "-bar\n"
 
 let content_symlink_fst = [
   same_file;
