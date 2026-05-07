@@ -9,6 +9,13 @@
 (**************************************************************************)
 
 open OpamTypes
+let[@warning "-32"] tdebug go =
+  if go then
+    fun fmt ->
+      Printf.ksprintf (fun str ->  OpamConsole.error "REPROOT:%s" str) fmt
+  else
+    fun fmt ->
+      Printf.ksprintf (fun _ -> ()) fmt
 
 module type PATH = sig
   open OpamTypes
