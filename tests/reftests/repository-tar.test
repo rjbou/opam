@@ -71,10 +71,7 @@ REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done 
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-'${OPAM} update' failed.
-Fatal error:
-File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
-# Return code 99 #
+Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -83,8 +80,11 @@ File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern match
 # Name # Installed # Synopsis
 dua    --
 empat  --
+enam   --
+lima   --
 satu   --
 tiga   --
+tujuh  --
 ### : remove packages
 ### rm -r packages/tujuh
 ### opam admin index
@@ -107,10 +107,7 @@ REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done 
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-'${OPAM} update' failed.
-Fatal error:
-File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
-# Return code 99 #
+Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -119,6 +116,8 @@ File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern match
 # Name # Installed # Synopsis
 dua    --
 empat  --
+enam   --
+lima   --
 satu   --
 tiga   --
 ### : change packages
@@ -145,10 +144,6 @@ REPO_BACKEND                    Internal diff (non-empty, 1 changed files) done 
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-'${OPAM} update' failed.
-Fatal error:
-File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
-# Return code 99 #
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
@@ -157,6 +152,8 @@ File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern match
 # Name # Installed # Synopsis
 dua    --
 empat  --
+enam   --
+lima   --
 satu   --
 tiga   --
 ### : from dir to tar, http mode
@@ -195,18 +192,17 @@ REPO_BACKEND                    Internal diff (non-empty, 3 changed files) done 
 REPOSITORY                      default: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
 Processing: [default: loading data]
-'${OPAM} update' failed.
-Fatal error:
-File "src/state/opamRepositoryState.ml", line 290, characters 4-9: Pattern matching failed
-# Return code 99 #
+Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
 ### opam list --all
 # Packages matching: any
-# Name # Installed # Synopsis
-dua    --
-empat  --
-satu   --
-tiga   --
+# Name  # Installed # Synopsis
+delapan --
+dua     --
+empat   --
+enam    --
+lima    --
+satu    --
 [[[Killing micro_httpd]]]

@@ -36,14 +36,13 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.2
 ### opam update default -vv | grep '^\+' | sed-cmd tar
-# Return code 99 #
 ### ls $OPAMROOT/repo | grep -v "cache"
 default.tar.gz
 lock
 plain
 repos-config
 ### opam install foo.2 -vv | grep '^\+' | sed-cmd test tar
-# Return code 5 #
++ test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.2)
 ### opam repository remove default --all
 ### : Add tarred repo (tarred)
 ### <REPO/packages/foo/foo.3/opam>
@@ -71,9 +70,8 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.4
 ### opam update -vv | grep '^\+' | sed-cmd tar
-# Return code 99 #
 ### opam install foo.4 -vv | grep '^\+' | sed-cmd test tar
-# Return code 5 #
++ test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.4)
 ### mkdir tarred-ext
 ### tar xf OPAM/repo/tarred.tar.gz
 ### diff -ru ./tarred REPO
