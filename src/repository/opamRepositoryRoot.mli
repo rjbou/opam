@@ -11,8 +11,8 @@
 
 open OpamTypes
 
-(** Abstraction of a internal representation of repositories
-    in <opamroot>/repo *)
+(** This module abstract the notion of repository root over its concrete
+    implementation (could be a database, a file, a directory, etc.) *)
 
 (** Repository root implemented as a directory *)
 module Dir : sig
@@ -52,11 +52,46 @@ module Dir : sig
 
 end
 
-val make_tar_gz : filename -> Dir.t -> unit
-val extract_in_job : filename -> Dir.t -> exn option OpamProcess.job
+module Tar : sig
+  type t
+
+  val of_file : filename -> t
+  val to_file : t -> filename
+  val to_string : t -> string
+
+  val quarantine : t -> t
+  val backup : inn:dirname -> t -> t
+
+  val exists : t -> bool
+  val remove : t -> unit
+  val extract_in : t -> dirname -> unit
+  val download_as :
+    ?quiet:bool ->
+    ?validate:bool ->
+    overwrite:bool ->
+    ?compress:bool ->
+    ?checksum:OpamHash.t ->
+    OpamUrl.t -> t -> unit OpamProcess.job
+  val copy : src:t -> dst:t -> unit
+  val move : src:t -> dst:t -> unit
+
+  (* TAR TODO: for debug purpose *)
+  val files : t -> OpamTar.tar_file list
+  val ls : t -> string
+  val extract_files:
+    (OpamTar.tar_file -> bool) -> t -> (OpamTar.tar_file * OpamTar.tar_content) list
+  val fold: ('a -> OpamTar.tar_file -> OpamTar.tar_content -> 'a) -> 'a -> t -> 'a
+  (* clean hashtbl that keep the repositories in ram *)
+  val unload_repo_tars: unit -> unit
+
+end
+
+val make_tar_gz : Tar.t -> Dir.t -> unit
+val extract_in_job : Tar.t -> Dir.t -> exn option OpamProcess.job
 
 type t =
   | Dir of Dir.t
+  | Tar of Tar.t
 
 (** [quarantine repo_root] returns a temporary repository root dedicated
     to [repo_root]. the returned repository is not created on disk and
@@ -76,7 +111,11 @@ val remove_prefix: filename -> t -> filename
 val remove_prefix_dir: dirname -> t -> dirname
 val to_string : t -> string
 
+val is_tar: t -> bool
+val is_dir: t -> bool
 val get_dir: t -> Dir.t
+val get_tar: t -> Tar.t
+val ls: t -> string
 
 val copy_job : src:t -> dst:t -> exn option OpamProcess.job
 val move_job : src:t -> dst:t -> exn option OpamProcess.job
