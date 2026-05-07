@@ -1890,6 +1890,27 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:repository-patchdiff.test} %{read-lines:testing-env}))))
 
 (rule
+ (alias reftest-repository-tar)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (action
+  (diff repository-tar.test repository-tar.out)))
+
+(alias
+ (name reftest)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (deps (alias reftest-repository-tar)))
+
+(rule
+ (targets repository-tar.out)
+ (deps root-N0REP0)
+ (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
+ (package opam)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:repository-tar.test} %{read-lines:testing-env}))))
+
+(rule
  (alias reftest-repository)
  (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action
