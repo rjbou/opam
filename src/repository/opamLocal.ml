@@ -150,6 +150,20 @@ module B = struct
     let finalise () = OpamRepositoryRoot.remove quarantine in
     let populate_quarantine () =
       match repo_root with
+      | OpamRepositoryRoot.Tar _ ->
+        (let quarantine = OpamRepositoryRoot.get_tar quarantine in
+         let to_archive dir =
+           OpamRepositoryRoot.make_tar_gz quarantine
+             (OpamRepositoryRoot.Dir.of_dir dir);
+           Done (Result ())
+         in
+         match OpamUrl.local_dir url with
+         | Some dir -> to_archive dir
+         | None ->
+           OpamFilename.with_tmp_dir_job @@ fun dir ->
+           pull_dir_quiet dir url @@+ function
+           | Result () -> to_archive dir
+           | exn -> Done exn)
       | OpamRepositoryRoot.Dir dir ->
         (let quarantine = OpamRepositoryRoot.get_dir quarantine in
          match OpamUrl.local_dir url with
