@@ -14,6 +14,41 @@ open OpamTypes
 (** This module abstract the notion of repository root over its concrete
     implementation (could be a database, a file, a directory, etc.) *)
 
+(** Abstraction of a internal representation of repositories
+    in <opamroot>/repo *)
+module type PATH = sig
+  open OpamTypes
+  type rooot
+  type diirname
+
+  (** Repository local path: {i $opam/repo/<name>} *)
+  val root: dirname -> repository_name -> rooot
+
+  (** Return the repo file *)
+  val repo: rooot -> OpamFile.Repo.t OpamFile.t
+
+  (** Packages folder: {i $repo/packages} *)
+  val packages_dir: rooot -> diirname
+
+  (** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
+  val packages: rooot -> string option -> package -> diirname
+
+  (** Return the OPAM file for a given package:
+      {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
+  val opam: rooot -> string option -> package -> OpamFile.OPAM.t OpamFile.t
+
+  (** Return the description file for a given package:
+      {i $repo/packages/XXX/$NAME.VERSION/descr} *)
+  val descr: rooot -> string option -> package -> OpamFile.Descr_legacy.t OpamFile.t
+
+  (** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
+  val url: rooot -> string option -> package -> OpamFile.URL_legacy.t OpamFile.t
+
+  (** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
+  val files: rooot -> string option -> package -> diirname
+
+end
+
 (** Repository root implemented as a directory *)
 module Dir : sig
   type t
@@ -48,6 +83,7 @@ module Dir : sig
     val ( // ) : t -> string -> filename
   end
 
+  module Path : PATH with type rooot = t and type diirname = dirname
 end
 
 module Tar : sig
@@ -82,6 +118,7 @@ module Tar : sig
   (* clean hashtbl that keep the repositories in ram *)
   val unload_repo_tars: unit -> unit
 
+  module Path : PATH with type rooot = t and type diirname = unix_dirname
 end
 
 val make_tar_gz : Tar.t -> Dir.t -> unit

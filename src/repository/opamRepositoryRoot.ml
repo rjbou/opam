@@ -10,6 +10,64 @@
 
 open OpamTypes
 
+module type PATH = sig
+  open OpamTypes
+  type rooot
+  type diirname
+
+  (** Repository local path: {i $opam/repo/<name>} *)
+  val root: dirname -> repository_name -> rooot
+
+  (** Return the repo file *)
+  val repo: rooot -> OpamFile.Repo.t OpamFile.t
+
+  (** Packages folder: {i $repo/packages} *)
+  val packages_dir: rooot -> diirname
+
+  (** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
+  val packages: rooot -> string option -> package -> diirname
+
+  (** Return the OPAM file for a given package:
+      {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
+  val opam: rooot -> string option -> package -> OpamFile.OPAM.t OpamFile.t
+
+  (** Return the description file for a given package:
+      {i $repo/packages/XXX/$NAME.VERSION/descr} *)
+  val descr: rooot -> string option -> package -> OpamFile.Descr_legacy.t OpamFile.t
+
+  (** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
+  val url: rooot -> string option -> package -> OpamFile.URL_legacy.t OpamFile.t
+
+  (** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
+  val files: rooot -> string option -> package -> diirname
+end
+
+module type OP = sig
+  type file
+  type dir
+  val (/): dir -> string -> dir
+  val (//): dir -> string -> file
+  val dir_of_string : string -> dir
+end
+
+module Path (Op: OP) = struct
+  open Op
+
+  let repo = OpamRepositoryPathName.repo_f
+  let packages_dir = OpamRepositoryPathName.packages_d
+
+  let packages prefix nv =
+    match prefix with
+    | None   -> (dir_of_string packages_dir) / OpamPackage.to_string nv
+    | Some p -> (dir_of_string packages_dir) / p / OpamPackage.to_string nv
+
+  let opam prefix nv = packages prefix nv // "opam"
+  let descr prefix nv = packages prefix nv // "descr"
+  let url prefix nv = packages prefix nv // "url"
+  let files prefix nv = packages prefix nv / OpamRepositoryPathName.files_d
+
+end
+
 module Dir = struct
   type t = dirname
 
@@ -40,6 +98,31 @@ module Dir = struct
   module Op = struct
     let (/) d s = OpamFilename.Op.(d / s)
     let (//) d s = OpamFilename.Op.(d // s)
+  end
+
+  module Path = struct
+    module P = Path (struct
+        type file = OpamFilename.t
+        type dir = OpamFilename.Dir.t
+        include OpamFilename.Op
+        let dir_of_string = OpamFilename.raw_dir
+      end)
+    type rooot = t
+    type diirname = OpamFilename.Dir.t
+    open OpamFilename.Op
+    let raw_d = OpamFilename.Dir.to_string
+    let raw = OpamFilename.to_string
+
+    let root root name =
+      of_dir (root / OpamRepositoryPathName.repo_d / OpamRepositoryName.to_string name)
+    let repo root = OpamFile.make (root // P.repo)
+    let packages_dir root = root / P.packages_dir
+    let packages root prefix nv = root / (raw_d (P.packages prefix nv))
+    let make_file f root prefix nv = OpamFile.make (root // (raw (f prefix nv)))
+    let opam = make_file P.opam
+    let descr = make_file P.descr
+    let url = make_file P.url
+    let files root prefix nv = root / raw_d (P.files prefix nv)
   end
 
 end
@@ -107,6 +190,33 @@ module Tar = struct
     if exists t then
       Some (match files t with | [] -> true | _ -> false)
     else None
+
+  module Path = struct
+    module P = Path (struct
+        type file = OpamFilename.Unix.t
+        type dir = OpamFilename.Unix.Dir.t
+        include OpamFilename.Unix.Op
+        let dir_of_string = OpamFilename.Unix.Dir.of_string
+      end)
+    type rooot = t
+    type diirname = OpamFilename.Unix.Dir.t
+    let root root name =
+      let open OpamFilename.Op in
+      of_file (root / OpamRepositoryPathName.repo_d
+               // (OpamRepositoryName.to_string name ^ ".tar.gz"))
+    let (!) = OpamFilename.Unix.of_string
+    let (!!) = OpamFilename.Unix.Dir.of_string
+    let opamfile_make rf = OpamFile.make (OpamFilename.Unix.to_filename rf)
+    let repo _ = opamfile_make (! P.repo)
+    let packages_dir _ = !! P.packages_dir
+    let packages _ prefix nv = P.packages prefix nv
+    let make_file f prefix nv = opamfile_make (f prefix nv)
+    let opam _ = make_file P.opam
+    let descr _ = make_file P.descr
+    let url _ = make_file P.url
+    let files (_:rooot) prefix nv = P.files prefix nv
+  end
+
 end
 
 let make_tar_gz = OpamTar.create_flat
@@ -247,10 +357,7 @@ let read_file (type a) (module R : OpamFile.IO_FILE with type t = a)
 
 let delayed_read_repo = function
   | Dir dir ->
-    let repo_file_path =
-      OpamFilename.Op.(dir // "repo")
-      |> OpamFile.make
-    in
+    let repo_file_path = Dir.Path.repo dir in
     let read () = OpamFile.Repo.safe_read repo_file_path in
     (OpamFile.exists repo_file_path, read)
   | Tar tar ->
