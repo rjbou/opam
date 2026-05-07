@@ -86,6 +86,7 @@ let base_env =
     "OPAMNOENVNOTICE", "1";
     "OPAMNODEPEXTS", "1";
     "OPAMDOWNLOADJOBS", "1";
+    "OPAMREPOSITORYTARRING", "1";
   ]
 
 (* See [opamprocess.safe_wait] *)
@@ -1305,6 +1306,6 @@ let () =
           | None -> failwith "Bad 'var=value' argument")
         env
     in
-    load_test input |> run_test ~opam ~vars
+    load_test input |> run_test ~opam ~vars;
   | _ ->
     failwith "Expected arguments: opam.exe opam file.test [env-bindings]"
