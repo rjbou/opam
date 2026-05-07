@@ -352,7 +352,7 @@ let opam_file_from_1_2_to_2_0 ?filename opam =
 
 (* Global state changes that need to be propagated *)
 let gtc_none = { gtc_repo = false; gtc_switch = false }
-let _gtc_repo = { gtc_repo = true; gtc_switch = false }
+let gtc_repo = { gtc_repo = true; gtc_switch = false }
 let _gtc_switch = { gtc_repo = false; gtc_switch = true }
 let _gtc_both = { gtc_repo = true; gtc_switch = true }
 
@@ -1152,6 +1152,40 @@ let v2_2 = OpamVersion.of_string "2.2"
 
 let from_2_2_beta_to_2_2 ~on_the_fly:_ _ conf = conf, gtc_none
 
+let v2_6_alpha = OpamVersion.of_string "2.6~alpha"
+
+let from_2_2_to_2_6_alpha_repo ?config root _conf =
+  let repos : OpamFile.Repos_config.t =
+    match config with
+    | Some config -> config
+    | None -> OpamFile.Repos_config.safe_read (OpamPath.repos_config root)
+  in
+  OpamRepositoryName.Map.iter (fun name _ ->
+      let tar = OpamRepositoryRoot.Tar.Path.root root name in
+      if OpamRepositoryRoot.Tar.exists tar then
+        OpamFilename.with_tmp_dir @@ fun tmp_dir ->
+        OpamRepositoryRoot.Tar.extract_in tar tmp_dir;
+        match OpamSystem.get_files (OpamFilename.Dir.to_string tmp_dir) with
+        | [] | _::_::_ -> ()
+        | [x] ->
+          OpamConsole.msg
+            "Upgrading the internal repository format for '%s'...\n"
+            (OpamRepositoryName.to_string name);
+          OpamTar.create_flat
+            (OpamRepositoryRoot.Tar.to_file tar)
+            OpamFilename.Op.(tmp_dir / x)
+    ) repos;
+  Some repos
+
+let from_2_2_to_2_6_alpha ~on_the_fly root conf =
+  if not on_the_fly then begin
+    let _ : OpamFile.Repos_config.t option =
+      from_2_2_to_2_6_alpha_repo ?config:None root conf
+    in
+    ()
+  end;
+  conf, gtc_repo
+
 (* To add an upgrade layer
    * If it is a light upgrade, returns as second element if the repo or switch
      need an light upgrade with `gtc_*` values.
@@ -1242,6 +1276,7 @@ let upgrades root_version =
     v2_2_alpha,  from_2_1_to_2_2_alpha;
     v2_2_beta,   from_2_2_alpha_to_2_2_beta;
     v2_2,        from_2_2_beta_to_2_2;
+    v2_6_alpha,  from_2_2_to_2_6_alpha;
   ]
   |> List.filter (fun (v,_) ->
       OpamVersion.compare root_version v < 0)
@@ -1437,6 +1472,7 @@ let as_necessary_repo lock_kind gt =
   (* No upgrade to do *)
   if not gt.global_state_to_upgrade.gtc_repo then None else
     let updates = [
+      v2_6_alpha,  from_2_2_to_2_6_alpha_repo;
     ] in
     as_necessary_repo_switch_t
       updates
