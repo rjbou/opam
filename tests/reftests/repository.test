@@ -38,8 +38,6 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.2
 ### opam update default -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/default" "packages" "repo"
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "packages" "repo"
 ### ls $OPAMROOT/repo | grep -v "cache"
 default.tar.gz
 lock
@@ -74,7 +72,6 @@ build: ["test" "-f" "baz"]
 some content
 ### sh hash.sh REPO foo.4
 ### opam update -vv | grep '^\+' | sed-cmd tar
-+ tar "cfz" "${BASEDIR}/OPAM/repo/tarred.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "packages" "repo"
 ### opam install foo.4 -vv | grep '^\+' | sed-cmd test tar
 + test "-f" "baz" (CWD=${BASEDIR}/OPAM/tarring/.opam-switch/build/foo.4)
 ### mkdir tarred-ext
@@ -992,8 +989,6 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 REPOSITORY                      repository-add
 REPOSITORY                      update changes from file://${BASEDIR}/CHG
-Processing  1/1: [changes: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/changes.tar.gz.new.tmp" "-C" "${BASEDIR}/CHG" "packages" "repo"
 REPOSITORY                      changes: applying update from scratch at ${BASEDIR}/OPAM/repo/changes.tar.gz.new
 [changes] Initialised
 UPDATE                          Repository has new changes
@@ -1109,8 +1104,6 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 REPOSITORY                      repository-set-url
 REPOSITORY                      update changes from file://${BASEDIR}/CHG
-Processing  1/1: [changes: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/changes.tar.gz.new.tmp" "-C" "${BASEDIR}/CHG" "packages" "repo"
 REPOSITORY                      changes: applying update from scratch at ${BASEDIR}/OPAM/repo/changes.tar.gz.new
 [changes] Initialised
 UPDATE                          Repository has new changes
@@ -1144,13 +1137,9 @@ RSTATE                          Cache found
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 UPDATE                          repository format change: from directory to archive (${BASEDIR}/OPAM/repo/changes.tar.gz)
-Processing  1/1:
-+ tar "cfz" "${BASEDIR}/OPAM/repo/changes.tar.gz.tmp" "-C" "${BASEDIR}/OPAM/repo/changes" ".git" "packages" "repo"
 REPOSITORY                      update changes from file://${BASEDIR}/CHG
-Processing  1/1: [changes: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/changes.tar.gz.new.tmp" "-C" "${BASEDIR}/CHG" "packages" "repo"
 REPO_BACKEND                    diff: ${BASEDIR}/OPAM/repo/{changes.tar.gz,changes.tar.gz.new}
-REPO_BACKEND                    Internal diff (non-empty, 42 changed files) done in 0.00s.
+REPO_BACKEND                    Internal diff (non-empty, 2 changed files) done in 0.00s.
 [changes] synchronised from file://${BASEDIR}/CHG
 REPOSITORY                      changes: applying patch update at ${BASEDIR}/OPAM/log/patch-xxx
 UPDATE                          Repository has new changes
@@ -1387,8 +1376,6 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 UPDATE                          repository exists as directory and archive, removing both
 REPOSITORY                      update changes from file://${BASEDIR}/CHG
-Processing  1/1: [changes: rsync]
-+ /usr/bin/tar "cfz" "${BASEDIR}/OPAM/repo/changes.tar.gz.new.tmp" "-C" "${BASEDIR}/CHG" "packages" "repo"
 REPOSITORY                      changes: applying update from scratch at ${BASEDIR}/OPAM/repo/changes.tar.gz.new
 [changes] Initialised
 UPDATE                          Repository has new changes
@@ -1442,13 +1429,10 @@ You may want to back it up before going further.
 Continue? [Y/n] y
 + tar "xfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz" "-C" "${OPAMTMP}"
 Upgrading the internal repository format for 'old-tarred'...
-+ tar "cfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz.tmp" "-C" "${OPAMTMP}/old-tarred" "packages" "repo"
 RSTATE                          No cache found
 Processing: [old-tarred: loading data]
 RSTATE                          read ./repo
 RSTATE                          loaded opam files from repo old-tarred in 0.000s
-Processing  1/1: [empty-r: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/empty-r.tar.gz.new.tmp" "-C" "${BASEDIR}/empty-repo" "packages" "repo"
 [empty-r] Initialised
 Processing: [empty-r: loading data]
 RSTATE                          read ./repo
@@ -1480,10 +1464,7 @@ Processing: [old-tarred: loading data]
 RSTATE                          loaded opam files from repo old-tarred in 0.000s
 
 <><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [old-tarred: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz.new.tmp" "-C" "${BASEDIR}/old-tarred" "packages" "repo"
 [old-tarred] Initialised
-Processing: [old-tarred: loading data]
 RSTATE                          read ./repo
 ### opam switch create empty --empty
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
@@ -1514,7 +1495,6 @@ You may want to back it up before going further.
 Continue? [Y/n] y
 + tar "xfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz" "-C" "${OPAMTMP}"
 Upgrading the internal repository format for 'old-tarred'...
-+ tar "cfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz.tmp" "-C" "${OPAMTMP}/old-tarred" "packages" "repo"
 Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
@@ -1523,8 +1503,6 @@ RSTATE                          read ./repo
 RSTATE                          loaded opam files from repo old-tarred in 0.000s
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-Processing  1/1: [old-tarred: rsync]
-+ tar "cfz" "${BASEDIR}/OPAM/repo/old-tarred.tar.gz.new.tmp" "-C" "${BASEDIR}/old-tarred" "packages" "repo"
 [old-tarred] no changes from file://${BASEDIR}/old-tarred
 ### tar tf OPAM/repo/old-tarred.tar.gz | grep repo
 repo

@@ -67,9 +67,11 @@ SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-+ tar "cfz" "${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp" "-C" "${BASEDIR}/REPO" "packages" "repo"
-Processing  1/1: [default: rsync]
-SYSTEM                          mv ${BASEDIR}/OPAM/repo/default.tar.gz.new.tmp -> ${BASEDIR}/OPAM/repo/default.tar.gz.new
+SYSTEM                          read ${BASEDIR}/REPO/repo
+SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.1/opam
+SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.2/opam
+SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.tar.gz.new
 FILE(repo)                      Read ./<none> in 0.000s
 FILE(repo)                      Read ./repo (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
