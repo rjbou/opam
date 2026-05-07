@@ -118,6 +118,7 @@ let set_url rt name url trust_anchors =
       OpamConsole.error_and_exit `Not_found "No repository %s found"
         (OpamRepositoryName.to_string name);
   in
+  (* TAR TODO : see how to handle this more elegantly. This scheme is in several places *)
   OpamRepositoryRoot.Dir.remove
     (OpamRepositoryRoot.Dir.Path.root rt.repos_global.root name);
   OpamRepositoryRoot.Tar.remove
@@ -231,6 +232,7 @@ let update_with_auto_upgrade rt repo_names =
     failed, rt
   else
   let rt, done_upgrade =
+    let tdebug = false in
     List.fold_left (fun (rt, done_upgrade) r ->
         if OpamStd.List.mem OpamRepositoryName.equal r.repo_name failed then
           rt, done_upgrade
@@ -249,6 +251,11 @@ let update_with_auto_upgrade rt repo_names =
               -> true
             | _ -> false
           in
+          let _ = if tdebug then
+              OpamConsole.error "RPC:UWAU:need upgrade ? %s %B"
+                (OpamUrl.to_string r.repo_url)
+                (need_upgrade)
+          in
           if need_upgrade then
             (if not done_upgrade then
                (OpamConsole.header_msg
@@ -257,6 +264,10 @@ let update_with_auto_upgrade rt repo_names =
              OpamConsole.msg "Upgrading repository \"%s\"...\n"
                (OpamRepositoryName.to_string r.repo_name);
              let repo_root = OpamRepositoryState.get_repo_root rt r in
+             let _ = if tdebug then
+                 OpamConsole.error "RPC:UWAU: %s"
+                   (OpamRepositoryRoot.to_string repo_root)
+             in
              OpamRepositoryRoot.in_dir (fun dir ->
                  OpamAdminRepoUpgrade.do_upgrade (OpamRepositoryRoot.Dir.of_dir dir))
                repo_root;
