@@ -13,11 +13,6 @@
 
 open OpamTypes
 
-(** Repository local path: {i $opam/repo/<name>} *)
-val root: dirname -> repository_name -> dirname
-
-(** obsolete, no longer use *)
-val repo_tarring: dirname -> repository_name -> filename
 
 (** Prefix where to store the downloaded files cache: {i $opam/download-cache}.
     Warning, this is relative to the opam root, not a repository root. *)
@@ -28,29 +23,6 @@ val pin_cache_dir: unit -> dirname
 
 (** Pin cache for a given download url. *)
 val pin_cache: OpamUrl.t -> dirname
-
-(** Return the repo file *)
-val repo: dirname -> OpamFile.Repo.t OpamFile.t
-
-(** Packages folder: {i $repo/packages} *)
-val packages_dir: dirname -> dirname
-
-(** Package folder: {i $repo/packages/XXX/$NAME.$VERSION} *)
-val packages: dirname -> string option -> package -> dirname
-
-(** Return the OPAM file for a given package:
-    {i $repo/packages/XXX/$NAME.$VERSION/opam} *)
-val opam: dirname -> string option -> package -> OpamFile.OPAM.t OpamFile.t
-
-(** Return the description file for a given package:
-    {i $repo/packages/XXX/$NAME.VERSION/descr} *)
-val descr: dirname -> string option -> package -> OpamFile.Descr_legacy.t OpamFile.t
-
-(** urls {i $repo/package/XXX/$NAME.$VERSION/url} *)
-val url: dirname -> string option -> package -> OpamFile.URL_legacy.t OpamFile.t
-
-(** files {i $repo/packages/XXX/$NAME.$VERSION/files} *)
-val files: dirname -> string option -> package -> dirname
 
 (** Url constructor for parts of remote repositories, when applicable (http and
     rsync). Function take the repo's root url. *)
