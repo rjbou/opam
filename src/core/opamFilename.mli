@@ -443,4 +443,5 @@ module Unix : sig
   (** Adds a dot and the given file extension *)
   val add_extension: t -> string -> t
 
+  val root_dir: t -> string option
 end
