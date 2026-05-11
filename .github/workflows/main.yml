@@ -17,9 +17,6 @@ on:
       - '!tests/bench/**'
       - 'shell/**'
   push:
-    branches:
-      - 'master'
-      - '2.**'
 
 env:
   OPAMBSVERSION: 2.1.0
