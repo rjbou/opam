@@ -48,6 +48,8 @@ module Dir : sig
     val ( // ) : t -> string -> filename
   end
 
+  val root : dirname -> repository_name -> t
+
 end
 
 val make_tar_gz_job : filename -> Dir.t -> exn option OpamProcess.job

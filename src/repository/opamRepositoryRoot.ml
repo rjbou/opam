@@ -42,6 +42,8 @@ module Dir = struct
     let (//) d s = OpamFilename.Op.(d // s)
   end
 
+  let root = OpamRepositoryPath.root
+
 end
 
 let make_tar_gz_job = OpamFilename.make_tar_gz_job
