@@ -83,7 +83,7 @@ let get_root_raw root repos_tmp name =
   match Hashtbl.find repos_tmp name with
   | lazy repo_root -> OpamRepositoryRoot.Dir repo_root
   | exception Not_found ->
-    OpamRepositoryRoot.Dir (OpamRepositoryPath.root root name)
+    OpamRepositoryRoot.Dir (OpamRepositoryRoot.Dir.root root name)
 
 let get_root rt name =
   get_root_raw rt.repos_global.root rt.repos_tmp name
@@ -142,7 +142,10 @@ let load_opams_from_dir repo_name repo_root =
     else r
   in
   Fun.protect
-    (fun () -> aux OpamPackage.Map.empty (OpamRepositoryPath.packages_dir repo_root))
+    (fun () ->
+       aux OpamPackage.Map.empty
+         (OpamRepositoryPath.packages_dir
+            (OpamRepositoryRoot.Dir.to_dir repo_root)))
     ~finally:OpamConsole.clear_status
 
 let load_opams_from_diff repo diffs rt =
@@ -232,7 +235,9 @@ let load_opams_from_diff repo diffs rt =
 
 let load_repo_from_dir repo repo_root =
   let repo_def =
-    OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root)
+    OpamRepositoryRoot.Dir.to_dir repo_root
+    |> OpamRepositoryPath.repo
+    |> OpamFile.Repo.safe_read
     |> OpamFile.Repo.with_root_url repo.repo_url
   in
   let opams = load_opams_from_dir repo.repo_name repo_root in
@@ -299,7 +304,9 @@ let load lock_kind gt =
   let repos_tmp_root = lazy (OpamFilename.mk_tmp_dir ()) in
   let repos_tmp = Hashtbl.create 23 in
   OpamRepositoryName.Map.iter (fun name repo ->
-      let uncompressed_root = OpamRepositoryPath.root gt.root repo.repo_name in
+      let uncompressed_root =
+        OpamRepositoryRoot.Dir.root gt.root repo.repo_name
+      in
       let tar = OpamRepositoryPath.tar gt.root repo.repo_name in
       if not (OpamRepositoryRoot.Dir.exists uncompressed_root) &&
          OpamFilename.exists tar

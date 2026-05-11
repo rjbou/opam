@@ -81,12 +81,12 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
-    if OpamRepositoryRoot.Dir.exists (OpamRepositoryPath.root root name) ||
+    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.root root name) ||
        OpamFilename.exists (OpamRepositoryPath.tar root name)
     then
       OpamConsole.error_and_exit `Bad_arguments
         "Invalid repository name, %s exists"
-        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryPath.root root name));
+        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryRoot.Dir.root root name));
     if url.OpamUrl.backend = `rsync &&
        OpamUrl.local_dir url <> None &&
        OpamUrl.local_dir (OpamRepositoryPath.Remote.packages_url url)
@@ -106,7 +106,7 @@ let remove rt name =
   in
   OpamRepositoryState.Cache.save rt;
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryPath.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
   OpamFilename.remove
     (OpamRepositoryPath.tar rt.repos_global.root name);
   rt
@@ -120,7 +120,7 @@ let set_url rt name url trust_anchors =
         (OpamRepositoryName.to_string name);
   in
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryPath.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
   OpamFilename.remove
     (OpamRepositoryPath.tar rt.repos_global.root name);
   let repo = { repo with repo_url = url; repo_trust = trust_anchors; } in
@@ -276,8 +276,10 @@ let update_with_auto_upgrade rt repo_names =
                       (Printexc.to_string e)
                   | None -> ());
              let def =
-               OpamFile.Repo.safe_read (OpamRepositoryPath.repo repo_root) |>
-               OpamFile.Repo.with_root_url r.repo_url
+               OpamRepositoryRoot.Dir.to_dir repo_root
+               |> OpamRepositoryPath.repo
+               |> OpamFile.Repo.safe_read
+               |> OpamFile.Repo.with_root_url r.repo_url
              in
              let opams =
                OpamRepositoryState.load_opams_from_dir r.repo_name repo_root
