@@ -67,16 +67,54 @@ SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 SYSTEM                          LOCK ${BASEDIR}/OPAM/repo/lock (none => write)
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-SYSTEM                          read ${BASEDIR}/REPO/repo
-SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.1/opam
-SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files/x-file.main-repo.1
-SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.2/opam
-SYSTEM                          read ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files/x-file.main-repo.2
-SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.tar.gz.new
-FILE(repo)                      Read ./<none> in 0.000s
-FILE(repo)                      Read ./repo (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
-FILE(opam)                      Read packages/main-repo/main-repo.1/opam (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
-FILE(opam)                      Read packages/main-repo/main-repo.2/opam (out of ${BASEDIR}/OPAM/repo/default.tar.gz) in 0.000s
+SYSTEM                          copydir ${BASEDIR}/REPO -> ${BASEDIR}/OPAM/repo/default.new
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new
+SYSTEM                          copydir ${BASEDIR}/REPO/packages -> ${BASEDIR}/OPAM/repo/default.new/packages
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages
+SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages/main-repo
+SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.1 -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1
+SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.1/opam -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/opam
+SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/files
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/files
+SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.1/files/x-file.main-repo.1 -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.2 -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2
+SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.2/opam -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/opam
+SYSTEM                          copydir ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/files
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/files
+SYSTEM                          copy ${BASEDIR}/REPO/packages/main-repo/main-repo.2/files/x-file.main-repo.2 -> ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          copy ${BASEDIR}/REPO/repo -> ${BASEDIR}/OPAM/repo/default.new/repo
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/opam
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/opam
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/repo
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/opam
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/opam
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default.new/repo
+SYSTEM                          rmdir ${BASEDIR}/OPAM/repo/default.new
+SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/opam
+SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/opam
+SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.new/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          rm ${BASEDIR}/OPAM/repo/default.new/repo
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/opam
+SYSTEM                          write ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/opam
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files
+SYSTEM                          write ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/opam
+SYSTEM                          write ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/opam
+SYSTEM                          mkdir ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files
+SYSTEM                          write ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+FILE(repo)                      Read ${BASEDIR}/OPAM/repo/default/repo in 0.000s
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/opam
+FILE(opam)                      Read packages/main-repo/main-repo.2/opam (out of ${BASEDIR}/OPAM/repo/default) in 0.000s
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/opam
+FILE(opam)                      Read packages/main-repo/main-repo.1/opam (out of ${BASEDIR}/OPAM/repo/default) in 0.000s
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/log/patch-xxx
 [default] synchronised from file://${BASEDIR}/REPO
 Processing: [default: loading data]
@@ -202,7 +240,7 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/install-from-repo/.opam-
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/install-from-repo/.opam-switch/sources/main-repo.1/content -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/x-source.main-repo.1
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/x-file.main-repo.1
 Processing  2/3: [main-repo: touch build-file]
 + touch "build-file" (CWD=${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1)
@@ -221,7 +259,7 @@ SYSTEM                          rm ${BASEDIR}/OPAM/install-from-repo/.opam-switc
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/main-repo.1
 FILE(opam)                      Wrote ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/main-repo.1/opam atomically in 0.000s
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/main-repo.1/files
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          LOCK ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/cache (none => write)
 CACHE(installed)                Writing the installed cache to ${BASEDIR}/OPAM/install-from-repo/.opam-switch/packages/cache ...
@@ -269,9 +307,9 @@ SYSTEM                          rmdir ${BASEDIR}/OPAM/install-from-repo/.opam-sw
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/content
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/x-source.main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/x-source.main-repo.1
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.1/x-file.main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.1/x-source.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.1/x-file.main-repo.1
@@ -376,9 +414,9 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/install-from-repo/.opam-
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.2
 SYSTEM                          copy ${BASEDIR}/OPAM/install-from-repo/.opam-switch/sources/main-repo.2/content -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.2/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.2/x-source.main-repo.2
-SYSTEM                          read default/packages/main-repo/main-repo.2/files/x-file.main-repo.2 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.2/files/x-file.main-repo.2 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/build/main-repo.2/x-file.main-repo.2
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.1/x-source.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.1/x-file.main-repo.1
@@ -478,7 +516,7 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/install-from-repo/.opam-
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.2
 SYSTEM                          copy ${BASEDIR}/OPAM/install-from-repo/.opam-switch/sources/main-repo.2/content -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.2/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.2/x-source.main-repo.2
-SYSTEM                          read default/packages/main-repo/main-repo.2/files/x-file.main-repo.2 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.2/x-file.main-repo.2
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-repo/.opam-switch/remove/main-repo.2/x-source.main-repo.2
 Processing  2/2: [main-repo: touch removal-file]
@@ -1999,7 +2037,7 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/install-from-version-pin
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/sources/main-repo/content -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/x-source.main-repo.1
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/x-file.main-repo.1
 Processing  2/3: [main-repo: touch build-file]
 + touch "build-file" (CWD=${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1)
@@ -2018,7 +2056,7 @@ SYSTEM                          rm ${BASEDIR}/OPAM/install-from-version-pin/.opa
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/main-repo.1
 FILE(opam)                      Wrote ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/main-repo.1/opam atomically in 0.000s
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/main-repo.1/files
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          LOCK ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/cache (none => write)
 CACHE(installed)                Writing the installed cache to ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/packages/cache ...
@@ -2067,9 +2105,9 @@ SYSTEM                          rmdir ${BASEDIR}/OPAM/install-from-version-pin/.
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/content
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/x-source.main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/x-source.main-repo.1
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/build/main-repo.1/x-file.main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/x-source.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/x-file.main-repo.1
@@ -2166,7 +2204,7 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/install-from-version-pin
 SYSTEM                          mkdir ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1
 SYSTEM                          copy ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/sources/main-repo/content -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/x-source.main-repo.1
-SYSTEM                          read default/packages/main-repo/main-repo.1/files/x-file.main-repo.1 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.1/files/x-file.main-repo.1
 SYSTEM                          write ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/x-file.main-repo.1
 SYSTEM                          rm ${BASEDIR}/OPAM/install-from-version-pin/.opam-switch/remove/main-repo.1/x-source.main-repo.1
 Processing  2/2: [main-repo: touch removal-file]
@@ -2299,7 +2337,7 @@ SYSTEM                          copydir ${BASEDIR}/OPAM/package-switch/.opam-swi
 SYSTEM                          mkdir ${BASEDIR}/OPAM/package-switch/.opam-switch/build/main-repo.2
 SYSTEM                          copy ${BASEDIR}/OPAM/package-switch/.opam-switch/sources/main-repo.2/content -> ${BASEDIR}/OPAM/package-switch/.opam-switch/build/main-repo.2/content
 SYSTEM                          copy ${BASEDIR}/OPAM/download-cache/md5/pre/+xs-hash+ -> ${BASEDIR}/OPAM/package-switch/.opam-switch/build/main-repo.2/x-source.main-repo.2
-SYSTEM                          read default/packages/main-repo/main-repo.2/files/x-file.main-repo.2 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          write ${BASEDIR}/OPAM/package-switch/.opam-switch/build/main-repo.2/x-file.main-repo.2
 Processing  2/3: [main-repo: touch build-file]
 + touch "build-file" (CWD=${BASEDIR}/OPAM/package-switch/.opam-switch/build/main-repo.2)
@@ -2318,7 +2356,7 @@ SYSTEM                          rm ${BASEDIR}/OPAM/package-switch/.opam-switch/p
 SYSTEM                          mkdir ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/main-repo.2
 FILE(opam)                      Wrote ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/main-repo.2/opam atomically in 0.000s
 SYSTEM                          mkdir ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/main-repo.2/files
-SYSTEM                          read default/packages/main-repo/main-repo.2/files/x-file.main-repo.2 from ${BASEDIR}/OPAM/repo/default.tar.gz
+SYSTEM                          read ${BASEDIR}/OPAM/repo/default/packages/main-repo/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          write ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/main-repo.2/files/x-file.main-repo.2
 SYSTEM                          LOCK ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/cache (none => write)
 CACHE(installed)                Writing the installed cache to ${BASEDIR}/OPAM/package-switch/.opam-switch/packages/cache ...
