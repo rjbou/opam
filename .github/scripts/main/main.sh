@@ -151,6 +151,13 @@ if [ "$OPAM_TEST" = "1" ]; then
     (set +x ; echo -en "::endgroup::rebuild opam\r") 2>/dev/null
   fi
 
+  git clone https://codeberg.org/kit-ty-kate/micro_httpd
+  pushd micro_httpd
+  dune build -p micro_httpd
+  dune install --root . --prefix "$PREFIX"
+  popd
+  rm -rf micro_httpd
+
   # Note: these tests require a "system" compiler and will use the one in $OPAMBSROOT
   make tests
 
