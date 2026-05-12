@@ -81,12 +81,12 @@ let add rt name url trust_anchors =
     let repo = { repo_name = name; repo_url = url;
                  repo_trust = trust_anchors; }
     in
-    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.root root name) ||
+    if OpamRepositoryRoot.Dir.exists (OpamRepositoryRoot.Dir.Path.root root name) ||
        OpamFilename.exists (OpamRepositoryPath.tar root name)
     then
       OpamConsole.error_and_exit `Bad_arguments
         "Invalid repository name, %s exists"
-        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryRoot.Dir.root root name));
+        (OpamRepositoryRoot.Dir.to_string (OpamRepositoryRoot.Dir.Path.root root name));
     if url.OpamUrl.backend = `rsync &&
        OpamUrl.local_dir url <> None &&
        OpamUrl.local_dir (OpamRepositoryPath.Remote.packages_url url)
@@ -106,7 +106,7 @@ let remove rt name =
   in
   OpamRepositoryState.Cache.save rt;
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.Path.root rt.repos_global.root name);
   OpamFilename.remove
     (OpamRepositoryPath.tar rt.repos_global.root name);
   rt
@@ -120,7 +120,7 @@ let set_url rt name url trust_anchors =
         (OpamRepositoryName.to_string name);
   in
   OpamRepositoryRoot.Dir.remove
-    (OpamRepositoryRoot.Dir.root rt.repos_global.root name);
+    (OpamRepositoryRoot.Dir.Path.root rt.repos_global.root name);
   OpamFilename.remove
     (OpamRepositoryPath.tar rt.repos_global.root name);
   let repo = { repo with repo_url = url; repo_trust = trust_anchors; } in
@@ -276,8 +276,7 @@ let update_with_auto_upgrade rt repo_names =
                       (Printexc.to_string e)
                   | None -> ());
              let def =
-               OpamRepositoryRoot.Dir.to_dir repo_root
-               |> OpamRepositoryPath.repo
+               OpamRepositoryRoot.Dir.Path.repo repo_root
                |> OpamFile.Repo.safe_read
                |> OpamFile.Repo.with_root_url r.repo_url
              in

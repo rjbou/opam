@@ -42,7 +42,36 @@ module Dir = struct
     let (//) d s = OpamFilename.Op.(d // s)
   end
 
-  let root = OpamRepositoryPath.root
+  module Path = struct
+    module P = OpamRepositoryPath.Path (struct
+        type file = filename
+        type dir = dirname
+        let (/) = OpamFilename.Op.(/)
+        let (//) = OpamFilename.Op.(//)
+        let dir_of_string = OpamFilename.raw_dir
+      end)
+    type repo_root = t
+    type repo_dirname = dirname
+
+    open OpamFilename.Op
+
+    let raw_d = OpamFilename.Dir.to_string
+    let raw = OpamFilename.to_string
+
+    let root root name =
+      of_dir (root / OpamRepositoryPathName.repo_d
+              / OpamRepositoryName.to_string name)
+    let repo root = OpamFile.make (root // OpamRepositoryPathName.repo_f)
+    let packages_dir root = root / OpamRepositoryPathName.packages_d
+    let packages root prefix nv = root / (raw_d (P.packages prefix nv))
+    let files root prefix nv = root / raw_d (P.files prefix nv)
+
+    let make_file f root prefix nv =
+      OpamFile.make (root // (raw (f prefix nv)))
+    let opam = make_file P.opam
+    let descr = make_file P.descr
+    let url = make_file P.url
+  end
 
 end
 

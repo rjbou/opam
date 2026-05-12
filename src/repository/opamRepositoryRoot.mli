@@ -11,8 +11,9 @@
 
 open OpamTypes
 
-(** Abstraction of a internal representation of repositories
-    in <opamroot>/repo *)
+(** This module abstract the notion of repository root over its concrete
+    implementation (could be a database, a file, a directory, etc.) *)
+
 
 (** Repository root implemented as a directory *)
 module Dir : sig
@@ -48,7 +49,9 @@ module Dir : sig
     val ( // ) : t -> string -> filename
   end
 
-  val root : dirname -> repository_name -> t
+  (* Repository paths or a dir repo root *)
+  module Path : OpamRepositoryPath.PATH
+    with type repo_root = t and type repo_dirname = dirname
 
 end
 
