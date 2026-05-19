@@ -20,4 +20,4 @@ esac
 
 export PATH="$PREFIX/bin:$PATH"
 
-make tests
+opam exec -- make tests
