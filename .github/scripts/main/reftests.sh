@@ -43,4 +43,4 @@ dune install --root . --prefix "$CONFIGURE_PREFIX"
 popd
 rm -rf micro_httpd
 
-opam exec -- make tests
+make tests
