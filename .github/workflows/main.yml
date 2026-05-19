@@ -243,6 +243,8 @@ jobs:
         opam list || exit /b 1
         opam config report || exit /b 1
     - name: Test (reftests)
+      env:
+        OPAM_TEST: 1
       run: bash -exu .github/scripts/main/reftests.sh ${{ matrix.host }}
 
 ####
