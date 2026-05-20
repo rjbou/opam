@@ -130,6 +130,7 @@ let load_opams_from_dir repo_name repo_root =
   let rec aux r dir =
     if OpamFilename.exists_dir dir then
       let fnames = Sys.readdir (OpamFilename.Dir.to_string dir) in
+      Array.sort String.compare fnames;
       if Array.exists (fun f -> String.equal f OpamPathName.opam_f) fnames then
         match read_package_opam ~repo_name ~repo_root dir with
         | Some (nv, opam) -> OpamPackage.Map.add nv opam r
