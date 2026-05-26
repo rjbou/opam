@@ -140,6 +140,7 @@ synopsis: "A tautological synopsis."
 Generating urls.txt...
 Generating index.tar.gz...
 Done.
+### find OPAM/repo
 ### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
 ### opam update http-repo | sed-cmd tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
