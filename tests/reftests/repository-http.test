@@ -102,6 +102,8 @@ Generating urls.txt...
 Generating index.tar.gz...
 Done.
 ### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
+### tar --list -f index.tar.gz
+### find OPAM/repo/http-repo
 ### opam update http-repo | sed-cmd tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
@@ -123,6 +125,7 @@ Now run 'opam upgrade' to apply any package updates.
 ### unset OPAMDEBUGSECTIONS
 ### unset OPAMDEBUG
 ### unset OPAMVERBOSE
+### find OPAM/repo/http-repo
 ### opam list --all
 # Packages matching: any
 # Name # Installed # Synopsis
@@ -140,7 +143,6 @@ synopsis: "A tautological synopsis."
 Generating urls.txt...
 Generating index.tar.gz...
 Done.
-### find OPAM/repo
 ### OPAMDEBUGSECTIONS="RSTATE REPOSITORY REPO_BACKEND UPDATE" OPAMDEBUG=-3 OPAMVERBOSE=2
 ### opam update http-repo | sed-cmd tar | grep -v "^+-" | ".*\(curl\|wget\).* \"--\"" -> 'curl-or-wget --' | "${HTTPSERVERPORT}" -> "port"
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
