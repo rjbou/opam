@@ -184,7 +184,6 @@ let get_diff repo1 repo2 =
   | diffs ->
     log "Internal diff (non-empty, %a changed files) done in %.2fs."
       (slog (fun l -> string_of_int (List.length l))) diffs (chrono ());
-    OpamConsole.error "DIFF\n%s" (Format.asprintf "%a" Patch.pp_list diffs);
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
     let file_diffs = List.map (add_prefix repo1 repo2) diffs in
