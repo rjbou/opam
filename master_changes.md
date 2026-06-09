@@ -314,3 +314,4 @@ users)
   * `OpamFilename.make_tar_gz{_job}`: rename `make_tar_gz_job` into `make_tar_gz` as it no longer need an external process call [#6945 @kit-ty-kate]
   * `OpamFilename.Unix`: add `basename`, `dirname`, `remove_prefix`, `add_extension`, `check_canonical` [#6625 @rjbou]
   * `OpamFilename.Unix.Dir`: add `basename` and `dirname` [#6625 @rjbou]
+  * `OpamFilename.Unix.{to_dir,to_filename}`: now translate `/` into filesystem directory separator [#6625 @rjbou]
