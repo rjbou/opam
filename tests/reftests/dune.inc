@@ -2079,27 +2079,6 @@
    (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:sources-directory-cleaning.test} %{read-lines:testing-env}))))
 
 (rule
- (alias reftest-swhid.unix)
- (enabled_if (and (= %{os_type} "Unix") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
- (action
-  (diff swhid.unix.test swhid.unix.out)))
-
-(alias
- (name reftest)
- (enabled_if (and (= %{os_type} "Unix") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
- (deps (alias reftest-swhid.unix)))
-
-(rule
- (targets swhid.unix.out)
- (deps root-N0REP0)
- (enabled_if (and (= %{os_type} "Unix") (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
- (package opam)
- (action
-  (with-stdout-to
-   %{targets}
-   (run ./run.exe %{exe:../../src/client/opamMain.exe.exe} %{dep:swhid.unix.test} %{read-lines:testing-env}))))
-
-(rule
  (alias reftest-switch-creation)
  (enabled_if (and  (or (<> %{env:TESTALL=1} 0) (= %{env:TESTN0REP0=0} 1))))
  (action
