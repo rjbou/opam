@@ -48,7 +48,7 @@ export PATH="$PREFIX/bin:$PATH"
 opam --version
 
 if [[ "$OPAM_DOC" -eq 1 ]]; then
-  opam exec -- make -C doc html man-html pages
+  make -C doc html man-html pages
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
