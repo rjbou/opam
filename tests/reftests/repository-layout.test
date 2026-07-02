@@ -2067,7 +2067,7 @@ Switch opam-dir-n-sw-xfiles and all its packages will be wiped. Are you sure? [Y
 ### :XII: packages/opam :
 ### :       opam file directly under packages
 ### ::::::::::::::::::::::
-### sh populate.sh pacckages
+### sh populate.sh packages
 ### sh add-nv.sh   opam-at-root-pkg packages
 ### :XII:1:a: Add new repository 'new-default*', load from scratch
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam repository add new-default-strict ./REPO --this-switch --strict
@@ -2076,27 +2076,23 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default-strict] Initialised
 UPDATE                          Repository has new changes
-[ERROR] Could not update repository "new-default-strict": In ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam:
-        unsupported or missing file format version; should be 2.0 or older
-[ERROR] Initial repository fetch failed
-# Return code 40 #
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam repository add new-default ./REPO --this-switch | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default] Initialised
 UPDATE                          Repository has new changes
-[ERROR] Could not update repository "new-default": In ${BASEDIR}/OPAM/repo/new-default/packages/opam:
-        unsupported or missing file format version; should be 2.0 or older
-[ERROR] Initial repository fetch failed
-# Return code 40 #
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default/packages/opam
 ### :XII:1:b: List available package
 ### opam switch create opam-at-root-pkg-sw-from-scratch --empty --repo=new-default,new-default-strict
 ### opam repository --this-switch
 
 <><> Repository configuration for switch opam-at-root-pkg-sw-from-scratch <><><>
- 1 new-default        not found
- 2 new-default-strict not found
+ 1 new-default        file://${BASEDIR}/REPO
+ 2 new-default-strict file://${BASEDIR}/REPO
 ### opam list -A --repo new-default-strict
 # Packages matching: from-repository(new-default-strict) & any
 # No matches found
@@ -2116,9 +2112,9 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default-strict] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
-[ERROR] Could not update repository "default-strict": In ${BASEDIR}/OPAM/repo/default-strict/packages/opam:
-        unsupported or missing file format version; should be 2.0 or older
-# Return code 40 #
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/default-strict/packages/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default-strict/packages/opam
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default-strict/packages/files/un/der/opam, ignored
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam update default
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
@@ -2127,9 +2123,9 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
-[ERROR] Could not update repository "default": In ${BASEDIR}/OPAM/repo/default/packages/opam:
-        unsupported or missing file format version; should be 2.0 or older
-# Return code 40 #
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/default/packages/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default/packages/opam
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/packages/files/un/der/opam, ignored
 ### :XII:2:b List available package
 ### opam list -A --repo default-strict
 # Packages matching: from-repository(default-strict) & any
@@ -2160,7 +2156,7 @@ RSTATE                          Cache found
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default-strict] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
-opam-file                       Missing expected extra files fst, un/der/snd, un/der/thrd at ${BASEDIR}/OPAM/repo/default-strict/packages/files
+opam-file                       Mismatching extra-files at ${BASEDIR}/OPAM/repo/default-strict/packages: missing from 'files' directory (1)
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/default-strict/packages/opam in 0.000s
 RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default-strict/packages/opam
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam update default
@@ -2172,28 +2168,28 @@ RSTATE                          Cache found
 [default] synchronised from file://${BASEDIR}/REPO
 UPDATE                          Repository has new changes
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/default/packages/opam in 0.000s
-opam-file                       Missing expected extra files fst, un/der/snd, un/der/thrd at ${BASEDIR}/OPAM/repo/default/packages/files
+opam-file                       Mismatching extra-files at ${BASEDIR}/OPAM/repo/default/packages: missing from 'files' directory (1)
 RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/default/packages/opam
 ### :XII:3:b: Add the last extrafile and update
 ### sh xfile.sh packages
-cp: cannot create regular file 'REPO/packages/files/un/der/': No such file or directory
-# Return code 1 #
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam update default-strict --strict | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-[default-strict] no changes from file://${BASEDIR}/REPO
-UPDATE                          Repository did not change: nothing to do.
+[default-strict] synchronised from file://${BASEDIR}/REPO
+UPDATE                          Repository has new changes
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default-strict/packages/files/un/der/opam, ignored
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam update default
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
-[default] no changes from file://${BASEDIR}/REPO
-UPDATE                          Repository did not change: nothing to do.
+[default] synchronised from file://${BASEDIR}/REPO
+UPDATE                          Repository has new changes
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/default/packages/files/un/der/opam, ignored
 ### :XII:3:b: List available package
 ### opam switch create opam-at-root-pkg-sw-xfiles --empty --repo=default,default-strict
 ### opam repository --this-switch
@@ -2219,7 +2215,6 @@ very-inner-nv   --
 # Return code 5 #
 ### :XII:4: Cleaning
 ### opam repository remove --all new-default-strict new-default
-[WARNING] No configured repositories by these names found: new-default-strict new-default
 ### opam switch remove opam-at-root-pkg-sw  opam-at-root-pkg-sw-from-scratch opam-at-root-pkg-sw-xfiles
 Switch opam-at-root-pkg-sw and all its packages will be wiped. Are you sure? [Y/n] y
 Switch opam-at-root-pkg-sw-from-scratch and all its packages will be wiped. Are you sure? [Y/n] y
@@ -2238,7 +2233,6 @@ RSTATE                          Cache found
 [new-default-strict] Initialised
 UPDATE                          Repository has new changes
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam in 0.000s
-opam-file                       Missing expected extra files fst, un/der/snd, un/der/thrd at ${BASEDIR}/OPAM/repo/new-default-strict/packages/files
 RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam repository add new-default ./REPO --this-switch | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
@@ -2247,7 +2241,6 @@ RSTATE                          Cache found
 [new-default] Initialised
 UPDATE                          Repository has new changes
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/opam in 0.000s
-opam-file                       Missing expected extra files fst, un/der/snd, un/der/thrd at ${BASEDIR}/OPAM/repo/new-default/packages/files
 RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default/packages/opam
 ### :XIII:1:b: List available package
 ### opam switch create z-good-sw-from-scratch --empty --repo=new-default,new-default-strict
@@ -2461,7 +2454,6 @@ Now run 'opam upgrade' to apply any package updates.
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE" OPAMDEBUG=-3 opam admin list | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 FILE(opam)                      Read ${BASEDIR}/packages/opam in 0.000s
-opam-file                       Missing expected extra files fst, un/der/snd, un/der/thrd at ${BASEDIR}/packages/files
 RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/packages/opam
 # No matches found
 # Packages matching: available
