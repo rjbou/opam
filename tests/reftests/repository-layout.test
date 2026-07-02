@@ -1719,21 +1719,21 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default-strict] Initialised
 UPDATE                          Repository has new changes
-[ERROR] At ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam-dir-nv/opam-dir-nv.1/opam:1:0-1:0::
-        Parse error
-[ERROR] Strict mode: aborting
-[ERROR] Could not update repository "new-default-strict": OpamStd.OpamSys.Exit(30)
-[ERROR] Initial repository fetch failed
-# Return code 40 #
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam-dir-nv/opam-dir-nv.1/opam, ignored
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/not-same-nv-in/not-same-nv-in.2/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/no-nv/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default-strict/packages/no-nv/opam
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/direct-root.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/i/n/e/r/very-inner-n-nv/very-inner-n-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/v/e/r/y/very-inner-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/not/no-n-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/good/good.1/opam in 0.000s
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam repository add new-default ./REPO --this-switch | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default] Initialised
 UPDATE                          Repository has new changes
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-nv/opam-dir-nv.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-nv/opam-dir-nv.1/opam:1:0-1:0::
-          Parse error
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/v/e/r/y/very-inner-nv.1/opam in 0.000s
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/direct-root.1/opam in 0.000s
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/good/good.1/opam in 0.000s
@@ -1749,7 +1749,7 @@ RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/new-def
 
 <><> Repository configuration for switch opam-dir-nv-sw-from-scratch ><><><><><>
  1 new-default        file://${BASEDIR}/REPO
- 2 new-default-strict not found
+ 2 new-default-strict file://${BASEDIR}/REPO
 ### opam list -A --repo new-default-strict
 # Packages matching: from-repository(new-default-strict) & any
 # No matches found
@@ -1877,7 +1877,6 @@ very-inner-nv   --
 # Return code 5 #
 ### :X:4: Cleaning
 ### opam repository remove --all new-default-strict new-default
-[WARNING] No configured repositories by these names found: new-default-strict
 ### opam switch remove opam-dir-nv-sw  opam-dir-nv-sw-from-scratch opam-dir-nv-sw-xfiles
 Switch opam-dir-nv-sw and all its packages will be wiped. Are you sure? [Y/n] y
 Switch opam-dir-nv-sw-from-scratch and all its packages will be wiped. Are you sure? [Y/n] y
@@ -1895,24 +1894,22 @@ RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default-strict] Initialised
 UPDATE                          Repository has new changes
-[ERROR] At ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam-dir-n/opam:1:0-1:0::
-        Parse error
-[ERROR] Strict mode: aborting
-[ERROR] Could not update repository "new-default-strict": OpamStd.OpamSys.Exit(30)
-[ERROR] Initial repository fetch failed
-# Return code 40 #
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam-dir-n/opam, ignored
+RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/new-default-strict/packages/opam-dir-nv/opam-dir-nv.1/opam, ignored
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/not-same-nv-in/not-same-nv-in.2/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/no-nv/opam in 0.000s
+RSTATE                          ERR: directory name not a valid package: ignored ${BASEDIR}/OPAM/repo/new-default-strict/packages/no-nv/opam
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/direct-root.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/i/n/e/r/very-inner-n-nv/very-inner-n-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/v/e/r/y/very-inner-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/not/no-n-nv.1/opam in 0.000s
+FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default-strict/packages/good/good.1/opam in 0.000s
 ### OPAMDEBUGSECTIONS="FILE(opam) opam-file RSTATE UPDATE" OPAMDEBUG=-3 opam repository add new-default ./REPO --this-switch | unordered
 FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          Cache found
 [new-default] Initialised
 UPDATE                          Repository has new changes
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-n/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-n/opam:1:0-1:0::
-          Parse error
-[WARNING] Could not read file ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-nv/opam-dir-nv.1/opam. skipping:
-          At ${BASEDIR}/OPAM/repo/new-default/packages/opam-dir-nv/opam-dir-nv.1/opam:1:0-1:0::
-          Parse error
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/v/e/r/y/very-inner-nv.1/opam in 0.000s
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/direct-root.1/opam in 0.000s
 FILE(opam)                      Read ${BASEDIR}/OPAM/repo/new-default/packages/good/good.1/opam in 0.000s
@@ -1929,7 +1926,7 @@ RSTATE                          ERR: Could not load ${BASEDIR}/OPAM/repo/new-def
 
 <><> Repository configuration for switch opam-dir-n-sw-from-scratch <><><><><><>
  1 new-default        file://${BASEDIR}/REPO
- 2 new-default-strict not found
+ 2 new-default-strict file://${BASEDIR}/REPO
 ### opam list -A --repo new-default-strict
 # Packages matching: from-repository(new-default-strict) & any
 # No matches found
@@ -2057,7 +2054,6 @@ very-inner-nv   --
 # Return code 5 #
 ### :XI:4: Cleaning
 ### opam repository remove --all new-default-strict new-default
-[WARNING] No configured repositories by these names found: new-default-strict
 ### opam switch remove opam-dir-n-sw  opam-dir-n-sw-from-scratch opam-dir-n-sw-xfiles
 Switch opam-dir-n-sw and all its packages will be wiped. Are you sure? [Y/n] y
 Switch opam-dir-n-sw-from-scratch and all its packages will be wiped. Are you sure? [Y/n] y
