@@ -48,7 +48,26 @@ export PATH="$PREFIX/bin:$PATH"
 opam --version
 
 if [[ "$OPAM_DOC" -eq 1 ]]; then
-  make -C doc html man-html pages
+ # test if an upgrade is needed
+  rcode=0
+  opam list 2> /dev/null || rcode=$?
+  if [ $rcode -eq 10 ]; then
+    echo "Recompiling for an opam root upgrade"
+    (set +x ; echo -en "::group::rebuild opam\r") 2>/dev/null
+    unset-dev-version
+    make all admin
+    rm -f "$PREFIX/bin/opam"
+    make install
+    rcode=0
+    opam list 2> /dev/null || rcode=$?
+    if [ $rcode -ne 10 ]; then
+      echo -e "\e[31mBad return code $rcode, should be 10\e[0m";
+      exit $rcode
+    fi
+    (set +x ; echo -en "::endgroup::rebuild opam\r") 2>/dev/null
+  fi
+
+  opam exec -- make -C doc html man-html pages
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     . .github/scripts/common/hygiene-preamble.sh
