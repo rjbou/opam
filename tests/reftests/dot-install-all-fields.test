@@ -18,7 +18,7 @@ N0REP0
 ### # we neeed the precise tracking to have a sha in changes file instead of timestamp
 ### OPAMPRECISETRACKING=1
 ### OPAMDEBUGSECTIONS="TRACK ACTION"
-### # Printer the installed file 'finstalled' in switch (or root)
+### # Printe the installed file 'installed-file' or 'installed-bin' in switch (or root)
 ### <cat.ml>
 #directory "+str"
 #directory "+unix"
@@ -61,14 +61,15 @@ let pkg = Sys.argv.(2)
 let root = Sys.getenv "OPAMROOT"
 let (/) = Filename.concat
 
-let fname = "finstalled"
+let fname = "installed-file"
+let bname = "installed-bin"
 let root_file = try Some Sys.argv.(3) with Invalid_argument _ -> None
 let files =
   match root_file with
   | None -> []
   | Some f -> [ root / f ]
 
-(* retrieve all files names 'finstalled' in switch prefix *)
+(* retrieve all files names 'installed-file' in switch prefix *)
 let files =
   let rec aux files cwd =
     let ls = Sys.readdir cwd |> Array.to_list in
@@ -83,7 +84,8 @@ let files =
     let files =
       files
       @ List.filter_map (fun f ->
-          if String.starts_with ~prefix:fname f then
+          if String.starts_with ~prefix:fname f
+          || String.starts_with ~prefix:bname f then
             Some (cwd / f) else None)
         cwd_files
     in
@@ -95,20 +97,28 @@ let files =
 
 let () =
   match files with
-  | [] -> Printf.printf "==> No 'finstalled' file found"
+  | [] -> Printf.printf "==> No 'installed-file' or 'installed-bin' found"
   | _ -> List.iter cat files
 
+### <installed-file>
+youhou, i'm installed!
+### <tiny.ml>
+print_endline "youhou i'm installed!"
+### ocamlc tiny.ml -o installed-bin
+### chmod -x installed-bin
+### ls -lah installed-bin
+-rw-rw-r-- 1 rjbou rjbou 21K Jul 10 17:24 installed-bin
 ### :::::::::::::::
 ### :I: Field 'lib'
 ### :::::::::::::::
-### <pkg:pkg-lib.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-lib/pkg-lib.1/files/
+### cp installed-file REPO/packages/pkg-lib/pkg-lib.1/files/installed-file
 ### opam switch create sw-lib --empty
 ### :I:1: No defined destination path
 ### <pkg:pkg-lib.1>
 opam-version: "2.0"
 ### <pkg:pkg-lib.1:pkg-lib.install>
-lib: [ "finstalled" ]
+lib: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-lib
 The following actions will be performed:
 === install 1 package
@@ -127,10 +137,10 @@ ACTION                          changes recorded for pkg-lib.1: 2 items (additio
 -> installed pkg-lib.1
 Done.
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
-added: ["lib/pkg-lib" {"D"} "lib/pkg-lib/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["lib/pkg-lib" {"D"} "lib/pkg-lib/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib pkg-lib
-==> ${BASEDIR}/OPAM/sw-lib/lib/pkg-lib/finstalled
+==> ${BASEDIR}/OPAM/sw-lib/lib/pkg-lib/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-lib
 The following actions will be performed:
 === remove 1 package
@@ -141,7 +151,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-lib.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-lib.1: files lib/pkg-lib/finstalled, lib/pkg-lib were already removed
+TRACK                           While removing pkg-lib.1: files lib/pkg-lib/installed-file, lib/pkg-lib were already removed
 -> removed   pkg-lib.1
 ACTION                          Cleaning up artefacts of pkg-lib.1
 ACTION                          Removing the local metadata
@@ -149,12 +159,12 @@ Done.
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
 # OPAM/sw-lib/.opam-switch/install/pkg-lib.changes not found
 ### ocaml cat.ml sw-lib pkg-lib
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :I:2: Specify destination path
 ### <pkg:pkg-lib.1>
 opam-version: "2.0"
 ### <pkg:pkg-lib.1:pkg-lib.install>
-lib: [ "finstalled" {"finstalled.lib"} ]
+lib: [ "installed-file" {"installed-file.lib"} ]
 ### OPAMDEBUG=-5 opam install pkg-lib
 The following actions will be performed:
 === install 1 package
@@ -173,10 +183,10 @@ ACTION                          changes recorded for pkg-lib.1: 2 items (additio
 -> installed pkg-lib.1
 Done.
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
-added: ["lib/pkg-lib" {"D"} "lib/pkg-lib/finstalled.lib" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["lib/pkg-lib" {"D"} "lib/pkg-lib/installed-file.lib" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib pkg-lib
-==> ${BASEDIR}/OPAM/sw-lib/lib/pkg-lib/finstalled.lib
+==> ${BASEDIR}/OPAM/sw-lib/lib/pkg-lib/installed-file.lib
 ### OPAMDEBUG=-5 opam remove pkg-lib
 The following actions will be performed:
 === remove 1 package
@@ -187,7 +197,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-lib.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-lib.1: files lib/pkg-lib/finstalled.lib, lib/pkg-lib were already removed
+TRACK                           While removing pkg-lib.1: files lib/pkg-lib/installed-file.lib, lib/pkg-lib were already removed
 -> removed   pkg-lib.1
 ACTION                          Cleaning up artefacts of pkg-lib.1
 ACTION                          Removing the local metadata
@@ -195,7 +205,7 @@ Done.
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
 # OPAM/sw-lib/.opam-switch/install/pkg-lib.changes not found
 ### ocaml cat.ml sw-lib pkg-lib
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :I:3: Non existing filename, with optional argument
 ### <pkg:pkg-lib.1>
 opam-version: "2.0"
@@ -223,7 +233,7 @@ Done.
 added: "lib/pkg-lib" {"D"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib pkg-lib
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-lib
 The following actions will be performed:
 === remove 1 package
@@ -242,7 +252,7 @@ Done.
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
 # OPAM/sw-lib/.opam-switch/install/pkg-lib.changes not found
 ### ocaml cat.ml sw-lib pkg-lib
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :I:4: Non existing filename
 ### <pkg:pkg-lib.1>
 opam-version: "2.0"
@@ -277,18 +287,18 @@ Some files in ${BASEDIR}/OPAM/sw-lib/.opam-switch/install/pkg-lib.install couldn
 ### opam-cat OPAM/sw-lib/.opam-switch/install/pkg-lib.changes
 # OPAM/sw-lib/.opam-switch/install/pkg-lib.changes not found
 ### ocaml cat.ml sw-lib pkg-lib
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::
 ### :II: Field 'bin'
 ### ::::::::::::::::
-### <pkg:pkg-bin.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-bin/pkg-bin.1/files
+### cp installed-bin REPO/packages/pkg-bin/pkg-bin.1/files/installed-bin
 ### opam switch create sw-bin --empty
 ### :II:1: No defined destination path
 ### <pkg:pkg-bin.1>
 opam-version: "2.0"
 ### <pkg:pkg-bin.1:pkg-bin.install>
-bin: [ "finstalled" ]
+bin: [ "installed-bin" ]
 ### OPAMDEBUG=-5 opam install pkg-bin
 The following actions will be performed:
 === install 1 package
@@ -306,10 +316,10 @@ ACTION                          changes recorded for pkg-bin.1: 1 items (additio
 -> installed pkg-bin.1
 Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
-added: "bin/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "bin/installed-bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-bin pkg-bin
-==> ${BASEDIR}/OPAM/sw-bin/bin/finstalled (+x)
+==> ${BASEDIR}/OPAM/sw-bin/bin/installed-bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-bin
 The following actions will be performed:
 === remove 1 package
@@ -320,7 +330,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-bin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-bin.1: files bin/finstalled were already removed
+TRACK                           While removing pkg-bin.1: files bin/installed-bin were already removed
 -> removed   pkg-bin.1
 ACTION                          Cleaning up artefacts of pkg-bin.1
 ACTION                          Removing the local metadata
@@ -328,12 +338,12 @@ Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
 # OPAM/sw-bin/.opam-switch/install/pkg-bin.changes not found
 ### ocaml cat.ml sw-bin pkg-bin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :II:2: Specify destination path
 ### <pkg:pkg-bin.1>
 opam-version: "2.0"
 ### <pkg:pkg-bin.1:pkg-bin.install>
-bin: [ "finstalled" {"finstalled.bin"} ]
+bin: [ "installed-bin" {"installed-bin.bin"} ]
 ### OPAMDEBUG=-5 opam install pkg-bin
 The following actions will be performed:
 === install 1 package
@@ -351,10 +361,10 @@ ACTION                          changes recorded for pkg-bin.1: 1 items (additio
 -> installed pkg-bin.1
 Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
-added: "bin/finstalled.bin" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "bin/installed-bin.bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-bin pkg-bin
-==> ${BASEDIR}/OPAM/sw-bin/bin/finstalled.bin (+x)
+==> ${BASEDIR}/OPAM/sw-bin/bin/installed-bin.bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-bin
 The following actions will be performed:
 === remove 1 package
@@ -365,7 +375,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-bin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-bin.1: files bin/finstalled.bin were already removed
+TRACK                           While removing pkg-bin.1: files bin/installed-bin.bin were already removed
 -> removed   pkg-bin.1
 ACTION                          Cleaning up artefacts of pkg-bin.1
 ACTION                          Removing the local metadata
@@ -373,7 +383,7 @@ Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
 # OPAM/sw-bin/.opam-switch/install/pkg-bin.changes not found
 ### ocaml cat.ml sw-bin pkg-bin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :II:3: Non existing filename, with optional argument
 ### <pkg:pkg-bin.1>
 opam-version: "2.0"
@@ -399,7 +409,7 @@ Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-bin pkg-bin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-bin
 The following actions will be performed:
 === remove 1 package
@@ -417,7 +427,7 @@ Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
 # OPAM/sw-bin/.opam-switch/install/pkg-bin.changes not found
 ### ocaml cat.ml sw-bin pkg-bin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :II:4: Non existing filename
 ### <pkg:pkg-bin.1>
 opam-version: "2.0"
@@ -451,18 +461,18 @@ Some files in ${BASEDIR}/OPAM/sw-bin/.opam-switch/install/pkg-bin.install couldn
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
 # OPAM/sw-bin/.opam-switch/install/pkg-bin.changes not found
 ### ocaml cat.ml sw-bin pkg-bin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::::
 ### :III: Field 'sbin'
 ### ::::::::::::::::::
-### <pkg:pkg-sbin.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-sbin/pkg-sbin.1/files
+### cp installed-bin REPO/packages/pkg-sbin/pkg-sbin.1/files/installed-bin
 ### opam switch create sw-sbin --empty
 ### :III:1: No defined destination path
 ### <pkg:pkg-sbin.1>
 opam-version: "2.0"
 ### <pkg:pkg-sbin.1:pkg-sbin.install>
-sbin: [ "finstalled" ]
+sbin: [ "installed-bin" ]
 ### OPAMDEBUG=-5 opam install pkg-sbin
 The following actions will be performed:
 === install 1 package
@@ -480,10 +490,10 @@ ACTION                          changes recorded for pkg-sbin.1: 1 items (additi
 -> installed pkg-sbin.1
 Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
-added: "sbin/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "sbin/installed-bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> ${BASEDIR}/OPAM/sw-sbin/sbin/finstalled (+x)
+==> ${BASEDIR}/OPAM/sw-sbin/sbin/installed-bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-sbin
 The following actions will be performed:
 === remove 1 package
@@ -494,7 +504,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-sbin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-sbin.1: files sbin/finstalled were already removed
+TRACK                           While removing pkg-sbin.1: files sbin/installed-bin were already removed
 -> removed   pkg-sbin.1
 ACTION                          Cleaning up artefacts of pkg-sbin.1
 ACTION                          Removing the local metadata
@@ -502,12 +512,12 @@ Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
 # OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes not found
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :III:2: Specify destination path
 ### <pkg:pkg-sbin.1>
 opam-version: "2.0"
 ### <pkg:pkg-sbin.1:pkg-sbin.install>
-sbin: [ "finstalled" {"finstalled.sbin"} ]
+sbin: [ "installed-bin" {"installed-bin.sbin"} ]
 ### OPAMDEBUG=-5 opam install pkg-sbin
 The following actions will be performed:
 === install 1 package
@@ -525,10 +535,10 @@ ACTION                          changes recorded for pkg-sbin.1: 1 items (additi
 -> installed pkg-sbin.1
 Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
-added: "sbin/finstalled.sbin" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "sbin/installed-bin.sbin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> ${BASEDIR}/OPAM/sw-sbin/sbin/finstalled.sbin (+x)
+==> ${BASEDIR}/OPAM/sw-sbin/sbin/installed-bin.sbin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-sbin
 The following actions will be performed:
 === remove 1 package
@@ -539,7 +549,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-sbin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-sbin.1: files sbin/finstalled.sbin were already removed
+TRACK                           While removing pkg-sbin.1: files sbin/installed-bin.sbin were already removed
 -> removed   pkg-sbin.1
 ACTION                          Cleaning up artefacts of pkg-sbin.1
 ACTION                          Removing the local metadata
@@ -547,7 +557,7 @@ Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
 # OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes not found
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :III:3: Non existing filename, with optional argument
 ### <pkg:pkg-sbin.1>
 opam-version: "2.0"
@@ -573,7 +583,7 @@ Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-sbin
 The following actions will be performed:
 === remove 1 package
@@ -591,7 +601,7 @@ Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
 # OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes not found
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :III:4: Non existing filename
 ### <pkg:pkg-sbin.1>
 opam-version: "2.0"
@@ -625,20 +635,20 @@ Some files in ${BASEDIR}/OPAM/sw-sbin/.opam-switch/install/pkg-sbin.install coul
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
 # OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes not found
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::::
 ### :IV: Field 'misc'
 ### :::::::::::::::::
 ### # special cases for this test as misc require to have a destination that is
 ### # an absolute path
-### <pkg:pkg-misc.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-misc/pkg-misc.1/files
+### cp installed-file REPO/packages/pkg-misc/pkg-misc.1/files/installed-file
 ### opam switch create sw-misc --empty
 ### :IV:1: No defined destination path
 ### <pkg:pkg-misc.1>
 opam-version: "2.0"
 ### <pkg:pkg-misc.1:pkg-misc.install>
-misc: [ "finstalled" ]
+misc: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-misc
 The following actions will be performed:
 === install 1 package
@@ -649,7 +659,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          download_package: pkg-misc.1
 ACTION                          prepare_package_source: pkg-misc.1 at ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1
 [WARNING] Errors in ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install, some fields have been ignored:
-            - At ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install:1:8-1:20::
+            - At ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install:1:8-1:24::
               expected abs-filename
 
 TRACK                           before install: 0 elements scanned in 0.000s
@@ -661,8 +671,8 @@ ACTION                          changes recorded for pkg-misc.1: 0 items
 Done.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 opam-version: "2.0"
-### ocaml cat.ml sw-misc pkg-misc finstalled
---> ${BASEDIR}/OPAM/finstalled: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file
+--> ${BASEDIR}/OPAM/installed-file: not found
 ### OPAMDEBUG=-5 opam remove pkg-misc
 The following actions will be performed:
 === remove 1 package
@@ -679,14 +689,14 @@ ACTION                          Removing the local metadata
 Done.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 # OPAM/sw-misc/.opam-switch/install/pkg-misc.changes not found
-### ocaml cat.ml sw-misc pkg-misc finstalled
---> ${BASEDIR}/OPAM/finstalled: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file
+--> ${BASEDIR}/OPAM/installed-file: not found
 ### :IV:2: Specify destination path
 ### <pkg:pkg-misc.1>
 opam-version: "2.0"
 substs: "pkg-misc.install"
 ### <pkg:pkg-misc.1:pkg-misc.install.in>
-misc: [ "finstalled" {"%{root}%/finstalled.misc"} ]
+misc: [ "installed-file" {"%{root}%/installed-file.misc"} ]
 ### OPAMDEBUG=-5 opam install pkg-misc
 The following actions will be performed:
 === install 1 package
@@ -701,7 +711,7 @@ ACTION                          pkg-misc: expanding opam variables in pkg-misc.i
 TRACK                           before install: 0 elements scanned in 0.000s
 ACTION                          Installing pkg-misc.1.
 
-Installing finstalled to ${BASEDIR}/OPAM/finstalled.misc.
+Installing installed-file to ${BASEDIR}/OPAM/installed-file.misc.
 Continue? [Y/n] y
 TRACK                           after install: 0 elements, 0 added, scanned in 0.000s
 ACTION                          changes recorded for pkg-misc.1: 0 items
@@ -709,8 +719,8 @@ ACTION                          changes recorded for pkg-misc.1: 0 items
 Done.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 opam-version: "2.0"
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
-==> ${BASEDIR}/OPAM/finstalled.misc
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+==> ${BASEDIR}/OPAM/installed-file.misc
 ### OPAMDEBUG=-5 opam remove pkg-misc
 The following actions will be performed:
 === remove 1 package
@@ -721,21 +731,21 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-misc.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-Removing ${BASEDIR}/OPAM/finstalled.misc.Continue? [Y/n] y
+Removing ${BASEDIR}/OPAM/installed-file.misc.Continue? [Y/n] y
 -> removed   pkg-misc.1
 ACTION                          Cleaning up artefacts of pkg-misc.1
 ACTION                          Removing the local metadata
 Done.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 # OPAM/sw-misc/.opam-switch/install/pkg-misc.changes not found
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
---> ${BASEDIR}/OPAM/finstalled.misc: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+--> ${BASEDIR}/OPAM/installed-file.misc: not found
 ### :IV:3: Non existing filename, with optional argument
 ### <pkg:pkg-misc.1>
 opam-version: "2.0"
 substs: "pkg-misc.install"
 ### <pkg:pkg-misc.1:pkg-misc.install.in>
-misc: [ "?finst" {"%{root}%/finstalled.misc"} ]
+misc: [ "?finst" {"%{root}%/installed-file.misc"} ]
 ### OPAMDEBUG=-5 opam install pkg-misc
 The following actions will be performed:
 === install 1 package
@@ -750,7 +760,7 @@ ACTION                          pkg-misc: expanding opam variables in pkg-misc.i
 TRACK                           before install: 0 elements scanned in 0.000s
 ACTION                          Installing pkg-misc.1.
 
-Installing finst to ${BASEDIR}/OPAM/finstalled.misc.
+Installing finst to ${BASEDIR}/OPAM/installed-file.misc.
 Continue? [Y/n] y
 
 Sys_error("${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/finst: No such file or directory")
@@ -764,22 +774,22 @@ Sys_error("${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/finst: No such 
 # Return code 31 #
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 # OPAM/sw-misc/.opam-switch/install/pkg-misc.changes not found
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
---> ${BASEDIR}/OPAM/finstalled.misc: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+--> ${BASEDIR}/OPAM/installed-file.misc: not found
 ### OPAMDEBUG=-5 opam remove pkg-misc
 [NOTE] pkg-misc is not installed.
 
 Nothing to do.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 # OPAM/sw-misc/.opam-switch/install/pkg-misc.changes not found
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
---> ${BASEDIR}/OPAM/finstalled.misc: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+--> ${BASEDIR}/OPAM/installed-file.misc: not found
 ### :IV:4: Non existing filename
 ### <pkg:pkg-misc.1>
 opam-version: "2.0"
 substs: "pkg-misc.install"
 ### <pkg:pkg-misc.1:pkg-misc.install.in>
-misc: [ "finst"  {"%{root}%/finstalled.misc"}]
+misc: [ "finst"  {"%{root}%/installed-file.misc"}]
 ### OPAMDEBUG=-5 opam install pkg-misc
 The following actions will be performed:
 === install 1 package
@@ -794,7 +804,7 @@ ACTION                          pkg-misc: expanding opam variables in pkg-misc.i
 TRACK                           before install: 0 elements scanned in 0.000s
 ACTION                          Installing pkg-misc.1.
 
-Installing finst to ${BASEDIR}/OPAM/finstalled.misc.
+Installing finst to ${BASEDIR}/OPAM/installed-file.misc.
 Continue? [Y/n] y
 
 Sys_error("${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/finst: No such file or directory")
@@ -808,13 +818,13 @@ Sys_error("${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/finst: No such 
 # Return code 31 #
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 # OPAM/sw-misc/.opam-switch/install/pkg-misc.changes not found
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
---> ${BASEDIR}/OPAM/finstalled.misc: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+--> ${BASEDIR}/OPAM/installed-file.misc: not found
 ### :IV:4: Non existing filename
 ### <pkg:pkg-misc.1>
 opam-version: "2.0"
 ### <pkg:pkg-misc.1:pkg-misc.install>
-misc: [ "finst"  {"finstalled.misc"}]
+misc: [ "finst"  {"installed-file.misc"}]
 ### OPAMDEBUG=-5 opam install pkg-misc
 The following actions will be performed:
 === install 1 package
@@ -825,8 +835,8 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          download_package: pkg-misc.1
 ACTION                          prepare_package_source: pkg-misc.1 at ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1
 [WARNING] Errors in ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install, some fields have been ignored:
-            - At ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install:1:18-1:35::
-              finstalled.misc is not an absolute filename.
+            - At ${BASEDIR}/OPAM/sw-misc/.opam-switch/build/pkg-misc.1/pkg-misc.install:1:18-1:39::
+              installed-file.misc is not an absolute filename.
 
 TRACK                           before install: 0 elements scanned in 0.000s
 ACTION                          Installing pkg-misc.1.
@@ -837,19 +847,19 @@ ACTION                          changes recorded for pkg-misc.1: 0 items
 Done.
 ### opam-cat OPAM/sw-misc/.opam-switch/install/pkg-misc.changes
 opam-version: "2.0"
-### ocaml cat.ml sw-misc pkg-misc finstalled.misc
---> ${BASEDIR}/OPAM/finstalled.misc: not found
+### ocaml cat.ml sw-misc pkg-misc installed-file.misc
+--> ${BASEDIR}/OPAM/installed-file.misc: not found
 ### ::::::::::::::::::::
 ### :V: Field 'toplevel'
 ### ::::::::::::::::::::
-### <pkg:pkg-toplevel.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-toplevel/pkg-toplevel.1/files
+### cp installed-file REPO/packages/pkg-toplevel/pkg-toplevel.1/files/installed-file
 ### opam switch create sw-toplevel --empty
 ### :V:1: No defined destination path
 ### <pkg:pkg-toplevel.1>
 opam-version: "2.0"
 ### <pkg:pkg-toplevel.1:pkg-toplevel.install>
-toplevel: [ "finstalled" ]
+toplevel: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-toplevel
 The following actions will be performed:
 === install 1 package
@@ -867,10 +877,10 @@ ACTION                          changes recorded for pkg-toplevel.1: 1 items (ad
 -> installed pkg-toplevel.1
 Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
-added: "lib/toplevel/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/toplevel/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> ${BASEDIR}/OPAM/sw-toplevel/lib/toplevel/finstalled
+==> ${BASEDIR}/OPAM/sw-toplevel/lib/toplevel/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-toplevel
 The following actions will be performed:
 === remove 1 package
@@ -888,12 +898,12 @@ Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
 # OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes not found
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :V:1: Specify destination path
 ### <pkg:pkg-toplevel.1>
 opam-version: "2.0"
 ### <pkg:pkg-toplevel.1:pkg-toplevel.install>
-toplevel: [ "finstalled" {"finstalled.toplevel"} ]
+toplevel: [ "installed-file" {"installed-file.toplevel"} ]
 ### OPAMDEBUG=-5 opam install pkg-toplevel
 The following actions will be performed:
 === install 1 package
@@ -911,10 +921,10 @@ ACTION                          changes recorded for pkg-toplevel.1: 1 items (ad
 -> installed pkg-toplevel.1
 Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
-added: "lib/toplevel/finstalled.toplevel" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/toplevel/installed-file.toplevel" {"F:a611026bf7b99362c57473c4e1ef30a0"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> ${BASEDIR}/OPAM/sw-toplevel/lib/toplevel/finstalled.toplevel
+==> ${BASEDIR}/OPAM/sw-toplevel/lib/toplevel/installed-file.toplevel
 ### OPAMDEBUG=-5 opam remove pkg-toplevel
 The following actions will be performed:
 === remove 1 package
@@ -932,7 +942,7 @@ Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
 # OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes not found
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :V:3: Non existing filename, with optional argument
 ### <pkg:pkg-toplevel.1>
 opam-version: "2.0"
@@ -958,7 +968,7 @@ Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-toplevel
 The following actions will be performed:
 === remove 1 package
@@ -976,7 +986,7 @@ Done.
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
 # OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes not found
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :V:4: Non existing filename
 ### <pkg:pkg-toplevel.1>
 opam-version: "2.0"
@@ -1010,18 +1020,18 @@ Some files in ${BASEDIR}/OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.inst
 ### opam-cat OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes
 # OPAM/sw-toplevel/.opam-switch/install/pkg-toplevel.changes not found
 ### ocaml cat.ml sw-toplevel pkg-toplevel
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::::::::
 ### :VI: Field 'stublibs'
 ### :::::::::::::::::::::
-### <pkg:pkg-stublibs.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-stublibs/pkg-stublibs.1/files
+### cp installed-bin REPO/packages/pkg-stublibs/pkg-stublibs.1/files/installed-bin
 ### opam switch create sw-stublibs --empty
 ### :VI:1: No defined destination path
 ### <pkg:pkg-stublibs.1>
 opam-version: "2.0"
 ### <pkg:pkg-stublibs.1:pkg-stublibs.install>
-stublibs: [ "finstalled" ]
+stublibs: [ "installed-bin" ]
 ### OPAMDEBUG=-5 opam install pkg-stublibs
 The following actions will be performed:
 === install 1 package
@@ -1039,10 +1049,10 @@ ACTION                          changes recorded for pkg-stublibs.1: 1 items (ad
 -> installed pkg-stublibs.1
 Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
-added: "lib/stublibs/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/stublibs/installed-bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/finstalled (+x)
+==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/installed-bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-stublibs
 The following actions will be performed:
 === remove 1 package
@@ -1053,7 +1063,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-stublibs.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-stublibs.1: files lib/stublibs/finstalled were already removed
+TRACK                           While removing pkg-stublibs.1: files lib/stublibs/installed-bin were already removed
 -> removed   pkg-stublibs.1
 ACTION                          Cleaning up artefacts of pkg-stublibs.1
 ACTION                          Removing the local metadata
@@ -1061,12 +1071,12 @@ Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
 # OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes not found
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VI:2: Specify destination path
 ### <pkg:pkg-stublibs.1>
 opam-version: "2.0"
 ### <pkg:pkg-stublibs.1:pkg-stublibs.install>
-stublibs: [ "finstalled" {"finstalled.stublibs"} ]
+stublibs: [ "installed-bin" {"installed-bin.stublibs"} ]
 ### OPAMDEBUG=-5 opam install pkg-stublibs
 The following actions will be performed:
 === install 1 package
@@ -1084,10 +1094,10 @@ ACTION                          changes recorded for pkg-stublibs.1: 1 items (ad
 -> installed pkg-stublibs.1
 Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
-added: "lib/stublibs/finstalled.stublibs" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/stublibs/installed-bin.stublibs" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/finstalled.stublibs (+x)
+==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/installed-bin.stublibs (+x)
 ### OPAMDEBUG=-5 opam remove pkg-stublibs
 The following actions will be performed:
 === remove 1 package
@@ -1098,7 +1108,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-stublibs.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-stublibs.1: files lib/stublibs/finstalled.stublibs were already removed
+TRACK                           While removing pkg-stublibs.1: files lib/stublibs/installed-bin.stublibs were already removed
 -> removed   pkg-stublibs.1
 ACTION                          Cleaning up artefacts of pkg-stublibs.1
 ACTION                          Removing the local metadata
@@ -1106,7 +1116,7 @@ Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
 # OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes not found
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VI:3: Non existing filename, with optional argument
 ### <pkg:pkg-stublibs.1>
 opam-version: "2.0"
@@ -1132,7 +1142,7 @@ Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-stublibs
 The following actions will be performed:
 === remove 1 package
@@ -1150,7 +1160,7 @@ Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
 # OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes not found
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VI:4: Non existing filename
 ### <pkg:pkg-stublibs.1>
 opam-version: "2.0"
@@ -1184,18 +1194,18 @@ Some files in ${BASEDIR}/OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.inst
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
 # OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes not found
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::::
 ### :VII: Field 'share'
 ### ::::::::::::::::::
-### <pkg:pkg-share.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-share/pkg-share.1/files
+### cp installed-file REPO/packages/pkg-share/pkg-share.1/files/installed-file
 ### opam switch create sw-share --empty
 ### :VII:1: No defined destination path
 ### <pkg:pkg-share.1>
 opam-version: "2.0"
 ### <pkg:pkg-share.1:pkg-share.install>
-share: [ "finstalled" ]
+share: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-share
 The following actions will be performed:
 === install 1 package
@@ -1214,10 +1224,10 @@ ACTION                          changes recorded for pkg-share.1: 3 items (addit
 -> installed pkg-share.1
 Done.
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
-added: ["share" {"D"} "share/pkg-share" {"D"} "share/pkg-share/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["share" {"D"} "share/pkg-share" {"D"} "share/pkg-share/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-share pkg-share
-==> ${BASEDIR}/OPAM/sw-share/share/pkg-share/finstalled
+==> ${BASEDIR}/OPAM/sw-share/share/pkg-share/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-share
 The following actions will be performed:
 === remove 1 package
@@ -1228,7 +1238,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-share.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-share.1: files share/pkg-share/finstalled, share/pkg-share were already removed
+TRACK                           While removing pkg-share.1: files share/pkg-share/installed-file, share/pkg-share were already removed
 -> removed   pkg-share.1
 ACTION                          Cleaning up artefacts of pkg-share.1
 ACTION                          Removing the local metadata
@@ -1236,12 +1246,12 @@ Done.
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
 # OPAM/sw-share/.opam-switch/install/pkg-share.changes not found
 ### ocaml cat.ml sw-share pkg-share
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VII:2: Specify destination path
 ### <pkg:pkg-share.1>
 opam-version: "2.0"
 ### <pkg:pkg-share.1:pkg-share.install>
-share: [ "finstalled" {"finstalled.share"} ]
+share: [ "installed-file" {"installed-file.share"} ]
 ### OPAMDEBUG=-5 opam install pkg-share
 The following actions will be performed:
 === install 1 package
@@ -1260,10 +1270,10 @@ ACTION                          changes recorded for pkg-share.1: 3 items (addit
 -> installed pkg-share.1
 Done.
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
-added: ["share" {"D"} "share/pkg-share" {"D"} "share/pkg-share/finstalled.share" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["share" {"D"} "share/pkg-share" {"D"} "share/pkg-share/installed-file.share" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-share pkg-share
-==> ${BASEDIR}/OPAM/sw-share/share/pkg-share/finstalled.share
+==> ${BASEDIR}/OPAM/sw-share/share/pkg-share/installed-file.share
 ### OPAMDEBUG=-5 opam remove pkg-share
 The following actions will be performed:
 === remove 1 package
@@ -1274,7 +1284,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-share.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-share.1: files share/pkg-share/finstalled.share, share/pkg-share were already removed
+TRACK                           While removing pkg-share.1: files share/pkg-share/installed-file.share, share/pkg-share were already removed
 -> removed   pkg-share.1
 ACTION                          Cleaning up artefacts of pkg-share.1
 ACTION                          Removing the local metadata
@@ -1282,7 +1292,7 @@ Done.
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
 # OPAM/sw-share/.opam-switch/install/pkg-share.changes not found
 ### ocaml cat.ml sw-share pkg-share
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VII:3: Non existing filename, with optional argument
 ### <pkg:pkg-share.1>
 opam-version: "2.0"
@@ -1310,7 +1320,7 @@ Done.
 added: ["share" {"D"} "share/pkg-share" {"D"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-share pkg-share
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-share
 The following actions will be performed:
 === remove 1 package
@@ -1329,7 +1339,7 @@ Done.
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
 # OPAM/sw-share/.opam-switch/install/pkg-share.changes not found
 ### ocaml cat.ml sw-share pkg-share
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VII:4: Non existing filename
 ### <pkg:pkg-share.1>
 opam-version: "2.0"
@@ -1364,18 +1374,18 @@ Some files in ${BASEDIR}/OPAM/sw-share/.opam-switch/install/pkg-share.install co
 ### opam-cat OPAM/sw-share/.opam-switch/install/pkg-share.changes
 # OPAM/sw-share/.opam-switch/install/pkg-share.changes not found
 ### ocaml cat.ml sw-share pkg-share
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::::::::::::
 ### :VIII: Field 'share_root'
 ### :::::::::::::::::::::::::
-### <pkg:pkg-share_root.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-share_root/pkg-share_root.1/files
+### cp installed-file REPO/packages/pkg-share_root/pkg-share_root.1/files/installed-file
 ### opam switch create sw-share_root --empty
 ### :VIII:1: No defined destination path
 ### <pkg:pkg-share_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-share_root.1:pkg-share_root.install>
-share_root: [ "finstalled" ]
+share_root: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-share_root
 The following actions will be performed:
 === install 1 package
@@ -1394,10 +1404,10 @@ ACTION                          changes recorded for pkg-share_root.1: 2 items (
 -> installed pkg-share_root.1
 Done.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
-added: ["share" {"D"} "share/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["share" {"D"} "share/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> ${BASEDIR}/OPAM/sw-share_root/share/finstalled
+==> ${BASEDIR}/OPAM/sw-share_root/share/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-share_root
 The following actions will be performed:
 === remove 1 package
@@ -1408,7 +1418,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-share_root.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-share_root.1: files share/finstalled were already removed
+TRACK                           While removing pkg-share_root.1: files share/installed-file were already removed
 -> removed   pkg-share_root.1
 ACTION                          Cleaning up artefacts of pkg-share_root.1
 ACTION                          Removing the local metadata
@@ -1416,12 +1426,12 @@ Done.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
 # OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes not found
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VIII:2: Specify destination path
 ### <pkg:pkg-share_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-share_root.1:pkg-share_root.install>
-share_root: [ "finstalled" {"finstalled.share_root"} ]
+share_root: [ "installed-file" {"installed-file.share_root"} ]
 ### OPAMDEBUG=-5 opam install pkg-share_root
 The following actions will be performed:
 === install 1 package
@@ -1440,10 +1450,10 @@ ACTION                          changes recorded for pkg-share_root.1: 2 items (
 -> installed pkg-share_root.1
 Done.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
-added: ["share" {"D"} "share/finstalled.share_root" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["share" {"D"} "share/installed-file.share_root" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> ${BASEDIR}/OPAM/sw-share_root/share/finstalled.share_root
+==> ${BASEDIR}/OPAM/sw-share_root/share/installed-file.share_root
 ### OPAMDEBUG=-5 opam remove pkg-share_root
 The following actions will be performed:
 === remove 1 package
@@ -1454,7 +1464,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-share_root.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-share_root.1: files share/finstalled.share_root were already removed
+TRACK                           While removing pkg-share_root.1: files share/installed-file.share_root were already removed
 -> removed   pkg-share_root.1
 ACTION                          Cleaning up artefacts of pkg-share_root.1
 ACTION                          Removing the local metadata
@@ -1462,7 +1472,7 @@ Done.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
 # OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes not found
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VIII:3: Non existing filename, with optional argument
 ### <pkg:pkg-share_root.1>
 opam-version: "2.0"
@@ -1490,7 +1500,7 @@ Done.
 added: "share" {"D"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-share_root
 The following actions will be performed:
 === remove 1 package
@@ -1508,7 +1518,7 @@ Done.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
 # OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes not found
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :VIII:4: Non existing filename
 ### <pkg:pkg-share_root.1>
 opam-version: "2.0"
@@ -1543,18 +1553,18 @@ Some files in ${BASEDIR}/OPAM/sw-share_root/.opam-switch/install/pkg-share_root.
 ### opam-cat OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes
 # OPAM/sw-share_root/.opam-switch/install/pkg-share_root.changes not found
 ### ocaml cat.ml sw-share_root pkg-share_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::
 ### :IX: Field 'etc'
 ### ::::::::::::::::
-### <pkg:pkg-etc.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-etc/pkg-etc.1/files
+### cp installed-file REPO/packages/pkg-etc/pkg-etc.1/files/installed-file
 ### opam switch create sw-etc --empty
 ### :IX:1: No defined destination path
 ### <pkg:pkg-etc.1>
 opam-version: "2.0"
 ### <pkg:pkg-etc.1:pkg-etc.install>
-etc: [ "finstalled" ]
+etc: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-etc
 The following actions will be performed:
 === install 1 package
@@ -1573,10 +1583,10 @@ ACTION                          changes recorded for pkg-etc.1: 3 items (additio
 -> installed pkg-etc.1
 Done.
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
-added: ["etc" {"D"} "etc/pkg-etc" {"D"} "etc/pkg-etc/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["etc" {"D"} "etc/pkg-etc" {"D"} "etc/pkg-etc/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-etc pkg-etc
-==> ${BASEDIR}/OPAM/sw-etc/etc/pkg-etc/finstalled
+==> ${BASEDIR}/OPAM/sw-etc/etc/pkg-etc/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-etc
 The following actions will be performed:
 === remove 1 package
@@ -1587,7 +1597,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-etc.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-etc.1: files etc/pkg-etc/finstalled, etc/pkg-etc were already removed
+TRACK                           While removing pkg-etc.1: files etc/pkg-etc/installed-file, etc/pkg-etc were already removed
 -> removed   pkg-etc.1
 ACTION                          Cleaning up artefacts of pkg-etc.1
 ACTION                          Removing the local metadata
@@ -1595,12 +1605,12 @@ Done.
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
 # OPAM/sw-etc/.opam-switch/install/pkg-etc.changes not found
 ### ocaml cat.ml sw-etc pkg-etc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :IX:2: Specify destination path
 ### <pkg:pkg-etc.1>
 opam-version: "2.0"
 ### <pkg:pkg-etc.1:pkg-etc.install>
-etc: [ "finstalled" {"finstalled.etc"} ]
+etc: [ "installed-file" {"installed-file.etc"} ]
 ### OPAMDEBUG=-5 opam install pkg-etc
 The following actions will be performed:
 === install 1 package
@@ -1619,10 +1629,10 @@ ACTION                          changes recorded for pkg-etc.1: 3 items (additio
 -> installed pkg-etc.1
 Done.
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
-added: ["etc" {"D"} "etc/pkg-etc" {"D"} "etc/pkg-etc/finstalled.etc" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["etc" {"D"} "etc/pkg-etc" {"D"} "etc/pkg-etc/installed-file.etc" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-etc pkg-etc
-==> ${BASEDIR}/OPAM/sw-etc/etc/pkg-etc/finstalled.etc
+==> ${BASEDIR}/OPAM/sw-etc/etc/pkg-etc/installed-file.etc
 ### OPAMDEBUG=-5 opam remove pkg-etc
 The following actions will be performed:
 === remove 1 package
@@ -1633,7 +1643,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-etc.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-etc.1: files etc/pkg-etc/finstalled.etc, etc/pkg-etc were already removed
+TRACK                           While removing pkg-etc.1: files etc/pkg-etc/installed-file.etc, etc/pkg-etc were already removed
 -> removed   pkg-etc.1
 ACTION                          Cleaning up artefacts of pkg-etc.1
 ACTION                          Removing the local metadata
@@ -1641,7 +1651,7 @@ Done.
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
 # OPAM/sw-etc/.opam-switch/install/pkg-etc.changes not found
 ### ocaml cat.ml sw-etc pkg-etc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :IX:3: Non existing filename, with optional argument
 ### <pkg:pkg-etc.1>
 opam-version: "2.0"
@@ -1669,7 +1679,7 @@ Done.
 added: ["etc" {"D"} "etc/pkg-etc" {"D"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-etc pkg-etc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-etc
 The following actions will be performed:
 === remove 1 package
@@ -1688,7 +1698,7 @@ Done.
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
 # OPAM/sw-etc/.opam-switch/install/pkg-etc.changes not found
 ### ocaml cat.ml sw-etc pkg-etc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :IX:4: Non existing filename
 ### <pkg:pkg-etc.1>
 opam-version: "2.0"
@@ -1723,18 +1733,18 @@ Some files in ${BASEDIR}/OPAM/sw-etc/.opam-switch/install/pkg-etc.install couldn
 ### opam-cat OPAM/sw-etc/.opam-switch/install/pkg-etc.changes
 # OPAM/sw-etc/.opam-switch/install/pkg-etc.changes not found
 ### ocaml cat.ml sw-etc pkg-etc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::
 ### :X: Field 'doc'
 ### :::::::::::::::
-### <pkg:pkg-doc.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-doc/pkg-doc.1/files
+### cp installed-file REPO/packages/pkg-doc/pkg-doc.1/files/installed-file
 ### opam switch create sw-doc --empty
 ### :X:1: No defined destination path
 ### <pkg:pkg-doc.1>
 opam-version: "2.0"
 ### <pkg:pkg-doc.1:pkg-doc.install>
-doc: [ "finstalled" ]
+doc: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-doc
 The following actions will be performed:
 === install 1 package
@@ -1753,10 +1763,10 @@ ACTION                          changes recorded for pkg-doc.1: 2 items (additio
 -> installed pkg-doc.1
 Done.
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
-added: ["doc/pkg-doc" {"D"} "doc/pkg-doc/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["doc/pkg-doc" {"D"} "doc/pkg-doc/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-doc pkg-doc
-==> ${BASEDIR}/OPAM/sw-doc/doc/pkg-doc/finstalled
+==> ${BASEDIR}/OPAM/sw-doc/doc/pkg-doc/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-doc
 The following actions will be performed:
 === remove 1 package
@@ -1767,7 +1777,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-doc.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-doc.1: files doc/pkg-doc/finstalled, doc/pkg-doc were already removed
+TRACK                           While removing pkg-doc.1: files doc/pkg-doc/installed-file, doc/pkg-doc were already removed
 -> removed   pkg-doc.1
 ACTION                          Cleaning up artefacts of pkg-doc.1
 ACTION                          Removing the local metadata
@@ -1775,12 +1785,12 @@ Done.
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
 # OPAM/sw-doc/.opam-switch/install/pkg-doc.changes not found
 ### ocaml cat.ml sw-doc pkg-doc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :X:2: Specify destination path
 ### <pkg:pkg-doc.1>
 opam-version: "2.0"
 ### <pkg:pkg-doc.1:pkg-doc.install>
-doc: [ "finstalled" {"finstalled.doc"} ]
+doc: [ "installed-file" {"installed-file.doc"} ]
 ### OPAMDEBUG=-5 opam install pkg-doc
 The following actions will be performed:
 === install 1 package
@@ -1799,10 +1809,10 @@ ACTION                          changes recorded for pkg-doc.1: 2 items (additio
 -> installed pkg-doc.1
 Done.
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
-added: ["doc/pkg-doc" {"D"} "doc/pkg-doc/finstalled.doc" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["doc/pkg-doc" {"D"} "doc/pkg-doc/installed-file.doc" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-doc pkg-doc
-==> ${BASEDIR}/OPAM/sw-doc/doc/pkg-doc/finstalled.doc
+==> ${BASEDIR}/OPAM/sw-doc/doc/pkg-doc/installed-file.doc
 ### OPAMDEBUG=-5 opam remove pkg-doc
 The following actions will be performed:
 === remove 1 package
@@ -1813,7 +1823,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-doc.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-doc.1: files doc/pkg-doc/finstalled.doc, doc/pkg-doc were already removed
+TRACK                           While removing pkg-doc.1: files doc/pkg-doc/installed-file.doc, doc/pkg-doc were already removed
 -> removed   pkg-doc.1
 ACTION                          Cleaning up artefacts of pkg-doc.1
 ACTION                          Removing the local metadata
@@ -1821,7 +1831,7 @@ Done.
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
 # OPAM/sw-doc/.opam-switch/install/pkg-doc.changes not found
 ### ocaml cat.ml sw-doc pkg-doc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :X:3: Non existing filename, with optional argument
 ### <pkg:pkg-doc.1>
 opam-version: "2.0"
@@ -1849,7 +1859,7 @@ Done.
 added: "doc/pkg-doc" {"D"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-doc pkg-doc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-doc
 The following actions will be performed:
 === remove 1 package
@@ -1868,7 +1878,7 @@ Done.
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
 # OPAM/sw-doc/.opam-switch/install/pkg-doc.changes not found
 ### ocaml cat.ml sw-doc pkg-doc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :X:4: Non existing filename
 ### <pkg:pkg-doc.1>
 opam-version: "2.0"
@@ -1903,19 +1913,19 @@ Some files in ${BASEDIR}/OPAM/sw-doc/.opam-switch/install/pkg-doc.install couldn
 ### opam-cat OPAM/sw-doc/.opam-switch/install/pkg-doc.changes
 # OPAM/sw-doc/.opam-switch/install/pkg-doc.changes not found
 ### ocaml cat.ml sw-doc pkg-doc
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::
 ### :XI: Field 'man'
 ### ::::::::::::::::
 ### # special case for this test, man file to install need to be an archive with a number
-### <pkg:pkg-man.1:finstalled.1.gz>
+### <pkg:pkg-man.1:installed-file.1.gz>
 i'm a fake archive. youhou, i'm installed!
 ### opam switch create sw-man --empty
 ### :XI:1: No defined destination path
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
 ### <pkg:pkg-man.1:pkg-man.install>
-man: [ "finstalled.1.gz" ]
+man: [ "installed-file.1.gz" ]
 ### OPAMDEBUG=-5 opam install pkg-man
 The following actions will be performed:
 === install 1 package
@@ -1933,10 +1943,10 @@ ACTION                          changes recorded for pkg-man.1: 1 items (additio
 -> installed pkg-man.1
 Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
-added: "man/man1/finstalled.1.gz" {"F:29a37105d05441eb9a8c11dd6c060a4f"}
+added: "man/man1/installed-file.1.gz" {"F:29a37105d05441eb9a8c11dd6c060a4f"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-man pkg-man
-==> ${BASEDIR}/OPAM/sw-man/man/man1/finstalled.1.gz
+==> ${BASEDIR}/OPAM/sw-man/man/man1/installed-file.1.gz
 ### OPAMDEBUG=-5 opam remove pkg-man
 The following actions will be performed:
 === remove 1 package
@@ -1947,7 +1957,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-man.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-man.1: files man/man1/finstalled.1.gz were already removed
+TRACK                           While removing pkg-man.1: files man/man1/installed-file.1.gz were already removed
 -> removed   pkg-man.1
 ACTION                          Cleaning up artefacts of pkg-man.1
 ACTION                          Removing the local metadata
@@ -1955,12 +1965,12 @@ Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XI:2: Specify destination path
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
 ### <pkg:pkg-man.1:pkg-man.install>
-man: [ "finstalled.1.gz" {"finstalled.1.gz.man"} ]
+man: [ "installed-file.1.gz" {"installed-file.1.gz.man"} ]
 ### OPAMDEBUG=-5 opam install pkg-man
 The following actions will be performed:
 === install 1 package
@@ -1978,10 +1988,10 @@ ACTION                          changes recorded for pkg-man.1: 1 items (additio
 -> installed pkg-man.1
 Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
-added: "man/finstalled.1.gz.man" {"F:29a37105d05441eb9a8c11dd6c060a4f"}
+added: "man/installed-file.1.gz.man" {"F:29a37105d05441eb9a8c11dd6c060a4f"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-man pkg-man
-==> ${BASEDIR}/OPAM/sw-man/man/finstalled.1.gz.man
+==> ${BASEDIR}/OPAM/sw-man/man/installed-file.1.gz.man
 ### OPAMDEBUG=-5 opam remove pkg-man
 The following actions will be performed:
 === remove 1 package
@@ -1992,7 +2002,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-man.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-man.1: files man/finstalled.1.gz.man were already removed
+TRACK                           While removing pkg-man.1: files man/installed-file.1.gz.man were already removed
 -> removed   pkg-man.1
 ACTION                          Cleaning up artefacts of pkg-man.1
 ACTION                          Removing the local metadata
@@ -2000,7 +2010,7 @@ Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XI:3: Non existing filename, with optional argument
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
@@ -2026,7 +2036,7 @@ Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-man
 The following actions will be performed:
 === remove 1 package
@@ -2044,7 +2054,7 @@ Done.
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XI:4: Non existing filename
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
@@ -2078,15 +2088,15 @@ Some files in ${BASEDIR}/OPAM/sw-man/.opam-switch/install/pkg-man.install couldn
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XI:5: Wrongly-formed filename, no destination specified
 ### # ERROR: this error should be better handled
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
-### <pkg:pkg-man.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-man/pkg-man.1/files
+### cp installed-file REPO/packages/pkg-man/pkg-man.1/files/installed-file
 ### <pkg:pkg-man.1:pkg-man.install>
-man: [ "finstalled" ]
+man: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-man
 The following actions will be performed:
 === install 1 package
@@ -2112,15 +2122,15 @@ OpamStd.OpamSys.Exit(30)
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XI:6: Wrongly-formed filename, with good format destination specified
 ### # ERROR: this error should be better handled
 ### <pkg:pkg-man.1>
 opam-version: "2.0"
-### <pkg:pkg-man.1:finstalled>
-i'm a fake archive. youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-man/pkg-man.1/files
+### cp installed-file REPO/packages/pkg-man/pkg-man.1/files/installed-file
 ### <pkg:pkg-man.1:pkg-man.install>
-man: [ "finstalled" "finstalled.1.gz"]
+man: [ "installed-file" "installed-file.1.gz"]
 ### OPAMDEBUG=-5 opam install pkg-man
 The following actions will be performed:
 === install 1 package
@@ -2146,18 +2156,18 @@ OpamStd.OpamSys.Exit(30)
 ### opam-cat OPAM/sw-man/.opam-switch/install/pkg-man.changes
 # OPAM/sw-man/.opam-switch/install/pkg-man.changes not found
 ### ocaml cat.ml sw-man pkg-man
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::::::::
 ### :XII: Field 'libexec'
 ### :::::::::::::::::::::
-### <pkg:pkg-libexec.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-libexec/pkg-libexec.1/files
+### cp installed-bin REPO/packages/pkg-libexec/pkg-libexec.1/files/installed-bin
 ### opam switch create sw-libexec --empty
 ### :XII:1: No defined destination path
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec.1:pkg-libexec.install>
-libexec: [ "finstalled" ]
+libexec: [ "installed-bin" ]
 ### OPAMDEBUG=-5 opam install pkg-libexec
 The following actions will be performed:
 === install 1 package
@@ -2176,10 +2186,10 @@ ACTION                          changes recorded for pkg-libexec.1: 2 items (add
 -> installed pkg-libexec.1
 Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
-added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/installed-bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/finstalled (+x)
+==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/installed-bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec
 The following actions will be performed:
 === remove 1 package
@@ -2190,7 +2200,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-libexec.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/finstalled, lib/pkg-libexec were already removed
+TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/installed-bin, lib/pkg-libexec were already removed
 -> removed   pkg-libexec.1
 ACTION                          Cleaning up artefacts of pkg-libexec.1
 ACTION                          Removing the local metadata
@@ -2198,12 +2208,12 @@ Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
 # OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes not found
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XII:2: Specify destination path
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec.1:pkg-libexec.install>
-libexec: [ "finstalled" {"finstalled.libexec"} ]
+libexec: [ "installed-bin" {"installed-bin.libexec"} ]
 ### OPAMDEBUG=-5 opam install pkg-libexec
 The following actions will be performed:
 === install 1 package
@@ -2222,10 +2232,10 @@ ACTION                          changes recorded for pkg-libexec.1: 2 items (add
 -> installed pkg-libexec.1
 Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
-added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/finstalled.libexec" {"F:a611026bf7b99362c57473c4e1ef30a0"}]
+added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/installed-bin.libexec" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/finstalled.libexec (+x)
+==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/installed-bin.libexec (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec
 The following actions will be performed:
 === remove 1 package
@@ -2236,7 +2246,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-libexec.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/finstalled.libexec, lib/pkg-libexec were already removed
+TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/installed-bin.libexec, lib/pkg-libexec were already removed
 -> removed   pkg-libexec.1
 ACTION                          Cleaning up artefacts of pkg-libexec.1
 ACTION                          Removing the local metadata
@@ -2244,7 +2254,7 @@ Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
 # OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes not found
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XII:3: Non existing filename, with optional argument
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
@@ -2272,7 +2282,7 @@ Done.
 added: "lib/pkg-libexec" {"D"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-libexec
 The following actions will be performed:
 === remove 1 package
@@ -2291,7 +2301,7 @@ Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
 # OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes not found
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XII:4: Non existing filename
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
@@ -2326,18 +2336,18 @@ Some files in ${BASEDIR}/OPAM/sw-libexec/.opam-switch/install/pkg-libexec.instal
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
 # OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes not found
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :::::::::::::::::::::::
 ### :XIII: Field 'lib_root'
 ### :::::::::::::::::::::::
-### <pkg:pkg-lib_root.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-lib_root/pkg-lib_root.1/files
+### cp installed-file REPO/packages/pkg-lib_root/pkg-lib_root.1/files/installed-file
 ### opam switch create sw-lib_root --empty
 ### :XIII:1: No defined destination path
 ### <pkg:pkg-lib_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-lib_root.1:pkg-lib_root.install>
-lib_root: [ "finstalled" ]
+lib_root: [ "installed-file" ]
 ### OPAMDEBUG=-5 opam install pkg-lib_root
 The following actions will be performed:
 === install 1 package
@@ -2355,10 +2365,10 @@ ACTION                          changes recorded for pkg-lib_root.1: 1 items (ad
 -> installed pkg-lib_root.1
 Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
-added: "lib/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/installed-file" {"F:a611026bf7b99362c57473c4e1ef30a0"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> ${BASEDIR}/OPAM/sw-lib_root/lib/finstalled
+==> ${BASEDIR}/OPAM/sw-lib_root/lib/installed-file
 ### OPAMDEBUG=-5 opam remove pkg-lib_root
 The following actions will be performed:
 === remove 1 package
@@ -2376,12 +2386,12 @@ Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
 # OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes not found
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIII:2: Specify destination path
 ### <pkg:pkg-lib_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-lib_root.1:pkg-lib_root.install>
-lib_root: [ "finstalled" {"finstalled.lib_root"} ]
+lib_root: [ "installed-file" {"installed-file.lib_root"} ]
 ### OPAMDEBUG=-5 opam install pkg-lib_root
 The following actions will be performed:
 === install 1 package
@@ -2399,10 +2409,10 @@ ACTION                          changes recorded for pkg-lib_root.1: 1 items (ad
 -> installed pkg-lib_root.1
 Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
-added: "lib/finstalled.lib_root" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/installed-file.lib_root" {"F:a611026bf7b99362c57473c4e1ef30a0"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> ${BASEDIR}/OPAM/sw-lib_root/lib/finstalled.lib_root
+==> ${BASEDIR}/OPAM/sw-lib_root/lib/installed-file.lib_root
 ### OPAMDEBUG=-5 opam remove pkg-lib_root
 The following actions will be performed:
 === remove 1 package
@@ -2420,7 +2430,7 @@ Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
 # OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes not found
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIII:3: Non existing filename, with optional argument
 ### <pkg:pkg-lib_root.1>
 opam-version: "2.0"
@@ -2446,7 +2456,7 @@ Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-lib_root
 The following actions will be performed:
 === remove 1 package
@@ -2464,7 +2474,7 @@ Done.
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
 # OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes not found
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIII:4: Non existing filename
 ### <pkg:pkg-lib_root.1>
 opam-version: "2.0"
@@ -2498,18 +2508,18 @@ Some files in ${BASEDIR}/OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.inst
 ### opam-cat OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes
 # OPAM/sw-lib_root/.opam-switch/install/pkg-lib_root.changes not found
 ### ocaml cat.ml sw-lib_root pkg-lib_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### ::::::::::::::::::::::::::
 ### :XIV: Field 'libexec_root'
 ### ::::::::::::::::::::::::::
-### <pkg:pkg-libexec_root.1:finstalled>
-youhou, i'm installed!
+### mkdir -p REPO/packages/pkg-libexec_root/pkg-libexec_root.1/files
+### cp installed-bin REPO/packages/pkg-libexec_root/pkg-libexec_root.1/files/installed-bin
 ### opam switch create sw-libexec_root --empty
 ### :XIV:1: No defined destination path
 ### <pkg:pkg-libexec_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec_root.1:pkg-libexec_root.install>
-libexec_root: [ "finstalled" ]
+libexec_root: [ "installed-bin" ]
 ### OPAMDEBUG=-5 opam install pkg-libexec_root
 The following actions will be performed:
 === install 1 package
@@ -2527,10 +2537,10 @@ ACTION                          changes recorded for pkg-libexec_root.1: 1 items
 -> installed pkg-libexec_root.1
 Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
-added: "lib/finstalled" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/installed-bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> ${BASEDIR}/OPAM/sw-libexec_root/lib/finstalled (+x)
+==> ${BASEDIR}/OPAM/sw-libexec_root/lib/installed-bin (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec_root
 The following actions will be performed:
 === remove 1 package
@@ -2548,12 +2558,12 @@ Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
 # OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes not found
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIV:2: Specify destination path
 ### <pkg:pkg-libexec_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec_root.1:pkg-libexec_root.install>
-libexec_root: [ "finstalled" {"finstalled.libexec_root"} ]
+libexec_root: [ "installed-bin" {"installed-bin.libexec_root"} ]
 ### OPAMDEBUG=-5 opam install pkg-libexec_root
 The following actions will be performed:
 === install 1 package
@@ -2571,10 +2581,10 @@ ACTION                          changes recorded for pkg-libexec_root.1: 1 items
 -> installed pkg-libexec_root.1
 Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
-added: "lib/finstalled.libexec_root" {"F:a611026bf7b99362c57473c4e1ef30a0"}
+added: "lib/installed-bin.libexec_root" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> ${BASEDIR}/OPAM/sw-libexec_root/lib/finstalled.libexec_root (+x)
+==> ${BASEDIR}/OPAM/sw-libexec_root/lib/installed-bin.libexec_root (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec_root
 The following actions will be performed:
 === remove 1 package
@@ -2592,7 +2602,7 @@ Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
 # OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes not found
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIV:3: Non existing filename, with optional argument
 ### <pkg:pkg-libexec_root.1>
 opam-version: "2.0"
@@ -2618,7 +2628,7 @@ Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### OPAMDEBUG=-5 opam remove pkg-libexec_root
 The following actions will be performed:
 === remove 1 package
@@ -2636,7 +2646,7 @@ Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
 # OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes not found
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
 ### :XIV:4: Non existing filename
 ### <pkg:pkg-libexec_root.1>
 opam-version: "2.0"
@@ -2670,4 +2680,4 @@ Some files in ${BASEDIR}/OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_r
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
 # OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes not found
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> No 'finstalled' file found
+==> No 'installed-file' or 'installed-bin' found
