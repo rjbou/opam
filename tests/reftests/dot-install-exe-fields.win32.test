@@ -19,7 +19,7 @@ N0REP0
 ### :    * man: it needs a specific file format
 ### :::::::
 ### OPAMYES=1
-### # we need to disable strict bc of erroring warnings
+### # we need to disable strict bc of erroring warnings
 ### OPAMSTRICT=0
 ### # we neeed the precise tracking to have a sha in changes file instead of timestamp
 ### OPAMPRECISETRACKING=1
@@ -157,7 +157,7 @@ Done.
 ### <pkg:pkg-bin.1>
 opam-version: "2.0"
 ### <pkg:pkg-bin.1:pkg-bin.install>
-bin: [ "installed-bin.exe" {"installed-bin.exe.bin"} ]
+bin: [ "installed-bin.exe" {"installed-bin.bin.exe"} ]
 ### OPAMDEBUG=-5 opam install pkg-bin
 The following actions will be performed:
 === install 1 package
@@ -175,10 +175,10 @@ ACTION                          changes recorded for pkg-bin.1: 1 items (additio
 -> installed pkg-bin.1
 Done.
 ### opam-cat OPAM/sw-bin/.opam-switch/install/pkg-bin.changes
-added: "bin/installed-bin.exe.bin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
+added: "bin/installed-bin.bin.exe" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-bin pkg-bin
-==> ${BASEDIR}/OPAM/sw-bin/bin/installed-bin.exe.bin (+x)
+==> ${BASEDIR}/OPAM/sw-bin/bin/installed-bin.bin.exe (+x)
 ### OPAMDEBUG=-5 opam remove pkg-bin
 The following actions will be performed:
 === remove 1 package
@@ -189,7 +189,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-bin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-bin.1: files bin/installed-bin.exe.bin were already removed
+TRACK                           While removing pkg-bin.1: files bin/installed-bin.bin.exe were already removed
 -> removed   pkg-bin.1
 ACTION                          Cleaning up artefacts of pkg-bin.1
 ACTION                          Removing the local metadata
@@ -377,7 +377,7 @@ Done.
 ### <pkg:pkg-sbin.1>
 opam-version: "2.0"
 ### <pkg:pkg-sbin.1:pkg-sbin.install>
-sbin: [ "installed-bin.exe" {"installed-bin.exe.sbin"} ]
+sbin: [ "installed-bin.exe" {"installed-bin.sbin.exe"} ]
 ### OPAMDEBUG=-5 opam install pkg-sbin
 The following actions will be performed:
 === install 1 package
@@ -395,10 +395,10 @@ ACTION                          changes recorded for pkg-sbin.1: 1 items (additi
 -> installed pkg-sbin.1
 Done.
 ### opam-cat OPAM/sw-sbin/.opam-switch/install/pkg-sbin.changes
-added: "sbin/installed-bin.exe.sbin" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
+added: "sbin/installed-bin.sbin.exe" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-sbin pkg-sbin
-==> ${BASEDIR}/OPAM/sw-sbin/sbin/installed-bin.exe.sbin (+x)
+==> ${BASEDIR}/OPAM/sw-sbin/sbin/installed-bin.sbin.exe (+x)
 ### OPAMDEBUG=-5 opam remove pkg-sbin
 The following actions will be performed:
 === remove 1 package
@@ -409,7 +409,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-sbin.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-sbin.1: files sbin/installed-bin.exe.sbin were already removed
+TRACK                           While removing pkg-sbin.1: files sbin/installed-bin.sbin.exe were already removed
 -> removed   pkg-sbin.1
 ACTION                          Cleaning up artefacts of pkg-sbin.1
 ACTION                          Removing the local metadata
@@ -597,7 +597,7 @@ Done.
 ### <pkg:pkg-stublibs.1>
 opam-version: "2.0"
 ### <pkg:pkg-stublibs.1:pkg-stublibs.install>
-stublibs: [ "installed-bin.exe" {"installed-bin.exe.stublibs"} ]
+stublibs: [ "installed-bin.exe" {"installed-bin.stublibs.exe"} ]
 ### OPAMDEBUG=-5 opam install pkg-stublibs
 The following actions will be performed:
 === install 1 package
@@ -615,10 +615,10 @@ ACTION                          changes recorded for pkg-stublibs.1: 1 items (ad
 -> installed pkg-stublibs.1
 Done.
 ### opam-cat OPAM/sw-stublibs/.opam-switch/install/pkg-stublibs.changes
-added: "lib/stublibs/installed-bin.exe.stublibs" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
+added: "lib/stublibs/installed-bin.stublibs.exe" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-stublibs pkg-stublibs
-==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/installed-bin.exe.stublibs (+x)
+==> ${BASEDIR}/OPAM/sw-stublibs/lib/stublibs/installed-bin.stublibs.exe (+x)
 ### OPAMDEBUG=-5 opam remove pkg-stublibs
 The following actions will be performed:
 === remove 1 package
@@ -629,7 +629,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-stublibs.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-stublibs.1: files lib/stublibs/installed-bin.exe.stublibs were already removed
+TRACK                           While removing pkg-stublibs.1: files lib/stublibs/installed-bin.stublibs.exe were already removed
 -> removed   pkg-stublibs.1
 ACTION                          Cleaning up artefacts of pkg-stublibs.1
 ACTION                          Removing the local metadata
@@ -818,7 +818,7 @@ Done.
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec.1:pkg-libexec.install>
-libexec: [ "installed-bin.exe" {"installed-bin.exe.libexec"} ]
+libexec: [ "installed-bin.exe" {"installed-bin.libexec.exe"} ]
 ### OPAMDEBUG=-5 opam install pkg-libexec
 The following actions will be performed:
 === install 1 package
@@ -837,10 +837,10 @@ ACTION                          changes recorded for pkg-libexec.1: 2 items (add
 -> installed pkg-libexec.1
 Done.
 ### opam-cat OPAM/sw-libexec/.opam-switch/install/pkg-libexec.changes
-added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/installed-bin.exe.libexec" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}]
+added: ["lib/pkg-libexec" {"D"} "lib/pkg-libexec/installed-bin.libexec.exe" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}]
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec pkg-libexec
-==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/installed-bin.exe.libexec (+x)
+==> ${BASEDIR}/OPAM/sw-libexec/lib/pkg-libexec/installed-bin.libexec.exe (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec
 The following actions will be performed:
 === remove 1 package
@@ -851,7 +851,7 @@ FILE(config)                    Read ${BASEDIR}/OPAM/config in 0.000s
 ACTION                          Removing pkg-libexec.1
 ACTION                          Removing files from .install
 ACTION                          Removing the misc files
-TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/installed-bin.exe.libexec, lib/pkg-libexec were already removed
+TRACK                           While removing pkg-libexec.1: files lib/pkg-libexec/installed-bin.libexec.exe, lib/pkg-libexec were already removed
 -> removed   pkg-libexec.1
 ACTION                          Cleaning up artefacts of pkg-libexec.1
 ACTION                          Removing the local metadata
@@ -943,7 +943,7 @@ Some files in ${BASEDIR}/OPAM/sw-libexec/.opam-switch/install/pkg-libexec.instal
 ### ocaml cat.ml sw-libexec pkg-libexec
 ==> No 'installed-bin.exe' found
 ### :IV:5: Default install with no executable bit
-### mv REPO/packages/pkg-libexec/pkg-libexec.1/files/installed-bin.exe.exe REPO/packages/pkg-libexec/pkg-libexec.1/files/installed-bin.exe
+### mv REPO/packages/pkg-libexec/pkg-libexec.1/files/installed-bin.exe REPO/packages/pkg-libexec/pkg-libexec.1/files/installed-bin
 ### <pkg:pkg-libexec.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec.1:pkg-libexec.install>
@@ -1042,7 +1042,7 @@ Done.
 ### <pkg:pkg-libexec_root.1>
 opam-version: "2.0"
 ### <pkg:pkg-libexec_root.1:pkg-libexec_root.install>
-libexec_root: [ "installed-bin.exe" {"installed-bin.exe.libexec_root"} ]
+libexec_root: [ "installed-bin.exe" {"installed-bin.libexec_root.exe"} ]
 ### OPAMDEBUG=-5 opam install pkg-libexec_root
 The following actions will be performed:
 === install 1 package
@@ -1060,10 +1060,10 @@ ACTION                          changes recorded for pkg-libexec_root.1: 1 items
 -> installed pkg-libexec_root.1
 Done.
 ### opam-cat OPAM/sw-libexec_root/.opam-switch/install/pkg-libexec_root.changes
-added: "lib/installed-bin.exe.libexec_root" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
+added: "lib/installed-bin.libexec_root.exe" {"F:fda59d3854ebb0b5f5fff2b3996b260a"}
 opam-version: "2.0"
 ### ocaml cat.ml sw-libexec_root pkg-libexec_root
-==> ${BASEDIR}/OPAM/sw-libexec_root/lib/installed-bin.exe.libexec_root (+x)
+==> ${BASEDIR}/OPAM/sw-libexec_root/lib/installed-bin.libexec_root.exe (+x)
 ### OPAMDEBUG=-5 opam remove pkg-libexec_root
 The following actions will be performed:
 === remove 1 package
