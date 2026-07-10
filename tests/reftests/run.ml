@@ -653,7 +653,7 @@ let common_filters ?opam dir =
   in
   let extra_dotinstall_dirs d =
     seq [ str "files "; str d; set "/\\" ],
-    Sed (d^"/");
+    Sed ("files "^d^"/");
   in
   [
     seq [ bol;
