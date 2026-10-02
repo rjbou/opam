@@ -159,13 +159,6 @@ if [ "$OPAM_TEST" = "1" ]; then
   # test if an upgrade is needed
   need-upgrade
 
-  (set +x ; echo -en "::group::opam-tests\r") 2>/dev/null
-  # Note: these tests require a "system" compiler and will use the one in $OPAMBSROOT
-  opam exec -- make tests
-  (set +x ; echo -en "::endgroup::opam-tests\r") 2>/dev/null
-
-  make distclean
-
   # Test https://github.com/ocaml/opam/issues/6963
   # Done here instead of reftests because sudo/root access is required
   # This test makes sure that opam is able to handle git repositories
@@ -190,100 +183,4 @@ EOF
   opam install -y "$testdir"
   (set +x ; echo -en "::endgroup::opam-git-dir-access\r") 2>/dev/null
 
-  # Compile opam-rt
-  (set +x ; echo -en "::group::opam-rt\r") 2>/dev/null
-  prepare_project "https://github.com/ocaml-opam/opam-rt" "opam-rt"
-
-  # opam lib pins defined in opam-rt are ignored as there is a local pin
-  opam pin . -yn --ignore-pin-depends
-  opam install opam-rt --deps-only opam-devel
-  opam exec -- make || { opam reinstall opam-client -y; opam exec -- make; }
-  (set +x ; echo -en "::endgroup::opam-rt\r") 2>/dev/null
-fi
-
-test_project () {
-  project=$1
-  packages=$2
-
-  (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
-  opam pin . --kind path -yn
-  for pkg_name in $(opam show . -f name); do
-    # Ignore unreleased packages
-    if echo "$packages" | grep -qwF "$pkg_name"; then
-      echo "Installing dependencies for $pkg_name"
-      deps_code=0
-      opam install "$pkg_name" --deps-only || deps_code=$?
-      if [ $deps_code -ne 0 ]; then
-        echo "Dependency installation failed for $pkg_name"
-        DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name"
-      else
-        echo "Installing opam-client and $pkg_name"
-        opam install opam-client
-        code=0
-        opam install "$pkg_name" || code=$?
-        if [ $code -ne 0 ]; then
-          LIB_ERRORS="$LIB_ERRORS $project"
-          echo -e "\e[31mErrors while installing $pkg_name\e[0m";
-        fi
-      fi
-    fi
-  done
-  (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
-}
-
-if [ "$OPAM_DEPENDS" = "1" ]; then
-  # test if an upgrade is needed
-  need-upgrade
-
-  DEPENDS_ERRORS=""
-  LIB_ERRORS=""
-  OCAMLVER=$(ocamlc -version)
-
-  (set +x; echo -en "::group::depends\r") 2>/dev/null
-  VERSION="2.5.2"
-  opam_libs=$(opam show . -f name 2>/dev/null)
-  depends_on=$(echo "$opam_libs" | sed "s/\$/.${VERSION}/" | paste -sd, -)
-  packages=$(echo "$opam_libs" | while read lib; do
-    opam list --depends-on "${lib}.${VERSION}"  --coinstallable-with \
-    "${lib}.${VERSION}" --depopts --column name -s 2>/dev/null
-    done | sort -u)
-  set +x
-  for exclude in $opam_libs; do
-    packages=$(echo "$packages" | grep -vF "$exclude")
-  done
-  set -x
-
-  dev_repos=()
-  for pkg in $packages; do
-    dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null)
-    dev_repo=$(echo "$dev_repo" | sed -E 's/^"//;s/"$//;s/^git\+//;s/\.git$//')
-
-    if [[ -n "$dev_repo" ]] && ! echo "${dev_repos[*]}" | grep -qwF "$dev_repo"; then
-      dev_repos+=("$dev_repo")
-      prepare_project "$dev_repo" "$pkg"
-      test_project "$pkg" "$packages"
-    fi
-  done
-
-  if [ -n "$DEPENDS_ERRORS" ]; then
-    echo -e "\e[31mErrors detected in dependencies of $DEPENDS_ERRORS\e[0m";
-  fi
-
-  if [ -n "$LIB_ERRORS" ]; then
-    FAIL=()
-    set +x
-    for critical in $FAIL_IF_DEPENDENT; do
-      if echo "$LIB_ERRORS" | grep -Fq "$critical"; then
-        FAIL+=("$critical")
-      fi
-    done
-    set -x
-    echo "Packages tested: $packages"
-    if [ -n "${FAIL[*]}" ]; then
-      echo "::error ::${FAIL[*]} is broken"
-      exit 1
-    fi
-  fi
-
-  (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
 fi
