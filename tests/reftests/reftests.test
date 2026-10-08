@@ -43,8 +43,7 @@ opam-version: "2.0"
 opam-version: "2.0"
 ### opam list --all
 # Packages matching: any
-# Name # Installed # Synopsis
-foo    --
+# No matches found
 ### :II:3: extrafile file in repo
 ### <pkg:foo.1:xfile>
 i'm with package foo
@@ -824,6 +823,11 @@ install:
   [
     [ "true" ]
   ]
+### opam update default
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] synchronised from file://${BASEDIR}/REPO
+Now run 'opam upgrade' to apply any package updates.
 ### opam-cat pkg.opam
 build: ["false"]
 install: [["true"]]
